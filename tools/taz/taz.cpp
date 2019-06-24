@@ -581,10 +581,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pPowder->setIcon(load_icon("res/icons/weather-snow.svg"));
 	pMenuCalc->addAction(pPowder);
 
-	QAction *pDisp = new QAction("Dispersions...", this);
-	//pDisp->setIcon(load_icon("disp.svg"));
-	pMenuCalc->addAction(pDisp);
-
 	pMenuCalc->addSeparator();
 
 	QAction *pDynPlane = new QAction("Kinematic Plane...", this);
@@ -747,7 +743,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QObject::connect(pCompProps, SIGNAL(triggered()), this, SLOT(ShowTofDlg()));
 	QObject::connect(m_pGoto, SIGNAL(triggered()), this, SLOT(ShowGotoDlg()));
 	QObject::connect(pPowder, SIGNAL(triggered()), this, SLOT(ShowPowderDlg()));
-	QObject::connect(pDisp, SIGNAL(triggered()), this, SLOT(ShowDispDlg()));
 	QObject::connect(pSpuri, SIGNAL(triggered()), this, SLOT(ShowSpurions()));
 	QObject::connect(pDW, SIGNAL(triggered()), this, SLOT(ShowDWDlg()));
 	QObject::connect(pDynPlane, SIGNAL(triggered()), this, SLOT(ShowDynPlaneDlg()));
@@ -935,7 +930,6 @@ void TazDlg::DeleteDialogs()
 	if(m_pAtomsDlg) { delete m_pAtomsDlg; m_pAtomsDlg = nullptr; }
 	if(m_pDeadAnglesDlg) { delete m_pDeadAnglesDlg; m_pDeadAnglesDlg = nullptr; }
 	if(m_pPowderDlg) { delete m_pPowderDlg; m_pPowderDlg = 0; }
-	if(m_pDispDlg) { delete m_pDispDlg; m_pDispDlg = 0; }
 
 #if !defined NO_3D
 	if(m_pRecip3d) { delete m_pRecip3d; m_pRecip3d = 0; }
@@ -1107,15 +1101,6 @@ void TazDlg::ShowPowderDlg()
 	}
 
 	focus_dlg(m_pPowderDlg);
-}
-
-
-void TazDlg::ShowDispDlg()
-{
-	if(!m_pDispDlg)
-		m_pDispDlg = new DispDlg(this, &m_settings);
-
-	focus_dlg(m_pDispDlg);
 }
 
 

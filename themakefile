@@ -410,7 +410,7 @@ OBJ_TAZ = obj/taz_main.o obj/taz.o obj/taz_crys.o \
 	obj/proj_lattice.o \
 	obj/tas_layout.o obj/tof_layout.o \
 	obj/RecipParamDlg.o obj/RealParamDlg.o obj/GotoDlg.o obj/PowderDlg.o \
-	obj/DispDlg.o obj/FavDlg.o \
+	obj/FavDlg.o \
 	obj/SettingsDlg.o obj/DWDlg.o obj/DynPlaneDlg.o obj/FormfactorDlg.o \
 	obj/FilePreviewDlg.o obj/AtomsDlg.o \
 	obj/SpurionDlg.o obj/NeutronDlg.o obj/TOFDlg.o \
@@ -623,8 +623,6 @@ obj/qthelper.o: libs/qt/qthelper.cpp libs/qt/qthelper.h
 obj/qwthelper.o: libs/qt/qwthelper.cpp libs/qt/qwthelper.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/PowderDlg.o: dialogs/PowderDlg.cpp dialogs/PowderDlg.h tlibs/phys/lattice.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/DispDlg.o: dialogs/DispDlg.cpp dialogs/DispDlg.h tlibs/phys/nn.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/SpurionDlg.o: dialogs/SpurionDlg.cpp dialogs/SpurionDlg.h
 	${CC} ${FLAGS} -c -o $@ $<
