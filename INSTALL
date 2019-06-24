@@ -1,0 +1,77 @@
+Preparations before compilation
+-------------------------------
+
+
+Install (developer versions of) all required libraries either from your
+system's package manager or directly from the given URLs:
+	* Boost: http://www.boost.org
+	* Qt 4: http://www.qt.io
+	* Qwt 6: http://qwt.sourceforge.net
+	* Clipper: http://www.ysbl.york.ac.uk/~cowtan/clipper/
+	* Minuit 2: http://seal.web.cern.ch/seal/snapshot/work-packages/mathlibs/minuit/release/download.html
+
+For example, on *buntu systems, use the following commands:
+	* sudo su
+	* apt-get install cmake clang build-essential libboost-all-dev libclipper-dev libqt4-dev qt4-dev-tools libqwt-dev python-dev libfreetype6-dev wget
+	* wget http://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz
+	* tar -xzvf Minuit2-5.34.14.tar.gz
+	* cd Minuit2-5.34.14
+	* ./configure --disable-openmp
+	* make && make install
+	* exit
+
+
+
+===============================================================================
+
+
+
+Set up other external dependencies:
+------------------------------
+	* cd to Takin dir
+	* ./setup_externals.sh
+
+
+
+===============================================================================
+
+
+
+Building Takin using the CMake path
+-----------------------------------
+
+
+Takin has to be compiled with a fully C++11 compliant compiler, e.g.:
+	* GCC version 4.8 or above
+	* Clang
+
+Make using CMake:
+	* mkdir build
+	* cd build
+	* cmake ..
+	* make
+	* optional: make install (as root)
+
+Run program with
+	* takin
+	* Or, in case tlibs is not found, 
+	  e.g.: LD_LIBRARY_PATH=/usr/local/lib takin
+
+
+
+===============================================================================
+
+
+
+Alternative building path
+-------------------------
+
+	* Open "themakefile" in your favourite editor.
+	* Adapt the flags in the first few lines according to your system.
+	* Build Takin using "./build.sh"
+	* Run "./gentab" to create required tables
+	* Run Takin with "./takin".
+
+
+
+===============================================================================

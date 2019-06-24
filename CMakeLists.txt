@@ -1,0 +1,465 @@
+#
+# Takin
+# @author Tobias Weber <tobias.weber@tum.de>
+# @date 2013-2019
+# @license GPLv2
+#
+
+project(takin)
+cmake_minimum_required(VERSION 3.0)
+
+# native or mingw build?
+set(BUILD_FOR_MINGW FALSE)
+#set(BUILD_FOR_MINGW TRUE)
+
+
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_CXX_STANDARD 11)
+#set(BUILD_SHARED_LIBS TRUE)
+set(USE_TR1_FUNCS FALSE)
+
+
+if(BUILD_FOR_MINGW)
+	# stuff needed by mingw
+	set(SOCK2 "ws2_32")
+	set(USE_GENTAB FALSE)
+	set(USE_RtMp FALSE)
+	set(SEARCH_PY FALSE)
+else()
+	set(SOCK2 "")
+	set(USE_GENTAB TRUE)
+	set(USE_RtMp TRUE)
+	set(SEARCH_PY TRUE)
+endif()
+
+
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}" "." "${PROJECT_SOURCE_DIR}/tlibs")
+set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+
+set(Boost_DEBUG FALSE)
+set(Boost_FIND_QUIETLY FALSE)
+set(BOOST_COMPS program_options iostreams filesystem system)
+
+if(USE_TR1_FUNCS)
+	list(APPEND BOOST_COMPS regex)
+endif()
+
+if(SEARCH_PY)
+	find_package(PythonInterp 3.7)
+	find_package(PythonLibs 3.7)
+endif()
+
+if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
+	list(APPEND BOOST_COMPS python)
+#	list(APPEND BOOST_COMPS python37)
+endif()
+
+
+find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} REQUIRED)
+find_package(Threads REQUIRED)
+find_package(Qt5 REQUIRED Core Widgets Gui OpenGL)
+find_package(PNG REQUIRED)
+find_package(Qwt REQUIRED)
+find_package(Minuit2)
+find_package(ZLIB)
+find_package(BZip2)
+
+if(USE_RtMp)
+	find_package(RtMp REQUIRED)
+else()
+	set(Rt_LIBRARIES "")
+	set(Mp_LIBRARIES "")
+endif()
+if(USE_GENTAB)
+	find_package(Clipper REQUIRED)
+endif()
+
+set(OpenGL_GL_PREFERENCE GLVND)
+find_package(OpenGL)
+find_package(Freetype)
+find_package(X11)
+
+
+
+# boost provides its own FindBoost substitute which does not set Boost_LIBRARIES!
+if("${Boost_LIBRARIES}" STREQUAL "")
+	message("Boost libraries not set, attempting to do it manually...")
+
+	foreach(comp ${BOOST_COMPS})
+		list(APPEND Boost_LIBRARIES Boost::${comp})
+	endforeach(comp)
+
+	message("Boost libraries: ${Boost_LIBRARIES}")
+endif()
+
+
+#message("Project source dir: ${PROJECT_SOURCE_DIR}")
+#message("CMake source dir: ${CMAKE_SOURCE_DIR}")
+#message("Binary dir: ${CMAKE_BINARY_DIR}")
+message("Install path prefix: ${CMAKE_INSTALL_PREFIX}")
+message("Using Qwt version ${QWT_MAJOR_VERSION}")
+message("Using Boost version ${Boost_VERSION}")
+message("Using Zlib version ${ZLIB_VERSION_STRING}")
+message("Using Bzip2 version ${BZIP2_VERSION_STRING}")
+message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
+
+
+add_definitions(-DNDEBUG)
+add_definitions(-DUSE_NET -DUSE_IOSTR -DUSE_CIF)
+add_definitions(-DNO_LAPACK)
+add_definitions(-DNO_JPEG -DNO_TIFF)
+add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+#add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)
+add_definitions(-DTLIBS_INC_HDR_IMPLS)
+
+if(USE_TR1_FUNCS)
+	add_definitions(-DUSE_BOOST_REX)
+endif()
+if(NOT BUILD_FOR_MINGW)
+	add_definitions(-DUSE_MULTI_TEXTURES)
+else()
+	add_definitions(-DNO_HELP_ASSISTANT)
+	add_definitions(-DNO_TERM_CMDS)
+	add_definitions(-DUSE_WIDE_STR)
+endif()
+
+# hack to prevent math_fwd.h inclusion
+add_definitions(-DBOOST_MATH_FWD_HPP)
+
+
+include_directories("${PROJECT_SOURCE_DIR}" ".")
+include_directories("${Boost_INCLUDE_DIRS}/..")
+include_directories("${PNG_INCLUDE_DIRS}")
+#include_directories("${JPEG_INCLUDE_DIRS} ${TIFF_INCLUDE_DIRS}")
+include_directories("${QT_INCLUDE_DIR}")
+include_directories("${QWT_INCLUDE_DIRS}")
+include_directories("${ZLIB_INCLUDE_DIRS}")
+include_directories("${BZIP2_INCLUDE_DIR}")
+
+
+
+# py scripting support
+if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
+	message("Enabling py scripting support.")
+
+	add_definitions(-DUSE_PY)
+	include_directories("${PYTHON_INCLUDE_DIRS}")
+
+	set(SRCS_PY tools/monteconvo/sqw_py.cpp)
+	set(LIBS_PY ${PYTHON_LIBRARIES})
+else()
+	message("Disabling py scripting support.")
+
+	add_definitions(-DNO_PY)
+endif()
+
+
+# fitting support
+if(Minuit2_FOUND)
+	message("Enabling fitting support.")
+	include_directories("${Minuit2_INCLUDE_DIRS}")
+	set(LIBS_FIT ${Minuit2_LIBRARIES})
+else()
+	message("Disabling fitting support.")
+	add_definitions(-DNO_FIT)
+endif()
+
+
+
+if(X11_FOUND)
+	include_directories(${X11_X11_INCLUDE_PATH})
+else()
+	set(X11_X11_LIB "")
+endif()
+
+
+
+# 3d support
+if(OPENGL_FOUND AND FREETYPE_FOUND)
+	message("Enabling 3D support. Inc: \"${OPENGL_INCLUDE_DIR}\".")
+
+	include_directories("${FREETYPE_INCLUDE_DIRS}")
+	if(NOT "${OPENGL_INCLUDE_DIR}" STREQUAL "")
+		include_directories("${OPENGL_INCLUDE_DIR}")
+		include_directories("${OPENGL_INCLUDE_DIR}/GL" "${OPENGL_INCLUDE_DIR}/OpenGL")
+	else()
+		message("Empty OGL dirs, guessing some defaults.")
+		include_directories("/usr/include/GL" "/usr/include/OpenGL" "/usr/x86_64-w64-mingw32/sys-root/mingw/include/GL")
+	endif()
+
+	add_definitions(-DUSE_3D)
+
+	set(SRCS_3D
+		libs/plotgl.cpp libs/plotgl2.cpp tools/taz/recip3d.cpp
+		tools/taz/real3d.cpp tools/taz/bz3d.cpp dialogs/EllipseDlg3D.cpp
+
+		tlibs/gfx/gl.cpp
+	)
+	set(LIBS_3D
+		${FREETYPE_LIBRARY}
+		Qt5::QtOpenGL ${OPENGL_LIBRARIES}
+		${X11_X11_LIB}
+	)
+else()
+	message("Disabling 3D support: OGL: ${OPENGL_FOUND}, FT: ${FREETYPE_FOUND}")
+
+	add_definitions(-DNO_3D)
+endif()
+
+
+
+set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOUIC OFF)
+
+add_definitions(-std=c++11)
+#add_definitions(-march=native -s)
+
+
+
+# -----------------------------------------------------------------------------
+# gentab
+# -----------------------------------------------------------------------------
+if(USE_GENTAB)
+	add_executable(gentab
+		tools/gentab/gentab.cpp
+		libs/spacegroups/spacegroup_clp.cpp libs/spacegroups/crystalsys.cpp
+		tlibs/log/log.cpp
+	)
+
+	target_link_libraries(gentab
+		${LIBS_PY} ${Clipper_LIBRARIES}
+		Qt5::QtCore Qt5::QtGui
+		${Boost_LIBRARIES}
+#		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	)
+
+	add_custom_command(TARGET gentab POST_BUILD
+		COMMAND cd ${CMAKE_BINARY_DIR} && ./gentab
+		MAIN_DEPENDENCY gentab)
+endif()
+# -----------------------------------------------------------------------------
+
+
+
+# -----------------------------------------------------------------------------
+# takin
+# -----------------------------------------------------------------------------
+add_executable(takin
+	tools/taz/taz_main.cpp
+	tools/taz/taz.cpp tools/taz/tas_layout.cpp tools/taz/tof_layout.cpp
+	tools/taz/taz_crys.cpp
+	tools/taz/taz_file.cpp tools/taz/taz_export.cpp
+	tools/taz/tas_layout.cpp tools/taz/scattering_triangle.cpp
+	tools/taz/real_lattice.cpp tools/taz/proj_lattice.cpp
+	tools/taz/nicos.cpp tools/taz/sics.cpp tools/taz/taz_net.cpp
+
+	tools/res/r0.cpp
+	tools/res/cn.cpp tools/res/pop.cpp tools/res/eck.cpp tools/res/viol.cpp tools/res/simple.cpp
+	tools/res/ResoDlg.cpp tools/res/ResoDlg_file.cpp
+
+	tools/monteconvo/ConvoDlg.cpp tools/monteconvo/ConvoDlg_file.cpp
+	tools/monteconvo/ConvoDlg_sim.cpp tools/monteconvo/ConvoDlg_fit.cpp
+	tools/convofit/convofit_import.cpp
+	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
+	tools/monteconvo/sqw.cpp tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
+	${SRCS_PY}
+
+	tools/convofit/scan.cpp
+	tools/scanviewer/scanviewer.cpp tools/scanviewer/FitParamDlg.cpp
+	tools/scanpos/ScanPosDlg.cpp
+	tools/powderfit/PowderFitDlg.cpp
+
+	dialogs/SettingsDlg.cpp dialogs/FilePreviewDlg.cpp
+	dialogs/GotoDlg.cpp dialogs/DWDlg.cpp dialogs/DynPlaneDlg.cpp
+	dialogs/NeutronDlg.cpp dialogs/TOFDlg.cpp
+	dialogs/SpurionDlg.cpp dialogs/PowderDlg.cpp
+	dialogs/DispDlg.cpp dialogs/FavDlg.cpp
+	dialogs/RecipParamDlg.cpp dialogs/RealParamDlg.cpp
+	dialogs/SrvDlg.cpp dialogs/NetCacheDlg.cpp dialogs/ScanMonDlg.cpp
+	dialogs/EllipseDlg.cpp tools/ffact/FormfactorDlg.cpp
+	dialogs/AtomsDlg.cpp dialogs/AboutDlg.cpp
+	dialogs/DeadAnglesDlg.cpp dialogs/LogDlg.cpp
+
+	libs/spacegroups/spacegroup.cpp tools/sglist/SgListDlg.cpp
+	libs/globals.cpp libs/globals_qt.cpp libs/spacegroups/crystalsys.cpp
+	libs/formfactors/formfact.cpp libs/qt/qthelper.cpp libs/qt/qwthelper.cpp
+
+	${SRCS_3D}
+
+	# statically link tlibs externals
+	#tlibs/file/loadinstr.cpp
+	libs/qt/recent.cpp  tlibs/file/x3d.cpp
+	tlibs/log/log.cpp tlibs/log/debug.cpp
+	tlibs/math/rand.cpp
+	tlibs/string/spec_char.cpp
+	tlibs/helper/flags.cpp  tlibs/version.cpp
+
+	libcrystal/version.cpp
+)
+
+target_link_libraries(takin
+	${LIBS_FIT}
+	${SOCK2}
+	${LIBS_3D}
+	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
+	${QWT_LIBRARIES}
+	Qt5::QtCore Qt5::QtGui Qt5::QtSvg
+	${LIBS_PY}
+	${PNG_LIBRARIES}
+	${Boost_LIBRARIES}
+#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+)
+
+
+# pre-build
+add_custom_target(prebuild-script
+	COMMAND ${PROJECT_SOURCE_DIR}/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
+)
+
+
+# post-build
+#add_custom_command(TARGET takin POST_BUILD
+#	COMMAND qcollectiongenerator ${PROJECT_SOURCE_DIR}/doc/takin.qhcp -o ${PROJECT_SOURCE_DIR}/doc/takin.qhc
+#		&& cp -v ${PROJECT_SOURCE_DIR}/doc/takin.qhc ${PROJECT_SOURCE_DIR}/res/
+#		&& cp -v ${PROJECT_SOURCE_DIR}/doc/takin.qch ${PROJECT_SOURCE_DIR}/res/
+#	MAIN_DEPENDENCY takin)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET takin POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:takin>
+		MAIN_DEPENDENCY takin
+	)
+endif()
+
+
+add_dependencies(takin prebuild-script)
+
+if(USE_GENTAB)
+	add_dependencies(takin gentab)
+endif()
+# -----------------------------------------------------------------------------
+
+
+
+if(Minuit2_FOUND)
+# -----------------------------------------------------------------------------
+# convofit, convoseries
+# -----------------------------------------------------------------------------
+add_executable(convofit
+	tools/res/r0.cpp
+	tools/res/cn.cpp tools/res/pop.cpp tools/res/eck.cpp tools/res/viol.cpp
+	#tools/res/simple.cpp
+
+	tools/monteconvo/TASReso.cpp
+	tools/monteconvo/sqw.cpp tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
+	${SRCS_PY}
+
+	tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
+	tools/convofit/model.cpp tools/convofit/scan.cpp
+	tools/convofit/convofit_main.cpp
+
+
+	# statically link tlibs externals
+	tlibs/log/log.cpp
+	tlibs/math/rand.cpp
+	tlibs/file/tmp.cpp
+	#tlibs/file/loadinstr.cpp
+	libs/globals.cpp
+)
+
+set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
+
+target_link_libraries(convofit
+	${LIBS_FIT} ${SOCK2}
+	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
+	${LIBS_PY}
+	${Boost_LIBRARIES}
+#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET convofit POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:convofit>
+		MAIN_DEPENDENCY convofit
+	)
+endif()
+
+# -----------------------------------------------------------------------------
+
+add_executable(convoseries
+	tools/convofit/scanseries.cpp
+
+	# statically link tlibs externals
+	tlibs/log/log.cpp
+)
+
+set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
+
+target_link_libraries(convoseries
+	${LIBS_PY}
+	${Boost_LIBRARIES}
+#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET convoseries POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:convoseries>
+		MAIN_DEPENDENCY convoseries
+	)
+endif()
+# -----------------------------------------------------------------------------
+
+endif()
+
+
+
+
+# -----------------------------------------------------------------------------
+# install
+# -----------------------------------------------------------------------------
+install(TARGETS takin DESTINATION bin COMPONENT apptakin)
+
+if(Minuit2_FOUND)
+	install(TARGETS convofit convoseries DESTINATION bin COMPONENT appconvofit)
+endif()
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc
+	DESTINATION share/takin COMPONENT takindata1)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons
+	DESTINATION share/takin/res COMPONENT takindata2)
+install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS 
+	${PROJECT_SOURCE_DIR}/LICENSES ${PROJECT_SOURCE_DIR}/LITERATURE
+	DESTINATION share/takin COMPONENT takininfo)
+install(FILES ${PROJECT_SOURCE_DIR}/takin_local.sh 
+	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ 
+	DESTINATION bin COMPONENT takinstarter)
+install(FILES ${PROJECT_SOURCE_DIR}/takin.desktop DESTINATION share/applications COMPONENT takindesk)
+# -----------------------------------------------------------------------------
+
+
+
+
+# -----------------------------------------------------------------------------
+# TODO: fix package
+# -----------------------------------------------------------------------------
+set(CPACK_PACKAGE_NAME "takin")
+set(CPACK_PACKAGE_CONTACT "tobias.weber@tum.de")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "inelastic neutron scattering package")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_EXECUTABLES "takin;Takin")
+set(CPACK_PACKAGE_VERSION "2.0.0")
+#set(CPACK_COMPONENTS_ALL apptakin appconvofit takindata1 takindata2 takininfo takinstarter takindesk)
+set(CPACK_SET_DESTDIR TRUE)
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "n/a")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libstdc++6, libboost, libqtcore5 (>=5.8.0), libqtgui5 (>=5.8.0), libqtopengl5 (>=5.8.0), libqtsvg5 (>=5.8.0), libqtxml5 (>=5.8.0), libqwt, python, freetype6")
+
+execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_ARCHITECTURE)
+message("Deb Arch: ${CPACK_DEBIAN_ARCHITECTURE}")
+
+
+#include(CPack)
+# -----------------------------------------------------------------------------
