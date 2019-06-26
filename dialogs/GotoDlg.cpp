@@ -71,6 +71,7 @@ GotoDlg::GotoDlg(QWidget* pParent, QSettings* pSett) : QDialog(pParent), m_pSett
 	}
 }
 
+
 GotoDlg::~GotoDlg()
 {
 	ClearList();
@@ -151,6 +152,7 @@ void GotoDlg::CalcSample()
 		labelStatus->setText("Position OK.");
 }
 
+
 void GotoDlg::CalcMonoAna()
 {
 	m_bMonoAnaOk = 0;
@@ -226,6 +228,7 @@ void GotoDlg::CalcMonoAna()
 		labelStatus->setText("Position OK.");
 }
 
+
 void GotoDlg::EditedKiKf()
 {
 	t_real dKi = tl::str_to_var_parse<t_real>(editKi->text().toStdString());
@@ -244,6 +247,7 @@ void GotoDlg::EditedKiKf()
 	CalcMonoAna();
 	CalcSample();
 }
+
 
 void GotoDlg::EditedE()
 {
@@ -288,7 +292,10 @@ void GotoDlg::EditedE()
 	CalcSample();
 }
 
-// calc. tas angles -> hkl
+
+/**
+ * calc. tas angles -> hkl
+ */
 void GotoDlg::EditedAngles()
 {
 	t_real th_m = tl::d2r(tl::str_to_var_parse<t_real>(edit2ThetaM->text().toStdString())/2.);
@@ -356,6 +363,7 @@ void GotoDlg::EditedAngles()
 		labelStatus->setText("Position OK.");
 }
 
+
 void GotoDlg::GetCurPos()
 {
 	if(!m_bHasParamsRecip)
@@ -379,11 +387,13 @@ void GotoDlg::GetCurPos()
 	CalcSample();
 }
 
+
 void GotoDlg::RecipParamsChanged(const RecipParams& params)
 {
 	m_bHasParamsRecip = 1;
 	m_paramsRecip = params;
 }
+
 
 void GotoDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 {
@@ -409,6 +419,7 @@ void GotoDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 }
 
+
 void GotoDlg::showEvent(QShowEvent *pEvt)
 {
 	QDialog::showEvent(pEvt);
@@ -417,12 +428,14 @@ void GotoDlg::showEvent(QShowEvent *pEvt)
 
 //------------------------------------------------------------------------------
 
+
 struct HklPos
 {
 	t_real dh, dk, dl;
 	t_real dki, dkf;
 	t_real dE;
 };
+
 
 bool GotoDlg::ApplyCurPos()
 {
@@ -458,6 +471,7 @@ bool GotoDlg::ApplyCurPos()
 	return true;
 }
 
+
 bool GotoDlg::GotoPos(QListWidgetItem* pItem, bool bApply)
 {
 	if(!pItem) return false;
@@ -478,6 +492,7 @@ bool GotoDlg::GotoPos(QListWidgetItem* pItem, bool bApply)
 	return m_bMonoAnaOk && m_bSampleOk;
 }
 
+
 bool GotoDlg::GotoPos(unsigned int iItem)
 {
 	if(int(iItem) >= listSeq->count())
@@ -485,11 +500,13 @@ bool GotoDlg::GotoPos(unsigned int iItem)
 	return GotoPos(listSeq->item(int(iItem)), 1);
 }
 
+
 void GotoDlg::ListItemSelected()
 {
 	QListWidgetItem *pItem = listSeq->currentItem();
 	GotoPos(pItem, 0);
 }
+
 
 void GotoDlg::ListItemDoubleClicked(QListWidgetItem* pItem)
 {
@@ -497,6 +514,7 @@ void GotoDlg::ListItemDoubleClicked(QListWidgetItem* pItem)
 	if(!bOk)
 		QMessageBox::critical(this, "Error", "Invalid position.");
 }
+
 
 void GotoDlg::AddPosToList(t_real dh, t_real dk, t_real dl, t_real dki, t_real dkf)
 {
@@ -530,6 +548,7 @@ void GotoDlg::AddPosToList(t_real dh, t_real dk, t_real dl, t_real dki, t_real d
 	pItem->setData(Qt::UserRole, QVariant::fromValue<void*>(pPos));
 }
 
+
 void GotoDlg::AddPosToList()
 {
 	t_real dh = tl::str_to_var_parse<t_real>(editH->text().toStdString());
@@ -541,6 +560,7 @@ void GotoDlg::AddPosToList()
 	AddPosToList(dh, dk, dl, dki, dkf);
 }
 
+
 void GotoDlg::RemPosFromList()
 {
 	QListWidgetItem *pItem = listSeq->currentItem();
@@ -551,6 +571,7 @@ void GotoDlg::RemPosFromList()
 		delete pItem;
 	}
 }
+
 
 void GotoDlg::ClearList()
 {
@@ -637,6 +658,7 @@ void GotoDlg::SaveList()
 		m_pSettings->setValue("goto_pos/last_dir", QString(strDir.c_str()));
 }
 
+
 void GotoDlg::Save(std::map<std::string, std::string>& mapConf, const std::string& strXmlRoot)
 {
 	mapConf[strXmlRoot + "goto_pos/h"] = editH->text().toStdString();
@@ -665,6 +687,7 @@ void GotoDlg::Save(std::map<std::string, std::string>& mapConf, const std::strin
 		mapConf[strXmlRoot + strItemBase + "kf"] = tl::var_to_str(pPos->dkf);
 	}
 }
+
 
 void GotoDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 {

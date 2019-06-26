@@ -27,6 +27,7 @@ protected:
 	std::unique_ptr<QwtPlotWrapper> m_plotwrap;
 
 	t_real_glob m_d2Theta = 0.;
+	t_real_glob m_dQ = 2.;
 	t_real_glob m_dEi = 5., m_dEf = 5.;
 
 protected:
