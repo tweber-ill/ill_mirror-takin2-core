@@ -8,7 +8,7 @@
 #ifndef __CRYSTALLIBS_VER_H__
 #define __CRYSTALLIBS_VER_H__
 
-#define LIBCRYSTAL_VERSION "0.5"
+#define LIBCRYSTAL_VERSION "0.6"
 
 namespace xtl {
 
