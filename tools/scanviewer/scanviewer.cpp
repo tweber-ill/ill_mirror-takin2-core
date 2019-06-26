@@ -35,6 +35,7 @@
 
 #ifndef NO_FIT
 	#include "tlibs/fit/minuit.h"
+	#include "tlibs/fit/interpolation.h"
 	#include "tlibs/fit/swarm.h"
 	using tl::t_real_min;
 #endif
@@ -1839,10 +1840,21 @@ void ScanViewerDlg::FitSine()
 }
 
 
+/**
+ * fits a gaussian peak
+ */
 void ScanViewerDlg::FitGauss()
 {
 	if(std::min(m_vecX.size(), m_vecY.size()) == 0)
 		return;
+
+
+	// prefit
+	unsigned int iOrder = 4;
+	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+
 
 	const bool bUseSlope = checkSloped->isChecked();
 
@@ -1869,10 +1881,22 @@ void ScanViewerDlg::FitGauss()
 		auto minmaxX = std::minmax_element(m_vecX.begin(), m_vecX.end());
 		auto minmaxY = std::minmax_element(m_vecY.begin(), m_vecY.end());
 
-		dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
-		dSig = std::abs((*minmaxX.second-*minmaxX.first) * 0.5);
-		dAmp = std::abs(*minmaxY.second-*minmaxY.first);
-		dOffs = *minmaxY.first;
+		// use prefitter values
+		if(vecMaximaX.size())
+		{
+			dX0 = vecMaximaX[0];
+			dAmp = vecMaximaSize[0];
+			dSig = tl::get_FWHM2SIGMA<t_real>()*vecMaximaWidth[0] * 0.5;
+			dOffs = *minmaxY.first;
+		}
+		// try to guess values
+		else
+		{
+			dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
+			dSig = std::abs((*minmaxX.second-*minmaxX.first) * 0.5);
+			dAmp = std::abs(*minmaxY.second-*minmaxY.first);
+			dOffs = *minmaxY.first;
+		}
 
 		dX0Err = dX0 * 0.1;
 		dSigErr = dSig * 0.1;
@@ -1919,10 +1943,21 @@ void ScanViewerDlg::FitGauss()
 }
 
 
+/**
+ * fits a lorentzian peak
+ */
 void ScanViewerDlg::FitLorentz()
 {
 	if(std::min(m_vecX.size(), m_vecY.size()) == 0)
 		return;
+
+
+	// prefit
+	unsigned int iOrder = 4;
+	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+
 
 	const bool bUseSlope = checkSloped->isChecked();
 
@@ -1949,10 +1984,22 @@ void ScanViewerDlg::FitLorentz()
 		auto minmaxX = std::minmax_element(m_vecX.begin(), m_vecX.end());
 		auto minmaxY = std::minmax_element(m_vecY.begin(), m_vecY.end());
 
-		dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
-		dHWHM = std::abs((*minmaxX.second-*minmaxX.first) * 0.5);
-		dAmp = std::abs(*minmaxY.second-*minmaxY.first);
-		dOffs = *minmaxY.first;
+		// use prefitter values
+		if(vecMaximaX.size())
+		{
+			dX0 = vecMaximaX[0];
+			dAmp = vecMaximaSize[0];
+			dHWHM = 0.5*vecMaximaWidth[0] * 0.5;
+			dOffs = *minmaxY.first;
+		}
+		// try to guess values
+		else
+		{
+			dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
+			dHWHM = std::abs((*minmaxX.second-*minmaxX.first) * 0.5);
+			dAmp = std::abs(*minmaxY.second-*minmaxY.first);
+			dOffs = *minmaxY.first;
+		}
 
 		dX0Err = dX0 * 0.1;
 		dHWHMErr = dHWHM * 0.1;
@@ -2005,10 +2052,22 @@ void ScanViewerDlg::FitVoigt() {}
 
 #else
 
+
+/**
+ * fits a voigtian peak
+ */
 void ScanViewerDlg::FitVoigt()
 {
 	if(std::min(m_vecX.size(), m_vecY.size()) == 0)
 		return;
+
+
+	// prefit
+	unsigned int iOrder = 4;
+	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+
 
 	const bool bUseSlope = checkSloped->isChecked();
 
@@ -2037,14 +2096,28 @@ void ScanViewerDlg::FitVoigt()
 		auto minmaxX = std::minmax_element(m_vecX.begin(), m_vecX.end());
 		auto minmaxY = std::minmax_element(m_vecY.begin(), m_vecY.end());
 
-		dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
-		dHWHM = std::abs((*minmaxX.second-*minmaxX.first) * 0.25);
-		dSig = std::abs((*minmaxX.second-*minmaxX.first) * 0.25);
-		dAmp = std::abs(*minmaxY.second-*minmaxY.first);
-		dOffs = *minmaxY.first;
+		// use prefitter values
+		if(vecMaximaX.size())
+		{
+			dX0 = vecMaximaX[0];
+			dAmp = vecMaximaSize[0];
+			dSig = tl::get_FWHM2SIGMA<t_real>()*vecMaximaWidth[0] * 0.5*0.5;
+			dHWHM = 0.5*vecMaximaWidth[0] * 0.5*0.5;
+			dOffs = *minmaxY.first;
+		}
+		// try to guess values
+		else
+		{
+			dX0 = m_vecX[minmaxY.second - m_vecY.begin()];
+			dHWHM = std::abs((*minmaxX.second-*minmaxX.first) * 0.25);
+			dSig = std::abs((*minmaxX.second-*minmaxX.first) * 0.25);
+			dAmp = std::abs(*minmaxY.second-*minmaxY.first);
+			dOffs = *minmaxY.first;
+		}
 
 		dX0Err = dX0 * 0.1;
 		dHWHMErr = dHWHM * 0.1;
+		dSigErr = dSig * 0.1;
 		dAmpErr = dAmp * 0.1;
 		dOffsErr = dOffs * 0.1;
 
