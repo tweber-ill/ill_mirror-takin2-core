@@ -1850,10 +1850,10 @@ void ScanViewerDlg::FitGauss()
 
 
 	// prefit
-	unsigned int iOrder = 4;
+	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
 	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
-		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
 	const bool bUseSlope = checkSloped->isChecked();
@@ -1953,10 +1953,10 @@ void ScanViewerDlg::FitLorentz()
 
 
 	// prefit
-	unsigned int iOrder = 4;
+	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
 	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
-		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
 	const bool bUseSlope = checkSloped->isChecked();
@@ -2063,10 +2063,10 @@ void ScanViewerDlg::FitVoigt()
 
 
 	// prefit
-	unsigned int iOrder = 4;
+	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
 	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
-		vecMaximaX, vecMaximaSize, vecMaximaWidth);
+		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
 	const bool bUseSlope = checkSloped->isChecked();
