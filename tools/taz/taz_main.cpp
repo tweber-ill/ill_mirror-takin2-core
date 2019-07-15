@@ -186,26 +186,24 @@ int main(int argc, char** argv)
 		SetErrorHandler([](int, bool, const char*, const char* pcMsg) { tl::log_err(pcMsg); });
 
 
-		std::string strLog = QDir::tempPath().toStdString();
-		strLog += "/takin.log";
-		std::ofstream ofstrLog(strLog, std::ios_base::out|std::ios_base::app);
-		if(add_logfile(&ofstrLog, 1))
-			tl::log_info("Logging to file \"", strLog, "\".");
-
-
 
 		// --------------------------------------------------------------------
 		// get program options
 		std::vector<std::string> vecTazFiles;
+		bool bShowHelp = 0;
 		bool bStartTakinMain = 1;
 		bool bStartMonteconvo = 0;
 		bool bStartScanviewer = 0;
 
-		opts::options_description args("takin options");
+		opts::options_description args("Takin options");
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("taz-file",
 			opts::value<decltype(vecTazFiles)>(&vecTazFiles),
-			"takin session file")));
+			"loads a Takin session file")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("help",
+			opts::bool_switch(&bShowHelp),
+			"shows the program options")));
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("monteconvo",
 			opts::bool_switch(&bStartMonteconvo),
@@ -230,8 +228,21 @@ int main(int argc, char** argv)
 
 		if(bStartMonteconvo || bStartScanviewer)
 			bStartTakinMain = 0;
+
+		if(bShowHelp)
+		{
+			std::cout << args << std::endl;
+			return 0;
+		}
 		// --------------------------------------------------------------------
 
+
+
+		std::string strLog = QDir::tempPath().toStdString();
+		strLog += "/takin.log";
+		std::ofstream ofstrLog(strLog, std::ios_base::out|std::ios_base::app);
+		if(add_logfile(&ofstrLog, 1))
+			tl::log_debug("Logging to file \"", strLog, "\".");
 
 
 		tl::log_info("This is Takin version " TAKIN_VER ".");
