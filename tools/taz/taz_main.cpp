@@ -14,6 +14,9 @@
 #include "libs/globals.h"
 #include "dialogs/NetCacheDlg.h"
 
+#include "tools/monteconvo/ConvoDlg.h"
+#include "tools/scanviewer/scanviewer.h"
+
 #include "tlibs/version.h"
 #include "libs/version.h"
 #include "libcrystal/version.h"
@@ -24,6 +27,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/scope_exit.hpp>
+#include <boost/program_options.hpp>
 
 #include <locale>
 #include <clocale>
@@ -38,6 +42,7 @@
 namespace chr = std::chrono;
 namespace asio = boost::asio;
 namespace sys = boost::system;
+namespace opts = boost::program_options;
 
 
 // ----------------------------------------------------------------------------
@@ -87,6 +92,9 @@ static inline void sys_err(const SysErr& err)
 
 static void show_splash_msg(QApplication *pApp, QSplashScreen *pSplash, const std::string &strMsg)
 {
+	if(!pApp || !pSplash)
+		return;
+
 	QColor colSplash(0xff, 0xcc, 0x00);
 	pSplash->showMessage(strMsg.c_str(), Qt::AlignCenter, colSplash);
 	pApp->processEvents();
@@ -107,7 +115,7 @@ protected:
 protected:
 
 public:
-	TakAppl(int argc, char** argv) : QApplication(argc, argv, 1) {}
+	TakAppl(int argc, char** argv) : QApplication(argc, argv) {}
 	virtual ~TakAppl() {}
 
 	void SetTakDlg(std::shared_ptr<TazDlg> pDlg) { m_pTakDlg = pDlg; }
@@ -140,7 +148,7 @@ public:
 
 
 /**
- * main entry point
+ * entry point for the main GUI
  */
 int main(int argc, char** argv)
 {
@@ -184,8 +192,50 @@ int main(int argc, char** argv)
 		if(add_logfile(&ofstrLog, 1))
 			tl::log_info("Logging to file \"", strLog, "\".");
 
-		const std::string strStarting = "Starting up Takin version " TAKIN_VER ".";
-		tl::log_info(strStarting);
+
+
+		// --------------------------------------------------------------------
+		// get program options
+		std::vector<std::string> vecTazFiles;
+		bool bStartTakinMain = 1;
+		bool bStartMonteconvo = 0;
+		bool bStartScanviewer = 0;
+
+		opts::options_description args("takin options");
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("taz-file",
+			opts::value<decltype(vecTazFiles)>(&vecTazFiles),
+			"takin session file")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("monteconvo",
+			opts::bool_switch(&bStartMonteconvo),
+			"directly starts the monteconvo tool")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("scanviewer",
+			opts::bool_switch(&bStartScanviewer),
+			"directly starts the scanviewer tool")));
+
+		// positional args
+		opts::positional_options_description args_pos;
+		args_pos.add("taz-file", -1);
+
+		opts::basic_command_line_parser<char> clparser(argc, argv);
+		clparser.options(args);
+		clparser.positional(args_pos);
+		opts::basic_parsed_options<char> parsedopts = clparser.run();
+
+		opts::variables_map opts_map;
+		opts::store(parsedopts, opts_map);
+		opts::notify(opts_map);
+
+		if(bStartMonteconvo || bStartScanviewer)
+			bStartTakinMain = 0;
+		// --------------------------------------------------------------------
+
+
+
+		tl::log_info("This is Takin version " TAKIN_VER ".");
+		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2019.");
 		tl::log_debug("Using ", sizeof(t_real_glob)*8, " bit ", tl::get_typename<t_real_glob>(), "s as internal data type.");
 
 
@@ -246,15 +296,26 @@ int main(int argc, char** argv)
 
 		// ------------------------------------------------------------
 		// splash screen
-		QPixmap pixSplash = load_pixmap("res/icons/takin.svg");
-		pixSplash = pixSplash.scaled(pixSplash.size().width()*0.55, pixSplash.size().height()*0.55);
-		std::unique_ptr<QSplashScreen> pSplash(new QSplashScreen(pixSplash));
-		QFont fontSplash = pSplash->font();
-		fontSplash.setPixelSize(14);
-		fontSplash.setBold(1);
-		pSplash->setFont(fontSplash);
+		std::unique_ptr<QSplashScreen> pSplash;
 
-		pSplash->show();
+		if(bStartTakinMain)
+		{
+			QPixmap pixSplash = load_pixmap("res/icons/takin.svg");
+			if(!pixSplash.isNull()) 
+				pixSplash = pixSplash.scaled(pixSplash.size().width()*0.55, pixSplash.size().height()*0.55);
+			pSplash.reset(new QSplashScreen{pixSplash});
+		}
+
+		if(pSplash)
+		{
+			QFont fontSplash = pSplash->font();
+			fontSplash.setPixelSize(14);
+			fontSplash.setBold(1);
+			pSplash->setFont(fontSplash);
+			pSplash->show();
+		}
+
+		const std::string strStarting = "Starting up Takin version " TAKIN_VER ".";
 		show_splash_msg(app.get(), pSplash.get(), strStarting);
 
 
@@ -339,55 +400,93 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
+
 		// ------------------------------------------------------------
+		std::shared_ptr<TazDlg> pTakDlg;
+		std::shared_ptr<ConvoDlg> pConvoDlg;
+		std::shared_ptr<ScanViewerDlg> pScanViewerDlg;
 
-
+		if(bStartTakinMain)
 		{
-#ifdef IS_EXPERIMENTAL_BUILD
-			int iPrevDaysSinceEpoch = 0;
-			if(settings.contains("debug/last_warned"))
-				iPrevDaysSinceEpoch = settings.value("debug/last_warned").toInt();
-			int iDaysSinceEpoch = tl::epoch_dur<tl::t_dur_days<int>>().count();
-
-			std::string strExp = "This " BOOST_PLATFORM " version of Takin is still experimental, "
-				"does not include all features and may show unexpected behaviour. Please report "
-				"bugs to tobias.weber@tum.de. Thanks!";
-			tl::log_warn(strExp);
-			//tl::log_debug("Days since last warning: ", iDaysSinceEpoch-iPrevDaysSinceEpoch, ".");
-
-			// show warning message box every 5 days
-			if(iDaysSinceEpoch - iPrevDaysSinceEpoch >= 5)
 			{
-				QMessageBox::warning(0, "Takin", strExp.c_str());
-				settings.setValue("debug/last_warned", iDaysSinceEpoch);
+	#ifdef IS_EXPERIMENTAL_BUILD
+				int iPrevDaysSinceEpoch = 0;
+				if(settings.contains("debug/last_warned"))
+					iPrevDaysSinceEpoch = settings.value("debug/last_warned").toInt();
+				int iDaysSinceEpoch = tl::epoch_dur<tl::t_dur_days<int>>().count();
+
+				std::string strExp = "This " BOOST_PLATFORM " version of Takin is still experimental, "
+					"does not include all features and may show unexpected behaviour. Please report "
+					"bugs to tobias.weber@tum.de. Thanks!";
+				tl::log_warn(strExp);
+				//tl::log_debug("Days since last warning: ", iDaysSinceEpoch-iPrevDaysSinceEpoch, ".");
+
+				// show warning message box every 5 days
+				if(iDaysSinceEpoch - iPrevDaysSinceEpoch >= 5)
+				{
+					QMessageBox::warning(0, "Takin", strExp.c_str());
+					settings.setValue("debug/last_warned", iDaysSinceEpoch);
+				}
+	#endif
+
+			/*// Warnings due to version changes
+				if(settings.value("debug/last_warning_shown", 0).toInt() < 1)
+				{
+					QMessageBox::warning(0, "Takin", "Please beware that in this version "
+						"the correction factors for the resolution convolution have been re-worked. "
+						"Any global scaling factors will have changed.");
+					settings.setValue("debug/last_warning_shown", 1);
+				}*/
 			}
-#endif
 
-		/*// Warnings due to version changes
-			if(settings.value("debug/last_warning_shown", 0).toInt() < 1)
+
+			show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 1/2 ...");
+			pTakDlg.reset(new TazDlg{nullptr, strLog});
+			app->SetTakDlg(pTakDlg);
+			show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 2/2 ...");
+			app->DoPendingRequests();
+
+			if(pSplash) pSplash->finish(pTakDlg.get());
+			if(vecTazFiles.size() >= 1)
 			{
-				QMessageBox::warning(0, "Takin", "Please beware that in this version "
-					"the correction factors for the resolution convolution have been re-worked. "
-					"Any global scaling factors will have changed.");
-				settings.setValue("debug/last_warning_shown", 1);
-			}*/
+				tl::log_info("Loading \"", vecTazFiles[0], "\"...");
+				pTakDlg->Load(vecTazFiles[0].c_str());
+			}
+			pTakDlg->show();
+		}
+		if(bStartMonteconvo)
+		{
+			pConvoDlg.reset(new ConvoDlg{nullptr, &settings});
+			pConvoDlg->setWindowFlags(Qt::Window);
+
+			// load a given convolution session file
+			if(vecTazFiles.size() >= 1)
+			{
+				tl::log_info("Loading \"", vecTazFiles[0], "\"...");
+
+				const std::string strXmlRoot("taz/");
+				tl::Prop<std::string> xml;
+				if(xml.Load(vecTazFiles[0], tl::PropType::XML))
+					pConvoDlg->Load(xml, strXmlRoot);
+				else
+					QMessageBox::critical(nullptr, "Error", "Could not load convolution file.");
+			}
+
+			pConvoDlg->show();
+		}
+		if(bStartScanviewer)
+		{
+			pScanViewerDlg.reset(new ScanViewerDlg{nullptr});
+			pScanViewerDlg->setWindowFlags(Qt::Window);
+
+			pScanViewerDlg->show();
 		}
 
 
-		show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 1/2 ...");
-		std::shared_ptr<TazDlg> pTakDlg(new TazDlg(nullptr, strLog));
-		app->SetTakDlg(pTakDlg);
-		show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 2/2 ...");
-		app->DoPendingRequests();
-
-		pSplash->finish(pTakDlg.get());
-		if(argc > 1)
-			pTakDlg->Load(argv[1]);
-		pTakDlg->show();
 		int iRet = app->exec();
 
-
 		// ------------------------------------------------------------
+
 		tl::deinit_spec_chars();
 		tl::log_info("Shutting down Takin.");
 		add_logfile(&ofstrLog, 0);

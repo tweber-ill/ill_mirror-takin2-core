@@ -505,7 +505,7 @@ all: ${ALL_PROGS}
 
 
 takin: ${OBJ_COMMON} ${OBJ_TAZ}
-	${CC} ${FLAGS} ${FAD_DEFS} ${LIB_DIRS} -o bin/takin $+ ${LIB_MIN} ${LIBS_TAZ}
+	${CC} ${FLAGS} ${FAD_DEFS} ${LIB_DIRS} -o bin/takin $+ ${LIB_MIN} ${LIBS_TAZ} -lboost_program_options
 	${STRIP} bin/takin
 
 montereso: ${OBJ_COMMON} ${OBJ_MONTERESO}
