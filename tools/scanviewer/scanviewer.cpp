@@ -1007,6 +1007,9 @@ lorentz3(x, a1,h1,x01, a2,h2,x02, a3,h3,x03, y0) = \
 parabola(x, a, x0, y0) = a * (x-x0)**2. + y0
 line(x, m, y0) = m*x + y0
 sine(x, a, f, p, y0) = a*sin(f*x + p) + y0
+
+coth(x) = x==0 ? 0 : 1/tanh(x)
+brillouin(x, J, x0, y0, scale) = scale*((1+1/(2*J)) * coth((1+1/(2*J))*(-x+x0)) - (1/(2*J)) * coth((1/(2*J))*(-x+x0))) + y0
 # --------------------------------------------------------------------------------
 
 
