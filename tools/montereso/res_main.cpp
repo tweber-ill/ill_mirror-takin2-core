@@ -18,6 +18,9 @@
 #include <string>
 #include <memory>
 
+#include <boost/program_options.hpp>
+namespace opts = boost::program_options;
+
 using namespace ublas;
 using t_real = t_real_reso;
 
@@ -242,43 +245,66 @@ static EllipseDlg* show_ellipses(const Resolution& res)
 
 int main(int argc, char **argv)
 {
+	std::ios_base::sync_with_stdio(0);
 	std::setlocale(LC_ALL, "C");
-	if(argc <= 1)
-	{
-		std::ostringstream ostr;
-		ostr << "Usage: " << argv[0] << " [-r,-c] <file>\n" 
-			<< "\t-r\t<file> contains resolution matrix\n"
-			<< "\t-c\t<file> contains covariance matrix\n"
-			<< "\t<n/a>\t<file> contains Q or ki,kf list";
 
-		tl::log_err("No input file given.\n", ostr.str());
+
+	std::string strFile;
+	bool bReso = 0;
+	bool bCovar = 0;
+
+	opts::options_description args("program options");
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("in-file",
+		opts::value<decltype(strFile)>(&strFile), "input file")));
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("reso",
+		opts::bool_switch(&bReso),
+		"file contains the resolution matrix")));
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("covar",
+		opts::bool_switch(&bCovar),
+		"file contains the covariance matrix")));
+
+	opts::positional_options_description args_pos;
+	args_pos.add("in-file", -1);
+
+	opts::basic_command_line_parser<char> clparser(argc, argv);
+	clparser.options(args);
+	clparser.positional(args_pos);
+	opts::basic_parsed_options<char> parsedopts = clparser.run();
+
+	opts::variables_map opts_map;
+	opts::store(parsedopts, opts_map);
+	opts::notify(opts_map);
+
+
+	if(argc < 2)
+	{
+		std::cerr << args << std::endl;
 		return -1;
 	}
 
-	const char* pcFile = argv[argc-1];
 
 	FileType ft = FileType::UNKNOWN;
-	for(int iArg=1; iArg<argc; ++iArg)
-	{
-		if(strcmp(argv[iArg], "-r") == 0)
-			ft = FileType::RESOLUTION_MATRIX;
-		else if(strcmp(argv[iArg], "-c") == 0)
-			ft = FileType::COVARIANCE_MATRIX;
-	}
-
+	if(bReso)
+		ft = FileType::RESOLUTION_MATRIX;
+	else if(bCovar)
+		ft = FileType::COVARIANCE_MATRIX;
+	
 
 	Resolution res;
 
 	if(ft==FileType::RESOLUTION_MATRIX || ft==FileType::COVARIANCE_MATRIX)
 	{
-		tl::log_info("Loading covariance/resolution matrix from \"", pcFile, "\".");
-		if(!load_mat(pcFile, res, ft))
+		tl::log_info("Loading covariance/resolution matrix from \"", strFile, "\".");
+		if(!load_mat(strFile.c_str(), res, ft))
 			return -1;
 	}
 	else
 	{
-		tl::log_info("Loading neutron list from \"", pcFile, "\".");
-		if(!load_mc_list(pcFile, res))
+		tl::log_info("Loading neutron list from \"", strFile, "\".");
+		if(!load_mc_list(strFile.c_str(), res))
 			return -1;
 	}
 

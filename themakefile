@@ -504,7 +504,7 @@ takin: ${OBJ_COMMON} ${OBJ_TAZ}
 
 montereso: ${OBJ_COMMON} ${OBJ_MONTERESO}
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/montereso $+ \
-		${BASIC_LIBS} ${QT_LIB} ${QWT_LIB} ${LAPACK_LIBS} ${STD_LIBS}
+		${BASIC_LIBS}  -lboost_program_options ${QT_LIB} ${QWT_LIB} ${LAPACK_LIBS} ${STD_LIBS}
 	${STRIP} bin/montereso
 
 xmonteconvo: ${OBJ_MONTECONVO} obj/xmconv_main.o obj/ConvoDlg.o obj/ConvoDlg_file.o\
@@ -719,8 +719,6 @@ obj/montereso_res_main.o: tools/montereso/res_main.cpp
 obj/reso_res_main.o: tools/res/res_main.cpp
 	${CC} ${FLAGS} -c -o $@ $<
 
-obj/mconv_main.o: tools/monteconvo/mconv_main.cpp
-	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/xmconv_main.o: tools/monteconvo/xmconv_main.cpp
 	${CC} ${FLAGS} -c -o $@ $<
 obj/sqw.o: tools/monteconvo/sqw.cpp tools/monteconvo/sqw.h tlibs/math/kd.h
