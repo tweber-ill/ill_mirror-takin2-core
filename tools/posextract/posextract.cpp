@@ -83,7 +83,8 @@ static void extract_monteconvo_pos(const char* pcIn, const char* pcOut)
 static void extract_pos(
 	const std::vector<std::string>& vecScans,
 	const std::vector<std::string>& vecCols,
-	const std::string& strOut)
+	const std::string& strOut,
+	const std::string& _strFilterCol)
 {
 	std::ostream *pOstr = &std::cout;
 	std::ofstream ofstr;
@@ -98,6 +99,19 @@ static void extract_pos(
 	}
 
 	pOstr->precision(iPrec);
+
+	(*pOstr)
+		<< std::left << std::setw(iPrec*dPadding) << "# h" << " "
+		<< std::left << std::setw(iPrec*dPadding) << "k" << " "
+		<< std::left << std::setw(iPrec*dPadding) << "l" << " "
+		<< std::left << std::setw(iPrec*dPadding) << "E" << " "
+		<< std::left << std::setw(iPrec*dPadding) << "I" << " "
+		<< std::left << std::setw(iPrec*dPadding) << "dI" << " ";
+
+
+	std::string strFilterCol, strFilterColVal;
+	std::tie(strFilterCol, strFilterColVal) = tl::split_first(_strFilterCol, std::string{"="}, 1);
+	t_real dFilterColVal = tl::str_to_var<t_real>(strFilterColVal);
 
 
 	for(const std::string& strScan : vecScans)
@@ -123,14 +137,8 @@ static void extract_pos(
 		const auto& vecMon = ptrInstr->GetCol(strMonVar);
 		const auto& vecCtr = ptrInstr->GetCol(strCtrVar);
 
+		const auto& vecFilterCol = ptrInstr->GetCol(strFilterCol);
 
-		(*pOstr)
-			<< std::left << std::setw(iPrec*dPadding) << "# h" << " "
-			<< std::left << std::setw(iPrec*dPadding) << "k" << " "
-			<< std::left << std::setw(iPrec*dPadding) << "l" << " "
-			<< std::left << std::setw(iPrec*dPadding) << "E" << " "
-			<< std::left << std::setw(iPrec*dPadding) << "I" << " "
-			<< std::left << std::setw(iPrec*dPadding) << "dI" << " ";
 
 		for(const std::string& strCol : vecCols)
 		{
@@ -151,6 +159,10 @@ static void extract_pos(
 
 		for(std::size_t iScanPos=0; iScanPos<ptrInstr->GetScanCount(); ++iScanPos)
 		{
+			// skip the point if it's different from the selected filter value
+			if(vecFilterCol.size() && !tl::float_equal(vecFilterCol[iScanPos], dFilterColVal))
+				continue;
+
 			t_real m = vecMon[iScanPos];
 			t_real c = vecCtr[iScanPos];
 			t_real dm = tl::float_equal(m, 0.) ? 1. : std::sqrt(m);
@@ -193,6 +205,7 @@ int main(int argc, char** argv)
 	std::vector<std::string> vecCols;
 	std::string strOutFile;
 	bool bMonteconvo = 0;
+	std::string strFilterCol;
 
 	opts::options_description args("program options");
 	args.add(boost::shared_ptr<opts::option_description>(
@@ -205,6 +218,10 @@ int main(int argc, char** argv)
 		new opts::option_description("out-file",
 		opts::value<decltype(strOutFile)>(&strOutFile),
 		"output file")));
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("filter",
+		opts::value<decltype(strFilterCol)>(&strFilterCol),
+		"filter non-matching columns")));
 	args.add(boost::shared_ptr<opts::option_description>(
 		new opts::option_description("monteconvo",
 		opts::bool_switch(&bMonteconvo),
@@ -239,7 +256,7 @@ int main(int argc, char** argv)
 	if(bMonteconvo)
 		extract_monteconvo_pos(vecScans[0].c_str(), strOutFile.c_str());
 	else
-		extract_pos(vecScans, vecCols, strOutFile);
+		extract_pos(vecScans, vecCols, strOutFile, strFilterCol);
 
 	return 0;
 }
