@@ -130,6 +130,7 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 
 	// neutron Q,E list
 	std::vector<vector<t_real>> vecQ;
+	std::vector<t_real> vecP;
 
 	// neutron ki, kf list
 	std::vector<vector<t_real>> vecKi, vecKf, vecPos;
@@ -174,11 +175,13 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 
 		if(ft == FileType::NEUTRON_Q_LIST)
 		{
-			t_real dQx=0., dQy=0., dQz=0., dE=0.;
-			istr >> dQx >> dQy >> dQz >> dE;
-			vector<t_real> _vec = tl::make_vec<vector<t_real>>({dQx, dQy, dQz, dE});
+			t_real dQh=0., dQk=0., dQl=0., dE=0., dP=1.;
+			istr >> dQh >> dQk >> dQl >> dE;
+			istr >> dP;
+			vector<t_real> _vec = tl::make_vec<vector<t_real>>({dQh, dQk, dQl, dE});
 
 			vecQ.push_back(std::move(_vec));
+			vecP.push_back(dP);
 		}
 		else if(ft == FileType::NEUTRON_KIKF_LIST)
 		{
@@ -208,7 +211,7 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 	//print_map(std::cout, mapParams);
 
 	if(ft == FileType::NEUTRON_Q_LIST)
-		res = calc_res(std::forward<decltype(vecQ)&&>(vecQ));
+		res = calc_res(std::forward<decltype(vecQ)&&>(vecQ), &vecP);
 	else if(ft == FileType::NEUTRON_KIKF_LIST)
 		res = calc_res(vecKi, vecKf, &vecPi, &vecPf);
 
