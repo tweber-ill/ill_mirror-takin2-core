@@ -178,10 +178,14 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 			t_real dQh=0., dQk=0., dQl=0., dE=0., dP=1.;
 			istr >> dQh >> dQk >> dQl >> dE;
 			istr >> dP;
-			vector<t_real> _vec = tl::make_vec<vector<t_real>>({dQh, dQk, dQl, dE});
 
-			vecQ.push_back(std::move(_vec));
-			vecP.push_back(dP);
+			if(!tl::float_equal(dP, t_real{0.}))
+			{
+				vector<t_real> _vec = tl::make_vec<vector<t_real>>({dQh, dQk, dQl, dE});
+
+				vecQ.push_back(std::move(_vec));
+				vecP.push_back(dP);
+			}
 		}
 		else if(ft == FileType::NEUTRON_KIKF_LIST)
 		{
@@ -210,10 +214,23 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 	tl::log_info("Number of neutrons in file: ", uiNumNeutr);
 	//print_map(std::cout, mapParams);
 
+
+	// TODO: move this normalisation into res.cpp
+	if(vecP.size())
+	{
+		const t_real dpMax = *std::max_element(vecP.begin(), vecP.end());
+		for(t_real& dP : vecP)
+			dP /= dpMax;
+	}
+
 	if(ft == FileType::NEUTRON_Q_LIST)
+	{
 		res = calc_res(std::forward<decltype(vecQ)&&>(vecQ), &vecP);
+	}
 	else if(ft == FileType::NEUTRON_KIKF_LIST)
+	{
 		res = calc_res(vecKi, vecKf, &vecPi, &vecPf);
+	}
 
 	for(vector<t_real>& vecCurQ : res.vecQ)
 		vecCurQ -= res.Q_avg_notrafo;

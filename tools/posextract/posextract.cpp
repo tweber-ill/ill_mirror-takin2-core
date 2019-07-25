@@ -100,6 +100,7 @@ static void extract_pos(
 
 	pOstr->precision(iPrec);
 
+
 	(*pOstr)
 		<< std::left << std::setw(iPrec*dPadding) << "# h" << " "
 		<< std::left << std::setw(iPrec*dPadding) << "k" << " "

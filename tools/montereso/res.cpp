@@ -129,7 +129,7 @@ Resolution calc_res(const std::vector<ublas::vector<t_real>>& vecKi,
 
 	const t_real pi_max = _p_i ? *std::max_element(_p_i->begin(), _p_i->end()) : 1.;
 	const t_real pf_max = _p_f ? *std::max_element(_p_f->begin(), _p_f->end()) : 1.;
-	const t_real p_max = fabs(pi_max*pf_max);
+	const t_real p_max = std::abs(pi_max*pf_max);
 
 	vector<t_real> Q_avg(4);
 	Q_avg[0] = Q_avg[1] = Q_avg[2] = Q_avg[3] = 0.;
