@@ -117,7 +117,9 @@ static bool load_mat(const char* pcFile, Resolution& reso, FileType ft)
 }
 
 
-static bool load_mc_list(const char* pcFile, Resolution& res)
+static bool load_mc_list(const char* pcFile, Resolution& res,
+	const ublas::vector<t_real> *qPara = nullptr,
+	const ublas::vector<t_real> *qPerp = nullptr)
 {
 	FileType ft = FileType::NEUTRON_Q_LIST;
 
@@ -179,6 +181,7 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 			istr >> dQh >> dQk >> dQl >> dE;
 			istr >> dP;
 
+			//if(dP < 0.5) continue;
 			if(!tl::float_equal(dP, t_real{0.}))
 			{
 				vector<t_real> _vec = tl::make_vec<vector<t_real>>({dQh, dQk, dQl, dE});
@@ -215,25 +218,16 @@ static bool load_mc_list(const char* pcFile, Resolution& res)
 	//print_map(std::cout, mapParams);
 
 
-	// TODO: move this normalisation into res.cpp
-	if(vecP.size())
-	{
-		const t_real dpMax = *std::max_element(vecP.begin(), vecP.end());
-		for(t_real& dP : vecP)
-			dP /= dpMax;
-	}
-
 	if(ft == FileType::NEUTRON_Q_LIST)
 	{
-		res = calc_res(std::forward<decltype(vecQ)&&>(vecQ), &vecP);
+		normalise_P(&vecP);
+		res = calc_res(std::forward<decltype(vecQ)&&>(vecQ), &vecP, qPara, qPerp);
 	}
 	else if(ft == FileType::NEUTRON_KIKF_LIST)
 	{
-		res = calc_res(vecKi, vecKf, &vecPi, &vecPf);
+		res = calc_res(vecKi, vecKf, &vecPi, &vecPf, qPara, qPerp);
 	}
 
-	for(vector<t_real>& vecCurQ : res.vecQ)
-		vecCurQ -= res.Q_avg_notrafo;
 
 	if(!res.bHasRes)
 	{
@@ -269,6 +263,10 @@ int main(int argc, char **argv)
 	std::setlocale(LC_ALL, "C");
 
 
+	ublas::vector<t_real> 
+		vecQPara = tl::zero_v<ublas::vector<t_real>>(3),
+		vecQPerp= tl::zero_v<ublas::vector<t_real>>(3);
+	std::string strOrient1, strOrient2;
 	std::string strFile;
 	bool bReso = 0;
 	bool bCovar = 0;
@@ -285,6 +283,12 @@ int main(int argc, char **argv)
 		new opts::option_description("covar",
 		opts::bool_switch(&bCovar),
 		"file contains the covariance matrix")));
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("orient1",
+		opts::value<decltype(strOrient1)>(&strOrient1), "first orientation vector")));
+	args.add(boost::shared_ptr<opts::option_description>(
+		new opts::option_description("orient2",
+		opts::value<decltype(strOrient2)>(&strOrient2), "second orientation vector")));
 
 	opts::positional_options_description args_pos;
 	args_pos.add("in-file", -1);
@@ -297,6 +301,18 @@ int main(int argc, char **argv)
 	opts::variables_map opts_map;
 	opts::store(parsedopts, opts_map);
 	opts::notify(opts_map);
+
+
+	std::vector<t_real> _vecOrient1, _vecOrient2;
+	if(strOrient1 != "")
+		tl::get_tokens<t_real>(strOrient1, std::string(" ,;"), _vecOrient1);
+	if(strOrient2 != "")
+		tl::get_tokens<t_real>(strOrient2, std::string(" ,;"), _vecOrient2);
+
+	for(std::size_t i=0; i<std::min(vecQPara.size(), _vecOrient1.size()); ++i)
+		vecQPara[i] = _vecOrient1[i];
+	for(std::size_t i=0; i<std::min(vecQPerp.size(), _vecOrient2.size()); ++i)
+		vecQPerp[i] = _vecOrient2[i];
 
 
 	if(argc < 2)
@@ -324,7 +340,8 @@ int main(int argc, char **argv)
 	else
 	{
 		tl::log_info("Loading neutron list from \"", strFile, "\".");
-		if(!load_mc_list(strFile.c_str(), res))
+		if(!load_mc_list(strFile.c_str(), res, 
+			_vecOrient1.size() ? &vecQPara : 0, _vecOrient2.size() ? &vecQPerp : 0))
 			return -1;
 	}
 

@@ -28,22 +28,55 @@ using namespace ublas;
 using t_real = t_real_reso;
 
 
+void normalise_P(std::vector<t_real>* pp_vec)
+{
+	if(!pp_vec)
+		return;
+
+	if(pp_vec->size())
+	{
+		const t_real dpMax = *std::max_element(pp_vec->begin(), pp_vec->end());
+		for(t_real& dP : *pp_vec)
+			dP /= dpMax;
+	}
+}
+
+
 /*
  * this function tries to be a 1:1 C++ reimplementation of the Perl function
  * 'read_mcstas_res' of the McStas 'mcresplot' program
  */
-Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<t_real>* pp_vec)
+Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<t_real>* pp_vec,
+	const ublas::vector<t_real> *qPara, const ublas::vector<t_real> *qPerp)
 {
 	vector<t_real> Q_avg = pp_vec ? tl::mean_value(*pp_vec, Q_vec) : tl::mean_value(Q_vec);
 
-	vector<t_real> Q_dir = tl::make_vec({Q_avg[0], Q_avg[1], Q_avg[2]});
+	vector<t_real> Q_dir, Q_perp;
+
+	// use user-given or average Q vector
+	if(qPara)
+		Q_dir = *qPara;
+	else
+		Q_dir = tl::make_vec({Q_avg[0], Q_avg[1], Q_avg[2]});
 	Q_dir = Q_dir / norm_2(Q_dir);
-	vector<t_real> Q_perp = tl::make_vec({-Q_dir[1], Q_dir[0], Q_dir[2]});
+
+	// vector perpendicular to Q, in the scattering plane
+	if(qPerp)
+		Q_perp = *qPerp;
+	else
+		Q_perp = tl::make_vec({-Q_dir[1], Q_dir[0], Q_dir[2]});
+	Q_perp = Q_perp / norm_2(Q_perp);
+	
+	// normal to scattering plane
 	vector<t_real> vecUp = tl::cross_3(Q_dir, Q_perp);
+
+
+	tl::log_info("Q_para = ", Q_dir, ", Q_perp = ", Q_perp, ", Q_up = ", vecUp, ".");
+
 
 	/*
 	 * transformation from the <Q_x, Q_y, Q_z, E> system
-	 * into the <Q_avg, Q_perp, Q_z, E> system,
+	 * into the <Qperp (approx. Q_avg), Q_perp, Q_z, E> system,
 	 * i.e. rotate by the (ki,Q) angle
 	 */
 	matrix<t_real> trafo = identity_matrix<t_real>(4);
@@ -100,6 +133,11 @@ Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<
 
 		reso.vecQ = Q_vec;
 
+		// transform monte carlo events into Q||, Qperp, Qup
+		for(vector<t_real>& Q : reso.vecQ)
+			Q = prod(tl::transpose(trafo), Q - reso.Q_avg_notrafo) /* + reso.Q_avg*/;
+
+
 		tl::log_info(ostrVals.str());
 		tl::log_info(ostrIncVals.str());
 		tl::log_info(ostrElli.str());
@@ -114,10 +152,10 @@ Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<
  * this function tries to be a 1:1 C++ reimplementation of the Perl function
  * 'read_mcstas_res' of the McStas 'mcresplot' program
  */
-Resolution calc_res(const std::vector<ublas::vector<t_real>>& vecKi,
-	const std::vector<ublas::vector<t_real>>& vecKf,
-	const std::vector<t_real>* _p_i,
-	const std::vector<t_real>* _p_f)
+Resolution calc_res(
+	const std::vector<ublas::vector<t_real>>& vecKi, const std::vector<ublas::vector<t_real>>& vecKf,
+	const std::vector<t_real>* _p_i, const std::vector<t_real>* _p_f,
+	const ublas::vector<t_real> *qPara, const ublas::vector<t_real> *qPerp)
 {
 	tl::log_info("Calculating resolution...");
 
@@ -161,7 +199,7 @@ Resolution calc_res(const std::vector<ublas::vector<t_real>>& vecKi,
 	Q_avg /= p_sum;
 	tl::log_info("Average Q vector: ", Q_avg);
 
-	return calc_res(Q_vec, &p_vec);
+	return calc_res(Q_vec, &p_vec, qPara, qPerp);
 }
 
 

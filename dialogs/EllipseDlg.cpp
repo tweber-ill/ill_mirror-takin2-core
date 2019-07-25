@@ -46,12 +46,12 @@ EllipseDlg::EllipseDlg(QWidget* pParent, QSettings* pSett, Qt::WindowFlags fl)
 		m_vecplotwrap[i]->GetCurve(1)->setTitle("Sliced Ellipse");
 
 		QPen penProj, penSlice, penPoints;
-		penProj.setColor(QColor(0, 0x99,0));
-		penSlice.setColor(QColor(0,0,0x99));
-		penPoints.setColor(QColor(0xff,0,0));
+		penProj.setColor(QColor(0, 0x99, 0));
+		penSlice.setColor(QColor(0, 0, 0x99));
+		penPoints.setColor(QColor(0xff, 0, 0, 0xff));
 		penProj.setWidth(2);
 		penSlice.setWidth(2);
-		penPoints.setWidth(2);
+		penPoints.setWidth(1);
 
 		m_vecplotwrap[i]->GetCurve(0)->setStyle(QwtPlotCurve::CurveStyle::Dots);
 		m_vecplotwrap[i]->GetCurve(1)->setStyle(QwtPlotCurve::CurveStyle::Lines);
