@@ -7,7 +7,7 @@
 
 MAKE=make
 GCC=$(which gcc 2>/dev/null)
-SKIP_PREBUILD=0
+SKIP_PREBUILD=1
 
 
 if [ "$GCC" != "" ]	# don't check version if only e.g. clang is available
@@ -23,7 +23,7 @@ fi
 
 if [ ! -d tlibs ] || [ ! -f tlibs/AUTHORS ]
 then
-	echo -e "Error: tlibs not installed. Use ./setup_tlibs.sh"
+	echo -e "Error: tlibs not installed."
 	exit -1;
 fi
 

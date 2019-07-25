@@ -108,6 +108,8 @@ static void extract_pos(
 		<< std::left << std::setw(iPrec*dPadding) << "I" << " "
 		<< std::left << std::setw(iPrec*dPadding) << "dI" << " ";
 
+	bool bHeaderFinished = 0;
+
 
 	std::string strFilterCol, strFilterColVal;
 	std::tie(strFilterCol, strFilterColVal) = tl::split_first(_strFilterCol, std::string{"="}, 1);
@@ -137,7 +139,16 @@ static void extract_pos(
 		const auto& vecMon = ptrInstr->GetCol(strMonVar);
 		const auto& vecCtr = ptrInstr->GetCol(strCtrVar);
 
+		if(vecCtr.size() != ptrInstr->GetScanCount() || 
+			vecMon.size() != ptrInstr->GetScanCount())
+		{
+			tl::log_err("Invalid counter or monitor in \"", strScan, "\".",
+			" Values in counter: ", vecCtr.size(), ", values in monitor: ", vecMon.size(), ".");
+			continue;
+		}
+
 		const auto& vecFilterCol = ptrInstr->GetCol(strFilterCol);
+
 
 
 		for(const std::string& strCol : vecCols)
@@ -151,10 +162,15 @@ static void extract_pos(
 
 			vecUserCols.push_back(vecUserCol);
 
-			(*pOstr) << std::left << std::setw(iPrec*dPadding) << strCol << " ";
+			if(!bHeaderFinished)
+				(*pOstr) << std::left << std::setw(iPrec*dPadding) << strCol << " ";
 		}
 
-		(*pOstr) << std::endl;
+		if(!bHeaderFinished)
+		{
+			(*pOstr) << std::endl;
+			bHeaderFinished = 1;
+		}
 
 
 		for(std::size_t iScanPos=0; iScanPos<ptrInstr->GetScanCount(); ++iScanPos)
