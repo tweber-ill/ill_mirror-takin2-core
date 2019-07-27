@@ -377,20 +377,17 @@ Ellipse2d<t_real> calc_res_ellipse(
  * incoherent (vanadium) widths
  */
 template<class t_real = t_real_reso>
-std::tuple<t_real, t_real> calc_vanadium_fwhms(
+t_real calc_vanadium_fwhm(
 	const ublas::matrix<t_real>& matReso,
 	const ublas::vector<t_real>& vecReso,
 	const t_real dScalarReso,
 	const ublas::vector<t_real>& vecQAvg)
 {
-	struct Ellipse2d<t_real> ellVa =
-		calc_res_ellipse<t_real>(matReso, vecReso, dScalarReso,
-		vecQAvg, 0, 3, 1, 2, -1);
+	ublas::matrix<t_real> M = quadric_proj(matReso, 0);
+	M = quadric_proj(M, 0);
+	M = quadric_proj(M, 0);
 
-	t_real dVanadiumFWHM_Q = ellVa.x_hwhm_bound*2.;
-	t_real dVanadiumFWHM_E = ellVa.y_hwhm_bound*2.;
-
-	return std::make_tuple(dVanadiumFWHM_Q, dVanadiumFWHM_E);
+	return tl::get_SIGMA2FWHM<t_real>() / std::sqrt(std::abs(M(0,0)));
 }
 
 // --------------------------------------------------------------------------------

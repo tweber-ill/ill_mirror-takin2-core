@@ -66,7 +66,7 @@ Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<
 	else
 		Q_perp = tl::make_vec({-Q_dir[1], Q_dir[0], Q_dir[2]});
 	Q_perp = Q_perp / norm_2(Q_perp);
-	
+
 	// normal to scattering plane
 	vector<t_real> vecUp = tl::cross_3(Q_dir, Q_perp);
 
@@ -113,7 +113,7 @@ Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<
 	if(reso.bHasRes)
 	{
 		reso.dQ = calc_bragg_fwhms(reso.res);
-		reso.dQinc = get_vanadium_fwhms(reso);
+		reso.dEinc = get_vanadium_fwhm(reso);
 
 		tl::log_info("Resolution matrix: ", reso.res);
 
@@ -123,8 +123,7 @@ Resolution calc_res(const std::vector<vector<t_real>>& Q_vec, const std::vector<
 			std::ostream_iterator<t_real>(ostrVals, ", "));
 
 		std::ostringstream ostrIncVals;
-		ostrIncVals << "Incoherent / Vanadium FWHM values (Qy, E): "
-			<< std::get<0>(reso.dQinc) << ", " << std::get<1>(reso.dQinc);
+		ostrIncVals << "Incoherent / Vanadium FWHM value (E in meV): " << reso.dEinc;
 
 		std::ostringstream ostrElli;
 		ostrElli << "Ellipsoid offsets: ";
@@ -206,9 +205,8 @@ Resolution calc_res(
 /**
  * vanadium widths
  */
-std::tuple<t_real, t_real> get_vanadium_fwhms(const Resolution& reso)
+t_real get_vanadium_fwhm(const Resolution& reso)
 {
 	ublas::vector<t_real> vec0 = ublas::zero_vector<t_real>(4);
-	return calc_vanadium_fwhms<t_real>(
-		reso.res, vec0, t_real(0), reso.Q_avg);
+	return calc_vanadium_fwhm<t_real>(reso.res, vec0, t_real(0), reso.Q_avg);
 }

@@ -30,8 +30,8 @@ struct Resolution
 	// full-widths (coh)
 	std::vector<t_real_reso> dQ;	// in 1/A and meV
 
-	// full-widths (inc)
-	std::tuple<t_real_reso, t_real_reso> dQinc;
+	// full-width (inc)
+	t_real_reso dEinc;
 
 	// ellipse origin
 	ublas::vector<t_real_reso> Q_avg, Q_avg_notrafo;
@@ -40,7 +40,7 @@ struct Resolution
 	std::vector<ublas::vector<t_real_reso>> vecQ;
 };
 
-std::tuple<t_real_reso, t_real_reso> get_vanadium_fwhms(const Resolution& reso);
+t_real_reso get_vanadium_fwhm(const Resolution& reso);
 
 void normalise_P(std::vector<t_real_reso>*);
 
