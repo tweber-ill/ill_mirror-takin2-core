@@ -1062,7 +1062,7 @@ set yrange [miny : maxy]
 
 # show fit results
 sig2fwhm = 2.*sqrt(2.*log(2.))
-fitres = sprintf("x0 = %.4g\nFWHM = %.4g", x01, sig2fwhm*s1)
+fitres = sprintf("x0 = %.4g\nFWHM = %.4g", x01, abs(sig2fwhm*s1))
 set label at graph 0.05, graph 0.95 fitres
 
 # use these functions with the plot command below
