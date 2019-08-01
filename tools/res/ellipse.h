@@ -97,7 +97,7 @@ enum class EllipseCoordSys : int
  * integrate over row/column iIdx
  */
 template<class T = t_real_reso>
-ublas::matrix<T> ellipsoid_gauss_int(const ublas::matrix<T>& mat, std::size_t iIdx)
+ublas::matrix<T> quadric_proj(const ublas::matrix<T>& mat, std::size_t iIdx)
 {
 	ublas::vector<T> b = T(0.5)*(tl::get_column(mat, iIdx) + tl::get_row(mat, iIdx));
 	b = tl::remove_elem(b, iIdx);
@@ -113,7 +113,7 @@ ublas::matrix<T> ellipsoid_gauss_int(const ublas::matrix<T>& mat, std::size_t iI
  * (see [eck14], equ. 57)
  */
 template<class T = t_real_reso>
-ublas::vector<T> ellipsoid_gauss_int(const ublas::vector<T>& vec,
+ublas::vector<T> quadric_proj(const ublas::vector<T>& vec,
 	const ublas::matrix<T>& mat, std::size_t iIdx)
 {
 	ublas::vector<T> b = tl::get_column(mat, iIdx);
@@ -217,12 +217,12 @@ void Ellipse2d<t_real>::GetCurvePoints(std::vector<t_real>& x, std::vector<t_rea
 // --------------------------------------------------------------------------------
 
 template<class T = t_real_reso>
-static void elli_gauss_int(tl::QuadEllipsoid<T>& quad, std::size_t iIdx)
+static void quadric_proj(tl::QuadEllipsoid<T>& quad, std::size_t iIdx)
 {
 	//tl::log_debug("before int: ", quad.GetR());
 
-	ublas::vector<T> vecRint = ellipsoid_gauss_int(quad.GetR(), quad.GetQ(), iIdx);
-	ublas::matrix<T> matQint = ellipsoid_gauss_int(quad.GetQ(), iIdx);
+	ublas::vector<T> vecRint = quadric_proj(quad.GetR(), quad.GetQ(), iIdx);
+	ublas::matrix<T> matQint = quadric_proj(quad.GetQ(), iIdx);
 	quad.RemoveElems(iIdx);
 	quad.SetQ(matQint);
 	quad.SetR(vecRint);
@@ -310,7 +310,7 @@ Ellipse2d<t_real> calc_res_ellipse(
 
 	if(iInt>-1)
 	{
-		elli_gauss_int(ell.quad, iInt);
+		quadric_proj(ell.quad, iInt);
 		Q_offs = tl::remove_elem(Q_offs, iInt);
 
 		if(iX>=iInt) --iX;
@@ -429,7 +429,7 @@ Ellipsoid3d<t_real> calc_res_ellipsoid(
 
 	if(iInt>-1)
 	{
-		elli_gauss_int(ell.quad, iInt);
+		quadric_proj(ell.quad, iInt);
 		Q_offs = tl::remove_elem(Q_offs, iInt);
 
 		if(iX>=iInt) --iX;
