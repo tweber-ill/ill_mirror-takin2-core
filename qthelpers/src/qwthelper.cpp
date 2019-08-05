@@ -284,7 +284,7 @@ void QwtPlotWrapper::SavePlot() const
 
 	ofstrDat.precision(g_iPrec);
 	ofstrDat << "#\n";
-	ofstrDat << "# comment: Created with the qthelpers library.\n";
+	ofstrDat << "# comment: Created with Takin.\n";
 	ofstrDat << "# timestamp: " << tl::var_to_str<t_real_qwt>(dEpoch)
 		<< " (" << tl::epoch_to_str<t_real_qwt>(dEpoch) << ").\n";
 	ofstrDat << "# title: " << m_pPlot->title().text().toStdString() << "\n";
@@ -383,7 +383,7 @@ void QwtPlotWrapper::ExportGpl() const
 
 	ofstrDat.precision(g_iPrec);
 	ofstrDat << "#\n";
-	ofstrDat << "# comment: Created with the qthelpers library.\n";
+	ofstrDat << "# comment: Created with Takin.\n";
 	ofstrDat << "# timestamp: " << tl::var_to_str<t_real_qwt>(dEpoch)
 		<< " (" << tl::epoch_to_str<t_real_qwt>(dEpoch) << ").\n";
 	ofstrDat << "#\n";
