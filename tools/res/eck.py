@@ -13,28 +13,57 @@ import numpy as np
 import numpy.linalg as la
 
 
+#--------------------------------------------------------------------------
 #
 # constants
 # see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/tascalc.py
 #
 ksq2E = 2.072124836832
 sig2fwhm = 2.*np.sqrt(2.*np.log(2.))
+#--------------------------------------------------------------------------
 
+
+
+#--------------------------------------------------------------------------
+# scattering triangle
 
 def k2lam(k):
     return 2.*np.pi / k
 
 
+def get_scattering_angle(ki, kf, Q):
+    c = (ki**2. + kf**2. - Q**2.) / (2.*ki*kf)
+    return np.arccos(c)
+
+
+def get_angle_ki_Q(ki, kf, Q):
+    c = (ki**2. + Q**2. - kf**2.) / (2.*ki*Q)
+    return np.arccos(c)
+
+
+def get_angle_kf_Q(ki, kf, Q):
+    tt = get_scattering_angle(ki, kf, Q)
+    kiQ = get_angle_ki_Q(ki, kf, Q)
+    return np.pi - tt - kiQ
+
+
+def get_mono_angle(k, d):
+    s = np.pi/(d*k)
+    angle = np.arcsin(s)
+    return angle
+#--------------------------------------------------------------------------
+
+
+
+#--------------------------------------------------------------------------
+# helpers
+
 #
 # z rotation matrix
 #
 def rotation_matrix_3d_z(angle):
-    if angle == 0.:
-        s = 0.
-        c = 1.
-    else:
-        s = np.sin(angle)
-        c = np.cos(angle)
+    s = np.sin(angle)
+    c = np.cos(angle)
 
     return np.array([
         [c, -s, 0],
@@ -48,54 +77,6 @@ def mirror_matrix(iSize, iComp):
     mat[iComp, iComp] = -1.
 
     return mat;
-
-
-
-def ellipsoid_volume(mat):
-    det = np.abs(la.det(mat))
-
-    return 4./3. * np.pi * np.sqrt(1./det)
-
-
-#
-# projects along one axis of the quadric
-# see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/cov.py
-#
-def quadric_proj(_E, idx):
-    E = np.delete(np.delete(_E, idx, axis=0), idx, axis=1)
-    if np.abs(_E[idx, idx]) < 1e-8:
-        return E
-
-    v = 0.5 * (_E[idx,:] + _E[:,idx])
-    vv = np.outer(v, v) / _E[idx, idx]
-    vv = np.delete(np.delete(vv, idx, axis=0), idx, axis=1)
-
-    return E - vv
-
-
-#
-# Project linear part of the quadric
-# (see [eck14], equ. 57)
-#
-def quadric_proj_vec(vec, _E, idx):
-    _col = _E[:,idx]
-    col = np.delete(_col, idx, axis=0)
-    if np.abs(_col[idx]) < 1e-8:
-        return col
-
-    v = np.delete(vec, idx, axis=0)
-    v = v - col*vec[idx]/_col[idx]
-
-    return v
-
-
-
-def calc_bragg_fwhms(reso):
-    vecFwhms = []
-    for i in range(len(reso)):
-        vecFwhms.append(sig2fwhm / np.sqrt(reso[i,i]))
-
-    return np.array(vecFwhms)
 
 
 
@@ -125,6 +106,59 @@ def foc_curv(lenBefore, lenAfter, tt, bVert):
         curv = 2. * f/s
 
     return curv
+#--------------------------------------------------------------------------
+
+
+
+#--------------------------------------------------------------------------
+# ellipsoid helpers
+
+def ellipsoid_volume(mat):
+    det = np.abs(la.det(mat))
+
+    return 4./3. * np.pi * np.sqrt(1./det)
+
+
+#
+# projects along one axis of the quadric
+# (see [eck14], equ. 57)
+#
+def quadric_proj(_E, idx):
+    E = np.delete(np.delete(_E, idx, axis=0), idx, axis=1)
+    if np.abs(_E[idx, idx]) < 1e-8:
+        return E
+
+    v = 0.5 * (_E[idx,:] + _E[:,idx])
+    vv = np.outer(v, v) / _E[idx, idx]
+    vv = np.delete(np.delete(vv, idx, axis=0), idx, axis=1)
+
+    return E - vv
+
+
+#
+# Project linear part of the quadric
+# (see [eck14], equ. 57)
+#
+def quadric_proj_vec(vec, _E, idx):
+    _col = _E[:,idx]
+    col = np.delete(_col, idx, axis=0)
+    if np.abs(_col[idx]) < 1e-8:
+        return col
+
+    v = np.delete(vec, idx, axis=0)
+    v = v - col*vec[idx]/_col[idx]
+
+    return v
+
+
+def calc_bragg_fwhms(reso):
+    vecFwhms = []
+    for i in range(len(reso)):
+        vecFwhms.append(sig2fwhm / np.sqrt(reso[i,i]))
+
+    return np.array(vecFwhms)
+#--------------------------------------------------------------------------
+
 
 
 
@@ -228,12 +262,12 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
     # z components, [eck14], equ. 42
     A[2,2] = Av[0,0] - Av[0,1]*Av[0,1]/Av[1,1]
-    B[2] = Bv[0] - Bv[1]*Av(0,1)/Av(1,1)
+    B[2] = Bv[0] - Bv[1]*Av[0,1]/Av[1,1]
     D = Cv - 0.25*Bv[1]/Av[1,1]
 
 
     # [eck14], equ. 54
-    therefl = refl * np.sqrt(pi / Av[1,1]) # typo in paper?
+    therefl = refl * np.sqrt(np.pi / Av[1,1]) # typo in paper?
     
     return [ A, B, C, D, therefl ]
 
@@ -258,13 +292,13 @@ def calc_eck(param):
     ana_curvh = param["ana_curvh"]
     ana_curvv = param["ana_curvv"]
 
-    if param["bMonoIsOptimallyCurvedH"]:
+    if param["mono_is_optimally_curved_h"]:
         mono_curvh = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), False)
-    if param["bMonoIsOptimallyCurvedV"]: 
+    if param["mono_is_optimally_curved_v"]: 
         mono_curvv = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), True)
-    if param["bAnaIsOptimallyCurvedH"]: 
+    if param["ana_is_optimally_curved_h"]: 
         ana_curvh = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), False)
-    if param["bAnaIsOptimallyCurvedV"]: 
+    if param["ana_is_optimally_curved_v"]: 
         ana_curvv = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.
@@ -272,13 +306,13 @@ def calc_eck(param):
     inv_ana_curvh = 0.
     inv_ana_curvv = 0.
 
-    if param["bMonoIsCurvedH"]:
+    if param["mono_is_curved_h"]:
         inv_mono_curvh = 1./mono_curvh
-    if param["bMonoIsCurvedV"]: 
+    if param["mono_is_curved_v"]: 
         inv_mono_curvv = 1./mono_curvv
-    if param["bAnaIsCurvedH"]: 
+    if param["ana_is_curved_h"]: 
         inv_ana_curvh = 1./ana_curvh
-    if param["bAnaIsCurvedV"]: 
+    if param["ana_is_curved_v"]: 
         inv_ana_curvv = 1./ana_curvv
     # --------------------------------------------------------------------
 
@@ -288,13 +322,13 @@ def calc_eck(param):
     coll_h_pre_mono = param["coll_h_pre_mono"]
     coll_v_pre_mono = param["coll_v_pre_mono"]
 
-    if param.bGuide:
+    if param["use_guide"]:
         coll_h_pre_mono = lam*param["guide_div_h"]
         coll_v_pre_mono = lam*param["guide_div_v"]
 
 
 
-    # results
+    # dict with results
     res = {}
 
     res["Q_avg"] = np.array([ param["Q"], 0., 0., param["E"] ])
@@ -325,7 +359,7 @@ def calc_eck(param):
         param["src_w"], param["src_h"],
         param["mono_w"], param["mono_h"],
         param["dist_src_mono"], param["dist_mono_sample"],
-        param["ki, thetam"],
+        param["ki"], param["thetam"],
         coll_h_pre_mono, param["coll_h_pre_sample"],
         coll_v_pre_mono, param["coll_v_pre_sample"],
         param["mono_mosaic"], param["mono_mosaic_v"],
@@ -433,24 +467,117 @@ def calc_eck(param):
 
 
     # prefactor and volume
-    res["dResVol"] = ellipsoid_volume(res["reso"])
+    res["res_vol"] = ellipsoid_volume(res["reso"])
 
-    res["dR0"] = Z
+    res["r0"] = Z
     # missing volume prefactor to normalise gaussian,
     # cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
-    res["dR0"] *= res["dResVol"] * np.pi * 3.
+    res["r0"] *= res["res_vol"] * np.pi * 3.
 
-    res["dR0"] *= np.exp(-W)
-    res["dR0"] *= dxsec
+    res["r0"] *= np.exp(-W)
+    res["r0"] *= dxsec
 
 	# Bragg widths
-    res["dBraggFWHMs"] = calc_bragg_fwhms(res["reso"])
+    res["bragg_fwhms"] = calc_bragg_fwhms(res["reso"])
+    res["ok"] = True
 
-    if np.isnan(res["dR0"]) or np.isinf(res["dR0"]) or np.isnan(res["reso"]) or np.isinf(res["reso"]):
-        res["bOk"] = False
-        return res
-
-	res["bOk"] = True
-
+    if np.isnan(res["r0"]) or np.isinf(res["r0"]) or np.isnan(res["reso"].any()) or np.isinf(res["reso"].any()):
+        res["ok"] = False
 
     return res
+
+
+
+#
+# test calculation
+#
+if __name__ == "__main__":
+    cm2A = 1e8
+    min2rad = 1./ 60. / 180.*np.pi
+    rad2deg = 180. / np.pi
+
+    d_mono = 3.355
+    d_ana = 3.355
+
+    ki = 1.4
+    kf = 1.4
+    Q = 1.5
+    E = 0.
+
+    twotheta = get_scattering_angle(ki, kf, Q)
+    thetam = get_mono_angle(ki, d_mono)
+    thetaa = get_mono_angle(kf, d_ana)
+    angle_ki_Q = get_angle_ki_Q(ki, kf, Q)
+    angle_kf_Q = get_angle_kf_Q(ki, kf, Q)
+
+    print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g" % 
+        (twotheta*rad2deg, thetam*rad2deg, thetaa*rad2deg, angle_ki_Q*rad2deg, angle_kf_Q*rad2deg))
+
+    params = {
+        "ki" : ki, "kf" : kf, "E" : E, "Q" : Q,
+
+        "twotheta" : twotheta,
+        "thetam" : thetam,
+        "thetaa" : thetaa,
+        "angle_ki_Q" : angle_ki_Q,
+        "angle_kf_Q" : angle_kf_Q,
+    
+        "dmono_sense" : -1.,
+        "dsample_sense" : 1.,
+        "dana_sense" : -1.,
+
+        "dist_src_mono" : 100. * cm2A,
+        "dist_mono_sample" : 100. * cm2A,
+        "dist_sample_ana" : 100. * cm2A,
+        "dist_ana_det" : 100. * cm2A,
+
+        "src_w" : 10. * cm2A,
+        "src_h" : 10. * cm2A,
+        "mono_w" : 10. * cm2A,
+        "mono_h" : 10. * cm2A,
+        "det_w" : 10. * cm2A,
+        "det_h" : 10. * cm2A,
+        "ana_w" : 10. * cm2A,
+        "ana_h" : 10. * cm2A,
+
+        "mono_curvh" : 0.,
+        "mono_curvv" : 0.,
+        "ana_curvh" : 0.,
+        "ana_curvv" : 0.,
+        "mono_is_optimally_curved_h" : False,
+        "mono_is_optimally_curved_v" : False,
+        "ana_is_optimally_curved_h" : False,
+        "ana_is_optimally_curved_v" : False,
+        "mono_is_curved_h" : False,
+        "mono_is_curved_v" : False,
+        "ana_is_curved_h" : False,
+        "ana_is_curved_v" : False,
+
+        "coll_h_pre_mono" : 9999. *min2rad,
+        "coll_v_pre_mono" : 9999. *min2rad,
+        "coll_h_pre_sample" : 9999. *min2rad,
+        "coll_v_pre_sample" : 9999. *min2rad,
+        "coll_h_post_sample" : 9999. *min2rad,
+        "coll_v_post_sample" : 9999. *min2rad,
+        "coll_h_post_ana" : 9999. *min2rad,
+        "coll_v_post_ana" : 9999. *min2rad,
+
+        "use_guide" : False,
+        "guide_div_h" : 9999. *min2rad,
+        "guide_div_v" : 9999. *min2rad,
+
+        "mono_mosaic" : 60. *min2rad,
+        "mono_mosaic_v" : 60. *min2rad,
+        "ana_mosaic" : 60. *min2rad,
+        "ana_mosaic_v" : 60. *min2rad,
+
+        "dmono_refl" : 1.,
+        "dana_effic" : 1.,
+
+        "pos_x" : 0. * cm2A,
+        "pos_y" : 0. * cm2A,
+        "pos_z" : 0. * cm2A,
+    }
+
+    res = calc_eck(params)
+    print(res)
