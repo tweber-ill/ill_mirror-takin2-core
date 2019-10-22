@@ -21,6 +21,10 @@ ksq2E = 2.072124836832
 sig2fwhm = 2.*np.sqrt(2.*np.log(2.))
 
 
+def k2lam(k):
+    return 2.*np.pi / k
+
+
 #
 # z rotation matrix
 #
@@ -35,9 +39,22 @@ def rotation_matrix_3d_z(angle):
     return np.array([
         [c, -s, 0],
         [s,  c, 0],
-        [0,  0, 1]
-    ])
+        [0,  0, 1]])
 
+
+
+def mirror_matrix(iSize, iComp):
+    mat = np.identity(iSize)
+    mat[iComp, iComp] = -1.
+
+    return mat;
+
+
+
+def ellipsoid_volume(mat):
+    det = np.abs(la.det(mat))
+
+    return 4./3. * np.pi * np.sqrt(1./det)
 
 
 #
@@ -73,8 +90,41 @@ def quadric_proj_vec(vec, _E, idx):
 
 
 
-def k2lam(k):
-    return 2.*np.pi / k
+def calc_bragg_fwhms(reso):
+    vecFwhms = []
+    for i in range(len(reso)):
+        vecFwhms.append(sig2fwhm / np.sqrt(reso[i,i]))
+
+    return np.array(vecFwhms)
+
+
+
+#
+# thin lens equation: 1/f = 1/lenB + 1/lenA
+#
+def focal_len(lenBefore, lenAfter):
+    f_inv = 1./lenBefore + 1./lenAfter
+    return 1. / f_inv
+
+
+
+#
+# optimal mono/ana curvature, 
+# see e.g. 
+# 	- (Shirane 2002) p. 66
+# 	- or nicos/nicos-core.git/tree/nicos/devices/tas/mono.py in nicos
+#  - or Monochromator_curved.comp in McStas
+#
+def foc_curv(lenBefore, lenAfter, tt, bVert):
+    f = focal_len(lenBefore, lenAfter)
+    s = np.abs(np.sin(0.5*tt))
+
+    if bVert:
+        curv = 2. * f*s
+    else:
+        curv = 2. * f/s
+
+    return curv
 
 
 
@@ -113,10 +163,10 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
 
-	# Av matrix: formula 38 in [eck14]
-	# some typos in paper leading to the (false) result of a better Qz resolution when focusing
-	# => trying to match terms in Av with corresponding terms in A
-	# corresponding pre-mono terms commented out in Av, as they are not considered there
+    # Av matrix: formula 38 in [eck14]
+    # some typos in paper leading to the (false) result of a better Qz resolution when focusing
+    # => trying to match terms in Av with corresponding terms in A
+    # corresponding pre-mono terms commented out in Av, as they are not considered there
     Av = np.identity(2)
 
     Av_t0 = 0.5 / (mono_mosaic_v*np.abs(np.sin(thetam)))
@@ -134,7 +184,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
 
-	# B vector: formula 27 in [eck14]
+    # B vector: formula 27 in [eck14]
     B = np.array([0,0,0])
     B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*np.abs(np.sin(thetam)))
 
@@ -148,7 +198,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
 
-	# Bv vector: formula 39 in [eck14]
+    # Bv vector: formula 39 in [eck14]
     Bv = np.array([0,0])
 
     Bv_t0 = inv_mono_curvv/mono_mosaic_v**2
@@ -165,24 +215,24 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
 
-	# C scalar: formula 28 in [eck14]
+    # C scalar: formula 28 in [eck14]
     C = 0.5*sig2fwhm**2. * pos_y**2. * \
 	    ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
 		    (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
-	# Cv scalar: formula 40 in [eck14] 
+    # Cv scalar: formula 40 in [eck14] 
     Cv = 0.5*sig2fwhm**2. * pos_z**2. * \
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
 
 
-	# z components, [eck14], equ. 42
+    # z components, [eck14], equ. 42
     A[2,2] = Av[0,0] - Av[0,1]*Av[0,1]/Av[1,1]
     B[2] = Bv[0] - Bv[1]*Av(0,1)/Av(1,1)
     D = Cv - 0.25*Bv[1]/Av[1,1]
 
 
-	# [eck14], equ. 54
+    # [eck14], equ. 54
     therefl = refl * np.sqrt(pi / Av[1,1]) # typo in paper?
     
     return [ A, B, C, D, therefl ]
@@ -208,14 +258,14 @@ def calc_eck(param):
     ana_curvh = param["ana_curvh"]
     ana_curvv = param["ana_curvv"]
 
-    #if param.bMonoIsOptimallyCurvedH:
-    #    mono_curvh = tl::foc_curv(param.dist_src_mono, param.dist_mono_sample, units::abs(t_real(2)*thetam), false);
-    #if param.bMonoIsOptimallyCurvedV: 
-    #    mono_curvv = tl::foc_curv(param.dist_src_mono, param.dist_mono_sample, units::abs(t_real(2)*thetam), true);
-    #if param.bAnaIsOptimallyCurvedH: 
-    #    ana_curvh = tl::foc_curv(param.dist_sample_ana, param.dist_ana_det, units::abs(t_real(2)*thetaa), false);
-    #if param.bAnaIsOptimallyCurvedV: 
-    #    ana_curvv = tl::foc_curv(param.dist_sample_ana, param.dist_ana_det, units::abs(t_real(2)*thetaa), true);
+    if param["bMonoIsOptimallyCurvedH"]:
+        mono_curvh = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), False)
+    if param["bMonoIsOptimallyCurvedV"]: 
+        mono_curvv = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), True)
+    if param["bAnaIsOptimallyCurvedH"]: 
+        ana_curvh = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), False)
+    if param["bAnaIsOptimallyCurvedV"]: 
+        ana_curvv = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.
     inv_mono_curvv = 0.
@@ -338,7 +388,8 @@ def calc_eck(param):
     matAE[3:6, 3:6] = Erot
 
     # U1 matrix
-    U1 = np.dot(np.dot(np.transpose(Tinv), matAE), Tinv)    # typo in paper in quadric trafo in equ 54 (top)?
+    # typo in paper in quadric trafo in equ 54 (top)?
+    U1 = np.dot(np.dot(np.transpose(Tinv), matAE), Tinv)
 
     # V1 vector
     vecBF = np.zeros(6)
@@ -374,6 +425,32 @@ def calc_eck(param):
     res["reso_s"] = W;
 
 
+    if param["dsample_sense"] < 0.:
+        # mirror Q_perp
+        matMirror = mirror_matrix(res.reso.size1(), 1)
+        res["reso"] = np.dot(np.dot(np.transpose(matMirror), res["reso"]), matMirror)
+        res["reso_v"][1] = -res["reso_v"][1]
+
+
+    # prefactor and volume
+    res["dResVol"] = ellipsoid_volume(res["reso"])
+
+    res["dR0"] = Z
+    # missing volume prefactor to normalise gaussian,
+    # cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
+    res["dR0"] *= res["dResVol"] * np.pi * 3.
+
+    res["dR0"] *= np.exp(-W)
+    res["dR0"] *= dxsec
+
+	# Bragg widths
+    res["dBraggFWHMs"] = calc_bragg_fwhms(res["reso"])
+
+    if np.isnan(res["dR0"]) or np.isinf(res["dR0"]) or np.isnan(res["reso"]) or np.isinf(res["reso"]):
+        res["bOk"] = False
+        return res
+
+	res["bOk"] = True
+
+
     return res
-
-
