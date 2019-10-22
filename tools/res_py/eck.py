@@ -403,7 +403,7 @@ def calc_eck(param):
 
     if param["dsample_sense"] < 0.:
         # mirror Q_perp
-        matMirror = mirror_matrix(res.reso.size1(), 1)
+        matMirror = mirror_matrix(len(res["reso"]), 1)
         res["reso"] = np.dot(np.dot(np.transpose(matMirror), res["reso"]), matMirror)
         res["reso_v"][1] = -res["reso_v"][1]
 
@@ -452,7 +452,7 @@ if __name__ == "__main__":
     thetam = get_mono_angle(ki, d_mono)
     thetaa = get_mono_angle(kf, d_ana)
     angle_ki_Q = get_angle_ki_Q(ki, kf, Q)
-    angle_kf_Q = get_angle_kf_Q(ki, kf, Q)
+    angle_kf_Q = -get_angle_kf_Q(ki, kf, Q)
 
     if verbose:
         print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g" % 
@@ -467,9 +467,9 @@ if __name__ == "__main__":
         "angle_ki_Q" : angle_ki_Q,
         "angle_kf_Q" : angle_kf_Q,
     
-        "dmono_sense" : -1.,
-        "dsample_sense" : 1.,
-        "dana_sense" : -1.,
+        "dmono_sense" : 1.,
+        "dsample_sense" : -1.,
+        "dana_sense" : 1.,
 
         "dist_src_mono" : 100. * cm2A,
         "dist_mono_sample" : 100. * cm2A,
