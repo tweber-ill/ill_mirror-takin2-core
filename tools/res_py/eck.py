@@ -11,21 +11,17 @@
 
 import numpy as np
 import numpy.linalg as la
+import reso
 
-
-#--------------------------------------------------------------------------
-#
-# constants
-# see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/tascalc.py
-#
-ksq2E = 2.072124836832
-sig2fwhm = 2.*np.sqrt(2.*np.log(2.))
-#--------------------------------------------------------------------------
-
+np.set_printoptions(floatmode = "fixed",  precision = 4)
 
 
 #--------------------------------------------------------------------------
 # scattering triangle
+# see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/tascalc.py
+
+ksq2E = 2.072124836832
+
 
 def k2lam(k):
     return 2.*np.pi / k
@@ -71,13 +67,11 @@ def rotation_matrix_3d_z(angle):
         [0,  0, 1]])
 
 
-
 def mirror_matrix(iSize, iComp):
     mat = np.identity(iSize)
     mat[iComp, iComp] = -1.
 
     return mat;
-
 
 
 #
@@ -86,7 +80,6 @@ def mirror_matrix(iSize, iComp):
 def focal_len(lenBefore, lenAfter):
     f_inv = 1./lenBefore + 1./lenAfter
     return 1. / f_inv
-
 
 
 #
@@ -106,57 +99,6 @@ def foc_curv(lenBefore, lenAfter, tt, bVert):
         curv = 2. * f/s
 
     return curv
-#--------------------------------------------------------------------------
-
-
-
-#--------------------------------------------------------------------------
-# ellipsoid helpers
-
-def ellipsoid_volume(mat):
-    det = np.abs(la.det(mat))
-
-    return 4./3. * np.pi * np.sqrt(1./det)
-
-
-#
-# projects along one axis of the quadric
-# (see [eck14], equ. 57)
-#
-def quadric_proj(_E, idx):
-    E = np.delete(np.delete(_E, idx, axis=0), idx, axis=1)
-    if np.abs(_E[idx, idx]) < 1e-8:
-        return E
-
-    v = 0.5 * (_E[idx,:] + _E[:,idx])
-    vv = np.outer(v, v) / _E[idx, idx]
-    vv = np.delete(np.delete(vv, idx, axis=0), idx, axis=1)
-
-    return E - vv
-
-
-#
-# Project linear part of the quadric
-# (see [eck14], equ. 57)
-#
-def quadric_proj_vec(vec, _E, idx):
-    _col = _E[:,idx]
-    col = np.delete(_col, idx, axis=0)
-    if np.abs(_col[idx]) < 1e-8:
-        return col
-
-    v = np.delete(vec, idx, axis=0)
-    v = v - col*vec[idx]/_col[idx]
-
-    return v
-
-
-def calc_bragg_fwhms(reso):
-    vecFwhms = []
-    for i in range(len(reso)):
-        vecFwhms.append(sig2fwhm / np.sqrt(reso[i,i]))
-
-    return np.array(vecFwhms)
 #--------------------------------------------------------------------------
 
 
@@ -182,14 +124,14 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     A_tx = inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam))
     A_t1 = A_t0*A_tx
 
-    A[0,0] = 0.5*sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
+    A[0,0] = 0.5*reso.sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
         ( (2./coll_h_pre_mono)**2. + (2*dist_src_mono/src_w)**2. + A_t0*A_t0 )
 
-    A[0,1] = A[1,0] = 0.5*sig2fwhm**2. / ki**2. * np.tan(thetam) * \
+    A[0,1] = A[1,0] = 0.5*reso.sig2fwhm**2. / ki**2. * np.tan(thetam) * \
         ( + 2.*(1./coll_h_pre_mono)**2. + 2.*dist_src_mono*(dist_src_mono-dist_mono_sample)/src_w**2. + \
             A_t0**2. - A_t0*A_t1)
 
-    A[1,1] = 0.5*sig2fwhm**2. / ki**2. * \
+    A[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
     ( (1./coll_h_pre_mono)**2. + (1./coll_h_pre_sample)**2. \
         + ((dist_src_mono-dist_mono_sample)/src_w)**2. \
         + (dist_mono_sample/(mono_w*np.abs(np.sin(thetam))))**2. \
@@ -206,14 +148,14 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     Av_t0 = 0.5 / (mono_mosaic_v*np.abs(np.sin(thetam)))
     Av_t1 = inv_mono_curvv*dist_mono_sample / mono_mosaic_v
 
-    Av[0,0] = 0.5*sig2fwhm**2. / ki**2. * \
+    Av[0,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
         ( (1./coll_v_pre_sample)**2. + (dist_mono_sample/src_h)**2. + (dist_mono_sample/mono_h)**2. + \
     	Av_t0**2. - 2.*Av_t0*Av_t1 + Av_t1**2. ) 	# typo/missing in paper?
 
-    Av[0,1] = Av[1,0] = 0.5*sig2fwhm**2. / ki**2. * \
+    Av[0,1] = Av[1,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
         ( dist_src_mono*dist_mono_sample/src_h**2. - Av_t0*Av_t0 + Av_t0*Av_t1 )
 
-    Av[1,1] = 0.5*sig2fwhm**2. / ki**2. * \
+    Av[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
         ( (1./(coll_v_pre_mono))**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
 
 
@@ -222,10 +164,10 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     B = np.array([0,0,0])
     B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*np.abs(np.sin(thetam)))
 
-    B[0] = sig2fwhm**2. * pos_y / ki * np.tan(thetam) * \
+    B[0] = reso.sig2fwhm**2. * pos_y / ki * np.tan(thetam) * \
         ( 2.*dist_src_mono / src_w**2. + B_t0 )
 
-    B[1] = sig2fwhm**2. * pos_y / ki * \
+    B[1] = reso.sig2fwhm**2. * pos_y / ki * \
     ( - dist_mono_sample / (mono_w*np.abs(np.sin(thetam)))**2. + \
         B_t0 - B_t0 * inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam)) + \
         (dist_src_mono-dist_mono_sample) / src_w**2. )
@@ -238,24 +180,24 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     Bv_t0 = inv_mono_curvv/mono_mosaic_v**2
 
     # typo in paper?
-    Bv[0] = (-1.) *  sig2fwhm**2. * pos_z / ki * \
+    Bv[0] = (-1.) *  reso.sig2fwhm**2. * pos_z / ki * \
         ( dist_mono_sample / mono_h**2. + dist_mono_sample / src_h**2. + \
             Bv_t0 * inv_mono_curvv*dist_mono_sample - 0.5*Bv_t0 / np.abs(np.sin(thetam)) )
 
     # typo in paper?
-    Bv[1] = (-1.) * sig2fwhm**2. * pos_z / ki * \
+    Bv[1] = (-1.) * reso.sig2fwhm**2. * pos_z / ki * \
         ( dist_src_mono / (src_h*src_h) + 0.5*Bv_t0/np.abs(np.sin(thetam)) )
 
 
 
 
     # C scalar: formula 28 in [eck14]
-    C = 0.5*sig2fwhm**2. * pos_y**2. * \
+    C = 0.5*reso.sig2fwhm**2. * pos_y**2. * \
 	    ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
 		    (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
     # Cv scalar: formula 40 in [eck14] 
-    Cv = 0.5*sig2fwhm**2. * pos_z**2. * \
+    Cv = 0.5*reso.sig2fwhm**2. * pos_z**2. * \
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
 
@@ -438,11 +380,11 @@ def calc_eck(param):
     # --------------------------------------------------------------------------
     # integrate last 2 vars -> equs 57 & 58 in [eck14]
 
-    U2 = quadric_proj(U1, 5);
-    U = quadric_proj(U2, 4);
+    U2 = reso.quadric_proj(U1, 5);
+    U = reso.quadric_proj(U2, 4);
 
-    V2 = quadric_proj_vec(V1, U1, 5);
-    V = quadric_proj_vec(V2, U2, 4);
+    V2 = reso.quadric_proj_vec(V1, U1, 5);
+    V = reso.quadric_proj_vec(V2, U2, 4);
 
     W = (C + D + G + H) - 0.25*V1[5]/U1[5,5] - 0.25*V2[4]/U2[4,4]
 
@@ -467,7 +409,7 @@ def calc_eck(param):
 
 
     # prefactor and volume
-    res["res_vol"] = ellipsoid_volume(res["reso"])
+    res["res_vol"] = reso.ellipsoid_volume(res["reso"])
 
     res["r0"] = Z
     # missing volume prefactor to normalise gaussian,
@@ -478,7 +420,7 @@ def calc_eck(param):
     res["r0"] *= dxsec
 
 	# Bragg widths
-    res["bragg_fwhms"] = calc_bragg_fwhms(res["reso"])
+    res["coherent_fwhms"] = reso.calc_coh_fwhms(res["reso"])
     res["ok"] = True
 
     if np.isnan(res["r0"]) or np.isinf(res["r0"]) or np.isnan(res["reso"].any()) or np.isinf(res["reso"].any()):
@@ -492,6 +434,8 @@ def calc_eck(param):
 # test calculation
 #
 if __name__ == "__main__":
+    verbose = True
+
     cm2A = 1e8
     min2rad = 1./ 60. / 180.*np.pi
     rad2deg = 180. / np.pi
@@ -510,8 +454,9 @@ if __name__ == "__main__":
     angle_ki_Q = get_angle_ki_Q(ki, kf, Q)
     angle_kf_Q = get_angle_kf_Q(ki, kf, Q)
 
-    print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g" % 
-        (twotheta*rad2deg, thetam*rad2deg, thetaa*rad2deg, angle_ki_Q*rad2deg, angle_kf_Q*rad2deg))
+    if verbose:
+        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g" % 
+            (twotheta*rad2deg, thetam*rad2deg, thetaa*rad2deg, angle_ki_Q*rad2deg, angle_kf_Q*rad2deg))
 
     params = {
         "ki" : ki, "kf" : kf, "E" : E, "Q" : Q,
@@ -580,4 +525,11 @@ if __name__ == "__main__":
     }
 
     res = calc_eck(params)
-    print(res)
+
+    if verbose:
+        print()
+        print("Resolution matrix:\n%s" % res["reso"])
+
+
+    ellipses = reso.calc_ellipses(res["reso"], verbose)
+    reso.plot_ellipses(ellipses, verbose)
