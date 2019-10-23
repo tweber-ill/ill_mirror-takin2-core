@@ -9,6 +9,7 @@
 # @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
 #
 
+# requires numpy version >= 1.10
 import numpy as np
 import numpy.linalg as la
 import reso
@@ -27,6 +28,10 @@ def k2lam(k):
     return 2.*np.pi / k
 
 
+def get_E(ki, kf):
+        return ksq2E * (ki**2. - kf**2.)
+
+
 def get_scattering_angle(ki, kf, Q):
     c = (ki**2. + kf**2. - Q**2.) / (2.*ki*kf)
     return np.arccos(c)
@@ -38,9 +43,8 @@ def get_angle_ki_Q(ki, kf, Q):
 
 
 def get_angle_kf_Q(ki, kf, Q):
-    tt = get_scattering_angle(ki, kf, Q)
-    kiQ = get_angle_ki_Q(ki, kf, Q)
-    return np.pi - tt - kiQ
+    c = (ki**2. - Q**2. - kf**2.) / (2.*kf*Q)
+    return np.arccos(c)
 
 
 def get_mono_angle(k, d):
@@ -220,11 +224,16 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 # Eckold algorithm combining the mono and ana resolutions
 #
 def calc_eck(param):
-    twotheta = param["twotheta"] * param["dsample_sense"]
-    thetaa = param["thetaa"] * param["dana_sense"]
-    thetam = param["thetam"] * param["dmono_sense"]
-    ki_Q = param["angle_ki_Q"] * param["dsample_sense"]
-    kf_Q = param["angle_kf_Q"] * param["dsample_sense"]
+    twotheta = param["twotheta"] * param["sample_sense"]
+    thetam = param["thetam"] * param["mono_sense"]
+    thetaa = param["thetaa"] * param["ana_sense"]
+    ki_Q = param["angle_ki_Q"] * param["sample_sense"]
+    kf_Q = param["angle_kf_Q"] * param["sample_sense"]
+
+    ki = param["ki"]
+    kf = param["kf"]
+    E = param["E"]
+    Q = param["Q"]
 
 
     # --------------------------------------------------------------------
@@ -259,7 +268,7 @@ def calc_eck(param):
     # --------------------------------------------------------------------
 
 
-    lam = k2lam(param["ki"])
+    lam = k2lam(ki)
 
     coll_h_pre_mono = param["coll_h_pre_mono"]
     coll_v_pre_mono = param["coll_v_pre_mono"]
@@ -273,7 +282,7 @@ def calc_eck(param):
     # dict with results
     res = {}
 
-    res["Q_avg"] = np.array([ param["Q"], 0., 0., param["E"] ])
+    res["Q_avg"] = np.array([ Q, 0., 0., E ])
 
     # -------------------------------------------------------------------------
 
@@ -301,7 +310,7 @@ def calc_eck(param):
         param["src_w"], param["src_h"],
         param["mono_w"], param["mono_h"],
         param["dist_src_mono"], param["dist_mono_sample"],
-        param["ki"], param["thetam"],
+        ki, thetam,
         coll_h_pre_mono, param["coll_h_pre_sample"],
         coll_v_pre_mono, param["coll_v_pre_sample"],
         param["mono_mosaic"], param["mono_mosaic_v"],
@@ -320,7 +329,7 @@ def calc_eck(param):
         param["det_w"], param["det_h"],
         param["ana_w"], param["ana_h"],
         param["dist_ana_det"], param["dist_sample_ana"],
-        param["kf"], -thetaa,
+        kf, -thetaa,
         param["coll_h_post_ana"], param["coll_h_post_sample"],
         param["coll_v_post_ana"], param["coll_v_post_sample"],
         param["ana_mosaic"], param["ana_mosaic_v"],
@@ -332,11 +341,11 @@ def calc_eck(param):
 
 
     # equ 4 & equ 53 in [eck14]
-    dE = (param["ki"]**2. - param["kf"]**2.) / (2.*param["Q"]**2.)
-    kipara = param["Q"]*(0.5+dE)
-    kfpara = param["Q"]-kipara
-    kperp = np.sqrt(np.abs(kipara**2. - param["ki"]**2.))
-    kperp *= param["dsample_sense"]
+    dE = (ki**2. - kf**2.) / (2.*Q**2.)
+    kipara = Q*(0.5+dE)
+    kfpara = Q-kipara
+    kperp = np.sqrt(np.abs(kipara**2. - ki**2.))
+    kperp *= param["sample_sense"]
 
 
 
@@ -401,7 +410,7 @@ def calc_eck(param):
     res["reso_s"] = W;
 
 
-    if param["dsample_sense"] < 0.:
+    if param["sample_sense"] < 0.:
         # mirror Q_perp
         matMirror = mirror_matrix(len(res["reso"]), 1)
         res["reso"] = np.dot(np.dot(np.transpose(matMirror), res["reso"]), matMirror)
@@ -444,38 +453,35 @@ if __name__ == "__main__":
     d_ana = 3.355
 
     ki = 1.4
-    kf = 1.4
+    kf = 1.5
     Q = 1.5
-    E = 0.
+    E = get_E(ki, kf)
 
-    twotheta = get_scattering_angle(ki, kf, Q)
-    thetam = get_mono_angle(ki, d_mono)
-    thetaa = get_mono_angle(kf, d_ana)
-    angle_ki_Q = get_angle_ki_Q(ki, kf, Q)
-    angle_kf_Q = -get_angle_kf_Q(ki, kf, Q)
-
-    if verbose:
-        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g" % 
-            (twotheta*rad2deg, thetam*rad2deg, thetaa*rad2deg, angle_ki_Q*rad2deg, angle_kf_Q*rad2deg))
+    sc_senses = [ 1., -1., 1.]
 
     params = {
+        # scattering triangle
         "ki" : ki, "kf" : kf, "E" : E, "Q" : Q,
 
-        "twotheta" : twotheta,
-        "thetam" : thetam,
-        "thetaa" : thetaa,
-        "angle_ki_Q" : angle_ki_Q,
-        "angle_kf_Q" : angle_kf_Q,
+        # angles
+        "twotheta" : get_scattering_angle(ki, kf, Q),
+        "thetam" : get_mono_angle(ki, d_mono),
+        "thetaa" : get_mono_angle(kf, d_ana),
+        "angle_ki_Q" : get_angle_ki_Q(ki, kf, Q),
+        "angle_kf_Q" : get_angle_kf_Q(ki, kf, Q),
     
-        "dmono_sense" : 1.,
-        "dsample_sense" : -1.,
-        "dana_sense" : 1.,
+        # scattering senses
+        "mono_sense" : sc_senses[0],
+        "sample_sense" : sc_senses[1],
+        "ana_sense" : sc_senses[2],
 
+        # distances
         "dist_src_mono" : 100. * cm2A,
         "dist_mono_sample" : 100. * cm2A,
         "dist_sample_ana" : 100. * cm2A,
         "dist_ana_det" : 100. * cm2A,
 
+        # component sizes
         "src_w" : 10. * cm2A,
         "src_h" : 10. * cm2A,
         "mono_w" : 10. * cm2A,
@@ -485,6 +491,7 @@ if __name__ == "__main__":
         "ana_w" : 10. * cm2A,
         "ana_h" : 10. * cm2A,
 
+        # focusing
         "mono_curvh" : 0.,
         "mono_curvv" : 0.,
         "ana_curvh" : 0.,
@@ -498,6 +505,7 @@ if __name__ == "__main__":
         "ana_is_curved_h" : False,
         "ana_is_curved_v" : False,
 
+        # collimation
         "coll_h_pre_mono" : 9999. *min2rad,
         "coll_v_pre_mono" : 9999. *min2rad,
         "coll_h_pre_sample" : 9999. *min2rad,
@@ -507,29 +515,47 @@ if __name__ == "__main__":
         "coll_h_post_ana" : 9999. *min2rad,
         "coll_v_post_ana" : 9999. *min2rad,
 
+        # guide
         "use_guide" : False,
         "guide_div_h" : 9999. *min2rad,
         "guide_div_v" : 9999. *min2rad,
 
+        # mosaics
         "mono_mosaic" : 60. *min2rad,
         "mono_mosaic_v" : 60. *min2rad,
         "ana_mosaic" : 60. *min2rad,
         "ana_mosaic_v" : 60. *min2rad,
 
+        # crystal reflectivities
+        # TODO, so far always 1
         "dmono_refl" : 1.,
         "dana_effic" : 1.,
 
+        # off-center scattering
+        # WARNING: while this is calculated, it is not yet considered in the ellipse plots
         "pos_x" : 0. * cm2A,
         "pos_y" : 0. * cm2A,
         "pos_z" : 0. * cm2A,
     }
 
+
+    # calculate resolution ellipsoid
     res = calc_eck(params)
+    if not res["ok"]:
+        print("RESOLUTION CALCULATION FAILED!")
+        exit(-1)
 
     if verbose:
-        print()
+        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" % 
+            (params["twotheta"]*rad2deg, params["thetam"]*rad2deg, params["thetaa"]*rad2deg, 
+            params["angle_ki_Q"]*rad2deg, params["angle_kf_Q"]*rad2deg))
+        print("R0 = %g, Vol = %g" % (res["r0"], res["res_vol"]))
         print("Resolution matrix:\n%s" % res["reso"])
+        print("Resolution vector: %s" % res["reso_v"])
+        print("Resolution scalar: %g" % res["reso_s"])
 
 
+    # describe and plot ellipses
     ellipses = reso.calc_ellipses(res["reso"], verbose)
     reso.plot_ellipses(ellipses, verbose)
+

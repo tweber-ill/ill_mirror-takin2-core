@@ -10,6 +10,7 @@
 # @desc see covariance calculations: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/cov.py
 #
 
+# requires numpy version >= 1.10
 import numpy as np
 import numpy.linalg as la
 
