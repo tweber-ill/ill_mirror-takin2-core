@@ -508,9 +508,9 @@ if __name__ == "__main__":
         # collimation
         "coll_h_pre_mono" : 9999. *min2rad,
         "coll_v_pre_mono" : 9999. *min2rad,
-        "coll_h_pre_sample" : 9999. *min2rad,
+        "coll_h_pre_sample" : 30. *min2rad,
         "coll_v_pre_sample" : 9999. *min2rad,
-        "coll_h_post_sample" : 9999. *min2rad,
+        "coll_h_post_sample" : 30. *min2rad,
         "coll_v_post_sample" : 9999. *min2rad,
         "coll_h_post_ana" : 9999. *min2rad,
         "coll_v_post_ana" : 9999. *min2rad,
