@@ -20,8 +20,8 @@ IS_UNSTABLE = 0
 NATIVE_OPTS = 0
 
 # which Py version to use for scripting
-PY_INC_VER = 3.7
-PY_LIB_VER = ${PY_INC_VER}
+PY_INC_VER = 3.6
+PY_LIB_VER = ${PY_INC_VER}m
 #PY_BOOSTLIB_VER = $(subst .,,${PY_LIB_VER})
 PY_BOOSTLIB_VER = $(word 1, $(subst ., ,${PY_LIB_VER}))
 $(info Py boost lib: ${PY_BOOSTLIB_VER})
@@ -57,7 +57,7 @@ USE_FADDEEVA = 1
 USE_CPP11_ABI = 1
 
 # enable Framework libs
-USE_FRAMEWORKS = 1
+USE_FRAMEWORKS = 0
 
 USE_CLP = 0
 
@@ -193,6 +193,11 @@ QT_INC =-I${MYINC}/qt5 \
 	-I${MYINC}/qt5/QtWidgets \
 	-I${MYINC}/qt5/QtGui \
 	-I${MYINC}/qt5/QtOpenGL \
+	-I/usr/include/x86_64-linux-gnu/qt5 \
+	-I/usr/include/x86_64-linux-gnu/qt5/QtCore \
+	-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets \
+	-I/usr/include/x86_64-linux-gnu/qt5/QtGui \
+	-I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL \
 	-I/usr/local/opt/qt5/Frameworks/QtOpenGL.framework/Versions/5/Headers \
 	-I/usr/local/opt/qt5/Frameworks/QtWidgets.framework/Versions/5/Headers \
 	-I/usr/local/opt/qt5/Frameworks/QtCore.framework/Versions/5/Headers \
@@ -352,8 +357,8 @@ endif
 
 ifeq ($(USE_PY), 1)
 	#PY_LIBS = -lboost_python${PY_BOOSTLIB_VER}${BOOST_SUFFIX}
-	PY_LIBS = -lboost_python37${BOOST_SUFFIX}
-	#PY_LIBS = -lboost_python${BOOST_SUFFIX}
+	#PY_LIBS = -lboost_python36${BOOST_SUFFIX}
+	PY_LIBS = -lboost_python${BOOST_SUFFIX}
 
 	ifeq ($(USE_FRAMEWORKS), 0)
 		PY_LIBS += -lpython${PY_LIB_VER}
