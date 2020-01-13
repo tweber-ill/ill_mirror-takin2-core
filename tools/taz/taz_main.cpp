@@ -312,7 +312,7 @@ int main(int argc, char** argv)
 		if(bStartTakinMain)
 		{
 			QPixmap pixSplash = load_pixmap("res/icons/takin.svg");
-			if(!pixSplash.isNull()) 
+			if(!pixSplash.isNull())
 				pixSplash = pixSplash.scaled(pixSplash.size().width()*0.55, pixSplash.size().height()*0.55);
 			pSplash.reset(new QSplashScreen{pixSplash});
 		}

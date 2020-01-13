@@ -9,8 +9,8 @@
 # system-specific build flags
 
 # which compiler?
-#CC = gcc
-CC = clang
+CC = g++
+#CC = clang++
 
 # debug or unstable version?
 DO_DEBUG = 0
@@ -31,7 +31,7 @@ USE_LAPACK = 0
 
 # compile the ogl code?
 USE_3D = 1
-REINIT_3D_HACK = 1
+REINIT_3D_HACK = 0
 
 # compile the network code?
 USE_NET = 1
@@ -99,9 +99,7 @@ else
 	MT_LIBS = -lpthread -lgomp -lrt
 endif
 
-STD_LIBS = -lstdc++
-#STD_LIBS = -lc++ -lc++abi
-STD_LIBS += -lm
+STD_LIBS =
 ifeq ($(USE_FRAMEWORKS), 0)
 	STD_LIBS += $(MT_LIBS)
 endif
@@ -358,7 +356,7 @@ endif
 ifeq ($(USE_PY), 1)
 	#PY_LIBS = -lboost_python${PY_BOOSTLIB_VER}${BOOST_SUFFIX}
 	#PY_LIBS = -lboost_python36${BOOST_SUFFIX}
-	PY_LIBS = -lboost_python${BOOST_SUFFIX}
+	PY_LIBS = -lboost_python3${BOOST_SUFFIX}
 
 	ifeq ($(USE_FRAMEWORKS), 0)
 		PY_LIBS += -lpython${PY_LIB_VER}
