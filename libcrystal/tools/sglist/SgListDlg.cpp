@@ -68,9 +68,9 @@ static QListWidgetItem* create_header_item(const char *pcTitle)
 	QBrush brushHeader = pHeaderItem->foreground();
 	brushHeader.setColor(QColor(0xff, 0xff, 0xff));
 	pHeaderItem->setForeground(brushHeader);
-
-	pHeaderItem->setData(Qt::UserRole, 1000);
 	pHeaderItem->setBackgroundColor(QColor(0x65, 0x65, 0x65));
+	
+	pHeaderItem->setData(Qt::UserRole, 1000);
 
 	return pHeaderItem;
 }
@@ -86,7 +86,8 @@ void SgListDlg::SetupSpacegroups()
 	bool bAlreadySeen[7] = { 0, 0, 0, 0, 0, 0, 0 };
 	const char** pcHeader = xtl::get_crystal_system_names(1);
 	const unsigned int *piStartNr = xtl::get_crystal_system_start_indices();
-	const QColor itemCols[] = {QColor(0xff, 0xff, 0xff), QColor(0xee, 0xee, 0xee)};
+	const QColor itemColsBackground[] = {QColor(0xff, 0xff, 0xff), QColor(0xee, 0xee, 0xee)};
+	const QColor itemColsForeground[] = {QColor(0x00, 0x00, 0x00), QColor(0x00, 0x00, 0x00)};
 
 	for(unsigned int iSG=0; iSG<pvecSG->size(); ++iSG)
 	{
@@ -109,7 +110,8 @@ void SgListDlg::SetupSpacegroups()
 
 		QListWidgetItem* pItem = new QListWidgetItem(ostrSg.str().c_str());
 		pItem->setData(Qt::UserRole, iSG);
-		pItem->setBackgroundColor(itemCols[iSgNr % (sizeof(itemCols)/sizeof(itemCols[0]))]);
+		pItem->setBackgroundColor(itemColsBackground[iSgNr % (sizeof(itemColsBackground)/sizeof(itemColsBackground[0]))]);
+		pItem->setTextColor(itemColsForeground[iSgNr % (sizeof(itemColsForeground)/sizeof(itemColsForeground[0]))]);
 		listSGs->addItem(pItem);
 	}
 }
