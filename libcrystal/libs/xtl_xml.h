@@ -201,7 +201,7 @@ load_xml(std::istream& istr)
 			// end of list?
 			if(!bOkPos || pos == "")
 				break;
-		
+
 			vecEquivPos.emplace_back(get_vec<t_real, t_vec>(pos));
 		}
 

@@ -220,7 +220,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";
 
 	ostrFeat << "<li>";
-#if defined NO_IOSTR || !defined USE_IOSTR
+#if defined NO_IOSTR
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";

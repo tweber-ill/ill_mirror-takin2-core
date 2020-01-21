@@ -871,7 +871,7 @@ bool TazDlg::ImportCIF(const char* pcFile)
 
 		// open pipe to external cif2xml tool
 		tl::log_info("Invoking ", strCifVer);
-		tl::PipeProc<char> proc((g_strCifTool + " 2>/dev/null " + strFile1).c_str(), false);
+		tl::PipeProc<char> proc((g_strCifTool + " 2>/dev/null \"" + strFile1 + "\"").c_str(), false);
 		if(!proc.IsReady())
 		{
 			QMessageBox::critical(this, "Error", strToolNotFound.c_str());
@@ -943,7 +943,7 @@ bool TazDlg::ImportCIF(const char* pcFile)
 				m_vecAtoms.emplace_back(std::move(theatom));
 			}
 		}
-		
+
 		ShowAtomsDlg(1);
 		if(m_pAtomsDlg)
 		{

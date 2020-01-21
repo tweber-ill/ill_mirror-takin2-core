@@ -37,7 +37,6 @@ REINIT_3D_HACK = 0
 USE_NET = 1
 
 # use boost's iostreams/regex/image lib?
-USE_IOSTR = 1
 USE_BOOST_REGEX = 0
 
 # compile the python or julia interfaces?
@@ -140,12 +139,6 @@ ifeq ($(USE_NET), 1)
 	DEFINES += -DUSE_NET
 else
 	DEFINES += -DNO_NET
-endif
-
-ifeq ($(USE_IOSTR), 1)
-	DEFINES += -DUSE_IOSTR
-else
-	DEFINES += -DNO_IOSTR
 endif
 
 ifeq ($(USE_BOOST_REGEX), 1)
@@ -337,9 +330,7 @@ else
 endif
 
 
-ifeq ($(USE_IOSTR), 1)
-	BASIC_LIBS += -lboost_iostreams${BOOST_SUFFIX}
-endif
+BASIC_LIBS += -lboost_iostreams${BOOST_SUFFIX}
 
 ifeq ($(USE_BOOST_REGEX), 1)
 	BASIC_LIBS += -lboost_regex${BOOST_SUFFIX}

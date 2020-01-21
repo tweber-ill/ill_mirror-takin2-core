@@ -7,6 +7,7 @@
 
 #include "convofit_import.h"
 #include "tlibs/file/tmp.h"
+#include "tlibs/log/log.h"
 #include "../res/defs.h"
 
 #include <map>
