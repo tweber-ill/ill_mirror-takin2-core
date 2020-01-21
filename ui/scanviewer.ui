@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>844</width>
-    <height>579</height>
+    <width>893</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -243,10 +243,13 @@
               <property name="spacing">
                <number>2</number>
               </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_17">
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="editPolCur1">
+                <property name="toolTip">
+                 <string>Initial.</string>
+                </property>
                 <property name="text">
-                 <string>Polarisation Vectors:</string>
+                 <string>i1</string>
                 </property>
                </widget>
               </item>
@@ -260,30 +263,17 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QLineEdit" name="editPolVec2">
-                <property name="toolTip">
-                 <string>Final.</string>
-                </property>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_19">
                 <property name="text">
-                 <string>p2</string>
+                 <string>Flippers:</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_18">
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="editFlip1">
                 <property name="text">
-                 <string>Dipole Currents:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="editPolCur1">
-                <property name="toolTip">
-                 <string>Initial.</string>
-                </property>
-                <property name="text">
-                 <string>i1</string>
+                 <string>f1</string>
                 </property>
                </widget>
               </item>
@@ -294,6 +284,51 @@
                 </property>
                 <property name="text">
                  <string>i2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLineEdit" name="editFlip2">
+                <property name="text">
+                 <string>f2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>Dipole Currents:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>Polarisation Vectors:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLineEdit" name="editPolVec2">
+                <property name="toolTip">
+                 <string>Final.</string>
+                </property>
+                <property name="text">
+                 <string>p2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="editXYZ">
+                <property name="text">
+                 <string>hx</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_20">
+                <property name="text">
+                 <string>Guide Coil:</string>
                 </property>
                </widget>
               </item>
@@ -1054,6 +1089,9 @@
   <tabstop>editPolVec2</tabstop>
   <tabstop>editPolCur1</tabstop>
   <tabstop>editPolCur2</tabstop>
+  <tabstop>editFlip1</tabstop>
+  <tabstop>editFlip2</tabstop>
+  <tabstop>editXYZ</tabstop>
   <tabstop>editPolMat</tabstop>
   <tabstop>editTitle</tabstop>
   <tabstop>editUser</tabstop>

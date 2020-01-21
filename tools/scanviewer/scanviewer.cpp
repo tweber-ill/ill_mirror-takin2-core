@@ -489,8 +489,12 @@ void ScanViewerDlg::CalcPol()
 	const std::string strPolVec2 = editPolVec2->text().toStdString();
 	const std::string strPolCur1 = editPolCur1->text().toStdString();
 	const std::string strPolCur2 = editPolCur2->text().toStdString();
+	const std::string strFlip1 = editFlip1->text().toStdString();
+	const std::string strFlip2 = editFlip2->text().toStdString();
+	const std::string strXYZ = editXYZ->text().toStdString();
 
 	m_pInstr->SetPolNames(strPolVec1.c_str(), strPolVec2.c_str(), strPolCur1.c_str(), strPolCur2.c_str());
+	m_pInstr->SetLinPolNames(strFlip1.c_str(), strFlip2.c_str(), strXYZ.c_str());
 	m_pInstr->ParsePolData();
 
 	const std::vector<std::array<t_real, 6>>& vecPolStates = m_pInstr->GetPolStates();
