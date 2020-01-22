@@ -645,13 +645,13 @@ void ScanViewerDlg::CalcPol()
 		}
 		ostrCnts << "</table></p>";
 	}
-	ostrCnts << "</p>";
+	ostrCnts << "</p><br><hr><br>";
 
 
 	// polarisation matrix elements
 	std::ostringstream ostrPol;
 	ostrPol.precision(g_iPrec);
-	ostrPol << "<p><h2>Polarisation Matrix Elements</h2>";
+	ostrPol << "<p><h2>Point-wise Polarisation Matrix Elements</h2>";
 	bool bHasAnyData = false;
 
 	// iterate over scan points
@@ -715,8 +715,91 @@ void ScanViewerDlg::CalcPol()
 	if(!bHasAnyData)
 		ostrPol << "<font size=\"5\" color=\"#ff0000\">Insufficient Data.</font>";
 
-	std::string strHtml = "<html><body>" + ostrPol.str() + "<br><hr><br>"
-		+ ostrCnts.str() + "</body></html>";
+	ostrPol << "<br><hr><br>";
+
+
+	// maybe a peak-background pair
+	std::ostringstream ostrPeakBkgrd;
+
+	if(bHasAnyData && vecCnts.size()/iNumPolStates == 2)
+	{
+		ostrPeakBkgrd.precision(g_iPrec);
+		ostrPeakBkgrd << "<p><h2>Polarisation Matrix Elements for Peak-Background</h2>";
+
+		std::size_t iPtFg=0, iPtBg=1;
+		if(vecCnts[0*iNumPolStates + 0] >= vecCnts[1*iNumPolStates + 0])
+		{
+			iPtFg = 0;
+			iPtBg = 1;
+		}
+		else
+		{
+			iPtFg = 1;
+			iPtBg = 0;
+		}
+
+		ostrPeakBkgrd << "<p><b>Foreground Scan Point: " << (iPtFg+1) << ", Background: " << (iPtBg+1);
+		if(strX != "" && iPtFg*iNumPolStates < vecX.size())
+			ostrPeakBkgrd << " (" << strX << " = " << vecX[iPtFg*iNumPolStates + 0] << ")";
+		ostrPeakBkgrd << "</b>";
+		ostrPeakBkgrd << "<table border=\"1\" cellpadding=\"0\">";
+		ostrPeakBkgrd << "<tr><th>Index 1</th>";
+		ostrPeakBkgrd << "<th>Index 2</th>";
+		ostrPeakBkgrd << "<th>Polarisation</th>";
+		ostrPeakBkgrd << "<th>Error</th></tr>";
+
+		// iterate over all polarisation states which have a SF partner
+		std::unordered_set<std::size_t> setPolAlreadySeen;
+		for(std::size_t iPol=0; iPol<iNumPolStates; ++iPol)
+		{
+			if(!vecHasSFPartner[iPol]) continue;
+			if(setPolAlreadySeen.find(iPol) != setPolAlreadySeen.end())
+				continue;
+
+			const std::size_t iSF = vecSFIdx[iPol];
+			const std::array<t_real, 6>& state = vecPolStates[iPol];
+
+			setPolAlreadySeen.insert(iPol);
+			setPolAlreadySeen.insert(iSF);
+
+			const t_real dCntsNSF = vecCnts[iPtFg*iNumPolStates + iPol] - vecCnts[iPtBg*iNumPolStates + iPol];
+			const t_real dCntsSF = vecCnts[iPtFg*iNumPolStates + iSF] - vecCnts[iPtBg*iNumPolStates + iSF];
+			t_real dNSFErr = std::sqrt(
+				vecCnts[iPtFg*iNumPolStates + iPol] +
+				vecCnts[iPtBg*iNumPolStates + iPol]);
+			t_real dSFErr = std::sqrt(
+				vecCnts[iPtFg*iNumPolStates + iSF] +
+				vecCnts[iPtBg*iNumPolStates + iSF]);
+
+			if(tl::float_equal(dCntsNSF, t_real(0), g_dEps))
+				dNSFErr = 1.;
+			if(tl::float_equal(dCntsSF, t_real(0), g_dEps))
+				dSFErr = 1.;
+
+			bool bInvalid = tl::float_equal(dCntsNSF+dCntsSF, t_real(0), g_dEps);
+			t_real dPolElem = 0., dPolErr = 1.;
+			if(!bInvalid)
+			{
+				dPolElem = /*std::abs*/((dCntsSF-dCntsNSF) / (dCntsSF+dCntsNSF));
+				dPolErr = propagate_err(dCntsNSF, dCntsSF, dNSFErr, dSFErr);
+			}
+
+			// polarisation matrix elements, e.g. <[100] | P | [010]> = <x|P|y>
+			ostrPeakBkgrd << "<tr><td>" << polvec_str(state[0], state[1], state[2]) << "</td>"
+				<< "<td>" << polvec_str(state[3], state[4], state[5]) << "</td>"
+				<< "<td><b>" << (bInvalid ? "--- ": tl::var_to_str(dPolElem, g_iPrec)) << "</b></td>"
+				<< "<td><b>" << (bInvalid ? "--- ": tl::var_to_str(dPolErr, g_iPrec)) << "</b></td>"
+				<< "</tr>";
+		}
+
+		ostrPeakBkgrd << "</table></p>";
+		ostrPeakBkgrd << "</p><br><hr><br>";
+	}
+
+
+	std::string strHtml = "<html><body>" +
+		ostrPeakBkgrd.str() + ostrPol.str() + ostrCnts.str() +
+		std::string{"</body></html>"};
 	editPolMat->setHtml(QString::fromUtf8(strHtml.c_str()));
 }
 
