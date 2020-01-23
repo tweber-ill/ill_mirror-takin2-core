@@ -634,8 +634,10 @@ void ScanViewerDlg::CalcPol()
 			t_real dPfy = vecPolStates[iPol][4];
 			t_real dPfz = vecPolStates[iPol][5];
 
-			std::size_t iCnts = std::size_t(vecCnts[iPt]);
-			t_real dErr = (iCnts==0 ? 1 : std::sqrt(vecCnts[iPt]));
+			std::size_t iCnts = 0;
+			if(iPt < vecCnts.size())
+				iCnts = std::size_t(vecCnts[iPt]);
+			t_real dErr = (iCnts==0 ? 1 : std::sqrt(t_real{iCnts}));
 
 			ostrCnts << "<tr><td>" << polvec_str(dPix, dPiy, dPiz) << "</td>"
 				<< "<td>" << polvec_str(dPfx, dPfy, dPfz) << "</td>"
@@ -682,8 +684,12 @@ void ScanViewerDlg::CalcPol()
 			setPolAlreadySeen.insert(iPol);
 			setPolAlreadySeen.insert(iSF);
 
-			const t_real dCntsNSF = vecCnts[iPt*iNumPolStates + iPol];
-			const t_real dCntsSF = vecCnts[iPt*iNumPolStates + iSF];
+			t_real dCntsNSF = t_real(0);
+			t_real dCntsSF = t_real(0);
+			if(iPt*iNumPolStates + iPol < vecCnts.size())
+				dCntsNSF = vecCnts[iPt*iNumPolStates + iPol];
+			if(iPt*iNumPolStates + iSF < vecCnts.size())
+				dCntsSF = vecCnts[iPt*iNumPolStates + iSF];
 			t_real dNSFErr = std::sqrt(dCntsNSF);
 			t_real dSFErr = std::sqrt(dCntsSF);
 			if(tl::float_equal(dCntsNSF, t_real(0), g_dEps))
@@ -762,14 +768,24 @@ void ScanViewerDlg::CalcPol()
 			setPolAlreadySeen.insert(iPol);
 			setPolAlreadySeen.insert(iSF);
 
-			const t_real dCntsNSF = vecCnts[iPtFg*iNumPolStates + iPol] - vecCnts[iPtBg*iNumPolStates + iPol];
-			const t_real dCntsSF = vecCnts[iPtFg*iNumPolStates + iSF] - vecCnts[iPtBg*iNumPolStates + iSF];
-			t_real dNSFErr = std::sqrt(
-				vecCnts[iPtFg*iNumPolStates + iPol] +
-				vecCnts[iPtBg*iNumPolStates + iPol]);
-			t_real dSFErr = std::sqrt(
-				vecCnts[iPtFg*iNumPolStates + iSF] +
-				vecCnts[iPtBg*iNumPolStates + iSF]);
+			t_real dCntsNSF_fg = t_real{0};
+			t_real dCntsNSF_bg = t_real{0};
+			t_real dCntsSF_fg = t_real{0};
+			t_real dCntsSF_bg = t_real{0};
+
+			if(iPtFg*iNumPolStates + iPol < vecCnts.size())
+				dCntsNSF_fg = vecCnts[iPtFg*iNumPolStates + iPol];
+			if(iPtBg*iNumPolStates + iPol < vecCnts.size())
+				dCntsNSF_bg = vecCnts[iPtBg*iNumPolStates + iPol];
+			if(iPtFg*iNumPolStates + iSF < vecCnts.size())
+				dCntsSF_fg = vecCnts[iPtFg*iNumPolStates + iSF];
+			if(iPtBg*iNumPolStates + iSF < vecCnts.size())
+				dCntsSF_bg = vecCnts[iPtBg*iNumPolStates + iSF];
+
+			const t_real dCntsNSF = dCntsNSF_fg - dCntsNSF_bg;
+			const t_real dCntsSF = dCntsSF_fg - dCntsSF_bg;
+			t_real dNSFErr = std::sqrt(dCntsNSF_fg + dCntsNSF_bg);
+			t_real dSFErr = std::sqrt(dCntsSF_fg + dCntsSF_bg);
 
 			if(tl::float_equal(dCntsNSF, t_real(0), g_dEps))
 				dNSFErr = 1.;
