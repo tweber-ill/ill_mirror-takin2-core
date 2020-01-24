@@ -44,7 +44,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	labelVersion->setText("Version " TAKIN_VER ".");
 	labelWritten->setText("Written by Tobias Weber <tweber@ill.fr>.");
 	labelYears->setText("2014 - 2017 for Technische Universität München, Garching, Germany"
-		";\n2017 - 2019 for Institut Laue-Langevin, Grenoble, France."); 
+		";\n2017 - 2020 for Institut Laue-Langevin, Grenoble, France."); 
 		// ... but developed as private project before June, 2019 ;)
 
 #ifdef PRIVATE_SRC_VERSION

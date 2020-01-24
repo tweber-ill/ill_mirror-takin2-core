@@ -206,7 +206,7 @@ void ScanViewerDlg::SetAbout()
 {
 	labelVersion->setText("Version " TAKIN_VER ".");
 	labelWritten->setText("Written by Tobias Weber <tobias.weber@tum.de>.");
-	labelYears->setText("Years: 2015 - 2019.");
+	labelYears->setText("Years: 2015 - 2020.");
 
 	std::string strCC = "Built";
 #ifdef BOOST_PLATFORM
