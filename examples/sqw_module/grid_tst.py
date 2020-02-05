@@ -28,8 +28,14 @@ lstep = 0.001
 numvals = 2     # [E, w]
 
 
+# longitudinal
 plot_hklbegin = np.array([-0.09, -0.09, -0.])
 plot_hklend = np.array([0.09, 0.09, 0.])
+
+# transversal
+#plot_hklbegin = np.array([0.09, -0.09, 0.])
+#plot_hklend = np.array([-0.09, 0.09, 0.])
+
 plot_hklsteps = 512
 # -----------------------------------------------------------------------------
 
