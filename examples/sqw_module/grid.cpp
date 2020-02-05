@@ -5,7 +5,8 @@
  * @license GPLv2
  */
 
-// g++ -std=c++11 -shared -fPIC -o plugins/sqwgrid.so -I. -I/usr/include/QtCore examples/sqw_module/grid.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp
+// Module: g++ -std=c++11 -shared -fPIC -o plugins/sqwgrid.so -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_module/grid.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp tlibs/string/eval.cpp
+// Test: g++ -std=c++11 -DDO_TEST -fPIC -o sqwgrid-tst -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_module/grid.cpp tools/monteconvo/sqwbase.cpp tlibs/string/eval.cpp tlibs/log/log.cpp -lboost_iostreams -lQt5Core
 
 #include "grid.h"
 
@@ -15,7 +16,6 @@
 #include "tlibs/phys/neutrons.h"
 #include "tlibs/file/prop.h"
 
-#include <boost/dll/alias.hpp>
 #include <QFile>
 
 
@@ -288,8 +288,44 @@ SqwBase* SqwMod::shallow_copy() const
 
 
 
+#ifdef DO_TEST
+// ----------------------------------------------------------------------------
+// test querying of data
+
+int main(int argc, char **argv)
+{
+	if(argc <= 1)
+	{
+		std::cerr << "Please specify a grid config file." << std::endl;
+		return -1;
+	}
+
+
+	SqwMod mod(argv[1]);
+	//mod.SetVarIfAvail("sigma", "0.1");
+
+	while(1)
+	{
+		t_real h, k, l;
+		std::cout << "Enter hkl: ";
+		std::cin >> h >> k >> l;
+
+		std::vector<t_real> vecE, vecW;
+		std::tie(vecE, vecW) = mod.disp(h, k, l);
+
+		for(std::size_t i=0; i<vecE.size(); ++i)
+			std::cout << "(" << i+1 << ") " << "E = " << vecE[i] << ", weight = " << vecW[i] << "\n";
+		std::cout << std::endl;
+	}
+}
+// ----------------------------------------------------------------------------
+
+#else
+
 // ----------------------------------------------------------------------------
 // SO interface
+#include <boost/dll/alias.hpp>
+
 
 static const char* pcModIdent = "gridmod";
 static const char* pcModName = "Grid";
@@ -312,3 +348,6 @@ std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
 // exports from so file
 BOOST_DLL_ALIAS(sqw_info, takin_sqw_info);
 BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
+// ----------------------------------------------------------------------------
+
+#endif
