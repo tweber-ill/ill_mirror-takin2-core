@@ -36,6 +36,10 @@ plot_hklend = np.array([0.09, 0.09, 0.])
 #plot_hklbegin = np.array([0.09, -0.09, 0.])
 #plot_hklend = np.array([-0.09, 0.09, 0.])
 
+# up
+#plot_hklbegin = np.array([0, 0, -0.09])
+#plot_hklend = np.array([0, 0, 0.09])
+
 plot_hklsteps = 512
 # -----------------------------------------------------------------------------
 
@@ -132,6 +136,7 @@ def plot_disp(idxfilehandle, datafilehandle, hklbegin, hklend, hklsteps):
     qs_h = np.array(qs_h)
     qs_k = np.array(qs_k)
     qs_l = np.array(qs_l)
+    qs = np.sqrt(qs_h**2. + qs_k**2. + qs_l**2.)
     Es = np.array(Es)
     ws = np.abs(np.array(ws))
 
