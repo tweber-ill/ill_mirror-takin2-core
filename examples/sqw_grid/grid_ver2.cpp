@@ -1,20 +1,19 @@
 /**
- * S(q,w) module example for a pre-calculated grid
- * @author Tobias Weber <tobias.weber@tum.de>
- * @date 30-sep-2018
+ * S(q,w) module example for a pre-calculated grid (file format version 2)
+ * @author Tobias Weber <tweber@ill.fr>
+ * @date 06-jan-2020
  * @license GPLv2
  */
 
-// Module: g++ -std=c++11 -shared -fPIC -o plugins/sqwgrid.so -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_grid/grid.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp tlibs/string/eval.cpp
-// Test: g++ -std=c++11 -DDO_TEST -fPIC -o sqwgrid-tst -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_grid/grid.cpp tools/monteconvo/sqwbase.cpp tlibs/string/eval.cpp tlibs/log/log.cpp -lboost_iostreams -lQt5Core
+// Module: g++ -std=c++11 -shared -fPIC -o plugins/sqwgrid.so -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_grid/grid_ver2.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp tlibs/string/eval.cpp
+// Test: g++ -std=c++11 -DDO_TEST -fPIC -o sqwgrid-tst -I. -I/usr/include/QtCore -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore examples/sqw_grid/grid_ver2.cpp tools/monteconvo/sqwbase.cpp tlibs/string/eval.cpp tlibs/log/log.cpp -lboost_iostreams -lQt5Core
 
-#include "grid.h"
+#include "grid_ver2.h"
 
 #include "libs/version.h"
 #include "tlibs/string/string.h"
 #include "tlibs/math/math.h"
 #include "tlibs/phys/neutrons.h"
-#include "tlibs/file/prop.h"
 
 #include <QFile>
 
@@ -27,37 +26,56 @@ using t_real = typename SqwMod::t_real;
 
 SqwMod::SqwMod()
 {
-	SqwBase::m_bOk = 1;
+	SqwBase::m_bOk = 0;
 }
 
 
-SqwMod::SqwMod(const std::string& strCfgFile) : SqwMod()
+SqwMod::SqwMod(const std::string& strDatFile) : m_strDataFile(strDatFile)
 {
-	tl::log_info("Grid description file: \"", strCfgFile, "\".");
+	SqwBase::m_bOk = 0;
+	tl::log_info("Loading grid version 2 data file: \"", strDatFile, "\".");
 
-	tl::Prop<std::string> prop;
-	if(prop.Load(strCfgFile.c_str(), tl::PropType::INFO))
+
+	QFile fileIdx(strDatFile.c_str());
+	if(!fileIdx.exists())
 	{
-		m_strIndexFile = prop.Query<std::string>("files/index");
-		m_strDataFile = prop.Query<std::string>("files/data");
-
-		m_hmin = prop.QueryAndParse<t_real>("dims/hmin");
-		m_hmax = prop.QueryAndParse<t_real>("dims/hmax");
-		m_hstep = prop.QueryAndParse<t_real>("dims/hstep");
-		m_kmin = prop.QueryAndParse<t_real>("dims/kmin");
-		m_kmax = prop.QueryAndParse<t_real>("dims/kmax");
-		m_kstep = prop.QueryAndParse<t_real>("dims/kstep");
-		m_lmin = prop.QueryAndParse<t_real>("dims/lmin");
-		m_lmax = prop.QueryAndParse<t_real>("dims/lmax");
-		m_lstep = prop.QueryAndParse<t_real>("dims/lstep");
-
-		SqwBase::m_bOk = 1;
+		tl::log_err("Grid data file \"", strDatFile, "\" does not exist.");
+		return;
 	}
-	else
+
+	if(!fileIdx.open(QIODevice::ReadOnly))
 	{
-		tl::log_err("Grid description file \"",  strCfgFile, "\" could not be loaded.");
-		SqwBase::m_bOk = 0;
+		tl::log_err("Grid data file \"", strDatFile, "\" cannot be opened.");
+		return;
 	}
+
+	const void *pMemIdx = fileIdx.map(0, sizeof(m_indexBlockOffset) + 9*sizeof(t_real));
+	if(!pMemIdx)
+	{
+		tl::log_err("Grid data file \"", strDatFile, "\" cannot be mapped.");
+		return;
+	}
+
+	m_indexBlockOffset = *((std::size_t*)pMemIdx);
+
+	m_hmin = ((t_real*)pMemIdx)[1];
+	m_hmax = ((t_real*)pMemIdx)[2];
+	m_hstep = ((t_real*)pMemIdx)[3];
+	m_kmin = ((t_real*)pMemIdx)[4];
+	m_kmax = ((t_real*)pMemIdx)[5];
+	m_kstep = ((t_real*)pMemIdx)[6];
+	m_lmin = ((t_real*)pMemIdx)[7];
+	m_lmax = ((t_real*)pMemIdx)[8];
+	m_lstep = ((t_real*)pMemIdx)[9];
+
+	fileIdx.unmap((unsigned char*)pMemIdx);
+	fileIdx.close();
+
+	tl::log_info("Data block dimensions: h=", m_hmin, "..", m_hmax, " (delta=", m_hstep, "), ",
+		"k=", m_kmin, "..", m_kmax, " (delta=", m_kstep, "), ",
+		"l=", m_lmin, "..", m_lmax, " (delta=", m_lstep, "), ");
+
+	SqwBase::m_bOk = 1;
 }
 
 
@@ -104,43 +122,11 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 	};
 
 
-	// ------------------------------------------------------------------------
-	// the index file holds the offsets into the data file
-	std::size_t idx_file_offs = hkl_to_idx(dh, dk, dl);
-
-	QFile fileIdx(m_strIndexFile.c_str());
-	if(!fileIdx.exists())
-	{
-		tl::log_err("Index file \"", m_strIndexFile, "\" does not exist.");
-		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
-	}
-
-	if(!fileIdx.open(QIODevice::ReadOnly))
-	{
-		tl::log_err("Index file \"", m_strIndexFile, "\" cannot be opened.");
-		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
-	}
-
-	const void *pMemIdx = fileIdx.map(idx_file_offs*sizeof(std::size_t), sizeof(std::size_t));
-	if(!pMemIdx)
-	{
-		tl::log_err("Index file \"", m_strIndexFile, "\" cannot be mapped.");
-		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
-	}
-
-	std::size_t dat_file_offs = *((std::size_t*)pMemIdx);
-	fileIdx.unmap((unsigned char*)pMemIdx);
-	fileIdx.close();
-	// ------------------------------------------------------------------------
-
-
-	// ------------------------------------------------------------------------
-	// the data file holds the energies and spectral weights of the dispersion branches
 
 	QFile fileDat(m_strDataFile.c_str());
 	if(!fileDat.exists())
 	{
-		tl::log_err("Data file \"", m_strDataFile, "\" does not exist.");
+		tl::log_err("Grid data file \"", m_strDataFile, "\" does not exist.");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
@@ -150,10 +136,31 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
+
+	// ------------------------------------------------------------------------
+	// the index block the offsets into the data block
+	std::size_t idx_file_offs = hkl_to_idx(dh, dk, dl);
+
+	const void *pMemIdx = fileDat.map(
+		m_indexBlockOffset + idx_file_offs*sizeof(std::size_t), sizeof(std::size_t));
+	if(!pMemIdx)
+	{
+		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped.");
+		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
+	}
+
+	std::size_t dat_file_offs = *((std::size_t*)pMemIdx);
+	fileDat.unmap((unsigned char*)pMemIdx);
+	// ------------------------------------------------------------------------
+
+
+	// ------------------------------------------------------------------------
+	// the data block holds the energies and spectral weights of the dispersion branches
+
 	const void *pMemDat = fileDat.map(dat_file_offs, sizeof(std::size_t));
 	if(!pMemDat)
 	{
-		tl::log_err("Data file \"", m_strDataFile, "\" cannot be mapped (1).");
+		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped (1).");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
@@ -167,7 +174,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 		iNumBranches*sizeof(t_real)*2);
 	if(!pMemDat)
 	{
-		tl::log_err("Data file \"", m_strDataFile, "\" cannot be mapped (2).");
+		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped (2).");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
@@ -270,8 +277,8 @@ SqwBase* SqwMod::shallow_copy() const
 	pMod->m_dIncSigma = this->m_dIncSigma;
 	pMod->m_dS0 = this->m_dS0;
 
-	pMod->m_strIndexFile = this->m_strIndexFile;
 	pMod->m_strDataFile = this->m_strDataFile;
+	pMod->m_indexBlockOffset = this->m_indexBlockOffset;
 
 	pMod->m_hmin = this->m_hmin;
 	pMod->m_hmax = this->m_hmax;
@@ -327,8 +334,8 @@ int main(int argc, char **argv)
 #include <boost/dll/alias.hpp>
 
 
-static const char* pcModIdent = "gridmod";
-static const char* pcModName = "Grid";
+static const char* pcModIdent = "grid2mod";
+static const char* pcModName = "Grid Version 2";
 
 
 std::tuple<std::string, std::string, std::string> sqw_info()
