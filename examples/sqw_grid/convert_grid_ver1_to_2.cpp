@@ -7,24 +7,24 @@
 
 /*
  * Grid version 2 format
- * 
+ *
  * Header format:
  * 8 bytes (std::size_t): offset of index block
  * 3*8 bytes (double): data dimensions: hmin, hmax, hstep
  * 3*8 bytes (double): data dimensions: kmin, kmax, kstep
  * 3*8 bytes (double): data dimensions: lmin, lmax, lstep
  * x bytes: metadata header
- * 
+ *
  * <data block>
  * <header block>
- * 
+ *
  * Data block format:
  * repeat:
  *      4 bytes (unsigned int): number of branches
  *      repeat (number of branches times):
  *          8 bytes (double): energy
  *          8 bytes (double): dynamical structure factor
- * 
+ *
  * Index block format:
  * repeat:
  *      8 bytes (std::size_t): offset into data block
@@ -46,7 +46,7 @@ int main()
 
 	std::string filenameNewDat = "grid_ver2.bin";
 
-    // dimensions of version 1 grid (TODO: load from config file)
+	// dimensions of version 1 grid (TODO: load from config file)
 	double hmin = -0.096;
 	double hmax = 0.096;
 	double hstep = 0.002;
@@ -114,10 +114,14 @@ int main()
 
 		for(unsigned int branch=0; branch<numBranches; ++branch)
 		{
-			double vals[4] = {0, 0, 0, 0};
+			// in case more than one weigh factor is stored in original grid:
+			//double vals[4] = {0, 0, 0, 0};
+
+			double vals[2] = {0, 0};
 			ifDat.read((char*)vals, sizeof(vals));
 
-			double w = std::abs(vals[1])+std::abs(vals[2])+std::abs(vals[3]);
+			//double w = std::abs(vals[1])+std::abs(vals[2])+std::abs(vals[3]);
+			double w = std::abs(vals[1]);
 
 			if(w >= eps)
 			{
@@ -155,8 +159,8 @@ int main()
 	std::cout << "\nConverting index file ..." << std::endl;
 
 	std::ifstream ifIdx(filenameIdx);
-    // write index block in the same file as data
-	std::ofstream &ofIdx = ofDat; 
+	// write index block in the same file as data
+	std::ofstream &ofIdx = ofDat;
 
 
 	while(1)
