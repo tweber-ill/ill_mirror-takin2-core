@@ -9,25 +9,25 @@
  * Grid version 2 format
  *
  * Header format:
- * 8 bytes (std::size_t): offset of index block
- * 3*8 bytes (double): data dimensions: hmin, hmax, hstep
- * 3*8 bytes (double): data dimensions: kmin, kmax, kstep
- * 3*8 bytes (double): data dimensions: lmin, lmax, lstep
- * x bytes: metadata header
+ *     8 bytes (std::size_t): offset of index block
+ *     3*8 bytes (double): data dimensions: hmin, hmax, hstep
+ *     3*8 bytes (double): data dimensions: kmin, kmax, kstep
+ *     3*8 bytes (double): data dimensions: lmin, lmax, lstep
+ *     x bytes: metadata header
  *
  * <data block>
  * <header block>
  *
  * Data block format:
- * repeat:
- *      4 bytes (unsigned int): number of branches
- *      repeat (number of branches times):
- *          8 bytes (double): energy
- *          8 bytes (double): dynamical structure factor
+ *     repeat for each reduced wave vector q:
+ *         4 bytes (unsigned int): number of dispersion branches
+ *             repeat (number of branches times):
+ *                 8 bytes (double): energy
+ *                 8 bytes (double): dynamical structure factor
  *
  * Index block format:
- * repeat:
- *      8 bytes (std::size_t): offset into data block
+ *     repeat for each (h,k,l) coordinate:
+ *         8 bytes (std::size_t): offset into data block
  */
 
 #include <iostream>
