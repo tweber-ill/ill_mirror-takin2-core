@@ -19,6 +19,7 @@
 
 #include <qwt_picker_machine.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_plot_renderer.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_scale_widget.h>
 
@@ -78,6 +79,8 @@ protected:
 		const int iKey = pEvt->key();
 		if(iKey == Qt::Key_S)
 			m_pPlotWrap->SavePlot();
+		else if(iKey == Qt::Key_P)
+			m_pPlotWrap->SavePlotGraphics();
 		else if(iKey == Qt::Key_G)
 			m_pPlotWrap->ExportGpl();
 		else
@@ -252,6 +255,16 @@ void QwtPlotWrapper::SetData(const std::vector<t_real_qwt>& vecX, const std::vec
 			m_vecCurves[iCurve]->GetShowErrors(), pvecYErr);
 		m_pPlot->replot();
 	}
+}
+
+
+void QwtPlotWrapper::SavePlotGraphics() const
+{
+	if(!m_pPlot)
+		return;
+
+	QwtPlotRenderer renderer;
+	renderer.exportTo(m_pPlot, "plot.pdf");
 }
 
 

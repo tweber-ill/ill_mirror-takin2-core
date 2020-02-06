@@ -171,7 +171,8 @@ public slots:
 	void setZoomBase(const QRectF&);
 	void doUpdate();
 
-	void SavePlot() const;
+	void SavePlotGraphics() const;	// save plot graphics
+	void SavePlot() const;		// save plot data
 	void ExportGpl() const;
 };
 

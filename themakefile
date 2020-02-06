@@ -20,8 +20,8 @@ IS_UNSTABLE = 0
 NATIVE_OPTS = 0
 
 # which Py version to use for scripting
-#PY_INC_VER = 3.6
-PY_INC_VER = 3.7
+PY_INC_VER = 3.6
+#PY_INC_VER = 3.7
 PY_LIB_VER = ${PY_INC_VER}m
 #PY_BOOSTLIB_VER = $(subst .,,${PY_LIB_VER})
 PY_BOOSTLIB_VER = $(word 1, $(subst ., ,${PY_LIB_VER}))
@@ -347,8 +347,8 @@ endif
 
 ifeq ($(USE_PY), 1)
 	#PY_LIBS = -lboost_python${PY_BOOSTLIB_VER}${BOOST_SUFFIX}
-	PY_LIBS = -lboost_python37${BOOST_SUFFIX}
-	#PY_LIBS = -lboost_python3${BOOST_SUFFIX}
+	#PY_LIBS = -lboost_python37${BOOST_SUFFIX}
+	PY_LIBS = -lboost_python3${BOOST_SUFFIX}
 
 	ifeq ($(USE_FRAMEWORKS), 0)
 		PY_LIBS += -lpython${PY_LIB_VER}
