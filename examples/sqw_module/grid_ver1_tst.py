@@ -1,5 +1,5 @@
 #
-# grid test
+# grid format version 1 loading test
 # @author tweber@ill.fr
 # @date 4-feb-2020
 # @license GPLv2
