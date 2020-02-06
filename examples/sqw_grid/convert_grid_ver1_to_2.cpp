@@ -16,7 +16,7 @@
  *     x bytes: metadata header
  *
  * <data block>
- * <header block>
+ * <index block>
  *
  * Data block format:
  *     repeat for each reduced wave vector q:
