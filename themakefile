@@ -413,7 +413,7 @@ OBJ_TAZ = obj/taz_main.o obj/taz.o obj/taz_crys.o \
 	obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o obj/simple.o \
 	obj/ResoDlg.o obj/ResoDlg_file.o obj/loadinstr.o obj/recent.o obj/globals.o \
 	obj/globals_qt.o obj/qthelper.o obj/qwthelper.o \
-	obj/sqw.o obj/sqwbase.o obj/sqwfact.o ${PY_OBJS} ${JL_OBJS} \
+	obj/sqw.o obj/sqw_grid.o obj/sqwbase.o obj/sqwfact.o ${PY_OBJS} ${JL_OBJS} \
 	obj/tasreso.o obj/ConvoDlg.o obj/ConvoDlg_file.o obj/SqwParamDlg.o \
 	obj/scanviewer.o obj/FitParamDlg.o obj/x3d.o obj/eval.o \
 	obj/tlibs_ver.o obj/libcrystal_ver.o obj/AboutDlg.o obj/convo_scan.o \
@@ -424,7 +424,7 @@ OBJ_TAZ = obj/taz_main.o obj/taz.o obj/taz_crys.o \
 OBJ_MONTERESO = obj/montereso_res.o obj/montereso_res_main.o \
 	obj/qthelper.o obj/qwthelper.o obj/globals.o obj/globals_qt.o
 
-OBJ_MONTECONVO = obj/log.o obj/debug.o obj/sqw.o obj/sqwbase.o \
+OBJ_MONTECONVO = obj/log.o obj/debug.o obj/sqw.o obj/sqw_grid.o obj/sqwbase.o \
 	obj/sqwfact.o ${PY_OBJS} ${JL_OBJS} obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o \
 	obj/rand.o obj/tasreso.o obj/eval.o \
 	obj/linalg2.o
@@ -515,7 +515,7 @@ xmonteconvo: ${OBJ_MONTECONVO} obj/xmconv_main.o obj/ConvoDlg.o obj/ConvoDlg_fil
 convofit: ${OBJ_CONVOFIT}
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/convofit $+ \
 		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options ${PY_LIBS} ${JL_LIBS} \
-		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
+		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS} -lQt5Core
 	${STRIP} bin/convofit
 
 convoseries: ${OBJ_CONVOSERIES}
@@ -717,6 +717,8 @@ obj/reso_res_main.o: tools/res/res_main.cpp
 obj/xmconv_main.o: tools/monteconvo/xmconv_main.cpp
 	${CC} ${FLAGS} -c -o $@ $<
 obj/sqw.o: tools/monteconvo/sqw.cpp tools/monteconvo/sqw.h tlibs/math/kd.h
+	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
+obj/sqw_grid.o: tools/monteconvo/sqw_grid_ver2.cpp tools/monteconvo/sqw_grid_ver2.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/sqwbase.o: tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwbase.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<

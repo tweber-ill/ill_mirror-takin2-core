@@ -7,6 +7,7 @@
 
 #include "sqwfactory.h"
 #include "sqw.h"
+#include "sqw_grid_ver2.h"
 
 #if !defined(NO_PY) || defined(USE_JL)
 	#include "sqw_proc.h"
@@ -47,6 +48,10 @@ static t_mapSqw g_mapSqw =
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwKdTree>(strCfgFile.c_str()); },
 		"4D Nearest-Point Raster of the Form (h, k, l, E, S)" } },
+	{ "uniform_grid", t_mapSqw::mapped_type {
+		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
+		{ return std::make_shared<SqwGridVer2>(strCfgFile.c_str()); },
+		"Uniform Grid" } },
 	{ "table_1d", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwTable1d>(strCfgFile.c_str()); },

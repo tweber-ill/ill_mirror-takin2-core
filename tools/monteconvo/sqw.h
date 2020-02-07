@@ -1,5 +1,5 @@
 /**
- * monte carlo convolution tool
+ * pre-defined sqw modules
  * @author Tobias Weber <tobias.weber@tum.de>
  * @date 2015 -- 2018
  * @license GPLv2
