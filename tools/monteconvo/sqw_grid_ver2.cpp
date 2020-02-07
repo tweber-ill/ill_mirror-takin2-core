@@ -11,10 +11,9 @@
 #include "tlibs/string/string.h"
 #include "tlibs/math/math.h"
 #include "tlibs/phys/neutrons.h"
+#include "tlibs/file/file.h"
 
-// TODO: use different memory-mapper to prevent QtCore dependency of convofit!
-#include <QFile>
-
+#include <fstream>
 
 using t_real = typename SqwGridVer2::t_real;
 
@@ -34,47 +33,46 @@ SqwGridVer2::SqwGridVer2(const std::string& strDatFile) : m_strDataFile(strDatFi
 	tl::log_info("Loading grid version 2 data file: \"", strDatFile, "\".");
 
 
-	QFile fileIdx(strDatFile.c_str());
-	if(!fileIdx.exists())
+	if(!tl::file_exists(strDatFile.c_str()))
 	{
 		tl::log_err("Grid data file \"", strDatFile, "\" does not exist.");
 		return;
 	}
 
-	if(!fileIdx.open(QIODevice::ReadOnly))
+	std::ifstream ifstr(strDatFile);
+	if(!ifstr)
 	{
 		tl::log_err("Grid data file \"", strDatFile, "\" cannot be opened.");
 		return;
 	}
 
-	const void *pMemIdx = fileIdx.map(0, sizeof(m_indexBlockOffset) + 9*sizeof(t_real));
-	if(!pMemIdx)
+	auto _blockOffs = tl::get_file_mem<std::size_t>(ifstr, 0, 1);
+	auto _dims = tl::get_file_mem<t_real>(ifstr, 8, 9);
+
+	if(!_blockOffs.first || !_blockOffs.second)
 	{
 		tl::log_err("Grid data file \"", strDatFile, "\" cannot be mapped.");
 		return;
 	}
 
-	m_indexBlockOffset = *((std::size_t*)pMemIdx);
+	m_indexBlockOffset = *_blockOffs.second;
 
-	m_hmin = ((t_real*)pMemIdx)[1];
-	m_hmax = ((t_real*)pMemIdx)[2];
-	m_hstep = ((t_real*)pMemIdx)[3];
+	m_hmin = _dims.second[0];
+	m_hmax = _dims.second[1];
+	m_hstep = _dims.second[2];
 
-	m_kmin = ((t_real*)pMemIdx)[4];
-	m_kmax = ((t_real*)pMemIdx)[5];
-	m_kstep = ((t_real*)pMemIdx)[6];
+	m_kmin = _dims.second[3];
+	m_kmax = _dims.second[4];
+	m_kstep = _dims.second[5];
 
-	m_lmin = ((t_real*)pMemIdx)[7];
-	m_lmax = ((t_real*)pMemIdx)[8];
-	m_lstep = ((t_real*)pMemIdx)[9];
+	m_lmin = _dims.second[6];
+	m_lmax = _dims.second[7];
+	m_lstep = _dims.second[8];
 
 	std::size_t numEntries =
 		std::size_t(((m_hmax-m_hmin) / m_hstep)) *
 		std::size_t(((m_kmax-m_kmin) / m_kstep)) *
 		std::size_t(((m_lmax-m_lmin) / m_lstep));
-
-	fileIdx.unmap((unsigned char*)pMemIdx);
-	fileIdx.close();
 
 	tl::log_info("Data block dimensions: h=", m_hmin, "..", m_hmax, " (delta=", m_hstep, "), ",
 		"k=", m_kmin, "..", m_kmax, " (delta=", m_kstep, "), ",
@@ -130,14 +128,15 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 
 
 
-	QFile fileDat(m_strDataFile.c_str());
-	if(!fileDat.exists())
+	if(!tl::file_exists(m_strDataFile.c_str()))
 	{
 		tl::log_err("Grid data file \"", m_strDataFile, "\" does not exist.");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
-	if(!fileDat.open(QIODevice::ReadOnly))
+	std::ifstream ifstr(m_strDataFile);
+
+	if(!ifstr)
 	{
 		tl::log_err("Data file \"", m_strDataFile, "\" cannot be opened.");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
@@ -147,44 +146,43 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 	// ------------------------------------------------------------------------
 	// the index block the offsets into the data block
 	std::size_t idx_file_offs = hkl_to_idx(dh, dk, dl);
+	auto _dat_file_offs = tl::get_file_mem<std::size_t>(ifstr,
+		m_indexBlockOffset + idx_file_offs*sizeof(std::size_t), 1);
 
-	const void *pMemIdx = fileDat.map(
-		m_indexBlockOffset + idx_file_offs*sizeof(std::size_t), sizeof(std::size_t));
-	if(!pMemIdx)
+	if(!_dat_file_offs.first)
 	{
 		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped.");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
-	std::size_t dat_file_offs = *((std::size_t*)pMemIdx);
-	fileDat.unmap((unsigned char*)pMemIdx);
+	std::size_t dat_file_offs = *_dat_file_offs.second;
 	// ------------------------------------------------------------------------
 
 
 	// ------------------------------------------------------------------------
 	// the data block holds the energies and spectral weights of the dispersion branches
 
-	const void *pMemDat = fileDat.map(dat_file_offs, sizeof(std::size_t));
-	if(!pMemDat)
+	auto _num_branches = tl::get_file_mem<unsigned int>(ifstr, dat_file_offs, 1);
+	if(!_num_branches.first)
 	{
 		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped (1).");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
 	// number of dispersion branches and weights
-	unsigned int iNumBranches = *((unsigned int*)pMemDat);
-	fileDat.unmap((unsigned char*)pMemDat);
+	unsigned int iNumBranches = *_num_branches.second;
 
 
 	// map actual (E, w) data
-	const t_real *pBranches = (t_real*)fileDat.map(dat_file_offs+sizeof(iNumBranches),
-		iNumBranches*sizeof(t_real)*2);
-	if(!pMemDat)
+	auto _branches = tl::get_file_mem<t_real>(ifstr,
+		dat_file_offs+sizeof(iNumBranches), iNumBranches*2);
+	if(!_branches.first)
 	{
 		tl::log_err("Grid data file \"", m_strDataFile, "\" cannot be mapped (2).");
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
+	const t_real *pBranches = _branches.second.get();
 
 	std::vector<t_real> vecE, vecw;
 	for(unsigned int iBranch=0; iBranch<iNumBranches; ++iBranch)
@@ -196,8 +194,6 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 		}
 	}
 
-	fileDat.unmap((unsigned char*)pBranches);
-	fileDat.close();
 	// ------------------------------------------------------------------------
 
 

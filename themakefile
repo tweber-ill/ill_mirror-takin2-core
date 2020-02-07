@@ -515,7 +515,7 @@ xmonteconvo: ${OBJ_MONTECONVO} obj/xmconv_main.o obj/ConvoDlg.o obj/ConvoDlg_fil
 convofit: ${OBJ_CONVOFIT}
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/convofit $+ \
 		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options ${PY_LIBS} ${JL_LIBS} \
-		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS} -lQt5Core
+		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
 	${STRIP} bin/convofit
 
 convoseries: ${OBJ_CONVOSERIES}
