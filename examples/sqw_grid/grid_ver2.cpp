@@ -61,19 +61,28 @@ SqwMod::SqwMod(const std::string& strDatFile) : m_strDataFile(strDatFile)
 	m_hmin = ((t_real*)pMemIdx)[1];
 	m_hmax = ((t_real*)pMemIdx)[2];
 	m_hstep = ((t_real*)pMemIdx)[3];
+
 	m_kmin = ((t_real*)pMemIdx)[4];
 	m_kmax = ((t_real*)pMemIdx)[5];
 	m_kstep = ((t_real*)pMemIdx)[6];
+
 	m_lmin = ((t_real*)pMemIdx)[7];
 	m_lmax = ((t_real*)pMemIdx)[8];
 	m_lstep = ((t_real*)pMemIdx)[9];
+
+	std::size_t numEntries =
+		std::size_t(((m_hmax-m_hmin) / m_hstep)) *
+		std::size_t(((m_kmax-m_kmin) / m_kstep)) *
+		std::size_t(((m_lmax-m_lmin) / m_lstep));
 
 	fileIdx.unmap((unsigned char*)pMemIdx);
 	fileIdx.close();
 
 	tl::log_info("Data block dimensions: h=", m_hmin, "..", m_hmax, " (delta=", m_hstep, "), ",
 		"k=", m_kmin, "..", m_kmax, " (delta=", m_kstep, "), ",
-		"l=", m_lmin, "..", m_lmax, " (delta=", m_lstep, "), ");
+		"l=", m_lmin, "..", m_lmax, " (delta=", m_lstep, ").");
+	tl::log_info("Number of entries: ", numEntries, ".");
+	//tl::log_info("Offset of index block: ", m_indexBlockOffset, ".");
 
 	SqwBase::m_bOk = 1;
 }
@@ -303,7 +312,7 @@ int main(int argc, char **argv)
 {
 	if(argc <= 1)
 	{
-		std::cerr << "Please specify a grid config file." << std::endl;
+		std::cerr << "Please specify a grid data file." << std::endl;
 		return -1;
 	}
 
