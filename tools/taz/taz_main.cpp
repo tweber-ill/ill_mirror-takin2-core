@@ -246,7 +246,7 @@ int main(int argc, char** argv)
 
 
 		tl::log_info("This is Takin version " TAKIN_VER ".");
-		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2019.");
+		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2020.");
 		tl::log_debug("Using ", sizeof(t_real_glob)*8, " bit ", tl::get_typename<t_real_glob>(), "s as internal data type.");
 
 

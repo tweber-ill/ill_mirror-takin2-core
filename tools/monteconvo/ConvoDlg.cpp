@@ -693,8 +693,8 @@ void ConvoDlg::ShowAboutDlg()
 {
 	std::ostringstream ostrAbout;
 	ostrAbout << "Takin/Monteconvo version " << TAKIN_VER << ".\n";
-	ostrAbout << "Written by Tobias Weber <tobias.weber@tum.de>,\n";
-	ostrAbout << "2015 - 2019.\n";
+	ostrAbout << "Written by Tobias Weber <tweber@ill.fr>,\n";
+	ostrAbout << "2015 - 2020.\n";
 	ostrAbout << "\n" << TAKIN_LICENSE("Takin/Monteconvo");
 
 	QMessageBox::about(this, "About Monteconvo", ostrAbout.str().c_str());

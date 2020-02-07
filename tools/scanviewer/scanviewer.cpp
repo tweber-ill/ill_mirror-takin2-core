@@ -205,7 +205,7 @@ ScanViewerDlg::~ScanViewerDlg()
 void ScanViewerDlg::SetAbout()
 {
 	labelVersion->setText("Version " TAKIN_VER ".");
-	labelWritten->setText("Written by Tobias Weber <tobias.weber@tum.de>.");
+	labelWritten->setText("Written by Tobias Weber <tweber@ill.fr>.");
 	labelYears->setText("Years: 2015 - 2020.");
 
 	std::string strCC = "Built";
