@@ -61,12 +61,13 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	};
 
 	m_vecEditBoxes = { editCrys, editRes, editSqw, editScan, editScale, editSlope, editOffs,
-		editCounter, editMonitor, editTemp, editField
+		editCounter, editMonitor, editTemp, editField, editAutosave,
 	};
 	m_vecEditNames = { "monteconvo/crys", "monteconvo/instr", "monteconvo/sqw_conf",
 		"monteconvo/scanfile", "monteconvo/S_scale", "monteconvo/S_slope", "monteconvo/S_offs",
 		"convofit/counter", "convofit/monitor",
-		"convofit/temp_override", "convofit/field_override"
+		"convofit/temp_override", "convofit/field_override",
+		"monteconvo/autosave",
 	};
 
 	m_vecTextBoxes = { editSqwParams };
@@ -100,7 +101,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 	/*
 	 * curve 0,1	->	convolution
-	 * curve 2		->	scan points
+	 * curve 2	->	scan points
 	 * curve 3-15	->	dispersion branches
 	 */
 	m_plotwrap.reset(new QwtPlotWrapper(plot, CONVO_MAX_CURVES, true));
@@ -324,6 +325,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	QObject::connect(btnBrowseRes, SIGNAL(clicked()), this, SLOT(browseResoFiles()));
 	QObject::connect(btnBrowseSqw, SIGNAL(clicked()), this, SLOT(browseSqwFiles()));
 	QObject::connect(btnBrowseScan, SIGNAL(clicked()), this, SLOT(browseScanFiles()));
+	QObject::connect(btnBrowseAutosave, SIGNAL(clicked()), this, SLOT(browseAutosaveFile()));
 
 	QObject::connect(btnFav, SIGNAL(clicked()), this, SLOT(ShowFavourites()));
 	QObject::connect(btnSqwParams, SIGNAL(clicked()), this, SLOT(showSqwParamDlg()));

@@ -325,7 +325,7 @@ void ConvoDlg::SaveResult()
 
 	QString strDirLast = ".";
 	if(m_pSett)
-		strDirLast = m_pSett->value("convo/last_dir_result", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_result", ".").toString();
 
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Save Scan", strDirLast, "Data Files (*.dat *.DAT)", nullptr, fileopt);
@@ -350,7 +350,7 @@ void ConvoDlg::SaveResult()
 	ofstr.write(strResult.c_str(), strResult.size());
 
 	if(m_pSett)
-		m_pSett->setValue("convo/last_dir_result", QString(strDir.c_str()));
+		m_pSett->setValue("monteconvo/last_dir_result", QString(strDir.c_str()));
 }
 // -----------------------------------------------------------------------------
 
@@ -452,7 +452,7 @@ void ConvoDlg::browseCrysFiles()
 
 	QString strDirLast = ".";
 	if(m_pSett)
-		strDirLast = m_pSett->value("convo/last_dir_crys", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_crys", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open Crystal File...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -463,7 +463,7 @@ void ConvoDlg::browseCrysFiles()
 
 	std::string strDir = tl::get_dir(strFile.toStdString());
 	if(m_pSett)
-		m_pSett->setValue("convo/last_dir_crys", QString(strDir.c_str()));
+		m_pSett->setValue("monteconvo/last_dir_crys", QString(strDir.c_str()));
 }
 
 
@@ -475,7 +475,7 @@ void ConvoDlg::browseResoFiles()
 
 	QString strDirLast = ".";
 	if(m_pSett)
-		strDirLast = m_pSett->value("convo/last_dir_reso", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_reso", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open Resolution File...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -486,7 +486,7 @@ void ConvoDlg::browseResoFiles()
 
 	std::string strDir = tl::get_dir(strFile.toStdString());
 	if(m_pSett)
-		m_pSett->setValue("convo/last_dir_reso", QString(strDir.c_str()));
+		m_pSett->setValue("monteconvo/last_dir_reso", QString(strDir.c_str()));
 }
 
 
@@ -498,7 +498,7 @@ void ConvoDlg::browseSqwFiles()
 
 	QString strDirLast = ".";
 	if(m_pSett)
-		strDirLast = m_pSett->value("convo/last_dir_sqw", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_sqw", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open S(q,w) File...", strDirLast, "All S(q,w) files (*.dat *.DAT *.py *.PY *.jl *.JL)",
 		nullptr, fileopt);
@@ -509,7 +509,7 @@ void ConvoDlg::browseSqwFiles()
 
 	std::string strDir = tl::get_dir(strFile.toStdString());
 	if(m_pSett)
-		m_pSett->setValue("convo/last_dir_sqw", QString(strDir.c_str()));
+		m_pSett->setValue("monteconvo/last_dir_sqw", QString(strDir.c_str()));
 }
 
 
@@ -521,7 +521,7 @@ void ConvoDlg::browseScanFiles()
 
 	QString strDirLast = ".";
 	if(m_pSett)
-		strDirLast = m_pSett->value("convo/last_dir_scan", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_scan", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open S(q,w) File...", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN)",
 		nullptr, fileopt);
@@ -532,7 +532,28 @@ void ConvoDlg::browseScanFiles()
 
 	std::string strDir = tl::get_dir(strFile.toStdString());
 	if(m_pSett)
-		m_pSett->setValue("convo/last_dir_scan", QString(strDir.c_str()));
+		m_pSett->setValue("monteconvo/last_dir_scan", QString(strDir.c_str()));
+}
+
+
+void ConvoDlg::browseAutosaveFile()
+{
+	QFileDialog::Option fileopt = QFileDialog::Option(0);
+	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
+		fileopt = QFileDialog::DontUseNativeDialog;
+
+	QString strDirLast = ".";
+	if(m_pSett)
+		strDirLast = m_pSett->value("monteconvo/last_dir_autosave", ".").toString();
+	QString strFile = QFileDialog::getSaveFileName(this,
+		"Open S(q,w) File...", strDirLast, "Data files (*.dat *.txt);;All files (*.*)",
+		nullptr, fileopt);
+
+	editScan->setText(strFile);
+
+	std::string strDir = tl::get_dir(strFile.toStdString());
+	if(m_pSett)
+		m_pSett->setValue("monteconvo/last_dir_autosave", QString(strDir.c_str()));
 }
 
 // -----------------------------------------------------------------------------

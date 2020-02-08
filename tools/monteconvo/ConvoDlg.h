@@ -101,6 +101,7 @@ protected slots:
 	void browseResoFiles();
 	void browseSqwFiles();
 	void browseScanFiles();
+	void browseAutosaveFile();
 
 	void SqwModelChanged(int);
 	void createSqwModel(const QString& qstrFile);

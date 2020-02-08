@@ -86,6 +86,7 @@ void ConvoDlg::Start1D()
 
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
+	std::string strAutosave = editAutosave->text().toStdString();
 
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
@@ -104,7 +105,7 @@ void ConvoDlg::Start1D()
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
 	std::function<void()> fkt = [this, connty, bForceDeferred, bUseScan,
-	dScale, dSlope, dOffs, bLiveResults, bLivePlots]
+	dScale, dSlope, dOffs, bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
@@ -415,6 +416,13 @@ void ConvoDlg::Start1D()
 
 				QMetaObject::invokeMethod(textResult, "setPlainText", connty,
 					Q_ARG(const QString&, QString(ostrOut.str().c_str())));
+
+				// autosave output
+				if(strAutosave != "")
+				{
+					std::ofstream ofstrAutosave(strAutosave);
+					ofstrAutosave << ostrOut.str() << std::endl;
+				}
 			}
 
 			QMetaObject::invokeMethod(progress, "setValue", Q_ARG(int, iStep+1));
@@ -461,6 +469,12 @@ void ConvoDlg::Start1D()
 			t_real tChi2 = tl::chi2_direct<t_real>(iNumScanPts,
 				vecSFuncY.data(), m_scan.vecCts.data(), m_scan.vecCtsErr.data());
 			tl::log_info("chi^2 = ", tChi2);
+
+			if(strAutosave != "")
+			{
+				std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+				ofstrAutosave << "# chi^2 = " << tChi2 << std::endl;
+			}
 		}
 
 
@@ -468,6 +482,13 @@ void ConvoDlg::Start1D()
 		watch.stop();
 		QMetaObject::invokeMethod(editStopTime, "setText",
 			Q_ARG(const QString&, QString(watch.GetStopTimeStr().c_str())));
+
+		if(strAutosave != "")
+		{
+			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+			ofstrAutosave << "# simulation start time = " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+		}
 
 		fktEnableButtons();
 	};
@@ -484,6 +505,7 @@ void ConvoDlg::Start1D()
 	}
 }
 
+
 /**
  * create 2d convolution
  */
@@ -493,6 +515,7 @@ void ConvoDlg::Start2D()
 
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
+	std::string strAutosave = editAutosave->text().toStdString();
 
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
@@ -510,7 +533,7 @@ void ConvoDlg::Start2D()
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
-	std::function<void()> fkt = [this, connty, bForceDeferred, bLiveResults, bLivePlots]
+	std::function<void()> fkt = [this, connty, bForceDeferred, bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
@@ -835,6 +858,13 @@ void ConvoDlg::Start2D()
 					ostrOut << "# ------------------------- EOF -------------------------\n";
 				QMetaObject::invokeMethod(textResult, "setPlainText", connty,
 					Q_ARG(const QString&, QString(ostrOut.str().c_str())));
+
+				// autosave output
+				if(strAutosave != "")
+				{
+					std::ofstream ofstrAutosave(strAutosave);
+					ofstrAutosave << ostrOut.str() << std::endl;
+				}
 			}
 
 			QMetaObject::invokeMethod(progress, "setValue", Q_ARG(int, iStep+1));
@@ -848,6 +878,13 @@ void ConvoDlg::Start2D()
 		watch.stop();
 		QMetaObject::invokeMethod(editStopTime2d, "setText",
 			Q_ARG(const QString&, QString(watch.GetStopTimeStr().c_str())));
+
+		if(strAutosave != "")
+		{
+			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+			ofstrAutosave << "# simulation start time = " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+		}
 
 		fktEnableButtons();
 	};
@@ -875,6 +912,7 @@ void ConvoDlg::StartDisp()
 
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
+	std::string strAutosave = editAutosave->text().toStdString();
 
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
@@ -892,7 +930,7 @@ void ConvoDlg::StartDisp()
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
-	std::function<void()> fkt = [this, connty, bForceDeferred, bLiveResults, bLivePlots]
+	std::function<void()> fkt = [this, connty, bForceDeferred, bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
@@ -1062,6 +1100,13 @@ void ConvoDlg::StartDisp()
 
 				QMetaObject::invokeMethod(textResult, "setPlainText", connty,
 					Q_ARG(const QString&, QString(ostrOut.str().c_str())));
+
+				// autosave output
+				if(strAutosave != "")
+				{
+					std::ofstream ofstrAutosave(strAutosave);
+					ofstrAutosave << ostrOut.str() << std::endl;
+				}
 			}
 
 			QMetaObject::invokeMethod(progress, "setValue", Q_ARG(int, iStep+1));
@@ -1074,6 +1119,13 @@ void ConvoDlg::StartDisp()
 		watch.stop();
 		QMetaObject::invokeMethod(editStopTime, "setText",
 			Q_ARG(const QString&, QString(watch.GetStopTimeStr().c_str())));
+
+		if(strAutosave != "")
+		{
+			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+			ofstrAutosave << "# calculation start time = " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# calculation stop time = " << watch.GetStopTimeStr() << std::endl;
+		}
 
 		fktEnableButtons();
 	};
