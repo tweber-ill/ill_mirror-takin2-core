@@ -9,6 +9,7 @@
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
 #include "tlibs/math/stat.h"
+#include "libs/version.h"
 
 
 using t_real = t_real_reso;
@@ -220,12 +221,15 @@ void ConvoDlg::Start1D()
 		std::ostringstream ostrOut;
 		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
+		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
 		ostrOut << "# Scale: " << dScale << "\n";
 		ostrOut << "# Offset: " << dOffs << "\n";
 		if(m_strLastFile != "")
 			ostrOut << "# File: " << m_strLastFile << "\n";
+		if(editScan->text() != "")
+			ostrOut << "# Scan File: " << editScan->text().toStdString() << "\n";
 		ostrOut << "#\n";
 
 		ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
@@ -482,7 +486,7 @@ void ConvoDlg::Start1D()
 			if(strAutosave != "")
 			{
 				std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-				ofstrAutosave << "# chi^2 = " << tChi2 << std::endl;
+				ofstrAutosave << "# chi^2: " << tChi2 << std::endl;
 			}
 		}
 
@@ -495,8 +499,8 @@ void ConvoDlg::Start1D()
 		if(strAutosave != "")
 		{
 			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-			ofstrAutosave << "# Simulation start time = " << watch.GetStartTimeStr() << "\n";
-			ofstrAutosave << "# Simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+			ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
 		}
 
 		fktEnableButtons();
@@ -704,6 +708,7 @@ void ConvoDlg::Start2D()
 		std::ostringstream ostrOut;
 		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
+		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
 		if(m_strLastFile != "")
@@ -897,8 +902,8 @@ void ConvoDlg::Start2D()
 		if(strAutosave != "")
 		{
 			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-			ofstrAutosave << "# Simulation start time = " << watch.GetStartTimeStr() << "\n";
-			ofstrAutosave << "# Simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+			ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
 		}
 
 		fktEnableButtons();
@@ -1003,8 +1008,9 @@ void ConvoDlg::StartDisp()
 
 
 		std::ostringstream ostrOut;
-        ostrOut.precision(g_iPrec);
+		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
+		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
 		ostrOut << "# Format: h k l E1 w1 E2 w2 ... En wn\n";
 		ostrOut << "#\n";
 
