@@ -218,11 +218,19 @@ void ConvoDlg::Start1D()
 
 
 		std::ostringstream ostrOut;
+        ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
-		ostrOut << "# Format: h k l E S\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
+        ostrOut << "# Scale: " << dScale << "\n";
+        ostrOut << "# Offset: " << dOffs << "\n";
 		ostrOut << "#\n";
+
+        ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+            << std::left << std::setw(g_iPrec*2) << "k" << " "
+            << std::left << std::setw(g_iPrec*2) << "l" << " "
+            << std::left << std::setw(g_iPrec*2) << "E" << " "
+            << std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
 
 		QMetaObject::invokeMethod(editStartTime, "setText",
 			Q_ARG(const QString&, QString(watch.GetStartTimeStr().c_str())));
@@ -342,7 +350,6 @@ void ConvoDlg::Start1D()
 				tl::log_warn("S(q,w) is invalid.");
 			}
 
-			ostrOut.precision(g_iPrec);
 			ostrOut << std::left << std::setw(g_iPrec*2) << vecH[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecK[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecL[iStep] << " "
@@ -486,8 +493,8 @@ void ConvoDlg::Start1D()
 		if(strAutosave != "")
 		{
 			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-			ofstrAutosave << "# simulation start time = " << watch.GetStartTimeStr() << "\n";
-			ofstrAutosave << "# simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+			ofstrAutosave << "# Simulation start time = " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# Simulation stop time = " << watch.GetStopTimeStr() << std::endl;
 		}
 
 		fktEnableButtons();
@@ -693,11 +700,16 @@ void ConvoDlg::Start2D()
 
 
 		std::ostringstream ostrOut;
+        ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
-		ostrOut << "# Format: h k l E S\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
 		ostrOut << "#\n";
+        ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+            << std::left << std::setw(g_iPrec*2) << "k" << " "
+            << std::left << std::setw(g_iPrec*2) << "l" << " "
+            << std::left << std::setw(g_iPrec*2) << "E" << " "
+            << std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
 
 		QMetaObject::invokeMethod(editStartTime2d, "setText",
 			Q_ARG(const QString&, QString(watch.GetStartTimeStr().c_str())));
@@ -833,7 +845,6 @@ void ConvoDlg::Start2D()
 				tl::log_warn("S(q,w) is invalid.");
 			}
 
-			ostrOut.precision(g_iPrec);
 			ostrOut << std::left << std::setw(g_iPrec*2) << vecH[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecK[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecL[iStep] << " "
@@ -882,8 +893,8 @@ void ConvoDlg::Start2D()
 		if(strAutosave != "")
 		{
 			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-			ofstrAutosave << "# simulation start time = " << watch.GetStartTimeStr() << "\n";
-			ofstrAutosave << "# simulation stop time = " << watch.GetStopTimeStr() << std::endl;
+			ofstrAutosave << "# Simulation start time = " << watch.GetStartTimeStr() << "\n";
+			ofstrAutosave << "# Simulation stop time = " << watch.GetStopTimeStr() << std::endl;
 		}
 
 		fktEnableButtons();
@@ -988,6 +999,7 @@ void ConvoDlg::StartDisp()
 
 
 		std::ostringstream ostrOut;
+        ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# Format: h k l E1 w1 E2 w2 ... En wn\n";
 		ostrOut << "#\n";
@@ -1049,7 +1061,6 @@ void ConvoDlg::StartDisp()
 			auto tupEW = fut.get();
 			if(!std::get<0>(tupEW)) break;
 
-			ostrOut.precision(g_iPrec);
 			ostrOut << std::left << std::setw(g_iPrec*2) << vecH[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecK[iStep] << " "
 				<< std::left << std::setw(g_iPrec*2) << vecL[iStep] << " ";
