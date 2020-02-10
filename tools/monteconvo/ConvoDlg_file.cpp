@@ -37,6 +37,7 @@ void ConvoDlg::New()
 {
 	clear_global_paths();
 	m_strLastFile = "";
+	editAutosave->setText("");
 	setWindowTitle(s_strTitle.c_str());
 }
 

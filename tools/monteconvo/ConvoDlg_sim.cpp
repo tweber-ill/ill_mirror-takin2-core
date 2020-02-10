@@ -218,19 +218,21 @@ void ConvoDlg::Start1D()
 
 
 		std::ostringstream ostrOut;
-        ostrOut.precision(g_iPrec);
+		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
-        ostrOut << "# Scale: " << dScale << "\n";
-        ostrOut << "# Offset: " << dOffs << "\n";
+		ostrOut << "# Scale: " << dScale << "\n";
+		ostrOut << "# Offset: " << dOffs << "\n";
+		if(m_strLastFile != "")
+			ostrOut << "# File: " << m_strLastFile << "\n";
 		ostrOut << "#\n";
 
-        ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
-            << std::left << std::setw(g_iPrec*2) << "k" << " "
-            << std::left << std::setw(g_iPrec*2) << "l" << " "
-            << std::left << std::setw(g_iPrec*2) << "E" << " "
-            << std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
+		ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+			<< std::left << std::setw(g_iPrec*2) << "k" << " "
+			<< std::left << std::setw(g_iPrec*2) << "l" << " "
+			<< std::left << std::setw(g_iPrec*2) << "E" << " "
+			<< std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
 
 		QMetaObject::invokeMethod(editStartTime, "setText",
 			Q_ARG(const QString&, QString(watch.GetStartTimeStr().c_str())));
@@ -700,16 +702,18 @@ void ConvoDlg::Start2D()
 
 
 		std::ostringstream ostrOut;
-        ostrOut.precision(g_iPrec);
+		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
+		if(m_strLastFile != "")
+			ostrOut << "# File: " << m_strLastFile << "\n";
 		ostrOut << "#\n";
-        ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
-            << std::left << std::setw(g_iPrec*2) << "k" << " "
-            << std::left << std::setw(g_iPrec*2) << "l" << " "
-            << std::left << std::setw(g_iPrec*2) << "E" << " "
-            << std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
+		ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+			<< std::left << std::setw(g_iPrec*2) << "k" << " "
+			<< std::left << std::setw(g_iPrec*2) << "l" << " "
+			<< std::left << std::setw(g_iPrec*2) << "E" << " "
+			<< std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
 
 		QMetaObject::invokeMethod(editStartTime2d, "setText",
 			Q_ARG(const QString&, QString(watch.GetStartTimeStr().c_str())));
