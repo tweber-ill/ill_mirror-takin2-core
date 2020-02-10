@@ -263,7 +263,7 @@ add_executable(takin
 	tools/monteconvo/ConvoDlg_sim.cpp tools/monteconvo/ConvoDlg_fit.cpp
 	tools/convofit/convofit_import.cpp
 	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
-	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_grid_ver2.cpp
+	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
 	${SRCS_PY}
 
@@ -354,7 +354,7 @@ add_executable(convofit
 	#tools/res/simple.cpp
 
 	tools/monteconvo/TASReso.cpp
-	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_grid_ver2.cpp
+	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
 	${SRCS_PY}
 

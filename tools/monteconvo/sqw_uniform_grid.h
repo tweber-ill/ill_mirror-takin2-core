@@ -12,7 +12,7 @@
 #include "tlibs/math/linalg.h"
 
 
-class SqwGridVer2 : public SqwBase
+class SqwUniformGrid : public SqwBase
 {
 	public:
 		using SqwBase::t_var;
@@ -46,9 +46,9 @@ class SqwGridVer2 : public SqwBase
 
 
 	public:
-		SqwGridVer2();
-		SqwGridVer2(const std::string& strDatFile);
-		virtual ~SqwGridVer2();
+		SqwUniformGrid();
+		SqwUniformGrid(const std::string& strDatFile);
+		virtual ~SqwUniformGrid();
 
 		virtual std::tuple<std::vector<t_real>, std::vector<t_real>>
 			disp(t_real dh, t_real dk, t_real dl) const override;

@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-#include "sqw_grid_ver2.h"
+#include "sqw_uniform_grid.h"
 
 #include "libs/version.h"
 #include "tlibs/string/string.h"
@@ -15,19 +15,19 @@
 
 #include <fstream>
 
-using t_real = typename SqwGridVer2::t_real;
+using t_real = typename SqwUniformGrid::t_real;
 
 
 // ----------------------------------------------------------------------------
 // constructors
 
-SqwGridVer2::SqwGridVer2()
+SqwUniformGrid::SqwUniformGrid()
 {
 	SqwBase::m_bOk = 0;
 }
 
 
-SqwGridVer2::SqwGridVer2(const std::string& strDatFile) : m_strDataFile(strDatFile)
+SqwUniformGrid::SqwUniformGrid(const std::string& strDatFile) : m_strDataFile(strDatFile)
 {
 	SqwBase::m_bOk = 0;
 	tl::log_info("Loading grid version 2 data file: \"", strDatFile, "\".");
@@ -84,7 +84,7 @@ SqwGridVer2::SqwGridVer2(const std::string& strDatFile) : m_strDataFile(strDatFi
 }
 
 
-SqwGridVer2::~SqwGridVer2()
+SqwUniformGrid::~SqwUniformGrid()
 {
 }
 
@@ -93,7 +93,7 @@ SqwGridVer2::~SqwGridVer2()
 // dispersion, spectral weight and structure factor
 
 std::tuple<std::vector<t_real>, std::vector<t_real>>
-	SqwGridVer2::disp(t_real dh, t_real dk, t_real dl) const
+	SqwUniformGrid::disp(t_real dh, t_real dk, t_real dl) const
 {
 	/**
 	 * calculate file index based on coordinates
@@ -204,7 +204,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 /**
  * S(q,E)
  */
-t_real SqwGridVer2::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
+t_real SqwUniformGrid::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 {
 	std::vector<t_real> vecE, vecW;
 	std::tie(vecE, vecW) = disp(dh, dk, dl);
@@ -225,7 +225,7 @@ t_real SqwGridVer2::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 // ----------------------------------------------------------------------------
 // get & set variables
 
-std::vector<SqwGridVer2::t_var> SqwGridVer2::GetVars() const
+std::vector<SqwUniformGrid::t_var> SqwUniformGrid::GetVars() const
 {
 	std::vector<t_var> vecVars;
 
@@ -240,7 +240,7 @@ std::vector<SqwGridVer2::t_var> SqwGridVer2::GetVars() const
 }
 
 
-void SqwGridVer2::SetVars(const std::vector<SqwGridVer2::t_var>& vecVars)
+void SqwUniformGrid::SetVars(const std::vector<SqwUniformGrid::t_var>& vecVars)
 {
 	if(!vecVars.size()) return;
 
@@ -259,7 +259,7 @@ void SqwGridVer2::SetVars(const std::vector<SqwGridVer2::t_var>& vecVars)
 }
 
 
-bool SqwGridVer2::SetVarIfAvail(const std::string& strKey, const std::string& strNewVal)
+bool SqwUniformGrid::SetVarIfAvail(const std::string& strKey, const std::string& strNewVal)
 {
 	return SqwBase::SetVarIfAvail(strKey, strNewVal);
 }
@@ -269,9 +269,9 @@ bool SqwGridVer2::SetVarIfAvail(const std::string& strKey, const std::string& st
 // ----------------------------------------------------------------------------
 // copy
 
-SqwBase* SqwGridVer2::shallow_copy() const
+SqwBase* SqwUniformGrid::shallow_copy() const
 {
-	SqwGridVer2 *pMod = new SqwGridVer2();
+	SqwUniformGrid *pMod = new SqwUniformGrid();
 
 	pMod->m_dT = this->m_dT;
 	pMod->m_dcut = this->m_dcut;
@@ -295,3 +295,35 @@ SqwBase* SqwGridVer2::shallow_copy() const
 
 	return pMod;
 }
+
+
+
+// test
+// g++ -o tst sqw_grid_ver2.cpp sqwbase.cpp ../../tlibs/log/log.cpp -I../../ -lboost_iostreams -lboost_filesyste
+/*
+int main(int argc, char **argv)
+{
+	if(argc <= 1)
+	{
+		std::cerr << "Please specify a grid data file." << std::endl;
+		return -1;
+	}
+
+
+	SqwUniformGrid mod(argv[1]);
+
+	while(1)
+	{
+		t_real h, k, l;
+		std::cout << "Enter hkl: ";
+		std::cin >> h >> k >> l;
+
+		std::vector<t_real> vecE, vecW;
+		std::tie(vecE, vecW) = mod.disp(h, k, l);
+
+		for(std::size_t i=0; i<vecE.size(); ++i)
+			std::cout << "(" << i+1 << ") " << "E = " << vecE[i] << ", weight = " << vecW[i] << "\n";
+		std::cout << std::endl;
+	}
+}
+*/

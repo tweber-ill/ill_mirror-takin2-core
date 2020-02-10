@@ -718,7 +718,7 @@ obj/xmconv_main.o: tools/monteconvo/xmconv_main.cpp
 	${CC} ${FLAGS} -c -o $@ $<
 obj/sqw.o: tools/monteconvo/sqw.cpp tools/monteconvo/sqw.h tlibs/math/kd.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
-obj/sqw_grid.o: tools/monteconvo/sqw_grid_ver2.cpp tools/monteconvo/sqw_grid_ver2.h
+obj/sqw_grid.o: tools/monteconvo/sqw_uniform_grid.cpp tools/monteconvo/sqw_uniform_grid.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/sqwbase.o: tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwbase.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
