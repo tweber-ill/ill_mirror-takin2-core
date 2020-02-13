@@ -222,14 +222,14 @@ void ConvoDlg::Start1D()
 		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
-		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
-		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
+		ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
+		ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
 		ostrOut << "# Scale: " << dScale << "\n";
 		ostrOut << "# Offset: " << dOffs << "\n";
 		if(m_strLastFile != "")
 			ostrOut << "# File: " << m_strLastFile << "\n";
 		if(editScan->text() != "")
-			ostrOut << "# Scan File: " << editScan->text().toStdString() << "\n";
+			ostrOut << "# Scan file: " << editScan->text().toStdString() << "\n";
 		ostrOut << "#\n";
 
 		ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
@@ -709,8 +709,8 @@ void ConvoDlg::Start2D()
 		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
-		ostrOut << "# MC Neutrons: " << iNumNeutrons << "\n";
-		ostrOut << "# MC Sample Steps: " << iNumSampleSteps << "\n";
+		ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
+		ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
 		if(m_strLastFile != "")
 			ostrOut << "# File: " << m_strLastFile << "\n";
 		ostrOut << "#\n";
