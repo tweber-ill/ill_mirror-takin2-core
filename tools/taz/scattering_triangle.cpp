@@ -1104,7 +1104,7 @@ void ScatteringTriangle::CalcPeaks(const xtl::LatticeCommon<t_real>& recipcommon
 								pPeak->SetColor(bHasRefl ? colPeakAllowed : colPeakForbidden);
 
 							pPeak->setPos(dX * m_dScaleFactor, dY * m_dScaleFactor);
-							pPeak->SetRadius(dF >= 0. ? dF : 0.);
+							pPeak->SetRadius(dF >= 0. ? dF : 1.);
 							pPeak->setData(TRIANGLE_NODE_TYPE_KEY, NODE_BRAGG);
 
 							std::ostringstream ostrLabel, ostrTip;
@@ -1132,6 +1132,7 @@ void ScatteringTriangle::CalcPeaks(const xtl::LatticeCommon<t_real>& recipcommon
 							else if(!bHasRefl)
 							{
 								pPeak->SetPeakAllowed(0);
+								//pPeak->SetRadius(0.);
 								ostrTip << "\nStructurally forbidden reflection.";
 							}
 
