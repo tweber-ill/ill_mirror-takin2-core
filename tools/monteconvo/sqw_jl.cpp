@@ -15,6 +15,9 @@ using t_real = t_real_reso;
 
 #define MAX_PARAM_VAL_SIZE 128
 
+
+extern "C" void jl_init__threading();
+
 SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 {
 	if(!tl::file_exists(pcFile))
@@ -32,24 +35,39 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 	static bool bInited = 0;
 	if(!bInited)
 	{
-		jl_init(/*0*/);
+		jl_init__threading();
 		std::string strJl = jl_ver_string();
 		tl::log_debug("Initialised Julia interpreter version ", strJl, ".");
 		bInited = 1;
 	}
 
-	// include module
+	// get include function
 	jl_function_t *pInc = jl_get_function(jl_base_module, "include");
-	jl_value_t *pMod = jl_cstr_to_string(pcFile);
-	jl_call1(pInc, pMod);
+	if(!pInc)
+	{
+		m_bOk = 0;
+		tl::log_err("Cannot get Julia include() function.");
+		return;
+	}
+
+	// include module
+	jl_value_t* pModIncRet = jl_call1(pInc, jl_cstr_to_string(pcFile));
+	if(pModIncRet)
+		tl::log_debug(GetJlString(pModIncRet));
+
 
 	// working dir
 	if(bSetScriptCWD)
 	{
 		jl_function_t *pCwd = jl_get_function(jl_base_module, "cd");
 		jl_value_t *pDir = jl_cstr_to_string(strDir.c_str());
-		jl_call1(pCwd, pDir);
+
+		if(pCwd && pDir)
+			jl_call1(pCwd, pDir);
+		else
+			tl::log_err("Cannot get Julia cd() function.");
 	}
+
 
 	// import takin functions
 	m_pInit = jl_get_function(jl_main_module, "TakinInit");
@@ -58,10 +76,25 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 
 	PrintExceptions();
 
+	if(m_pInit)
+		tl::log_info("TakinInit function was found in \"", strFile, "\".");
+	else
+		tl::log_warn("No TakinInit function was found in \"", strFile, "\".");
+
+	if(m_pSqw)
+		tl::log_info("TakinSqw function was found in \"", strFile, "\".");
+	else
+		tl::log_err("No TakinSqw function was found in \"", strFile, "\".");
+
+	if(m_pDisp)
+		tl::log_info("TakinDisp function was found in \"", strFile, "\".");
+	else
+		tl::log_warn("No TakinDisp function was found in \"", strFile, "\".");
+
+	// does the module have a TakinSqw function?
 	if(!m_pSqw)
 	{
 		m_bOk = 0;
-		tl::log_err("Julia script has no TakinSqw function.");
 		return;
 	}
 	else
@@ -78,9 +111,36 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 		tl::log_warn("Julia script has no TakinInit function.");
 }
 
+
 SqwJl::~SqwJl()
 {
-	//jl_atexit_hook(0);
+}
+
+
+/**
+ * converts a jl_value_t to a string
+ */
+std::string SqwJl::GetJlString(void* _pVal) const
+{
+	jl_value_t* pVal = (jl_value_t*)_pVal;
+	if(!pVal) return "";
+
+	std::string str;
+	jl_value_t *pStr = nullptr;
+
+	jl_function_t *pToStr = jl_get_function(jl_base_module, "string");
+	if(!pToStr)
+	{
+		tl::log_err("Cannot get Julia string() function.");
+		return "";
+	}
+
+	if(pToStr)
+		pStr = jl_call1(pToStr, pVal);
+	if(pStr)
+		str = jl_string_ptr(pStr);
+
+	return str;
 }
 
 
@@ -90,16 +150,10 @@ SqwJl::~SqwJl()
 void SqwJl::PrintExceptions() const
 {
 	jl_value_t* pEx = jl_exception_occurred();
+
 	if(pEx)
 	{
-		std::string strEx;
-		jl_value_t *pExStr = nullptr;
-
-		jl_function_t *pPrint = jl_get_function(jl_base_module, "string");
-		if(pPrint)
-			pExStr = jl_call1(pPrint, pEx);
-		if(pExStr)
-			strEx = jl_string_ptr(pExStr);
+		std::string strEx = GetJlString(pEx);
 
 		if(strEx != "")
 			tl::log_err("Julia error: ", strEx, ".");

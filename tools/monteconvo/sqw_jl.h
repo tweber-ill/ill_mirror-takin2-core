@@ -27,6 +27,7 @@ protected:
 	std::string m_strVarPrefix = "g_";
 
 protected:
+	std::string GetJlString(void* pVal) const;
 	void PrintExceptions() const;
 
 public:
