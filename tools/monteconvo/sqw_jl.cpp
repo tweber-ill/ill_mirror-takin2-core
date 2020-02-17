@@ -15,8 +15,8 @@ using t_real = t_real_reso;
 
 #define MAX_PARAM_VAL_SIZE 128
 
-
 extern "C" void jl_init__threading();
+
 
 SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 {
@@ -42,7 +42,7 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 	}
 
 	// get include function
-	jl_function_t *pInc = jl_get_function(jl_base_module, "include");
+	jl_function_t *pInc = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("include")));
 	if(!pInc)
 	{
 		m_bOk = 0;
@@ -51,15 +51,18 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 	}
 
 	// include module
-	jl_value_t* pModIncRet = jl_call1(pInc, jl_cstr_to_string(pcFile));
-	if(pModIncRet)
-		tl::log_debug(GetJlString(pModIncRet));
+	jl_value_t* pModIncRet = jl_call2(pInc, (jl_value_t*)jl_main_module, jl_cstr_to_string(pcFile));
+	if(!pModIncRet)
+	{
+		tl::log_err("Cannot load Julia script: \"", pcFile, "\".");
+		PrintExceptions();
+	}
 
 
 	// working dir
 	if(bSetScriptCWD)
 	{
-		jl_function_t *pCwd = jl_get_function(jl_base_module, "cd");
+		jl_function_t *pCwd = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("cd")));
 		jl_value_t *pDir = jl_cstr_to_string(strDir.c_str());
 
 		if(pCwd && pDir)
@@ -70,11 +73,12 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 
 
 	// import takin functions
-	m_pInit = jl_get_function(jl_main_module, "TakinInit");
-	m_pSqw = jl_get_function(jl_main_module, "TakinSqw");
-	m_pDisp = jl_get_function(jl_main_module, "TakinDisp");
+	m_pInit = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinInit")));
+	m_pSqw = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinSqw")));
+	m_pDisp = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinDisp")));
 
 	PrintExceptions();
+
 
 	if(m_pInit)
 		tl::log_info("TakinInit function was found in \"", strFile, "\".");
@@ -128,7 +132,7 @@ std::string SqwJl::GetJlString(void* _pVal) const
 	std::string str;
 	jl_value_t *pStr = nullptr;
 
-	jl_function_t *pToStr = jl_get_function(jl_base_module, "string");
+	jl_function_t *pToStr = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("string")));
 	if(!pToStr)
 	{
 		tl::log_err("Cannot get Julia string() function.");
@@ -247,9 +251,9 @@ std::vector<SqwBase::t_var> SqwJl::GetVars() const
 		return vecVars;
 	}
 
-	jl_function_t *pNames = jl_get_function(jl_base_module, "names");
-	jl_function_t *pGetField = jl_get_function(jl_base_module, "getfield");
-	jl_function_t *pPrint = jl_get_function(jl_base_module, "string");
+	jl_function_t *pNames = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("names")));
+	jl_function_t *pGetField = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("getfield")));
+	jl_function_t *pPrint = reinterpret_cast<jl_function_t*>(jl_get_global(jl_base_module, jl_symbol("string")));
 
 	if(!pNames || !pGetField || !pPrint)
 	{

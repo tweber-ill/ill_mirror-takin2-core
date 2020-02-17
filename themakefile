@@ -42,7 +42,7 @@ USE_BOOST_REGEX = 0
 
 # compile the python or julia interfaces?
 USE_PY = 1
-USE_JL = 0
+USE_JL = 1
 
 # enable CIF support
 USE_CIF = 1

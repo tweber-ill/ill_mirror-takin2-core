@@ -5,9 +5,11 @@
 # @date dec-2016
 #
 
+import LinearAlgebra
 
-# TODO: import constant
-kB = 1.23
+
+# from scipy.constants
+kB = 0.08617
 
 
 # example dispersion
@@ -83,7 +85,7 @@ function TakinDisp(h::Float64, k::Float64, l::Float64)
 	# momentum
 	Q = vec([h,k,l])
 	# reduced momentum
-	q = vecnorm(Q - g_G)
+	q = LinearAlgebra.norm(Q - g_G)
 
 	# energy
 	E_peak = disp_ferro(q, g_D, g_offs)
@@ -115,5 +117,6 @@ end
 # -----------------------------------------------------------------------------
 # test
 #
+#TakinInit()
+#println(TakinDisp(1.0, 1.0, 0.0))
 #println(TakinSqw(1.0, 1.0, 0.0, 0.0))
-#
