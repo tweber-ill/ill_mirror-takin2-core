@@ -6,7 +6,6 @@
  */
 
 #include "sqw_jl.h"
-#include "libs/version.h"
 #include "tlibs/string/string.h"
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
@@ -365,6 +364,7 @@ SqwBase* SqwJl::shallow_copy() const
 #include <boost/dll/alias.hpp>
 #include "sqw_proc.h"
 #include "sqw_proc_impl.h"
+#include "libs/version.h"
 
 
 static const char* pcModIdent = "jl";

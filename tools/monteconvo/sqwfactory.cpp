@@ -9,12 +9,12 @@
 #include "sqw.h"
 #include "sqw_uniform_grid.h"
 
-#include "sqw_proc.h"
-#include "sqw_proc_impl.h"
+//#include "sqw_proc.h"
+//#include "sqw_proc_impl.h"
 
-#ifndef NO_PY
+/*#ifndef NO_PY
 	#include "sqw_py.h"
-#endif
+#endif*/
 /*#ifdef USE_JL
 	#include "sqw_jl.h"
 #endif*/
@@ -67,13 +67,13 @@ static t_mapSqw g_mapSqw =
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwMagnon>(strCfgFile.c_str()); },
 		"Simple Magnon Model" } },
-#ifndef NO_PY
+/*#ifndef NO_PY
 	{ "py", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		//{ return std::make_shared<SqwPy>(strCfgFile.c_str()); },
 		{ return std::make_shared<SqwProc<SqwPy>>(strCfgFile.c_str()); },
 		"Python Model" } },
-#endif
+#endif*/
 /*#ifdef USE_JL
 	{ "jl", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
@@ -160,9 +160,10 @@ void load_sqw_plugins()
 		{
 			try
 			{
+				// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
 				std::shared_ptr<so::shared_library> pmod =
-					std::make_shared<so::shared_library>(strPlugin, 
-						so::load_mode::rtld_lazy | so::load_mode::rtld_global);
+					std::make_shared<so::shared_library>(strPlugin,
+						so::load_mode::rtld_lazy /*| so::load_mode::rtld_global*/);
 				if(!pmod) continue;
 
 				// import info function
@@ -174,6 +175,13 @@ void load_sqw_plugins()
 				const std::string& strTakVer = std::get<0>(tupInfo);
 				const std::string& strModIdent = std::get<1>(tupInfo);
 				const std::string& strModLongName = std::get<2>(tupInfo);
+
+				// module already registered?
+				if(g_mapSqw.find(strModIdent) != g_mapSqw.end())
+				{
+					tl::log_warn("Module \"", strModLongName, "\" (id=", strModIdent, ") is already registered.");
+					continue;
+				}
 
 				if(strTakVer != TAKIN_VER)
 				{

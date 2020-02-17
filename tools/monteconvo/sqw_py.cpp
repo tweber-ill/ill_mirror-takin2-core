@@ -17,16 +17,15 @@ using t_real = t_real_reso;
 #define MAX_PARAM_VAL_SIZE 128
 
 
-SqwPy::SqwPy(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
+SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>())
 {
-	if(!tl::file_exists(pcFile))
+	if(!tl::file_exists(strFile.c_str()))
 	{
-		tl::log_err("Could not find Python script file: \"", pcFile, "\".");
+		tl::log_err("Could not find Python script file: \"", strFile, "\".");
 		m_bOk = 0;
 		return;
 	}
 
-	std::string strFile = pcFile;
 	std::string strDir = tl::get_dir(strFile);
 	std::string strMod = tl::get_file_noext(tl::get_file_nodir(strFile));
 	const bool bSetScriptCWD = 1;
@@ -339,3 +338,34 @@ SqwBase* SqwPy::shallow_copy() const
 
 	return pSqw;
 }
+
+
+
+// ----------------------------------------------------------------------------
+// SO interface
+#include <boost/dll/alias.hpp>
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
+#include "libs/version.h"
+
+
+static const char* pcModIdent = "py";
+static const char* pcModName = "Python Model";
+
+std::tuple<std::string, std::string, std::string> sqw_info()
+{
+	tl::log_info("In ", __func__, ".");
+	return std::make_tuple(TAKIN_VER, pcModIdent, pcModName);
+}
+
+std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
+{
+	tl::log_info("In ", __func__, ".");
+	return std::make_shared<SqwProc<SqwPy>>(strCfgFile);
+}
+
+
+// exports from so file
+BOOST_DLL_ALIAS(sqw_info, takin_sqw_info);
+BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
+// ----------------------------------------------------------------------------

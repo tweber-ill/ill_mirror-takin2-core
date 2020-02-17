@@ -20,8 +20,8 @@ IS_UNSTABLE = 0
 NATIVE_OPTS = 0
 
 # which Py version to use for scripting
-PY_INC_VER = 3.6
-#PY_INC_VER = 3.7
+#PY_INC_VER = 3.6
+PY_INC_VER = 3.7
 PY_LIB_VER = ${PY_INC_VER}m
 #PY_BOOSTLIB_VER = $(subst .,,${PY_LIB_VER})
 PY_BOOSTLIB_VER = $(word 1, $(subst ., ,${PY_LIB_VER}))
@@ -146,12 +146,6 @@ ifeq ($(USE_BOOST_REGEX), 1)
 	DEFINES += -DUSE_BOOST_REX
 endif
 
-ifeq ($(USE_PY), 1)
-	DEFINES += -DUSE_PY
-else
-	DEFINES += -DNO_PY
-endif
-
 ifeq ($(USE_CIF), 1)
 	DEFINES += -DUSE_CIF
 else
@@ -167,8 +161,6 @@ endif
 ifeq ($(USE_FRAMEWORKS), 1)
 	DEFINES += -DUSING_FRAMEWORKS
 endif
-
-DEFINES += -DPY_VER=$(PY_INC_VER)
 
 
 # -----------------------------------------------------------------------------
@@ -253,8 +245,7 @@ INC =	-I${MYINC} \
 	-I/usr/local/opt/freetype/include/freetype2 \
 	-I/usr/include/freetype2 \
 	-I/usr/include/lapacke \
-	-I/usr/local/opt/python/Frameworks/Python.framework/Versions/${PY_INC_VER}/Headers/ \
-	-I/usr/include/python${PY_INC_VER} -idirafter /usr/include/root \
+	-idirafter /usr/include/root \
 	-I/usr/include -I/usr/include/GL
 
 LIB_DIRS =	-L${MYLIB} \
@@ -339,25 +330,6 @@ else
 	FAD_LIBS =
 endif
 
-ifeq ($(USE_PY), 1)
-	#PY_LIBS = -lboost_python${PY_BOOSTLIB_VER}${BOOST_SUFFIX}
-	#PY_LIBS = -lboost_python37${BOOST_SUFFIX}
-	PY_LIBS = -lboost_python3${BOOST_SUFFIX}
-
-	ifeq ($(USE_FRAMEWORKS), 0)
-		PY_LIBS += -lpython${PY_LIB_VER}
-	else
-		#PY_LIBS += -F /usr/local/opt/python/Frameworks -framework Python
-		PY_LIBS += -L/usr/local/opt/python/Frameworks/Python.framework/Versions/${PY_INC_VER}/lib -lpython${PY_LIB_VER}
-	endif
-
-	PY_OBJS = obj/sqw_py.o 
-else
-	PY_LIBS =
-	PY_OBJS =
-endif
-
-
 ifeq ($(USE_PLUGINS), 1)
 	DL_LIBS = -ldl
 else
@@ -373,7 +345,7 @@ else
 endif
 
 LIBS_TAZ = ${BASIC_LIBS} ${FAD_LIBS} ${QT_LIB} ${QWT_LIB} ${GL_LIBS} \
-	${PY_LIBS} ${DL_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
+	${DL_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
 
 
 
@@ -397,7 +369,7 @@ OBJ_TAZ = obj/taz_main.o obj/taz.o obj/taz_crys.o \
 	obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o obj/simple.o \
 	obj/ResoDlg.o obj/ResoDlg_file.o obj/loadinstr.o obj/recent.o obj/globals.o \
 	obj/globals_qt.o obj/qthelper.o obj/qwthelper.o \
-	obj/sqw.o obj/sqw_grid.o obj/sqwbase.o obj/sqwfact.o ${PY_OBJS} \
+	obj/sqw.o obj/sqw_grid.o obj/sqwbase.o obj/sqwfact.o  \
 	obj/tasreso.o obj/ConvoDlg.o obj/ConvoDlg_file.o obj/SqwParamDlg.o \
 	obj/scanviewer.o obj/FitParamDlg.o obj/x3d.o obj/eval.o \
 	obj/tlibs_ver.o obj/libcrystal_ver.o obj/AboutDlg.o obj/convo_scan.o \
@@ -409,7 +381,7 @@ OBJ_MONTERESO = obj/montereso_res.o obj/montereso_res_main.o \
 	obj/qthelper.o obj/qwthelper.o obj/globals.o obj/globals_qt.o
 
 OBJ_MONTECONVO = obj/log.o obj/debug.o obj/sqw.o obj/sqw_grid.o obj/sqwbase.o \
-	obj/sqwfact.o ${PY_OBJS} obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o \
+	obj/sqwfact.o obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o \
 	obj/rand.o obj/tasreso.o obj/eval.o \
 	obj/linalg2.o
 
@@ -463,6 +435,24 @@ JL_OBJS = obj/sqw_jl.o
 JL_INC = -I/usr/local/include/julia -I/usr/include/julia -I${JL_APP}/include/julia
 
 
+# py plugin
+#PY_LIBS = -lboost_python${PY_BOOSTLIB_VER}${BOOST_SUFFIX}
+PY_LIBS = -lboost_python37${BOOST_SUFFIX}
+#PY_LIBS = -lboost_python3${BOOST_SUFFIX}
+
+ifeq ($(USE_FRAMEWORKS), 0)
+	PY_LIBS += -lpython${PY_LIB_VER}
+else
+	#PY_LIBS += -F /usr/local/opt/python/Frameworks -framework Python
+	PY_LIBS += -L/usr/local/opt/python/Frameworks/Python.framework/Versions/${PY_INC_VER}/lib -lpython${PY_LIB_VER}
+endif
+
+PY_INC = -I/usr/local/opt/python/Frameworks/Python.framework/Versions/${PY_INC_VER}/Headers/ \
+	-I/usr/include/python${PY_INC_VER}
+PY_OBJS = obj/sqw_py.o 
+
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -488,6 +478,10 @@ ifeq ($(USE_JL), 1)
 	ALL_PROGS += jlmod
 endif
 
+ifeq ($(USE_PY), 1)
+	ALL_PROGS += pymod
+endif
+
 
 all: ${ALL_PROGS}
 
@@ -508,12 +502,12 @@ xmonteconvo: ${OBJ_MONTECONVO} obj/xmconv_main.o obj/ConvoDlg.o obj/ConvoDlg_fil
 	obj/spec_char.o obj/convofit_import.o obj/recent.o
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/xmonteconvo $+ \
 		${BASIC_LIBS} ${QT_LIB} ${QWT_LIB} \
-		${PY_LIBS} ${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
+		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
 	${STRIP} bin/xmonteconvo
 
 convofit: ${OBJ_CONVOFIT}
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/convofit $+ \
-		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options ${PY_LIBS} \
+		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options \
 		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
 	${STRIP} bin/convofit
 
@@ -550,6 +544,10 @@ doc: doc/takin.qhcp doc/takin.qhp doc/*.html
 
 jlmod: ${JL_OBJS} obj/sqwbase.o obj/log.o obj/rand.o
 	${CC} ${FLAGS} ${JL_INC} ${LIB_DIRS} -shared -fPIC -o plugins/jl_mod.so $+ ${JL_LIBS}
+
+pymod: ${PY_OBJS} obj/sqwbase.o obj/log.o obj/rand.o
+	${CC} ${FLAGS} ${PY_INC} ${LIB_DIRS} -shared -fPIC -o plugins/py_mod.so $+ ${PY_LIBS}
+
 
 # -----------------------------------------------------------------------------
 
@@ -727,10 +725,12 @@ obj/sqwbase.o: tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwbase.h
 obj/sqwfact.o: tools/monteconvo/sqwfactory.cpp tools/monteconvo/sqwfactory.h \
 	tools/monteconvo/sqw_proc.h tools/monteconvo/sqw_proc_impl.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
+
 obj/sqw_py.o: tools/monteconvo/sqw_py.cpp tools/monteconvo/sqw_py.h
-	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
+	${CC} ${FLAGS} ${PY_INC} -shared -fPIC -DNO_QT -c -o $@ $<
 obj/sqw_jl.o: tools/monteconvo/sqw_jl.cpp tools/monteconvo/sqw_jl.h
 	${CC} ${FLAGS} ${JL_INC} -shared -fPIC -DNO_QT -c -o $@ $<
+
 obj/tasreso.o: tools/monteconvo/TASReso.cpp tools/monteconvo/TASReso.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/posextract.o: tools/posextract/posextract.cpp

@@ -10,10 +10,6 @@
 #include "tlibs/math/math.h"
 #include "tlibs/math/rand.h"
 
-#ifndef NO_PY
-	#include "sqw_py.h"
-#endif
-
 #include "libs/globals.h"
 #include "libs/globals_qt.h"
 #include "libs/qt/recent.h"
@@ -407,14 +403,6 @@ void ConvoDlg::createSqwModel(const QString& qstrFile)
 		tl::log_warn("No S(q,w) config file given.");
 		//return;
 	}
-
-#ifdef NO_PY
-	if(strSqwIdent == "py")
-	{
-		QMessageBox::critical(this, "Error", "Compiled without python support.");
-		return;
-	}
-#endif
 
 	m_pSqw = construct_sqw(strSqwIdent, strSqwFile);
 	if(!m_pSqw)

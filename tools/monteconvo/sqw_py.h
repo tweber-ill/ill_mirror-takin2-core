@@ -34,7 +34,7 @@ protected:
 
 public:
 	SqwPy() = default;
-	SqwPy(const char* pcFile);
+	SqwPy(const std::string& strFile);
 	virtual ~SqwPy();
 
 	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>
