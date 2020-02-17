@@ -152,12 +152,6 @@ else
 	DEFINES += -DNO_PY
 endif
 
-ifeq ($(USE_JL), 1)
-	DEFINES += -DUSE_JL
-else
-	DEFINES += -DNO_JL
-endif
-
 ifeq ($(USE_CIF), 1)
 	DEFINES += -DUSE_CIF
 else
@@ -363,15 +357,6 @@ else
 	PY_OBJS =
 endif
 
-ifeq ($(USE_JL), 1)
-	JL_LIBS = -L${JL_APP}/lib -ljulia
-	JL_OBJS = obj/sqw_jl.o 
-	JL_INC = -I/usr/local/include/julia -I/usr/include/julia -I${JL_APP}/include/julia
-else
-	JL_LIBS =
-	JL_OBJS =
-	JL_INC =
-endif
 
 ifeq ($(USE_PLUGINS), 1)
 	DL_LIBS = -ldl
@@ -388,12 +373,11 @@ else
 endif
 
 LIBS_TAZ = ${BASIC_LIBS} ${FAD_LIBS} ${QT_LIB} ${QWT_LIB} ${GL_LIBS} \
-	${PY_LIBS} ${JL_LIBS} ${DL_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
+	${PY_LIBS} ${DL_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
 
 
 
 # -----------------------------------------------------------------------------
-
 
 
 OBJ_COMMON = obj/log.o obj/debug.o obj/rand.o obj/linalg2.o \
@@ -413,7 +397,7 @@ OBJ_TAZ = obj/taz_main.o obj/taz.o obj/taz_crys.o \
 	obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o obj/simple.o \
 	obj/ResoDlg.o obj/ResoDlg_file.o obj/loadinstr.o obj/recent.o obj/globals.o \
 	obj/globals_qt.o obj/qthelper.o obj/qwthelper.o \
-	obj/sqw.o obj/sqw_grid.o obj/sqwbase.o obj/sqwfact.o ${PY_OBJS} ${JL_OBJS} \
+	obj/sqw.o obj/sqw_grid.o obj/sqwbase.o obj/sqwfact.o ${PY_OBJS} \
 	obj/tasreso.o obj/ConvoDlg.o obj/ConvoDlg_file.o obj/SqwParamDlg.o \
 	obj/scanviewer.o obj/FitParamDlg.o obj/x3d.o obj/eval.o \
 	obj/tlibs_ver.o obj/libcrystal_ver.o obj/AboutDlg.o obj/convo_scan.o \
@@ -425,7 +409,7 @@ OBJ_MONTERESO = obj/montereso_res.o obj/montereso_res_main.o \
 	obj/qthelper.o obj/qwthelper.o obj/globals.o obj/globals_qt.o
 
 OBJ_MONTECONVO = obj/log.o obj/debug.o obj/sqw.o obj/sqw_grid.o obj/sqwbase.o \
-	obj/sqwfact.o ${PY_OBJS} ${JL_OBJS} obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o \
+	obj/sqwfact.o ${PY_OBJS} obj/r0.o obj/cn.o obj/pop.o obj/eck.o obj/viol.o \
 	obj/rand.o obj/tasreso.o obj/eval.o \
 	obj/linalg2.o
 
@@ -472,6 +456,13 @@ OBJ_TAZ += obj/SgListDlg.o obj/spacegroup.o
 #LIBS_TAZ += 
 
 
+
+# jl plugin
+JL_LIBS = -L${JL_APP}/lib -ljulia
+JL_OBJS = obj/sqw_jl.o 
+JL_INC = -I/usr/local/include/julia -I/usr/include/julia -I${JL_APP}/include/julia
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -482,13 +473,21 @@ SETUP_PROGS = gentab
 AUX_PROGS = montereso xmonteconvo posextract \
 	scanviewer sglist sfact polextract
 
+
 ALL_PROGS = ${BASE_PROGS}
+
 ifeq ($(BUILD_SETUP_PROGS), 1)
 	ALL_PROGS += ${SETUP_PROGS}
 endif
+
 ifeq ($(BUILD_AUX_PROGS), 1)
 	ALL_PROGS += ${AUX_PROGS}
 endif
+
+ifeq ($(USE_JL), 1)
+	ALL_PROGS += jlmod
+endif
+
 
 all: ${ALL_PROGS}
 
@@ -509,12 +508,12 @@ xmonteconvo: ${OBJ_MONTECONVO} obj/xmconv_main.o obj/ConvoDlg.o obj/ConvoDlg_fil
 	obj/spec_char.o obj/convofit_import.o obj/recent.o
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/xmonteconvo $+ \
 		${BASIC_LIBS} ${QT_LIB} ${QWT_LIB} \
-		${PY_LIBS} ${JL_LIBS} ${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
+		${PY_LIBS} ${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
 	${STRIP} bin/xmonteconvo
 
 convofit: ${OBJ_CONVOFIT}
 	${CC} ${FLAGS} ${LIB_DIRS} -o bin/convofit $+ \
-		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options ${PY_LIBS} ${JL_LIBS} \
+		${LIB_MIN} ${BASIC_LIBS} -lboost_program_options ${PY_LIBS} \
 		${LAPACK_LIBS} ${DL_LIBS} ${STD_LIBS}
 	${STRIP} bin/convofit
 
@@ -548,6 +547,9 @@ doc: doc/takin.qhcp doc/takin.qhp doc/*.html
 	cp -v doc/takin.qhc res/
 	cp -v doc/takin.qch res/
 
+
+jlmod: ${JL_OBJS} obj/sqwbase.o obj/log.o obj/rand.o
+	${CC} ${FLAGS} ${JL_INC} ${LIB_DIRS} -shared -fPIC -o plugins/jl_mod.so $+ ${JL_LIBS}
 
 # -----------------------------------------------------------------------------
 
@@ -728,7 +730,7 @@ obj/sqwfact.o: tools/monteconvo/sqwfactory.cpp tools/monteconvo/sqwfactory.h \
 obj/sqw_py.o: tools/monteconvo/sqw_py.cpp tools/monteconvo/sqw_py.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/sqw_jl.o: tools/monteconvo/sqw_jl.cpp tools/monteconvo/sqw_jl.h
-	${CC} ${FLAGS} ${JL_INC} -DNO_QT -c -o $@ $<
+	${CC} ${FLAGS} ${JL_INC} -shared -fPIC -DNO_QT -c -o $@ $<
 obj/tasreso.o: tools/monteconvo/TASReso.cpp tools/monteconvo/TASReso.h
 	${CC} ${FLAGS} -DNO_QT -c -o $@ $<
 obj/posextract.o: tools/posextract/posextract.cpp

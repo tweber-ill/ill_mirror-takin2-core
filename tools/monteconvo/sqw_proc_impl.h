@@ -379,6 +379,11 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg)
 }
 
 
+template<class t_sqw>
+SqwProc<t_sqw>::SqwProc(const std::string& strCfg) : SqwProc<t_sqw>::SqwProc(strCfg.c_str())
+{}
+
+
 /**
  * clean up sub-process
  */

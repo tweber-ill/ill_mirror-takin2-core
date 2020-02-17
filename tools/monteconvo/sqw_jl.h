@@ -32,7 +32,7 @@ protected:
 
 public:
 	SqwJl() = default;
-	SqwJl(const char* pcFile);
+	SqwJl(const std::string& pcFile);
 	virtual ~SqwJl();
 
 	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>

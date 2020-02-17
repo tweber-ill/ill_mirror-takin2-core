@@ -11,6 +11,7 @@
 #include "sqw.h"
 #include <mutex>
 #include <memory>
+#include <string>
 #include <unistd.h>
 #include <boost/interprocess/ipc/message_queue.hpp>
 
@@ -34,6 +35,7 @@ protected:
 public:
 	SqwProc();
 	SqwProc(const char* pcCfg);
+	explicit SqwProc(const std::string& strCfg);
 	virtual ~SqwProc();
 
 	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>

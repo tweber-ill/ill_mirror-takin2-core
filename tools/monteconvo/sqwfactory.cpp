@@ -1,7 +1,7 @@
 /**
  * factory and plugin interface for S(q,w) models
- * @author Tobias Weber <tobias.weber@tum.de>
- * @date 2016 -- 2018
+ * @author Tobias Weber <tweber@ill.fr>
+ * @date 2016 -- 2020
  * @license GPLv2
  */
 
@@ -9,16 +9,15 @@
 #include "sqw.h"
 #include "sqw_uniform_grid.h"
 
-#if !defined(NO_PY) || defined(USE_JL)
-	#include "sqw_proc.h"
-	#include "sqw_proc_impl.h"
-#endif
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
+
 #ifndef NO_PY
 	#include "sqw_py.h"
 #endif
-#ifdef USE_JL
+/*#ifdef USE_JL
 	#include "sqw_jl.h"
-#endif
+#endif*/
 
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
@@ -75,13 +74,12 @@ static t_mapSqw g_mapSqw =
 		{ return std::make_shared<SqwProc<SqwPy>>(strCfgFile.c_str()); },
 		"Python Model" } },
 #endif
-#ifdef USE_JL
+/*#ifdef USE_JL
 	{ "jl", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
-		//{ return std::make_shared<SqwJl>(strCfgFile.c_str()); },
 		{ return std::make_shared<SqwProc<SqwJl>>(strCfgFile.c_str()); },
 		"Julia Model" } },
-#endif
+#endif*/
 	{ "elastic", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwElast>(strCfgFile.c_str()); },
@@ -163,7 +161,8 @@ void load_sqw_plugins()
 			try
 			{
 				std::shared_ptr<so::shared_library> pmod =
-					std::make_shared<so::shared_library>(strPlugin);
+					std::make_shared<so::shared_library>(strPlugin, 
+						so::load_mode::rtld_lazy | so::load_mode::rtld_global);
 				if(!pmod) continue;
 
 				// import info function

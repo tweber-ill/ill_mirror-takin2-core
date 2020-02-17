@@ -184,7 +184,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";
 
 	ostrFeat << "<li>";
-#if defined NO_JL || !defined USE_JL
+#if defined NO_JL
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";

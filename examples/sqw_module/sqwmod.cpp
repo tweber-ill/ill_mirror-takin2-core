@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-// gcc -I. -shared -fPIC -o plugins/sqwmod.so examples/sqw_module/sqwmod.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp -std=c++11 -lstdc++
+// g++ -std=c++11 -I. -shared -fPIC -o plugins/sqwmod.so examples/sqw_module/sqwmod.cpp tools/monteconvo/sqwbase.cpp tlibs/log/log.cpp
 
 #include "sqwmod.h"
 
@@ -13,8 +13,6 @@
 #include "tlibs/string/string.h"
 #include "tlibs/math/math.h"
 #include "tlibs/phys/neutrons.h"
-
-#include <boost/dll/alias.hpp>
 
 
 using t_real = typename SqwMod::t_real;
@@ -147,6 +145,9 @@ SqwBase* SqwMod::shallow_copy() const
 
 // ----------------------------------------------------------------------------
 // SO interface
+
+#include <boost/dll/alias.hpp>
+
 
 static const char* pcModIdent = "tstmod";
 static const char* pcModName = "Test Module";

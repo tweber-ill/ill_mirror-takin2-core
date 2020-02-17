@@ -6,6 +6,7 @@
  */
 
 #include "sqw_jl.h"
+#include "libs/version.h"
 #include "tlibs/string/string.h"
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
@@ -18,16 +19,15 @@ using t_real = t_real_reso;
 extern "C" void jl_init__threading();
 
 
-SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
+SqwJl::SqwJl(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>())
 {
-	if(!tl::file_exists(pcFile))
+	if(!tl::file_exists(strFile.c_str()))
 	{
-		tl::log_err("Could not find Julia script file: \"", pcFile, "\".");
+		tl::log_err("Could not find Julia script file: \"", strFile, "\".");
 		m_bOk = 0;
 		return;
 	}
 
-	std::string strFile = pcFile;
 	std::string strDir = tl::get_dir(strFile);
 	const bool bSetScriptCWD = 1;
 
@@ -51,10 +51,10 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 	}
 
 	// include module
-	jl_value_t* pModIncRet = jl_call2(pInc, (jl_value_t*)jl_main_module, jl_cstr_to_string(pcFile));
+	jl_value_t* pModIncRet = jl_call2(pInc, (jl_value_t*)jl_main_module, jl_cstr_to_string(strFile.c_str()));
 	if(!pModIncRet)
 	{
-		tl::log_err("Cannot load Julia script: \"", pcFile, "\".");
+		tl::log_err("Cannot load Julia script: \"", strFile, "\".");
 		PrintExceptions();
 	}
 
@@ -118,6 +118,7 @@ SqwJl::SqwJl(const char* pcFile) : m_pmtx(std::make_shared<std::mutex>())
 
 SqwJl::~SqwJl()
 {
+	// TODO: cleanup...
 }
 
 
@@ -356,3 +357,33 @@ SqwBase* SqwJl::shallow_copy() const
 
 	return pSqw;
 }
+
+
+
+// ----------------------------------------------------------------------------
+// SO interface
+#include <boost/dll/alias.hpp>
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
+
+
+static const char* pcModIdent = "jl";
+static const char* pcModName = "Julia Model";
+
+std::tuple<std::string, std::string, std::string> sqw_info()
+{
+	tl::log_info("In ", __func__, ".");
+	return std::make_tuple(TAKIN_VER, pcModIdent, pcModName);
+}
+
+std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
+{
+	tl::log_info("In ", __func__, ".");
+	return std::make_shared<SqwProc<SqwJl>>(strCfgFile);
+}
+
+
+// exports from so file
+BOOST_DLL_ALIAS(sqw_info, takin_sqw_info);
+BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
+// ----------------------------------------------------------------------------
