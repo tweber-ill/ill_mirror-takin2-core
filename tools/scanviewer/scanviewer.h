@@ -1,7 +1,7 @@
 /**
  * Scan viewer
- * @author Tobias Weber <tobias.weber@tum.de>
- * @date mar-2015 - 2018
+ * @author Tobias Weber <tweber@ill.fr>
+ * @date mar-2015 - 2020
  * @license GPLv2
  */
 
@@ -54,11 +54,6 @@ protected:
 	void ClearPlot();
 	void PlotScan();
 	void ShowProps();
-
-	void GenerateForRoot();
-	void GenerateForGnuplot();
-	void GenerateForPython();
-	void GenerateForHermelin();
 
 	int HasRecentPath(const QString& strPath);
 

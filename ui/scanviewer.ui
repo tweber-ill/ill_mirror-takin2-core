@@ -792,6 +792,11 @@
              </item>
              <item>
               <property name="text">
+               <string>Julia</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Hermelin</string>
               </property>
              </item>
