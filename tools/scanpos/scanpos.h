@@ -37,6 +37,7 @@ t_vec get_plane_coord(const t_vec& vec0, const t_vec& vec1, const t_vec& vecHKL)
 	return vecPos;
 }
 
+
 /**
  * transforms rlu into local <vec0, vec1> coordinates
  */
@@ -66,7 +67,7 @@ template<class t_vec, class t_real>
 bool make_plot(std::ostream& ostr,
 	const t_vec& vec0, const t_vec& vec1, const t_vec& vecBraggHKL,
 	const std::vector<t_vec>& vecAllHKL, const std::vector<t_vec>& vecAllPos,
-	bool bFlip = 1)
+	bool bFlip = 1, bool b3D = 0)
 {
 	using namespace tl_ops;
 	std::ostream *pOstr = &ostr;
@@ -94,12 +95,23 @@ bool make_plot(std::ostream& ostr,
 	(*pOstr) << "unset key\n";
 	(*pOstr) << "set size 1,1\n";
 	(*pOstr) << "set xlabel \"[" << vec0[0] << ", " << vec0[1] << ", " << vec0[2] << "] (rlu)\"\n";
-	(*pOstr) << "set ylabel \"[" << vec1[0] << ", " << vec1[1] << ", " << vec1[2] << "] (rlu)\"\n\n";
+	(*pOstr) << "set ylabel \"[" << vec1[0] << ", " << vec1[1] << ", " << vec1[2] << "] (rlu)\"\n";
+	if(b3D)
+	{
+		t_vec vec2 = tl::cross_3(vec0, vec1);
+		(*pOstr) << "set zlabel \"[" << vec2[0] << ", " << vec2[1] << ", " << vec2[2] << "] (rlu)\"\n";
+	}
+	(*pOstr) << "\n";
 
 	(*pOstr) << "set xtics rotate 0.05\n";
 	(*pOstr) << "set mxtics 2\n";
 	(*pOstr) << "set ytics 0.05\n";
 	(*pOstr) << "set mytics 2\n\n";
+	if(b3D)
+	{
+		(*pOstr) << "set ztics 0.05\n";
+		(*pOstr) << "set mztics 2\n\n";
+	}
 
 
 	t_vec vecBragg(2);
@@ -146,24 +158,45 @@ bool make_plot(std::ostream& ostr,
 	// ranges
 	t_real xpad = (xmax-xmin)*0.1 + dLabelPadX*10.;
 	t_real ypad = (ymax-ymin)*0.1 + dLabelPadY*10.;
+
 	if(tl::float_equal<t_real>(ypad, 0)) ypad = xpad;
 
 	(*pOstr) << "xpad = " << xpad << "\n";
 	(*pOstr) << "ypad = " << ypad << "\n";
+
 	(*pOstr) << "set xrange [" << xmin << "-xpad" << " : " << xmax << "+xpad" << "]\n";
 	if(bFlip)
 		(*pOstr) << "set yrange [" << ymax << "+ypad" << " : " << ymin << "-ypad" << "]\n\n";
 	else
 		(*pOstr) << "set yrange [" << ymin << "-ypad" << " : " << ymax << "+ypad" << "]\n\n";
+	if(b3D)
+	{
+		(*pOstr) << "set zrange [ -0.05 : 0.05 ]\n";
+
+		(*pOstr) << "\n";
+		(*pOstr) << "set xyplane at 0\n";
+		(*pOstr) << "set view 45, 20, 1, 1\n";
+	}
+
+	(*pOstr) << "\n";
 
 
-	(*pOstr) << "plot \\\n";
-	(*pOstr) << "\t\"-\" u 1:2 w p pt 7 ps size_bragg lc rgb col_bragg, \\\n";
-	(*pOstr) << "\t\"-\" u 1:2 w p pt 7 ps size_pos lc rgb col_pos\n";
+	if(b3D)
+	{
+		(*pOstr) << "splot \\\n";
+		(*pOstr) << "\t\"-\" u ($1):($2):(0) w p pt 7 ps size_bragg lc rgb col_bragg, \\\n";
+		(*pOstr) << "\t\"-\" u ($1):($2):(0) w p pt 7 ps size_pos lc rgb col_pos\n";
+	}
+	else
+	{
+		(*pOstr) << "plot \\\n";
+		(*pOstr) << "\t\"-\" u 1:2 w p pt 7 ps size_bragg lc rgb col_bragg, \\\n";
+		(*pOstr) << "\t\"-\" u 1:2 w p pt 7 ps size_pos lc rgb col_pos\n";
+	}
 
-	(*pOstr) << std::left << std::setw(g_iPrec*2) << vecBragg[0] << " " 
-		<< std::left << std::setw(g_iPrec*2)<< vecBragg[1] 
-		<< "\t# Bragg peak: G = (" 
+	(*pOstr) << std::left << std::setw(g_iPrec*2) << vecBragg[0] << " "
+		<< std::left << std::setw(g_iPrec*2)<< vecBragg[1]
+		<< "\t# Bragg peak: G = ("
 		<< vecBraggHKL[0] << ", " << vecBraggHKL[1] << ", " << vecBraggHKL[2] << ")"
 		<< "\ne\n";
 
@@ -172,7 +205,7 @@ bool make_plot(std::ostream& ostr,
 		const t_vec& vecHKL = vecAllHKL[iPos];
 		const t_vec& vecPos = vecAllPos[iPos];
 
-		(*pOstr) << std::left << std::setw(g_iPrec*2) << vecPos[0] << " " 
+		(*pOstr) << std::left << std::setw(g_iPrec*2) << vecPos[0] << " "
 			<< std::left << std::setw(g_iPrec*2) << vecPos[1]
 			<< "\t# Q = (" << vecHKL[0] << ", " << vecHKL[1] << ", " << vecHKL[2] << ")\n";
 	}

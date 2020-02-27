@@ -40,6 +40,7 @@ ScanPosDlg::ScanPosDlg(QWidget* pParent, QSettings *pSett)
 	QObject::connect(editPlane, SIGNAL(textChanged(const QString&)), this, SLOT(UpdatePlot()));
 	QObject::connect(editPos, SIGNAL(textChanged()), this, SLOT(UpdatePlot()));
 	QObject::connect(checkFlip, SIGNAL(toggled(bool)), this, SLOT(UpdatePlot()));
+	QObject::connect(check3D, SIGNAL(toggled(bool)), this, SLOT(UpdatePlot()));
 	QObject::connect(btnFromScan, SIGNAL(clicked()), this, SLOT(LoadPlaneFromFile()));
 	QObject::connect(btnAddFromScan, SIGNAL(clicked()), this, SLOT(LoadPosFromFile()));
 }
@@ -248,6 +249,7 @@ void ScanPosDlg::UpdatePlot()
 		std::string strPlane = editPlane->text().toStdString();
 		std::string strAllPos = editPos->toPlainText().toStdString();
 		bool bFlip = checkFlip->isChecked();
+		bool b3D = check3D->isChecked();
 
 
 		// Bragg reflection
@@ -289,7 +291,7 @@ void ScanPosDlg::UpdatePlot()
 
 		// Create plot script
 		std::ostringstream ostrPlot;
-		make_plot<t_vec, t_real>(ostrPlot, vec1, vec2, vecBragg, vecAllHKL, vecAllPos, bFlip);
+		make_plot<t_vec, t_real>(ostrPlot, vec1, vec2, vecBragg, vecAllHKL, vecAllPos, bFlip, b3D);
 		editScript->setPlainText(ostrPlot.str().c_str());
 	}
 	catch(const std::exception& ex)
