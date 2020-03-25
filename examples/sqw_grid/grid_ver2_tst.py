@@ -81,9 +81,9 @@ def hkl_to_idx(hkl, dims):
         l = dims["lmax"] - dims["lstep"]
 
     # max dimensions
-    iHSize = int((dims["hmax"]-dims["hmin"]) / dims["hstep"])
-    iKSize = int((dims["kmax"]-dims["kmin"]) / dims["kstep"])
-    iLSize = int((dims["lmax"]-dims["lmin"]) / dims["lstep"])
+    iHSize = int(round((dims["hmax"]-dims["hmin"]) / dims["hstep"]))
+    iKSize = int(round((dims["kmax"]-dims["kmin"]) / dims["kstep"]))
+    iLSize = int(round((dims["lmax"]-dims["lmin"]) / dims["lstep"]))
 
     # position indices
     iH = int(round(((h - dims["hmin"]) / dims["hstep"])))
