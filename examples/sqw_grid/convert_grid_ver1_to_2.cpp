@@ -35,10 +35,13 @@
 #include <string>
 #include <unordered_map>
 
+using t_float_src = double;
+using t_float_dst = double;
+
 
 int main()
 {
-	const double eps = 1e-8;
+	const t_float_dst eps = 1e-8;
 
 
 	std::string filenameIdx = "grid_ver1.idx";
@@ -46,18 +49,19 @@ int main()
 
 	std::string filenameNewDat = "grid_ver2.bin";
 
+
 	// dimensions of version 1 grid (TODO: load from config file)
-	double hmin = -0.096;
-	double hmax = 0.096;
-	double hstep = 0.002;
+	t_float_dst hmin = -0.096;
+	t_float_dst hmax = 0.096;
+	t_float_dst hstep = 0.002;
 
-	double kmin = -0.096;
-	double kmax = 0.096;
-	double kstep = 0.002;
+	t_float_dst kmin = -0.096;
+	t_float_dst kmax = 0.096;
+	t_float_dst kstep = 0.002;
 
-	double lmin = -0.096;
-	double lmax = 0.096;
-	double lstep = 0.002;
+	t_float_dst lmin = -0.096;
+	t_float_dst lmax = 0.096;
+	t_float_dst lstep = 0.002;
 
 
 	std::cout << "Converting data file ..." << std::endl;
@@ -115,17 +119,21 @@ int main()
 		for(unsigned int branch=0; branch<numBranches; ++branch)
 		{
 			// in case more than one weigh factor is stored in original grid:
-			//double vals[4] = {0, 0, 0, 0};
+			//t_float_src vals[4] = {0, 0, 0, 0};
 
-			double vals[2] = {0, 0};
+			t_float_src vals[2] = { 0, 0 };
 			ifDat.read((char*)vals, sizeof(vals));
 
-			//double w = std::abs(vals[1])+std::abs(vals[2])+std::abs(vals[3]);
-			double w = std::abs(vals[1]);
+			t_float_dst E = vals[0];
+			if(std::abs(E) < eps)
+				E = t_float_dst(0);
+
+			//t_float_dst w = std::abs(vals[1])+std::abs(vals[2])+std::abs(vals[3]);
+			t_float_dst w = std::abs(vals[1]);
 
 			if(w >= eps)
 			{
-				double newvals[2] = {vals[0], w};
+				t_float_dst newvals[2] = { E, w };
 				ofDat.write((char*)newvals, sizeof(newvals));
 
 				++numNewBranches;

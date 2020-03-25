@@ -15,14 +15,17 @@ datafile = "grid.bin"
 # longitudinal
 plot_hklbegin = np.array([-0.09, -0.09, -0.])
 plot_hklend = np.array([0.09, 0.09, 0.])
+plot_dir = 0
 
 # transversal
 #plot_hklbegin = np.array([0.09, -0.09, 0.])
 #plot_hklend = np.array([-0.09, 0.09, 0.])
+#plot_dir = 0
 
 # up
 #plot_hklbegin = np.array([0, 0, -0.09])
 #plot_hklend = np.array([0, 0, 0.09])
+#plot_dir = 2
 
 numdatavals = 2     # [E, w]
 plot_hklsteps = 512
@@ -32,14 +35,15 @@ plot_hklsteps = 512
 # -----------------------------------------------------------------------------
 size_uint32 = 4
 size_uint64 = 8
-size_float64 = 8
+size_float = 8
+float_type = "float64"
 # -----------------------------------------------------------------------------
 
 
 
 def get_dims(datafilehandle):
     header_data = np.memmap(datafilehandle, dtype="uint8", mode="r")
-    dims_data = np.ndarray.view(header_data[8 : 8+size_float64*9], dtype="float64")
+    dims_data = np.ndarray.view(header_data[8 : 8+size_float*9], dtype=float_type)
 
     dims = {}
 
@@ -102,10 +106,10 @@ def getE(datafilehandle, hkl):
     # offset to index block
     header_data = np.memmap(datafilehandle, dtype="uint8", mode="r")
     idx_offs = np.ndarray.view(header_data[0 : 8], dtype="uint64")
-    
+
     dims = get_dims(datafilehandle)
     hklidx = hkl_to_idx(hkl, dims)
-    
+
     # index of (energy, weights) data
     idx = np.memmap(datafilehandle, dtype="uint64", mode="r", offset=int(idx_offs + hklidx*size_uint64))[0]
 
@@ -113,7 +117,7 @@ def getE(datafilehandle, hkl):
     data = np.memmap(datafilehandle, dtype="uint32", mode="r", offset=int(idx))
     numbranches = data[0]
 
-    values = np.ndarray.view(data[1 : 1+numbranches*numdatavals * int(size_float64/size_uint32)], dtype="float64")
+    values = np.ndarray.view(data[1 : 1+numbranches*numdatavals * int(size_float/size_uint32)], dtype=float_type)
     values.shape = (numbranches, numdatavals)
     return values
 
@@ -161,7 +165,12 @@ def plot_disp(datafilehandle, hklbegin, hklend, hklsteps):
     plt.set_ylabel("E (meV)")
     plt.set_xlim(-0.09, 0.09)
     plt.set_ylim(-1., 1.)
-    plt.scatter(qs_h, Es, marker=".", s=ws*symscale)
+    if plot_dir == 0:
+        plt.scatter(qs_h, Es, marker=".", s=ws*symscale)
+    elif plot_dir == 1:
+        plt.scatter(qs_k, Es, marker=".", s=ws*symscale)
+    else:
+        plt.scatter(qs_l, Es, marker=".", s=ws*symscale)
 
     plot.tight_layout()
     plot.show()

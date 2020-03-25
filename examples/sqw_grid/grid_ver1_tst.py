@@ -31,14 +31,17 @@ numvals = 2     # [E, w]
 # longitudinal
 plot_hklbegin = np.array([-0.09, -0.09, -0.])
 plot_hklend = np.array([0.09, 0.09, 0.])
+plot_dir = 0
 
 # transversal
 #plot_hklbegin = np.array([0.09, -0.09, 0.])
 #plot_hklend = np.array([-0.09, 0.09, 0.])
+#plot_dir = 0
 
 # up
 #plot_hklbegin = np.array([0, 0, -0.09])
 #plot_hklend = np.array([0, 0, 0.09])
+#plot_dir = 2
 
 plot_hklsteps = 512
 # -----------------------------------------------------------------------------
@@ -147,7 +150,12 @@ def plot_disp(idxfilehandle, datafilehandle, hklbegin, hklend, hklsteps):
     plt.set_ylabel("E (meV)")
     plt.set_xlim(-0.09, 0.09)
     plt.set_ylim(-1., 1.)
-    plt.scatter(qs_h, Es, marker=".", s=ws*symscale)
+    if plot_dir == 0:
+        plt.scatter(qs_h, Es, marker=".", s=ws*symscale)
+    elif plot_dir == 1:
+        plt.scatter(qs_k, Es, marker=".", s=ws*symscale)
+    else:
+        plt.scatter(qs_l, Es, marker=".", s=ws*symscale)
 
     plot.tight_layout()
     plot.show()
