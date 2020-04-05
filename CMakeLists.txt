@@ -18,6 +18,7 @@ set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_CXX_STANDARD 11)
 #set(BUILD_SHARED_LIBS TRUE)
 set(USE_TR1_FUNCS FALSE)
+set(USE_PLUGINS TRUE)
 
 
 if(BUILD_FOR_MINGW)
@@ -37,6 +38,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}" "." "${PROJECT_SOURCE_DIR}/tlibs")
 set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
 
 set(Boost_DEBUG FALSE)
 set(Boost_USE_DEBUG_LIBS FALSE)
@@ -72,6 +74,13 @@ else()
 	set(Rt_LIBRARIES "")
 	set(Mp_LIBRARIES "")
 endif()
+
+if(USE_PLUGINS)
+	find_package(Dl REQUIRED)
+else()
+	set(Dl_LIBRARIES "")
+endif()
+
 if(USE_GENTAB)
 	find_package(Clipper REQUIRED)
 endif()
@@ -127,9 +136,14 @@ add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 #add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)
 add_definitions(-DTLIBS_INC_HDR_IMPLS)
 
+if(USE_PLUGINS)
+	add_definitions(-DUSE_PLUGINS)
+endif()
+
 if(USE_TR1_FUNCS)
 	add_definitions(-DUSE_BOOST_REX)
 endif()
+
 if(NOT BUILD_FOR_MINGW)
 	add_definitions(-DUSE_MULTI_TEXTURES)
 else()
@@ -322,7 +336,7 @@ target_link_libraries(takin
 	${LIBS_FIT}
 	${SOCK2}
 	${LIBS_3D}
-	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
+	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 	${QWT_LIBRARIES}
 	Qt5::Core Qt5::Gui Qt5::Svg
 	${PNG_LIBRARIES}
@@ -361,6 +375,33 @@ endif()
 
 
 
+if(USE_PLUGINS)
+# -----------------------------------------------------------------------------
+# build plugins
+# -----------------------------------------------------------------------------
+add_library(pymod SHARED
+	tools/monteconvo/sqw_py.cpp tools/monteconvo/sqwbase.cpp
+	tlibs/log/log.cpp
+	tlibs/math/rand.cpp
+)
+
+target_link_libraries(pymod
+	${Python3_LIBRARIES}
+)
+
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET pymod POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:pymod>
+		MAIN_DEPENDENCY pymod
+	)
+endif()
+# -----------------------------------------------------------------------------
+
+endif()
+
+
+
 if(Minuit2_FOUND)
 # -----------------------------------------------------------------------------
 # convofit, convoseries
@@ -391,7 +432,7 @@ set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
 target_link_libraries(convofit
 	${LIBS_FIT} ${SOCK2}
-	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
+	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 	${Boost_LIBRARIES}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
