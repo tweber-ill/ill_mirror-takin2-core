@@ -100,7 +100,7 @@ std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 		std::get<0>(tup) = val.first;
 		std::get<1>(tup) = std::get<1>(val.second);
 
-		vec.push_back(std::move(tup));
+		vec.emplace_back(std::move(tup));
 	}
 
 	std::sort(vec.begin(), vec.end(), [](const t_tup& tup0, const t_tup& tup1) -> bool
@@ -141,8 +141,29 @@ static std::vector<std::shared_ptr<so::shared_library>> g_vecMods;
 void unload_sqw_plugins()
 {
 	for(auto& pMod : g_vecMods)
+	{
+		std::function<t_fkt_info> fktInfo =
+			pMod->get<t_pfkt_info>("takin_sqw_info");
+
+		if(fktInfo)
+		{
+			auto tupInfo = fktInfo();
+			const std::string& strModIdent = std::get<1>(tupInfo);
+			tl::log_debug("Unloading plugin: ", strModIdent, ".");
+
+			// remove module from map
+			auto iterMod = g_mapSqw.find(strModIdent);
+			if(iterMod != g_mapSqw.end())
+				g_mapSqw.erase(iterMod);
+		}
+
 		pMod->unload();
+		pMod.reset();
+		//tl::log_debug("Unloaded plugin.");
+	}
+
 	g_vecMods.clear();
+	tl::log_debug("Unloaded all plugins.");
 }
 
 void load_sqw_plugins()
@@ -285,7 +306,7 @@ bool load_sqw_params(SqwBase* pSqw,
 			SqwBase::t_var var;
 			std::get<0>(var) = strChild;
 			std::get<2>(var) = *opVal;
-			vecVars.push_back(std::move(var));
+			vecVars.emplace_back(std::move(var));
 		}
 
 		boost::optional<std::string> opErr =
@@ -296,7 +317,7 @@ bool load_sqw_params(SqwBase* pSqw,
 		std::get<0>(varFit) = strChild;
 		std::get<1>(varFit) = opErr ? *opErr : "0";
 		std::get<2>(varFit) = opFit ? *opFit : 0;
-		vecVarsFit.push_back(std::move(varFit));
+		vecVarsFit.emplace_back(std::move(varFit));
 	}
 
 	pSqw->SetVars(vecVars);

@@ -36,6 +36,12 @@ SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 		if(!bInited)
 		{
 			::Py_InitializeEx(0);
+			if(!::Py_IsInitialized())
+			{
+				tl::log_err("Cannot initialise Python interpreter.");
+				return;
+			}
+
 			std::string strPy = Py_GetVersion();
 			tl::find_all_and_replace(strPy, std::string("\n"), std::string(", "));
 			tl::log_debug("Initialised Python interpreter version ", strPy, ".");
@@ -106,6 +112,9 @@ SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 
 SqwPy::~SqwPy()
 {
+	tl::log_debug("Unloading Python interpreter.");
+	Py_FinalizeEx();
+	tl::log_debug("Unloaded Python interpreter.");
 }
 
 
