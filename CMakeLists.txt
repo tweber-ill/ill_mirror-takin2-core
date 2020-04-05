@@ -1,7 +1,7 @@
 #
 # Takin
 # @author Tobias Weber <tobias.weber@tum.de>
-# @date 2013-2019
+# @date 2013-2020
 # @license GPLv2
 #
 
@@ -13,7 +13,7 @@ set(BUILD_FOR_MINGW FALSE)
 #set(BUILD_FOR_MINGW TRUE)
 
 
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_CXX_STANDARD 11)
 #set(BUILD_SHARED_LIBS TRUE)
@@ -39,6 +39,8 @@ set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 
 set(Boost_DEBUG FALSE)
+set(Boost_USE_DEBUG_LIBS FALSE)
+set(Boost_USE_RELEASE_LIBS TRUE)
 set(Boost_FIND_QUIETLY FALSE)
 set(BOOST_COMPS program_options iostreams filesystem system)
 
@@ -47,19 +49,17 @@ if(USE_TR1_FUNCS)
 endif()
 
 if(SEARCH_PY)
-	find_package(PythonInterp 3.7)
-	find_package(PythonLibs 3.7)
+	find_package(Python3 COMPONENTS Interpreter Development)
 endif()
 
-if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
-	list(APPEND BOOST_COMPS python)
-#	list(APPEND BOOST_COMPS python37)
+if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+	list(APPEND BOOST_COMPS python37 numpy37)
 endif()
 
 
 find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Qt5 REQUIRED Core Widgets Gui OpenGL)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Qwt REQUIRED)
 find_package(Minuit2)
@@ -95,14 +95,27 @@ if("${Boost_LIBRARIES}" STREQUAL "")
 endif()
 
 
-#message("Project source dir: ${PROJECT_SOURCE_DIR}")
-#message("CMake source dir: ${CMAKE_SOURCE_DIR}")
-#message("Binary dir: ${CMAKE_BINARY_DIR}")
+if("${QT_MOC_EXECUTABLE}" STREQUAL "")
+	get_target_property(QT_MOC_EXECUTABLE Qt5::moc IMPORTED_LOCATION)
+endif()
+
+if("${QT_UIC_EXECUTABLE}" STREQUAL "")
+	get_target_property(QT_UIC_EXECUTABLE Qt5::uic IMPORTED_LOCATION)
+endif()
+
+
+message("Project source dir: ${PROJECT_SOURCE_DIR}")
+message("CMake source dir: ${CMAKE_SOURCE_DIR}")
+message("CMake binary dir: ${CMAKE_BINARY_DIR}")
 message("Install path prefix: ${CMAKE_INSTALL_PREFIX}")
-message("Using Qwt version ${QWT_MAJOR_VERSION}")
+message("Using Qt version ${Qt5Core_VERSION}")
+#message("Using Qwt version ${QWT_MAJOR_VERSION}")
 message("Using Boost version ${Boost_VERSION}")
 message("Using Zlib version ${ZLIB_VERSION_STRING}")
 message("Using Bzip2 version ${BZIP2_VERSION_STRING}")
+if(NOT "${Python3_VERSION}" STREQUAL "")
+	message("Using Py version ${Python3_VERSION}")
+endif()
 message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
 
 
@@ -129,11 +142,16 @@ endif()
 add_definitions(-DBOOST_MATH_FWD_HPP)
 
 
+#add_definitions("${Qt5Core_DEFINITIONS}")
+#add_definitions("${Qt5Widgets_DEFINITIONS}")
+#add_definitions("${QtGui_DEFINITIONS}")
+#add_definitions("${Qt5OpenGL_DEFINITIONS}")
+
 include_directories("${PROJECT_SOURCE_DIR}" ".")
 include_directories("${Boost_INCLUDE_DIRS}/..")
 include_directories("${PNG_INCLUDE_DIRS}")
 #include_directories("${JPEG_INCLUDE_DIRS} ${TIFF_INCLUDE_DIRS}")
-include_directories("${QT_INCLUDE_DIR}")
+include_directories("${Qt5Core_INCLUDE_DIRS}" "${Qt5Gui_INCLUDE_DIRS}" "${Qt5Widgets_INCLUDE_DIRS}")
 include_directories("${QWT_INCLUDE_DIRS}")
 include_directories("${ZLIB_INCLUDE_DIRS}")
 include_directories("${BZIP2_INCLUDE_DIR}")
@@ -141,14 +159,14 @@ include_directories("${BZIP2_INCLUDE_DIR}")
 
 
 # py scripting support
-if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
+if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
 	message("Enabling py scripting support.")
 
 	add_definitions(-DUSE_PY)
-	include_directories("${PYTHON_INCLUDE_DIRS}")
+	include_directories("${Python3_INCLUDE_DIRS}")
 
 	set(SRCS_PY tools/monteconvo/sqw_py.cpp)
-	set(LIBS_PY ${PYTHON_LIBRARIES})
+	set(LIBS_PY ${Python3_LIBRARIES})
 else()
 	message("Disabling py scripting support.")
 
@@ -199,7 +217,7 @@ if(OPENGL_FOUND AND FREETYPE_FOUND)
 	)
 	set(LIBS_3D
 		${FREETYPE_LIBRARY}
-		Qt5::QtOpenGL ${OPENGL_LIBRARIES}
+		Qt5::OpenGL ${OPENGL_LIBRARIES}
 		${X11_X11_LIB}
 	)
 else()
@@ -212,6 +230,7 @@ endif()
 
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_AUTOUIC OFF)
+set(CMAKE_AUTORCC OFF)
 
 add_definitions(-std=c++11)
 #add_definitions(-march=native -s)
@@ -229,14 +248,14 @@ if(USE_GENTAB)
 	)
 
 	target_link_libraries(gentab
-		${LIBS_PY} ${Clipper_LIBRARIES}
-		Qt5::QtCore Qt5::QtGui
+		${Clipper_LIBRARIES}
+		Qt5::Core Qt5::Gui Qt5::Widgets
 		${Boost_LIBRARIES}
-#		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	)
 
 	add_custom_command(TARGET gentab POST_BUILD
-		COMMAND cd ${CMAKE_BINARY_DIR} && ./gentab
+		COMMAND cd ${CMAKE_BINARY_DIR} && ./bin/gentab
 		MAIN_DEPENDENCY gentab)
 endif()
 # -----------------------------------------------------------------------------
@@ -265,7 +284,6 @@ add_executable(takin
 	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
 	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
-	${SRCS_PY}
 
 	tools/convofit/scan.cpp
 	tools/scanviewer/scanviewer.cpp tools/scanviewer/FitParamDlg.cpp
@@ -306,17 +324,16 @@ target_link_libraries(takin
 	${LIBS_3D}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
 	${QWT_LIBRARIES}
-	Qt5::QtCore Qt5::QtGui Qt5::QtSvg
-	${LIBS_PY}
+	Qt5::Core Qt5::Gui Qt5::Svg
 	${PNG_LIBRARIES}
 	${Boost_LIBRARIES}
-#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
 
 # pre-build
 add_custom_target(prebuild-script
-	COMMAND ${PROJECT_SOURCE_DIR}/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
+	COMMAND ${PROJECT_SOURCE_DIR}/prebuild.sh ${Qt5Widgets_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
 )
 
 
@@ -356,7 +373,6 @@ add_executable(convofit
 	tools/monteconvo/TASReso.cpp
 	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
-	${SRCS_PY}
 
 	tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
 	tools/convofit/model.cpp tools/convofit/scan.cpp
@@ -376,9 +392,8 @@ set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 target_link_libraries(convofit
 	${LIBS_FIT} ${SOCK2}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES}
-	${LIBS_PY}
 	${Boost_LIBRARIES}
-#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -400,9 +415,8 @@ add_executable(convoseries
 set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
 target_link_libraries(convoseries
-	${LIBS_PY}
 	${Boost_LIBRARIES}
-#	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -431,11 +445,11 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc
 	DESTINATION share/takin COMPONENT takindata1)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons
 	DESTINATION share/takin/res COMPONENT takindata2)
-install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS 
+install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS
 	${PROJECT_SOURCE_DIR}/LICENSES ${PROJECT_SOURCE_DIR}/LITERATURE
 	DESTINATION share/takin COMPONENT takininfo)
-install(FILES ${PROJECT_SOURCE_DIR}/takin_local.sh 
-	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ 
+install(FILES ${PROJECT_SOURCE_DIR}/takin_local.sh
+	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ
 	DESTINATION bin COMPONENT takinstarter)
 install(FILES ${PROJECT_SOURCE_DIR}/takin.desktop DESTINATION share/applications COMPONENT takindesk)
 # -----------------------------------------------------------------------------
@@ -447,7 +461,7 @@ install(FILES ${PROJECT_SOURCE_DIR}/takin.desktop DESTINATION share/applications
 # TODO: fix package
 # -----------------------------------------------------------------------------
 set(CPACK_PACKAGE_NAME "takin")
-set(CPACK_PACKAGE_CONTACT "tobias.weber@tum.de")
+set(CPACK_PACKAGE_CONTACT "tweber@ill.fr")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "inelastic neutron scattering package")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_EXECUTABLES "takin;Takin")

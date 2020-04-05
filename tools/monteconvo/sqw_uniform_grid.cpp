@@ -55,7 +55,7 @@ SqwUniformGrid::SqwUniformGrid(const std::string& strDatFile) : m_strDataFile(st
 		return;
 	}
 
-	m_indexBlockOffset = *_blockOffs.second;
+	m_indexBlockOffset = *_blockOffs.second.get();
 
 	m_hmin = _dims.second[0];
 	m_hmax = _dims.second[1];
@@ -155,7 +155,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 		return std::make_tuple(std::vector<t_real>(), std::vector<t_real>());
 	}
 
-	std::size_t dat_file_offs = *_dat_file_offs.second;
+	std::size_t dat_file_offs = *_dat_file_offs.second.get();
 	// ------------------------------------------------------------------------
 
 
@@ -170,7 +170,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 	}
 
 	// number of dispersion branches and weights
-	unsigned int iNumBranches = *_num_branches.second;
+	unsigned int iNumBranches = *_num_branches.second.get();
 
 
 	// map actual (E, w) data

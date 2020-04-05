@@ -163,7 +163,7 @@ static QListWidgetItem* create_header_item(const char *pcTitle, bool bSubheader=
 	pHeaderItem->setForeground(brushHeader);
 
 	pHeaderItem->setData(Qt::UserRole, 0);
-	pHeaderItem->setBackgroundColor(bSubheader ? QColor(0x85, 0x85, 0x85) : QColor(0x65, 0x65, 0x65));
+	pHeaderItem->setBackground(bSubheader ? QColor(0x85, 0x85, 0x85) : QColor(0x65, 0x65, 0x65));
 
 	return pHeaderItem;
 }

@@ -1,0 +1,26 @@
+find_path(QWT_INCLUDE_DIRS
+	NAMES qwt.h
+	PATH_SUFFIXES qwt6-qt5 qwt-qt5 qwt6 qwt
+	HINTS /usr/include /usr/local/include /opt/local/include
+	DOC "Qwt include directories"
+)
+
+list(APPEND QWT_INCLUDE_DIRS "${QWT_INCLUDE_DIRS}/..")
+
+
+find_library(QWT_LIBRARIES
+	NAMES qwt6-qt5 qwt-qt5 qwt6 qwt
+	HINTS /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib32 /usr/local/lib32
+	DOC "Qwt libraries"
+)
+
+if(QWT_INCLUDE_DIRS AND QWT_LIBRARIES)
+	set(QWT_FOUND 1)
+
+	message("Qwt include directories: ${QWT_INCLUDE_DIRS}")
+	message("Qwt library: ${QWT_LIBRARIES}")
+else()
+	set(QWT_FOUND 0)
+
+	message("Error: Qwt could not be found!")
+endif()

@@ -16,7 +16,6 @@ if [ $? -ne 0 ]; then
 fi
 
 
-FINDQWT=http://cmake.org/Wiki/images/2/27/FindQwt.cmake
 FADD=http://ab-initio.mit.edu/Faddeeva
 TANGOICONS=http://tango.freedesktop.org/releases/tango-icon-theme-0.8.90.tar.gz
 
@@ -35,24 +34,6 @@ MAGFFACT2=https://raw.githubusercontent.com/neutronpy/neutronpy/master/neutronpy
 
 SPACEGROUPS=https://raw.githubusercontent.com/egonw/bodr/master/bodr/crystal/space-groups.xml
 ELEMENTS=https://raw.githubusercontent.com/egonw/bodr/master/bodr/elements/elements.xml
-
-
-#
-# qwt finder for cmake
-#
-function dl_findqwt
-{
-#	rm -f FindQwt.cmake
-
-	if [ ! -f FindQwt.cmake ]; then
-		echo -e "Downloading FindQwt...\n"
-
-		if ! wget ${FINDQWT}; then
-			echo -e "Error: Cannot download FindQwt.";
-			return -1;
-		fi
-	fi
-}
 
 
 
@@ -307,8 +288,6 @@ echo -e "-----------------------------------------------------------------------
 dl_fadd
 echo -e "--------------------------------------------------------------------------------"
 dl_tangoicons
-echo -e "--------------------------------------------------------------------------------"
-dl_findqwt
 echo -e "--------------------------------------------------------------------------------"
 
 echo -e "\nAfter successfully obtaining all resource files, the program ./gentab has to be run!\n"

@@ -39,7 +39,6 @@ scanviewer.mk
 CMakeFiles/*
 CMakeCache.txt
 cmake_install.cmake
-FindQwt.cmake
 Makefile
 tlibs-master.tar.bz2
 tlibs/*

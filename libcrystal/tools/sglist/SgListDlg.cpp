@@ -68,8 +68,8 @@ static QListWidgetItem* create_header_item(const char *pcTitle)
 	QBrush brushHeader = pHeaderItem->foreground();
 	brushHeader.setColor(QColor(0xff, 0xff, 0xff));
 	pHeaderItem->setForeground(brushHeader);
-	pHeaderItem->setBackgroundColor(QColor(0x65, 0x65, 0x65));
-	
+	pHeaderItem->setBackground(QColor(0x65, 0x65, 0x65));
+
 	pHeaderItem->setData(Qt::UserRole, 1000);
 
 	return pHeaderItem;
@@ -110,8 +110,8 @@ void SgListDlg::SetupSpacegroups()
 
 		QListWidgetItem* pItem = new QListWidgetItem(ostrSg.str().c_str());
 		pItem->setData(Qt::UserRole, iSG);
-		pItem->setBackgroundColor(itemColsBackground[iSgNr % (sizeof(itemColsBackground)/sizeof(itemColsBackground[0]))]);
-		pItem->setTextColor(itemColsForeground[iSgNr % (sizeof(itemColsForeground)/sizeof(itemColsForeground[0]))]);
+		pItem->setBackground(itemColsBackground[iSgNr % (sizeof(itemColsBackground)/sizeof(itemColsBackground[0]))]);
+		pItem->setForeground(itemColsForeground[iSgNr % (sizeof(itemColsForeground)/sizeof(itemColsForeground[0]))]);
 		listSGs->addItem(pItem);
 	}
 }
