@@ -412,8 +412,10 @@ SqwProc<t_sqw>::~SqwProc()
 			ipr::message_queue::remove(("takin_sqw_proc_out_" + m_strProcName).c_str());
 		}
 	}
-	catch(const std::exception&)
-	{}
+	catch(const std::exception& ex)
+	{
+		tl::log_debug("Process unloading exception: ", ex.what());
+	}
 }
 
 
@@ -458,6 +460,7 @@ t_real SqwProc<t_sqw>::operator()(t_real dh, t_real dk, t_real dl, t_real dE) co
 	ProcMsg msgS = msg_recv(*m_pmsgIn);
 	return msgS.dRet;
 }
+
 
 template<class t_sqw>
 bool SqwProc<t_sqw>::IsOk() const

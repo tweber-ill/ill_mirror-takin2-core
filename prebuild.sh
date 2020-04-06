@@ -31,7 +31,9 @@ if [ -z "$UIC" ] || [ -z "${MOC}" ]; then
 	exit -1;
 fi
 
-echo -e "Using UIC: ${UIC}\nUsing MOC: ${MOC}\n"
+echo -e "Using UIC: ${UIC}\nUsing MOC: ${MOC}"
+echo -e "Takin root dir: ${TAKINROOT}\n"
+
 
 
 
@@ -100,7 +102,6 @@ declare -a hfiles=(
 	"${TAKINROOT}/dialogs/FilePreviewDlg.h"
 	"${TAKINROOT}/tools/ffact/FormfactorDlg.h"
 	"${TAKINROOT}/dialogs/AboutDlg.h"
-	"${TAKINROOT}/dialogs/DispDlg.h"
 	"${TAKINROOT}/dialogs/DeadAnglesDlg.h"
 	"${TAKINROOT}/dialogs/LogDlg.h"
 	"${TAKINROOT}/libs/qt/qwthelper.h"

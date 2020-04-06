@@ -187,8 +187,8 @@ void load_sqw_plugins()
 			{
 				// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
 				std::shared_ptr<so::shared_library> pmod =
-					std::make_shared<so::shared_library>(strPlugin,
-						so::load_mode::rtld_lazy /*| so::load_mode::rtld_global*/);
+					std::make_shared<so::shared_library>(strPlugin/*,
+						so::load_mode::rtld_lazy*/ /*| so::load_mode::rtld_global*/);
 				if(!pmod) continue;
 
 				// import info function
@@ -204,7 +204,8 @@ void load_sqw_plugins()
 				// module already registered?
 				if(g_mapSqw.find(strModIdent) != g_mapSqw.end())
 				{
-					tl::log_warn("Module \"", strModLongName, "\" (id=", strModIdent, ") is already registered.");
+					tl::log_warn("Module \"", strModLongName, "\" (id=", strModIdent, ") is already registered. Plugin: ", strPlugin, ".");
+					pmod->unload();
 					continue;
 				}
 

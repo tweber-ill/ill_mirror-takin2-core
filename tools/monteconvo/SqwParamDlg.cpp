@@ -89,8 +89,7 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 			pItemName = new QTableWidgetItem();
 			tableParams->setItem(iRow, SQW_NAME, pItemName);
 		}
-		pItemName->setFlags((pItemName->flags() & ~Qt::ItemIsEditable) | Qt::ItemIsUserCheckable);
-		pItemName->setCheckState(Qt::Unchecked);
+		pItemName->setFlags(pItemName->flags() & ~Qt::ItemIsEditable);
 		pItemName->setText(strName.c_str());
 
 
@@ -147,13 +146,9 @@ void SqwParamDlg::SaveSqwParams()
 {
 	std::vector<SqwBase::t_var> vecVars;
 	std::vector<SqwBase::t_var_fit> vecVarsFit;
-	bool bAnythingSelected=0;
 
 	for(int iRow=0; iRow<tableParams->rowCount(); ++iRow)
 	{
-		if(tableParams->item(iRow, SQW_NAME)->checkState() != Qt::Checked)
-			continue;
-
 		// basic vars
 		SqwBase::t_var var;
 		std::get<SQW_NAME>(var) = tableParams->item(iRow, SQW_NAME)->text().toStdString();
@@ -169,13 +164,9 @@ void SqwParamDlg::SaveSqwParams()
 
 		vecVars.push_back(std::move(var));
 		vecVarsFit.push_back(std::move(varFit));
-		bAnythingSelected = 1;
 	}
 
-	if(bAnythingSelected)
-		emit SqwParamsChanged(vecVars, &vecVarsFit);
-	else
-		QMessageBox::warning(this, "Warning", "No variable is selected for update.");
+	emit SqwParamsChanged(vecVars, &vecVarsFit);
 }
 
 

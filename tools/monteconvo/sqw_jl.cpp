@@ -372,13 +372,13 @@ static const char* pcModName = "Julia Model";
 
 std::tuple<std::string, std::string, std::string> sqw_info()
 {
-	tl::log_info("In ", __func__, ".");
+	//tl::log_info("In ", __func__, ".");
 	return std::make_tuple(TAKIN_VER, pcModIdent, pcModName);
 }
 
 std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
 {
-	tl::log_info("In ", __func__, ".");
+	//tl::log_info("In ", __func__, ".");
 	return std::make_shared<SqwProc<SqwJl>>(strCfgFile);
 }
 

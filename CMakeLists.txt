@@ -15,6 +15,9 @@ set(DEBUG FALSE)
 set(BUILD_FOR_MINGW FALSE)
 #set(BUILD_FOR_MINGW TRUE)
 
+set(USE_PLUGINS TRUE)
+set(USE_TR1_FUNCS FALSE)
+
 
 if(DEBUG)
 	message("Doing a DEBUG build.")
@@ -44,11 +47,9 @@ else()
 endif()
 
 
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_CXX_STANDARD 11)
-set(USE_TR1_FUNCS FALSE)
-set(USE_PLUGINS TRUE)
-
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
 #add_definitions(-rdynamic -fPIC)
 
 
@@ -83,7 +84,7 @@ if(SEARCH_PY)
 endif()
 
 if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
-	list(APPEND BOOST_COMPS python37 numpy37)
+	list(APPEND BOOST_COMPS python37)
 endif()
 
 
@@ -119,19 +120,6 @@ find_package(Freetype)
 find_package(X11)
 
 
-
-# boost provides its own FindBoost substitute which does not set Boost_LIBRARIES!
-if("${Boost_LIBRARIES}" STREQUAL "")
-	message("Boost libraries not set, attempting to do it manually...")
-
-	foreach(comp ${BOOST_COMPS})
-		list(APPEND Boost_LIBRARIES Boost::${comp})
-	endforeach(comp)
-
-	message("Boost libraries: ${Boost_LIBRARIES}")
-endif()
-
-
 if("${QT_MOC_EXECUTABLE}" STREQUAL "")
 	get_target_property(QT_MOC_EXECUTABLE Qt5::moc IMPORTED_LOCATION)
 endif()
@@ -164,6 +152,7 @@ add_definitions(-DNO_JPEG -DNO_TIFF)
 add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 #add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)
 add_definitions(-DTLIBS_INC_HDR_IMPLS)
+add_definitions(-DHAS_COMPLEX_ERF)
 
 if(USE_PLUGINS)
 	add_definitions(-DUSE_PLUGINS)
@@ -207,9 +196,6 @@ if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
 
 	add_definitions(-DUSE_PY)
 	include_directories("${Python3_INCLUDE_DIRS}")
-
-	set(SRCS_PY tools/monteconvo/sqw_py.cpp)
-	set(LIBS_PY ${Python3_LIBRARIES})
 else()
 	message("Disabling py scripting support.")
 
@@ -290,7 +276,7 @@ if(USE_GENTAB)
 	target_link_libraries(gentab
 		${Clipper_LIBRARIES}
 		Qt5::Core Qt5::Gui Qt5::Widgets
-		${Boost_LIBRARIES}
+		Boost::program_options Boost::iostreams Boost::filesystem Boost::system
 		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	)
 
@@ -347,7 +333,6 @@ add_executable(takin
 
 	${SRCS_3D}
 
-	# statically link tlibs externals
 	#tlibs/file/loadinstr.cpp
 	libs/qt/recent.cpp  tlibs/file/x3d.cpp
 	tlibs/log/log.cpp tlibs/log/debug.cpp
@@ -356,24 +341,26 @@ add_executable(takin
 	tlibs/helper/flags.cpp  tlibs/version.cpp
 
 	libcrystal/version.cpp
+
+	./3rdparty/Faddeeva.cc
 )
 
 target_link_libraries(takin
 	${LIBS_FIT}
 	${SOCK2}
-	${LIBS_3D}
-	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
-	${QWT_LIBRARIES}
 	Qt5::Core Qt5::Gui Qt5::Svg
+	${QWT_LIBRARIES}
+	${LIBS_3D}
 	${PNG_LIBRARIES}
-	${Boost_LIBRARIES}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
+	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 )
 
 
 # pre-build
 add_custom_target(prebuild-script
-	COMMAND ${PROJECT_SOURCE_DIR}/prebuild.sh ${Qt5Widgets_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
+	COMMAND ${PROJECT_SOURCE_DIR}/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
 )
 
 
@@ -412,7 +399,7 @@ add_library(pymod SHARED
 )
 
 target_link_libraries(pymod
-	${Python3_LIBRARIES}
+	Boost::python37 ${Python3_LIBRARIES}
 )
 
 
@@ -459,7 +446,7 @@ set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 target_link_libraries(convofit
 	${LIBS_FIT} ${SOCK2}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
-	${Boost_LIBRARIES}
+	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
@@ -482,7 +469,7 @@ add_executable(convoseries
 set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
 target_link_libraries(convoseries
-	${Boost_LIBRARIES}
+	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
@@ -508,6 +495,10 @@ if(Minuit2_FOUND)
 	install(TARGETS convofit convoseries DESTINATION bin COMPONENT appconvofit)
 endif()
 
+if(USE_PLUGINS)
+	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
+endif()
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc
 	DESTINATION share/takin COMPONENT takindata1)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons
@@ -515,7 +506,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc $
 install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS
 	${PROJECT_SOURCE_DIR}/LICENSES ${PROJECT_SOURCE_DIR}/LITERATURE
 	DESTINATION share/takin COMPONENT takininfo)
-install(FILES ${PROJECT_SOURCE_DIR}/takin_local.sh
+install(FILES ${PROJECT_SOURCE_DIR}/takin.sh
 	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ
 	DESTINATION bin COMPONENT takinstarter)
 install(FILES ${PROJECT_SOURCE_DIR}/takin.desktop DESTINATION share/applications COMPONENT takindesk)
