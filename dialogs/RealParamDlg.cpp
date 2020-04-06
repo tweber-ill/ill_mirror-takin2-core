@@ -61,7 +61,7 @@ static void print_matrix(std::ostream& ostr, const t_mat& mat)
 			ostr << "\t<td>" << mat(i,j) << "</td>";
 		ostr << "</tr>\n";
 	}
-};
+}
 
 
 static t_vec get_vec(const QLineEdit* pEdit)
@@ -73,7 +73,7 @@ static t_vec get_vec(const QLineEdit* pEdit)
 	vec.resize(3,1);
 
 	return vec;
-};
+}
 
 
 // ----------------------------------------------------------------------------

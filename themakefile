@@ -271,7 +271,7 @@ ifeq ($(DO_DEBUG), 0)
 	FLAGS += ${DEFINES}
 	STRIP = strip -v 
 else
-	FLAGS = ${INC} ${STD_CPP} ${SYS_FLAGS} -rdynamic -ggdb -DDEBUG -Wall -Wall -Wpedantic -Wextra -Weffc++ -fPIC ${DEFINES}
+	FLAGS = ${INC} ${STD_CPP} ${SYS_FLAGS} -rdynamic -fPIC -ggdb -DDEBUG -Wall -Wpedantic -Wextra -Weffc++ ${DEFINES}
 	STRIP = echo Retaining debug symbols of 
 endif
 

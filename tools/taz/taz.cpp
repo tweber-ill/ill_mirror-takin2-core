@@ -894,7 +894,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 TazDlg::~TazDlg()
 {
-	//log_debug("In ", __func__, ".");
 	Disconnect();
 	DeleteDialogs();
 

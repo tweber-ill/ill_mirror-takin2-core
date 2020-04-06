@@ -8,17 +8,48 @@
 project(takin)
 cmake_minimum_required(VERSION 3.0)
 
+# release or debug build?
+set(DEBUG FALSE)
+
 # native or mingw build?
 set(BUILD_FOR_MINGW FALSE)
 #set(BUILD_FOR_MINGW TRUE)
 
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_CXX_STANDARD 11)
-#set(BUILD_SHARED_LIBS TRUE)
+
+if(DEBUG)
+	message("Doing a DEBUG build.")
+
+	set(CMAKE_VERBOSE_MAKEFILE TRUE)
+	set(CMAKE_BUILD_TYPE Debug)
+
+	set(Boost_DEBUG TRUE)
+	set(Boost_USE_DEBUG_LIBS TRUE)
+	set(Boost_USE_RELEASE_LIBS FALSE)
+
+	add_definitions(-DDEBUG)
+	add_definitions(-ggdb)
+	add_definitions(-Wall -Wpedantic -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter)
+else()
+	message("Doing a RELEASE build.")
+
+	set(CMAKE_VERBOSE_MAKEFILE FALSE)
+	set(CMAKE_BUILD_TYPE Release)
+
+	set(Boost_DEBUG FALSE)
+	set(Boost_USE_DEBUG_LIBS FALSE)
+	set(Boost_USE_RELEASE_LIBS TRUE)
+
+	add_definitions(-DNDEBUG -DQT_NO_DEBUG)
+	#add_definitions(-march=native -s)
+endif()
+
+
+set(CMAKE_CXX_STANDARD 11)
 set(USE_TR1_FUNCS FALSE)
 set(USE_PLUGINS TRUE)
+
+add_definitions(-std=c++11)
+#add_definitions(-rdynamic -fPIC)
 
 
 if(BUILD_FOR_MINGW)
@@ -40,9 +71,6 @@ set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
 
-set(Boost_DEBUG FALSE)
-set(Boost_USE_DEBUG_LIBS FALSE)
-set(Boost_USE_RELEASE_LIBS TRUE)
 set(Boost_FIND_QUIETLY FALSE)
 set(BOOST_COMPS program_options iostreams filesystem system)
 
@@ -118,7 +146,9 @@ message("CMake source dir: ${CMAKE_SOURCE_DIR}")
 message("CMake binary dir: ${CMAKE_BINARY_DIR}")
 message("Install path prefix: ${CMAKE_INSTALL_PREFIX}")
 message("Using Qt version ${Qt5Core_VERSION}")
-#message("Using Qwt version ${QWT_MAJOR_VERSION}")
+if(NOT "${QWT_MAJOR_VERSION}" STREQUAL "")
+	message("Using Qwt version ${QWT_MAJOR_VERSION}")
+endif()
 message("Using Boost version ${Boost_VERSION}")
 message("Using Zlib version ${ZLIB_VERSION_STRING}")
 message("Using Bzip2 version ${BZIP2_VERSION_STRING}")
@@ -128,7 +158,6 @@ endif()
 message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
 
 
-add_definitions(-DNDEBUG)
 add_definitions(-DUSE_NET -DUSE_CIF)
 add_definitions(-DNO_LAPACK)
 add_definitions(-DNO_JPEG -DNO_TIFF)
@@ -245,9 +274,6 @@ endif()
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTORCC OFF)
-
-add_definitions(-std=c++11)
-#add_definitions(-march=native -s)
 
 
 

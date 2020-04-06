@@ -112,9 +112,8 @@ SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 
 SqwPy::~SqwPy()
 {
-	tl::log_debug("Unloading Python interpreter.");
-	Py_FinalizeEx();
-	tl::log_debug("Unloaded Python interpreter.");
+	//tl::log_debug("Unloading Python interpreter.");
+	//Py_FinalizeEx();
 }
 
 

@@ -113,6 +113,7 @@ std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 	return vec;
 }
 
+
 std::shared_ptr<SqwBase> construct_sqw(const std::string& strName,
 	const std::string& strConfigFile)
 {
@@ -135,8 +136,10 @@ std::shared_ptr<SqwBase> construct_sqw(const std::string& strName,
 
 namespace so = boost::dll;
 
+
 // tracking modules for refcounting
 static std::vector<std::shared_ptr<so::shared_library>> g_vecMods;
+
 
 void unload_sqw_plugins()
 {
@@ -165,6 +168,7 @@ void unload_sqw_plugins()
 	g_vecMods.clear();
 	tl::log_debug("Unloaded all plugins.");
 }
+
 
 void load_sqw_plugins()
 {
@@ -234,10 +238,13 @@ void load_sqw_plugins()
 		}
 	}
 
+	tl::log_debug("Loaded all plugins.");
 	bPluginsLoaded = 1;
 }
 
+
 #else
+
 
 void unload_sqw_plugins()
 {
@@ -283,6 +290,7 @@ bool save_sqw_params(const SqwBase* pSqw,
 
 	return 1;
 }
+
 
 bool load_sqw_params(SqwBase* pSqw,
 	tl::Prop<std::string>& xml, const std::string& strXmlRoot)

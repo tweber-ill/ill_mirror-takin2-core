@@ -636,7 +636,7 @@ void ScanViewerDlg::CalcPol()
 			std::size_t iCnts = 0;
 			if(iPt < vecCnts.size())
 				iCnts = std::size_t(vecCnts[iPt]);
-			t_real dErr = (iCnts==0 ? 1 : std::sqrt(t_real{iCnts}));
+			t_real dErr = (iCnts==0 ? 1 : std::sqrt(t_real(iCnts)));
 
 			ostrCnts << "<tr><td>" << polvec_str(dPix, dPiy, dPiz) << "</td>"
 				<< "<td>" << polvec_str(dPfx, dPfy, dPfz) << "</td>"
