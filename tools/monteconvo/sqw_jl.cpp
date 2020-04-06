@@ -383,7 +383,25 @@ std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
 }
 
 
+SqwBase* sqw_construct_raw(const std::string& strCfgFile)
+{
+	return new SqwProc<SqwJl>(strCfgFile);
+}
+
+
+void sqw_destruct_raw(SqwBase *sqw)
+{
+	if(sqw) delete sqw;
+}
+
+
 // exports from so file
 BOOST_DLL_ALIAS(sqw_info, takin_sqw_info);
+
+// construction interface
 BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
+
+// alternate raw construction interface
+//BOOST_DLL_ALIAS(sqw_construct_raw, takin_sqw_new);
+//BOOST_DLL_ALIAS(sqw_destruct_raw, takin_sqw_del);
 // ----------------------------------------------------------------------------

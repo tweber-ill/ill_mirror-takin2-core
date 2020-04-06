@@ -8,6 +8,7 @@
 #include "sqwfactory.h"
 #include "sqw.h"
 #include "sqw_uniform_grid.h"
+#include "sqwrawdelegate.h"
 
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
@@ -24,13 +25,25 @@
 using t_pfkt_info = std::tuple<std::string, std::string, std::string>(*)();
 using t_fkt_info = typename std::remove_pointer<t_pfkt_info>::type;
 
-// sqw module function: "takin_sqw"
+// sqw module creation function: "takin_sqw"
+// old interface returning a shared pointer, which might be dangerous for so files,
+// see: https://www.boost.org/doc/libs/1_72_0/doc/html/boost_dll/missuses.html
 using t_pfkt = std::shared_ptr<SqwBase>(*)(const std::string&);
 using t_fkt = typename std::remove_pointer<t_pfkt>::type;
 
+// new raw pointer constructor interface
+using t_pfkt_raw_new = SqwBase*(*)(const std::string&);
+using t_fkt_raw_new = typename std::remove_pointer<t_pfkt_raw_new>::type;
+using t_pfkt_raw_del = void(*)(SqwBase*);
+using t_fkt_raw_del = typename std::remove_pointer<t_pfkt_raw_del>::type;
+
+
 // key: identifier, value: [func, long name]
 using t_mapSqw = std::unordered_map<std::string, std::tuple<t_pfkt, std::string>>;
+using t_mapSqwRaw = std::unordered_map<std::string, std::tuple<t_pfkt_raw_new, t_pfkt_raw_del, std::string>>;
 
+
+// shared_ptr constructors
 static t_mapSqw g_mapSqw =
 {
 	{ "kd", t_mapSqw::mapped_type {
@@ -64,6 +77,10 @@ static t_mapSqw g_mapSqw =
 };
 
 
+// raw pointer constructors
+static t_mapSqwRaw g_mapSqwRaw;
+
+
 
 std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 {
@@ -80,6 +97,15 @@ std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 		vec.emplace_back(std::move(tup));
 	}
 
+	for(const t_mapSqwRaw::value_type& val : g_mapSqwRaw)
+	{
+		t_tup tup;
+		std::get<0>(tup) = val.first;
+		std::get<1>(tup) = std::get<2>(val.second);
+
+		vec.emplace_back(std::move(tup));
+	}
+
 	std::sort(vec.begin(), vec.end(), [](const t_tup& tup0, const t_tup& tup1) -> bool
 	{
 		const std::string& str0 = std::get<1>(tup0);
@@ -87,6 +113,7 @@ std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 
 		return std::lexicographical_compare(str0.begin(), str0.end(), str1.begin(), str1.end());
 	});
+
 	return vec;
 }
 
@@ -95,14 +122,37 @@ std::shared_ptr<SqwBase> construct_sqw(const std::string& strName,
 	const std::string& strConfigFile)
 {
 	typename t_mapSqw::const_iterator iter = g_mapSqw.find(strName);
-	if(iter == g_mapSqw.end())
+	typename t_mapSqwRaw::const_iterator iterRaw = g_mapSqwRaw.find(strName);
+
+	if(iter != g_mapSqw.end())
 	{
-		tl::log_err("No S(q,w) model of name \"", strName, "\" found.");
-		return nullptr;
+		t_pfkt pFkt = std::get<0>(iter->second);
+		if(!pFkt)
+		{
+			tl::log_err("Invalid constructor function for S(q,w) model.");
+			return nullptr;
+		}
+
+		tl::log_debug("Constructing \"", iter->first, "\" S(q,w) module.");
+		return (*pFkt)(strConfigFile);
+	}
+	else if(iterRaw != g_mapSqwRaw.end())
+	{
+		t_pfkt_raw_new pFktNew = std::get<0>(iterRaw->second);
+		t_pfkt_raw_del pFktDel = std::get<1>(iterRaw->second);
+
+		if(!pFktNew || !pFktDel)
+		{
+			tl::log_err("Invalid constructor function for S(q,w) model.");
+			return nullptr;
+		}
+
+		tl::log_debug("Constructing \"", iterRaw->first, "\" S(q,w) module via raw interface.");
+		return std::make_shared<SqwRawDelegate>(pFktNew(strConfigFile));
 	}
 
-	//tl::log_debug("Constructing ", iter->first, ".");
-	return (*std::get<0>(iter->second))(strConfigFile);
+	tl::log_err("No S(q,w) model of name \"", strName, "\" found.");
+	return nullptr;
 }
 
 
@@ -139,7 +189,7 @@ void unload_sqw_plugins()
 
 		pMod->unload();
 		pMod.reset();
-		//tl::log_debug("Unloaded plugin.");
+		tl::log_debug("Unloaded plugin.");
 	}
 
 	g_vecMods.clear();
@@ -166,12 +216,16 @@ void load_sqw_plugins()
 				std::shared_ptr<so::shared_library> pmod =
 					std::make_shared<so::shared_library>(strPlugin,
 						so::load_mode::rtld_lazy /*| so::load_mode::rtld_global*/);
-				if(!pmod) continue;
+				if(!pmod)
+					continue;
 
 				// import info function
+				if(!pmod->has("takin_sqw_info"))
+					continue;
 				std::function<t_fkt_info> fktInfo =
 					pmod->get<t_pfkt_info>("takin_sqw_info");
-				if(!fktInfo) continue;
+				if(!fktInfo)
+					continue;
 
 				auto tupInfo = fktInfo();
 				const std::string& strTakVer = std::get<0>(tupInfo);
@@ -191,27 +245,60 @@ void load_sqw_plugins()
 					tl::log_err("Skipping S(q,w) plugin \"", strPlugin,
 						"\" as it was compiled for Takin version ", strTakVer,
 						", but this is version ", TAKIN_VER, ".");
+
+					pmod->unload();
 					continue;
 				}
 
 
 				// import factory function
-				t_pfkt pFkt = pmod->get<t_pfkt>("takin_sqw");
-				if(!pFkt) continue;
+				if(pmod->has("takin_sqw_new") && pmod->has("takin_sqw_del"))
+				{
+					t_pfkt_raw_new pFktNew = pmod->get<t_pfkt_raw_new>("takin_sqw_new");
+					t_pfkt_raw_del pFktDel = pmod->get<t_pfkt_raw_del>("takin_sqw_del");
+					if(!pFktNew || !pFktDel)
+					{
+						pmod->unload();
+						continue;
+					}
 
-				g_mapSqw.insert( t_mapSqw::value_type {
-					strModIdent,
-					t_mapSqw::mapped_type { pFkt, strModLongName }
-				});
+					// use the raw new/delete interface if it exists
+					g_mapSqwRaw.insert( t_mapSqwRaw::value_type
+					{
+						strModIdent,
+						t_mapSqwRaw::mapped_type { pFktNew, pFktDel, strModLongName }
+					});
+				}
+				else if(pmod->has("takin_sqw"))
+				{
+					// if raw interface does not exist, try the old shared_ptr one
+					t_pfkt pFkt = pmod->get<t_pfkt>("takin_sqw");
+					if(!pFkt)
+					{
+						pmod->unload();
+						continue;
+					}
+
+					g_mapSqw.insert( t_mapSqw::value_type
+					{
+						strModIdent,
+						t_mapSqw::mapped_type { pFkt, strModLongName }
+					});
+				}
+				else
+				{
+					// no valid constructor interface found
+					continue;
+				}
 
 
-				g_vecMods.push_back(pmod);
+				g_vecMods.emplace_back(std::move(pmod));
 				tl::log_info("Loaded plugin: ", strPlugin,
 					" -> ", strModIdent, " (\"", strModLongName, "\").");
 			}
 			catch(const std::exception& ex)
 			{
-				//tl::log_err("Could not load ", strPlugin, ". Reason: ", ex.what());
+				tl::log_err("Could not load ", strPlugin, ". Reason: ", ex.what());
 			}
 		}
 	}

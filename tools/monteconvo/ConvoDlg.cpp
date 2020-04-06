@@ -367,9 +367,9 @@ ConvoDlg::~ConvoDlg()
 
 	if(m_pSqwParamDlg) { delete m_pSqwParamDlg; m_pSqwParamDlg = nullptr; }
 	if(m_pFavDlg) { delete m_pFavDlg; m_pFavDlg = nullptr; }
-	if(m_pSqw) m_pSqw.reset();
 	if(m_pMenuBar) { delete m_pMenuBar; m_pMenuBar = nullptr; }
 
+	if(m_pSqw) m_pSqw.reset();
 	unload_sqw_plugins();
 }
 
@@ -404,6 +404,7 @@ void ConvoDlg::createSqwModel(const QString& qstrFile)
 		//return;
 	}
 
+	m_pSqw.reset();
 	m_pSqw = construct_sqw(strSqwIdent, strSqwFile);
 	if(!m_pSqw)
 	{
@@ -428,6 +429,7 @@ void ConvoDlg::SqwParamsChanged(const std::vector<SqwBase::t_var>& vecVars,
 	const std::vector<SqwBase::t_var_fit>* pvecVarsFit)
 {
 	if(!m_pSqw) return;
+
 	m_pSqw->SetVars(vecVars);
 	if(pvecVarsFit) m_pSqw->SetFitVars(*pvecVarsFit);
 

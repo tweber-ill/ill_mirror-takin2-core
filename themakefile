@@ -13,7 +13,7 @@ CC = g++
 #CC = clang++
 
 # debug or unstable version?
-DO_DEBUG = 0
+DO_DEBUG = 1
 IS_UNSTABLE = 0
 
 # optimise specifically for THIS processor?

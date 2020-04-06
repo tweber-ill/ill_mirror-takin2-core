@@ -390,8 +390,9 @@ SqwProc<t_sqw>::SqwProc(const std::string& strCfg) : SqwProc<t_sqw>::SqwProc(str
 template<class t_sqw>
 SqwProc<t_sqw>::~SqwProc()
 {
-	// is this instance the last?
-	if(m_pMem.use_count() > 1) return;
+	// make sure that this instance is the last
+	if(m_pMem.use_count() > 1)
+		return;
 
 	try
 	{
@@ -408,7 +409,6 @@ SqwProc<t_sqw>::~SqwProc()
 			ipr::message_queue::remove(("takin_sqw_proc_out_" + m_strProcName).c_str());
 
 			ipr::shared_memory_object::remove(("takin_sqw_proc_mem_" + m_strProcName).c_str());
-
 			m_pMem->destroy<t_sh_str>(("takin_sqw_proc_params_" + m_strProcName).c_str());
 
 			tl::log_debug("Removed process memory \"", "takin_sqw_proc_*_", m_strProcName, "\".");
@@ -531,6 +531,7 @@ SqwBase* SqwProc<t_sqw>::shallow_copy() const
 	pSqw->m_strProcName = this->m_strProcName;
 	pSqw->m_pidChild = this->m_pidChild;
 	pSqw->m_pSharedPars = this->m_pSharedPars;
+	pSqw->m_iRefCnt = this->m_iRefCnt;
 
 	return pSqw;
 }
