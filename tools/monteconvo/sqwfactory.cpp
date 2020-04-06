@@ -9,16 +9,6 @@
 #include "sqw.h"
 #include "sqw_uniform_grid.h"
 
-//#include "sqw_proc.h"
-//#include "sqw_proc_impl.h"
-
-/*#ifndef NO_PY
-	#include "sqw_py.h"
-#endif*/
-/*#ifdef USE_JL
-	#include "sqw_jl.h"
-#endif*/
-
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
 #include "libs/globals.h"
@@ -67,19 +57,6 @@ static t_mapSqw g_mapSqw =
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwMagnon>(strCfgFile.c_str()); },
 		"Simple Magnon Model" } },
-/*#ifndef NO_PY
-	{ "py", t_mapSqw::mapped_type {
-		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
-		//{ return std::make_shared<SqwPy>(strCfgFile.c_str()); },
-		{ return std::make_shared<SqwProc<SqwPy>>(strCfgFile.c_str()); },
-		"Python Model" } },
-#endif*/
-/*#ifdef USE_JL
-	{ "jl", t_mapSqw::mapped_type {
-		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
-		{ return std::make_shared<SqwProc<SqwJl>>(strCfgFile.c_str()); },
-		"Julia Model" } },
-#endif*/
 	{ "elastic", t_mapSqw::mapped_type {
 		[](const std::string& strCfgFile) -> std::shared_ptr<SqwBase>
 		{ return std::make_shared<SqwElast>(strCfgFile.c_str()); },
@@ -187,8 +164,8 @@ void load_sqw_plugins()
 			{
 				// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
 				std::shared_ptr<so::shared_library> pmod =
-					std::make_shared<so::shared_library>(strPlugin/*,
-						so::load_mode::rtld_lazy*/ /*| so::load_mode::rtld_global*/);
+					std::make_shared<so::shared_library>(strPlugin,
+						so::load_mode::rtld_lazy /*| so::load_mode::rtld_global*/);
 				if(!pmod) continue;
 
 				// import info function

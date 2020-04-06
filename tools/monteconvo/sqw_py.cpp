@@ -369,6 +369,7 @@ std::tuple<std::string, std::string, std::string> sqw_info()
 std::shared_ptr<SqwBase> sqw_construct(const std::string& strCfgFile)
 {
 	//tl::log_info("In ", __func__, ".");
+	//return std::make_shared<SqwPy>(strCfgFile);
 	return std::make_shared<SqwProc<SqwPy>>(strCfgFile);
 }
 
