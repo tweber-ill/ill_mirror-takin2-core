@@ -173,6 +173,8 @@ int main(int argc, char** argv)
 		}
 		// --------------------------------------------------------------------
 
+		tl::Stopwatch<t_real> watch;
+		watch.start();
 
 		unsigned int iNumThreads = get_max_threads();
 		tl::ThreadPool<bool()> tp(iNumThreads);
@@ -190,11 +192,7 @@ int main(int argc, char** argv)
 			});
 		}
 
-		tl::Stopwatch<t_real> watch;
-		watch.start();
-		tp.StartTasks();
-
-		auto& lstFut = tp.GetFutures();
+		auto& lstFut = tp.GetResults();
 		std::size_t iTask = 0;
 		for(auto& fut : lstFut)
 		{

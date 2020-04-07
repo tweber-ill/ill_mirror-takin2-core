@@ -260,7 +260,7 @@ void ConvoDlg::Start1D()
 
 		void (*pThStartFunc)() = []{ tl::init_rand(); };
 		tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
-		auto& lstFuts = tp.GetFutures();
+		auto& lstFuts = tp.GetResults();
 
 		for(unsigned int iStep=0; iStep<iNumSteps; ++iStep)
 		{
@@ -331,8 +331,6 @@ void ConvoDlg::Start1D()
 				return std::pair<bool, t_real>(true, dS);
 			});
 		}
-
-		tp.StartTasks();
 
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
@@ -758,7 +756,7 @@ void ConvoDlg::Start2D()
 
 		void (*pThStartFunc)() = []{ tl::init_rand(); };
 		tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
-		auto& lstFuts = tp.GetFutures();
+		auto& lstFuts = tp.GetResults();
 
 		for(unsigned int iStep=0; iStep<iNumSteps*iNumSteps; ++iStep)
 		{
@@ -829,8 +827,6 @@ void ConvoDlg::Start2D()
 				return std::pair<bool, t_real>(true, dS);
 			});
 		}
-
-		tp.StartTasks();
 
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
@@ -1032,7 +1028,7 @@ void ConvoDlg::StartDisp()
 
 		tl::ThreadPool<std::tuple<bool, std::vector<t_real>, std::vector<t_real>>()>
 			tp(iNumThreads);
-		auto& lstFuts = tp.GetFutures();
+		auto& lstFuts = tp.GetResults();
 
 		for(unsigned int iStep=0; iStep<iNumSteps; ++iStep)
 		{
@@ -1052,8 +1048,6 @@ void ConvoDlg::StartDisp()
 					(true, vecE, vecW);
 			});
 		}
-
-		tp.StartTasks();
 
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
