@@ -13,6 +13,7 @@
 #include "tlibs/log/log.h"
 #include "tlibs/math/rand.h"
 
+#include <signal.h>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/string.hpp>
@@ -221,8 +222,8 @@ static ProcMsg msg_recv(ipr::message_queue& msgqueue)
 	ProcMsg msg;
 	try
 	{
-		std::size_t iSize;
-		unsigned int iPrio;
+		std::size_t iSize = 0;
+		unsigned int iPrio = 0;
 		msgqueue.receive(&msg, sizeof(msg), iSize, iPrio);
 
 		if(iSize != sizeof(msg))
@@ -240,7 +241,6 @@ static ProcMsg msg_recv(ipr::message_queue& msgqueue)
 
 // ----------------------------------------------------------------------------
 // child process
-
 // ----------------------------------------------------------------------------
 
 template<class t_sqw>
@@ -302,9 +302,8 @@ static void child_proc(ipr::message_queue& msgToParent, ipr::message_queue& msgF
 			}
 			case ProcMsgTypes::QUIT:
 			{
-				tl::log_debug("Exiting child process");
-				exit(0);
-				break;
+				tl::log_debug("Child process ", getpid(), " received quit request.");
+				return;
 			}
 			default:
 			{
@@ -315,8 +314,10 @@ static void child_proc(ipr::message_queue& msgToParent, ipr::message_queue& msgF
 }
 
 
+
 // ----------------------------------------------------------------------------
 // parent process
+// ----------------------------------------------------------------------------
 
 template<class t_sqw>
 SqwProc<t_sqw>::SqwProc()
@@ -360,14 +361,15 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg)
 		{
 			child_proc<t_sqw>(*m_pmsgIn, *m_pmsgOut, pcCfg);
 			exit(0);
+			return;
 		}
 
-		tl::log_debug("Waiting for client to become ready...");
+		tl::log_debug("Waiting for client ", m_pidChild, " to become ready...");
 		ProcMsg msgReady = msg_recv(*m_pmsgIn);
 		if(!msgReady.bRet)
-			tl::log_err("Client reports failure.");
+			tl::log_err("Client ", m_pidChild, " reports failure.");
 		else
-			tl::log_debug("Client is ready.");
+			tl::log_debug("Client ", m_pidChild, " is ready.");
 
 		m_bOk = msgReady.bRet;
 	}
@@ -390,6 +392,13 @@ SqwProc<t_sqw>::SqwProc(const std::string& strCfg) : SqwProc<t_sqw>::SqwProc(str
 template<class t_sqw>
 SqwProc<t_sqw>::~SqwProc()
 {
+	// we're in a child process
+	if(m_pidChild == 0)
+	{
+		tl::log_debug("Child process ", getpid(), " ending.");
+		return;
+	}
+
 	// make sure that this instance is the last
 	if(m_pMem.use_count() > 1)
 		return;
@@ -401,22 +410,27 @@ SqwProc<t_sqw>::~SqwProc()
 			ProcMsg msg;
 			msg.ty = ProcMsgTypes::QUIT;
 			msg_send(*m_pmsgOut, msg);
+
+			//kill(m_pidChild, SIGABRT);
 		}
 
 		if(--m_iRefCnt == 0)
 		{
+			// give clients time to end before removing the shared memory
+			std::this_thread::sleep_for(std::chrono::milliseconds{200});
+
 			ipr::message_queue::remove(("takin_sqw_proc_in_" + m_strProcName).c_str());
 			ipr::message_queue::remove(("takin_sqw_proc_out_" + m_strProcName).c_str());
 
 			ipr::shared_memory_object::remove(("takin_sqw_proc_mem_" + m_strProcName).c_str());
 			m_pMem->destroy<t_sh_str>(("takin_sqw_proc_params_" + m_strProcName).c_str());
 
-			tl::log_debug("Removed process memory \"", "takin_sqw_proc_*_", m_strProcName, "\".");
+			tl::log_debug("Removed process memory \"", "takin_sqw_proc_*_", m_strProcName, "\" for client ", m_pidChild, ".");
 		}
 	}
 	catch(const std::exception& ex)
 	{
-		tl::log_debug("Process unloading exception: ", ex.what());
+		tl::log_debug("Client process ", m_pidChild, " unloading exception: ", ex.what());
 	}
 }
 

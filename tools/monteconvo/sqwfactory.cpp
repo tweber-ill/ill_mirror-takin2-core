@@ -189,7 +189,6 @@ void unload_sqw_plugins()
 
 		pMod->unload();
 		pMod.reset();
-		tl::log_debug("Unloaded plugin.");
 	}
 
 	g_vecMods.clear();
@@ -215,7 +214,7 @@ void load_sqw_plugins()
 				// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
 				std::shared_ptr<so::shared_library> pmod =
 					std::make_shared<so::shared_library>(strPlugin,
-						so::load_mode::rtld_lazy /*| so::load_mode::rtld_global*/);
+						so::load_mode::rtld_lazy | so::load_mode::rtld_local);
 				if(!pmod)
 					continue;
 

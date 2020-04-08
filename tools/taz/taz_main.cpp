@@ -39,6 +39,9 @@
 #include <QSplashScreen>
 #include <QStyleFactory>
 
+#include <unistd.h>
+
+
 namespace chr = std::chrono;
 namespace asio = boost::asio;
 namespace sys = boost::system;
@@ -154,6 +157,7 @@ int main(int argc, char** argv)
 {
 	try
 	{
+		pid_t pidMain = getpid();
 		std::ios_base::sync_with_stdio(0);
 
 #ifdef NO_TERM_CMDS
@@ -163,8 +167,16 @@ int main(int argc, char** argv)
 		// install exit signal handlers
 		asio::io_service ioSrv;
 		asio::signal_set sigInt(ioSrv, SIGABRT, SIGTERM, SIGINT);
-		sigInt.async_wait([&ioSrv](const sys::error_code& err, int iSig)
+		sigInt.async_wait([&ioSrv, pidMain](const sys::error_code& err, int iSig)
 		{
+			pid_t pid = getpid();
+			if(pid != pidMain)
+			{
+				tl::log_warn("Child process exit requested via signal.", pid, ".");
+				ioSrv.stop();
+				exit(-1);
+			}
+
 			tl::log_warn("Hard exit requested via signal ", iSig, ". This may cause a fault.");
 			if(err) tl::log_err("Error: ", err.message(), ", error category: ", err.category().name(), ".");
 			ioSrv.stop();

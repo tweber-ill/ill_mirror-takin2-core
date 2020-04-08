@@ -323,6 +323,8 @@ static inline std::string find_program_binary(const std::string& strExe)
 		g_strApp + "/" + strExe + ".exe",
 		g_strApp + "/externals/" + strExe + ".exe",
 		g_strApp + "/../externals/" + strExe + ".exe",
+		"/usr/local/bin/" + strExe,
+		"/usr/bin/" + strExe,
 	};
 
 	for(const std::string& strPath : vecPaths)

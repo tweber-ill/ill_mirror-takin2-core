@@ -50,7 +50,7 @@ endif()
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_CXX_STANDARD 11)
 add_definitions(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
-#add_definitions(-rdynamic -fPIC)
+#add_definitions(-fPIC)
 
 
 if(BUILD_FOR_MINGW)
@@ -276,7 +276,7 @@ if(USE_GENTAB)
 	target_link_libraries(gentab
 		${Clipper_LIBRARIES}
 		Qt5::Core Qt5::Gui Qt5::Widgets
-		Boost::program_options Boost::iostreams Boost::filesystem Boost::system
+		Boost::iostreams Boost::system Boost::filesystem Boost::program_options
 		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	)
 
@@ -353,7 +353,7 @@ target_link_libraries(takin
 	${LIBS_3D}
 	${PNG_LIBRARIES}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
-	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
+	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 )
 
@@ -446,7 +446,7 @@ set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 target_link_libraries(convofit
 	${LIBS_FIT} ${SOCK2}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
-	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
+	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
@@ -469,7 +469,7 @@ add_executable(convoseries
 set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
 target_link_libraries(convoseries
-	Boost::program_options Boost::iostreams Boost::filesystem Boost::system
+	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
