@@ -18,7 +18,7 @@
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/string.hpp>
 
-#define MSG_QUEUE_SIZE 128
+#define MSG_QUEUE_SIZE 512
 #define PARAM_MEM 1024*1024
 
 
@@ -422,8 +422,8 @@ SqwProc<t_sqw>::~SqwProc()
 			ipr::message_queue::remove(("takin_sqw_proc_in_" + m_strProcName).c_str());
 			ipr::message_queue::remove(("takin_sqw_proc_out_" + m_strProcName).c_str());
 
-			ipr::shared_memory_object::remove(("takin_sqw_proc_mem_" + m_strProcName).c_str());
 			m_pMem->destroy<t_sh_str>(("takin_sqw_proc_params_" + m_strProcName).c_str());
+			ipr::shared_memory_object::remove(("takin_sqw_proc_mem_" + m_strProcName).c_str());
 
 			tl::log_debug("Removed process memory \"", "takin_sqw_proc_*_", m_strProcName, "\" for client ", m_pidChild, ".");
 		}
