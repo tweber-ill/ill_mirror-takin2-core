@@ -74,6 +74,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
 
 set(Boost_FIND_QUIETLY FALSE)
 set(BOOST_COMPS program_options iostreams filesystem system)
+set(BOOST_OPT_COMPS)
 
 if(USE_TR1_FUNCS)
 	list(APPEND BOOST_COMPS regex)
@@ -83,20 +84,35 @@ if(SEARCH_PY)
 	find_package(Python3 COMPONENTS Interpreter Development)
 endif()
 
+set(Py_FOUND FALSE)
 if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
-	list(APPEND BOOST_COMPS python37)
+	list(APPEND BOOST_OPT_COMPS python3 python37 python36)
+	set(Py_FOUND TRUE)
 endif()
 
 
-find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} REQUIRED)
+find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} OPTIONAL_COMPONENTS ${BOOST_OPT_COMPS})
 find_package(Threads REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg)
 find_package(PNG REQUIRED)
 find_package(Qwt REQUIRED)
 find_package(Julia)
 find_package(Minuit2)
 find_package(ZLIB)
 find_package(BZip2)
+
+if(Py_FOUND)
+	if(TARGET Boost::python3)
+		set(_BOOST_PY_TARGET Boost::python3)
+	elseif(TARGET Boost::python37)
+		set(_BOOST_PY_TARGET Boost::python37)
+	elseif(TARGET Boost::python36)
+		set(_BOOST_PY_TARGET Boost::python36)
+	else()
+		set(Py_FOUND FALSE)
+	endif()
+endif()
+
 
 if(USE_RtMp)
 	find_package(RtMp REQUIRED)
@@ -145,7 +161,7 @@ endif()
 message("Using Boost version ${Boost_VERSION}")
 message("Using Zlib version ${ZLIB_VERSION_STRING}")
 message("Using Bzip2 version ${BZIP2_VERSION_STRING}")
-if(NOT "${Python3_VERSION}" STREQUAL "")
+if(NOT "${Python3_VERSION}" STREQUAL "" AND Py_FOUND)
 	message("Using Py version ${Python3_VERSION}")
 endif()
 message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
@@ -197,7 +213,7 @@ include_directories("${BZIP2_INCLUDE_DIR}")
 
 
 # py scripting support
-if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+if(Py_FOUND)
 	message("Enabling py scripting support.")
 	add_definitions(-DUSE_PY)
 	include_directories("${Python3_INCLUDE_DIRS}")
@@ -409,7 +425,7 @@ endif()
 # build plugins
 # -----------------------------------------------------------------------------
 
-if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+if(Py_FOUND)
 #add_library(takinmod_py SHARED
 add_executable(takinmod_py
 	tools/monteconvo/sqw_py.cpp tools/monteconvo/sqwbase.cpp
@@ -419,7 +435,7 @@ add_executable(takinmod_py
 
 target_link_libraries(takinmod_py
 	Boost::iostreams Boost::system Boost::filesystem
-	Boost::python37 ${Python3_LIBRARIES}
+	${_BOOST_PY_TARGET} ${Python3_LIBRARIES}
 	Threads::Threads ${Rt_LIBRARIES}
 )
 
@@ -544,7 +560,7 @@ if(USE_PLUGINS)
 	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
 endif()
 
-if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+if(Py_FOUND)
 	install(TARGETS takinmod_py DESTINATION bin COMPONENT apptakinmod_py)
 endif()
 
