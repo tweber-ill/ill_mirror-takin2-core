@@ -1,1 +1,1 @@
-../data/res
+data/res
