@@ -565,7 +565,7 @@ install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS
 install(FILES ${PROJECT_SOURCE_DIR}/takin.sh
 	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ
 	DESTINATION bin COMPONENT takinstarter)
-install(FILES ${PROJECT_SOURCE_DIR}/takin.desktop DESTINATION share/applications COMPONENT takindesk)
+install(FILES ${PROJECT_SOURCE_DIR}/setup_lin/takin.desktop DESTINATION share/applications COMPONENT takindesk)
 # -----------------------------------------------------------------------------
 
 
