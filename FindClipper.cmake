@@ -1,7 +1,7 @@
 find_path(Clipper_INCLUDE_DIRS
 	NAMES clipper.h
 	PATH_SUFFIXES clipper
-	HINTS /usr/local/include/clipper /usr/local/include /usr/include/clipper /usr/include /opt/local/include/clipper /opt/local/include
+	HINTS /usr/local/include /usr/include /opt/local/include
 	DOC "Clipper include directories"
 )
 

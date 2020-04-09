@@ -1,6 +1,7 @@
 find_path(Julia_INCLUDE_DIRS
 	NAMES julia.h
-	HINTS /usr/local/include /usr/local/include/julia /usr/include /usr/include/julia /opt/local/include /opt/local/include/julia
+	PATH_SUFFIXES julia
+	HINTS /usr/local/include /usr/include /opt/local/include
 	DOC "Julia include directories"
 )
 

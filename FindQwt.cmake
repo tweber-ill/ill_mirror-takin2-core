@@ -1,6 +1,6 @@
 find_path(QWT_INCLUDE_DIRS
 	NAMES qwt.h
-	PATH_SUFFIXES qwt6-qt5 qwt-qt5 qwt6 qwt
+	PATH_SUFFIXES qwt6-qt5 qwt-qt5 qt5/qwt qt5/qwt/qwt qt5/qwt6 qt5 qwt6 qwt
 	HINTS /usr/local/include /usr/include /opt/local/include
 	DOC "Qwt include directories"
 )
