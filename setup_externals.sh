@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# gets external files
-# @author Tobias Weber <tobias.weber@tum.de>
+# gets external dependencies
+# @author Tobias Weber <tweber@ill.fr>
 # @license GPLv2
 #
 
