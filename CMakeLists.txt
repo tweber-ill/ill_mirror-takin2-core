@@ -132,6 +132,10 @@ if("${QT_UIC_EXECUTABLE}" STREQUAL "")
 	get_target_property(QT_UIC_EXECUTABLE Qt5::uic IMPORTED_LOCATION)
 endif()
 
+#if("${QT_QCOLLECTIONGENERATOR_EXECUTABLE}" STREQUAL "")
+#	get_target_property(QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator IMPORTED_LOCATION)
+#endif()
+
 
 message("Project source dir: ${PROJECT_SOURCE_DIR}")
 message("CMake source dir: ${CMAKE_SOURCE_DIR}")

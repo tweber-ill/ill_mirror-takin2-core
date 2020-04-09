@@ -9,16 +9,19 @@
 if [[ $# -ge 3 ]]; then
 	UIC="$1"
 	MOC="$2"
+	COLGEN="$(dirname $2)/qcollectiongenerator-qt5"
 
 	TAKINROOT="$3"
 	FORCE=0
 else
 	UIC="$(which uic-qt5)"
 	MOC="$(which moc-qt5)"
+	COLGEN="$(which qcollectiongenerator-qt5)"
 
 	if [ $? -ne 0 ]; then
 		UIC="$(which uic)"
 		MOC="$(which moc)"
+		COLGEN="$(which qcollectiongenerator)"
 	fi
 
 	TAKINROOT=.
@@ -31,7 +34,7 @@ if [ -z "$UIC" ] || [ -z "${MOC}" ]; then
 	exit -1;
 fi
 
-echo -e "Using UIC: ${UIC}\nUsing MOC: ${MOC}"
+echo -e "Using UIC: ${UIC}\nUsing MOC: ${MOC}\nUsing collection generator: ${COLGEN}"
 echo -e "Takin root dir: ${TAKINROOT}\n"
 
 
@@ -123,7 +126,7 @@ echo -e "\n"
 echo -e "--------------------------------------------------------------------------------"
 echo -e "building docs..."
 
-qcollectiongenerator ${TAKINROOT}/doc/takin.qhcp -o ${TAKINROOT}/doc/takin.qhc
+${COLGEN} ${TAKINROOT}/doc/takin.qhcp -o ${TAKINROOT}/doc/takin.qhc
 cp -v ${TAKINROOT}/doc/takin.qhc ${TAKINROOT}/res/doc/
 cp -v ${TAKINROOT}/doc/takin.qch ${TAKINROOT}/res/doc/
 
