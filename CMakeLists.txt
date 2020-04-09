@@ -52,6 +52,9 @@ set(CMAKE_CXX_STANDARD 11)
 add_definitions(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
 #add_definitions(-fPIC)
 
+# for application plugins
+add_definitions("-DBUILD_APPLI")
+
 
 if(BUILD_FOR_MINGW)
 	# stuff needed by mingw
@@ -93,6 +96,7 @@ find_package(Threads REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Qwt REQUIRED)
+find_package(Julia)
 find_package(Minuit2)
 find_package(ZLIB)
 find_package(BZip2)
@@ -193,14 +197,25 @@ include_directories("${BZIP2_INCLUDE_DIR}")
 # py scripting support
 if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
 	message("Enabling py scripting support.")
-
 	add_definitions(-DUSE_PY)
 	include_directories("${Python3_INCLUDE_DIRS}")
 else()
 	message("Disabling py scripting support.")
-
 	add_definitions(-DNO_PY)
 endif()
+
+
+
+# jl scripting support
+if(Julia_FOUND)
+	message("Enabling jl scripting support.")
+	add_definitions(-DUSE_JL)
+	include_directories("${Julia_INCLUDE_DIRS}")
+else()
+	message("Disabling jl scripting support.")
+	add_definitions(-DNO_JL)
+endif()
+
 
 
 # fitting support
@@ -388,30 +403,58 @@ endif()
 
 
 
-if(USE_PLUGINS)
 # -----------------------------------------------------------------------------
 # build plugins
 # -----------------------------------------------------------------------------
-add_library(pymod SHARED
+
+if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+#add_library(takinmod_py SHARED
+add_executable(takinmod_py
 	tools/monteconvo/sqw_py.cpp tools/monteconvo/sqwbase.cpp
 	tlibs/log/log.cpp
 	tlibs/math/rand.cpp
 )
 
-target_link_libraries(pymod
+target_link_libraries(takinmod_py
+	Boost::iostreams Boost::system Boost::filesystem
 	Boost::python37 ${Python3_LIBRARIES}
+	Threads::Threads ${Rt_LIBRARIES}
 )
 
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	add_custom_command(TARGET pymod POST_BUILD
-		COMMAND strip -v $<TARGET_FILE:pymod>
-		MAIN_DEPENDENCY pymod
+	add_custom_command(TARGET takinmod_py POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:takinmod_py>
+		MAIN_DEPENDENCY takinmod_py
 	)
 endif()
-# -----------------------------------------------------------------------------
-
 endif()
+
+
+
+if(Julia_FOUND)
+#add_library(takinmod_jl SHARED
+add_executable(takinmod_jl
+	tools/monteconvo/sqw_jl.cpp tools/monteconvo/sqwbase.cpp
+	tlibs/log/log.cpp
+	tlibs/math/rand.cpp
+)
+
+target_link_libraries(takinmod_jl
+	Boost::iostreams Boost::system Boost::filesystem
+	${Julia_LIBRARIES}
+	Threads::Threads ${Rt_LIBRARIES}
+)
+
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET takinmod_jl POST_BUILD
+		COMMAND strip -v $<TARGET_FILE:takinmod_jl>
+		MAIN_DEPENDENCY takinmod_jl
+	)
+endif()
+endif()
+# -----------------------------------------------------------------------------
 
 
 
@@ -497,6 +540,14 @@ endif()
 
 if(USE_PLUGINS)
 	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
+endif()
+
+if(Python3_Interpreter_FOUND AND Python3_Development_FOUND)
+	install(TARGETS takinmod_py DESTINATION bin COMPONENT apptakinmod_py)
+endif()
+
+if(Julia_FOUND)
+	install(TARGETS takinmod_jl DESTINATION bin COMPONENT apptakinmod_jl)
 endif()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc

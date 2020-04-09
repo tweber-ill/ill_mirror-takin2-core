@@ -1,7 +1,7 @@
 find_path(QWT_INCLUDE_DIRS
 	NAMES qwt.h
 	PATH_SUFFIXES qwt6-qt5 qwt-qt5 qwt6 qwt
-	HINTS /usr/include /usr/local/include /opt/local/include
+	HINTS /usr/local/include /usr/include /opt/local/include
 	DOC "Qwt include directories"
 )
 
@@ -10,7 +10,7 @@ list(APPEND QWT_INCLUDE_DIRS "${QWT_INCLUDE_DIRS}/..")
 
 find_library(QWT_LIBRARIES
 	NAMES qwt6-qt5 qwt-qt5 qwt6 qwt
-	HINTS /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib32 /usr/local/lib32
+	HINTS /usr/local/lib64 /usr/local/lib /usr/lib64 /usr/lib /opt/local/lib /usr/lib32 /usr/local/lib32
 	DOC "Qwt libraries"
 )
 

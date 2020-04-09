@@ -13,7 +13,11 @@
 
 using t_real = t_real_reso;
 
+static const char* pcModIdent = "jl";
+static const char* pcModName = "Julia Model";
+
 #define MAX_PARAM_VAL_SIZE 128
+
 
 extern "C" void jl_init__threading();
 
@@ -361,14 +365,13 @@ SqwBase* SqwJl::shallow_copy() const
 
 // ----------------------------------------------------------------------------
 // SO interface
+#ifdef BUILD_PLUGIN
+
 #include <boost/dll/alias.hpp>
 #include "sqw_proc.h"
 #include "sqw_proc_impl.h"
 #include "libs/version.h"
 
-
-static const char* pcModIdent = "jl";
-static const char* pcModName = "Julia Model";
 
 std::tuple<std::string, std::string, std::string> sqw_info()
 {
@@ -404,4 +407,39 @@ BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
 // alternate raw construction interface
 //BOOST_DLL_ALIAS(sqw_construct_raw, takin_sqw_new);
 //BOOST_DLL_ALIAS(sqw_destruct_raw, takin_sqw_del);
+
+#endif
+// ----------------------------------------------------------------------------
+
+
+
+// ----------------------------------------------------------------------------
+// external program
+#ifdef BUILD_APPLI
+
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
+#include "libs/version.h"
+
+
+int main(int argc, char** argv)
+{
+	if(argc <= 2)
+	{
+		std::cout << "#\n# This is a Takin plugin module.\n#\n";
+		std::cout << "module_ident: " << pcModIdent << "\n";
+		std::cout << "module_name: " << pcModName << "\n";
+		std::cout << "required_takin_version: " << TAKIN_VER << "\n";
+		std::cout.flush();
+		return 0;
+	}
+
+	const char* pcCfgFile = argv[1];
+	const char* pcSharedMem = argv[2];
+	SqwProc<SqwJl> proc(pcCfgFile, SqwProcStartMode::START_CHILD, pcSharedMem);
+
+	return 0;
+}
+
+#endif
 // ----------------------------------------------------------------------------

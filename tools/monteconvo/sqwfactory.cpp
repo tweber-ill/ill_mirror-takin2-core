@@ -7,11 +7,16 @@
 
 #include "sqwfactory.h"
 #include "sqw.h"
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
 #include "sqw_uniform_grid.h"
 #include "sqwrawdelegate.h"
+#include "sqwnull.h"
 
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/proc.h"
 #include "libs/globals.h"
 #include "libs/version.h"
 
@@ -41,6 +46,10 @@ using t_fkt_raw_del = typename std::remove_pointer<t_pfkt_raw_del>::type;
 // key: identifier, value: [func, long name]
 using t_mapSqw = std::unordered_map<std::string, std::tuple<t_pfkt, std::string>>;
 using t_mapSqwRaw = std::unordered_map<std::string, std::tuple<t_pfkt_raw_new, t_pfkt_raw_del, std::string>>;
+
+// key: identifier, value: [long name, binary file name]
+using t_mapSqwExt = std::unordered_map<std::string, std::tuple<std::string, std::string>>;
+
 
 
 // shared_ptr constructors
@@ -80,6 +89,8 @@ static t_mapSqw g_mapSqw =
 // raw pointer constructors
 static t_mapSqwRaw g_mapSqwRaw;
 
+// external process plugins
+static t_mapSqwExt g_mapSqwExt;
 
 
 std::vector<std::tuple<std::string, std::string>> get_sqw_names()
@@ -106,6 +117,15 @@ std::vector<std::tuple<std::string, std::string>> get_sqw_names()
 		vec.emplace_back(std::move(tup));
 	}
 
+	for(const t_mapSqwExt::value_type& val : g_mapSqwExt)
+	{
+		t_tup tup;
+		std::get<0>(tup) = val.first;
+		std::get<1>(tup) = std::get<0>(val.second);
+
+		vec.emplace_back(std::move(tup));
+	}
+
 	std::sort(vec.begin(), vec.end(), [](const t_tup& tup0, const t_tup& tup1) -> bool
 	{
 		const std::string& str0 = std::get<1>(tup0);
@@ -123,6 +143,7 @@ std::shared_ptr<SqwBase> construct_sqw(const std::string& strName,
 {
 	typename t_mapSqw::const_iterator iter = g_mapSqw.find(strName);
 	typename t_mapSqwRaw::const_iterator iterRaw = g_mapSqwRaw.find(strName);
+	typename t_mapSqwExt::const_iterator iterExt = g_mapSqwExt.find(strName);
 
 	if(iter != g_mapSqw.end())
 	{
@@ -150,12 +171,107 @@ std::shared_ptr<SqwBase> construct_sqw(const std::string& strName,
 		tl::log_debug("Constructing \"", iterRaw->first, "\" S(q,w) module via raw interface.");
 		return std::make_shared<SqwRawDelegate>(pFktNew(strConfigFile));
 	}
+	else if(iterExt != g_mapSqwExt.end())
+	{
+		tl::log_debug("Constructing \"", iterExt->first, "\" S(q,w) module via external interface.");
+
+		return std::make_shared<SqwProc<SqwNull>>(strConfigFile.c_str(),
+			SqwProcStartMode::START_PARENT_CREATE_CHILD, nullptr, std::get<1>(iterExt->second).c_str());
+	}
 
 	tl::log_err("No S(q,w) model of name \"", strName, "\" found.");
 	return nullptr;
 }
 
 
+
+
+// --------------------------------------------------------------------------------
+// external process plugins
+// --------------------------------------------------------------------------------
+
+// tracking modules for refcounting
+static std::vector<std::string> g_vecExtMods;
+
+void unload_sqw_ext_plugins()
+{
+	g_mapSqwExt.clear();
+	g_vecExtMods.clear();
+	tl::log_debug("Unloaded all external plugins.");
+}
+
+
+void load_sqw_ext_plugins()
+{
+	static bool bPluginsLoaded = 0;
+	if(!bPluginsLoaded)
+	{
+		tl::log_info("Loading external plugins from directory: ", g_strApp, ".");
+
+		std::vector<std::string> vecPlugins = tl::get_all_files(g_strApp.c_str());
+		for(const std::string& strPlugin : vecPlugins)
+		{
+			std::string strPluginNoDir = tl::get_file_nodir<std::string>(strPlugin);
+
+			// file names have to start with "takinmod_"
+			if(!tl::begins_with<std::string>(strPluginNoDir, "takinmod_", false))
+				continue;
+
+
+			// get module infos
+			tl::PipeProc<char> proc(strPlugin.c_str(), false);
+			if(!proc.IsReady())
+			{
+				tl::log_err("Cannot query external plugin infos for \"", strPlugin, "\".");
+				continue;
+			}
+
+			std::string strModIdent, strModName, strTakVer;
+			// get module descriptor strings
+			while(!proc.GetIstr().eof())
+			{
+				std::string line;
+				std::getline(proc.GetIstr(), line);
+
+				std::vector<std::string> vecTokens;
+				tl::get_tokens<std::string, std::string>(line, std::string(":"), vecTokens);
+				if(vecTokens.size() != 2)
+					continue;
+
+				if(vecTokens[0] == "module_ident")
+					strModIdent = tl::trimmed(vecTokens[1]);
+				else if(vecTokens[0] == "module_name")
+					strModName = tl::trimmed(vecTokens[1]);
+				else if(vecTokens[0] == "required_takin_version")
+					strTakVer = tl::trimmed(vecTokens[1]);
+			}
+
+			if(strTakVer != TAKIN_VER)
+			{
+				tl::log_err("Skipping external S(q,w) plugin \"", strPlugin,
+					"\" as it was compiled for Takin version ", strTakVer,
+					", but this is version ", TAKIN_VER, ".");
+
+				continue;
+			}
+
+			g_vecExtMods.push_back(strModIdent);
+			g_mapSqwExt.insert(std::make_pair(strModIdent, std::make_tuple(strModName, strPlugin)));
+			tl::log_info("Loaded plugin: ", strPlugin, " -> ", strModIdent, " (\"", strModName, "\").");
+		}
+
+		tl::log_debug("Loaded all exernal plugins.");
+		bPluginsLoaded = 1;
+	}
+}
+
+// --------------------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------------------------
+// plugins
+// --------------------------------------------------------------------------------
 #ifdef USE_PLUGINS
 
 #include <boost/dll/shared_library.hpp>
@@ -185,6 +301,11 @@ void unload_sqw_plugins()
 			auto iterMod = g_mapSqw.find(strModIdent);
 			if(iterMod != g_mapSqw.end())
 				g_mapSqw.erase(iterMod);
+
+			// also look in the map for modules using the raw interface
+			auto iterModRaw = g_mapSqwRaw.find(strModIdent);
+			if(iterModRaw != g_mapSqwRaw.end())
+				g_mapSqwRaw.erase(iterModRaw);
 		}
 
 		pMod->unload();
@@ -193,118 +314,128 @@ void unload_sqw_plugins()
 
 	g_vecMods.clear();
 	tl::log_debug("Unloaded all plugins.");
+
+
+	// also unload the external process plugins
+	unload_sqw_ext_plugins();
 }
 
 
 void load_sqw_plugins()
 {
 	static bool bPluginsLoaded = 0;
-	if(bPluginsLoaded) return;
-
-	std::vector<std::string> vecPlugins = find_resource_dirs("plugins");
-	for(const std::string& strPlugins : vecPlugins)
+	if(!bPluginsLoaded)
 	{
-		tl::log_info("Loading plugins from directory: ", strPlugins, ".");
-
-		std::vector<std::string> vecPlugins = tl::get_all_files(strPlugins.c_str());
-		for(const std::string& strPlugin : vecPlugins)
+		std::vector<std::string> vecPlugins = find_resource_dirs("plugins");
+		for(const std::string& strPlugins : vecPlugins)
 		{
-			try
+			tl::log_info("Loading plugins from directory: ", strPlugins, ".");
+
+			std::vector<std::string> vecPlugins = tl::get_all_files(strPlugins.c_str());
+			for(const std::string& strPlugin : vecPlugins)
 			{
-				// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
-				std::shared_ptr<so::shared_library> pmod =
-					std::make_shared<so::shared_library>(strPlugin,
-						so::load_mode::rtld_lazy | so::load_mode::rtld_local);
-				if(!pmod)
-					continue;
-
-				// import info function
-				if(!pmod->has("takin_sqw_info"))
-					continue;
-				std::function<t_fkt_info> fktInfo =
-					pmod->get<t_pfkt_info>("takin_sqw_info");
-				if(!fktInfo)
-					continue;
-
-				auto tupInfo = fktInfo();
-				const std::string& strTakVer = std::get<0>(tupInfo);
-				const std::string& strModIdent = std::get<1>(tupInfo);
-				const std::string& strModLongName = std::get<2>(tupInfo);
-
-				// module already registered?
-				if(g_mapSqw.find(strModIdent) != g_mapSqw.end())
+				try
 				{
-					tl::log_warn("Module \"", strModLongName, "\" (id=", strModIdent, ") is already registered. Plugin: ", strPlugin, ".");
-					pmod->unload();
-					continue;
-				}
+					// TODO: libjulia.so needs rtld_global, but cannot be used here as the takin_sqw_info functions are named the same in all so files...
+					std::shared_ptr<so::shared_library> pmod =
+						std::make_shared<so::shared_library>(strPlugin,
+							so::load_mode::rtld_lazy | so::load_mode::rtld_local);
+					if(!pmod)
+						continue;
 
-				if(strTakVer != TAKIN_VER)
-				{
-					tl::log_err("Skipping S(q,w) plugin \"", strPlugin,
-						"\" as it was compiled for Takin version ", strTakVer,
-						", but this is version ", TAKIN_VER, ".");
+					// import info function
+					if(!pmod->has("takin_sqw_info"))
+						continue;
+					std::function<t_fkt_info> fktInfo =
+						pmod->get<t_pfkt_info>("takin_sqw_info");
+					if(!fktInfo)
+						continue;
 
-					pmod->unload();
-					continue;
-				}
+					auto tupInfo = fktInfo();
+					const std::string& strTakVer = std::get<0>(tupInfo);
+					const std::string& strModIdent = std::get<1>(tupInfo);
+					const std::string& strModLongName = std::get<2>(tupInfo);
 
-
-				// import factory function
-				if(pmod->has("takin_sqw_new") && pmod->has("takin_sqw_del"))
-				{
-					t_pfkt_raw_new pFktNew = pmod->get<t_pfkt_raw_new>("takin_sqw_new");
-					t_pfkt_raw_del pFktDel = pmod->get<t_pfkt_raw_del>("takin_sqw_del");
-					if(!pFktNew || !pFktDel)
+					// module already registered?
+					if(g_mapSqw.find(strModIdent) != g_mapSqw.end())
 					{
+						tl::log_warn("Module \"", strModLongName, "\" (id=", strModIdent, ") is already registered. Plugin: ", strPlugin, ".");
 						pmod->unload();
 						continue;
 					}
 
-					// use the raw new/delete interface if it exists
-					g_mapSqwRaw.insert( t_mapSqwRaw::value_type
+					if(strTakVer != TAKIN_VER)
 					{
-						strModIdent,
-						t_mapSqwRaw::mapped_type { pFktNew, pFktDel, strModLongName }
-					});
-				}
-				else if(pmod->has("takin_sqw"))
-				{
-					// if raw interface does not exist, try the old shared_ptr one
-					t_pfkt pFkt = pmod->get<t_pfkt>("takin_sqw");
-					if(!pFkt)
-					{
+						tl::log_err("Skipping S(q,w) plugin \"", strPlugin,
+							"\" as it was compiled for Takin version ", strTakVer,
+							", but this is version ", TAKIN_VER, ".");
+
 						pmod->unload();
 						continue;
 					}
 
-					g_mapSqw.insert( t_mapSqw::value_type
+
+					// import factory function
+					if(pmod->has("takin_sqw_new") && pmod->has("takin_sqw_del"))
 					{
-						strModIdent,
-						t_mapSqw::mapped_type { pFkt, strModLongName }
-					});
+						t_pfkt_raw_new pFktNew = pmod->get<t_pfkt_raw_new>("takin_sqw_new");
+						t_pfkt_raw_del pFktDel = pmod->get<t_pfkt_raw_del>("takin_sqw_del");
+						if(!pFktNew || !pFktDel)
+						{
+							pmod->unload();
+							continue;
+						}
+
+						// use the raw new/delete interface if it exists
+						g_mapSqwRaw.insert( t_mapSqwRaw::value_type
+						{
+							strModIdent,
+							t_mapSqwRaw::mapped_type { pFktNew, pFktDel, strModLongName }
+						});
+					}
+					else if(pmod->has("takin_sqw"))
+					{
+						// if raw interface does not exist, try the old shared_ptr one
+						t_pfkt pFkt = pmod->get<t_pfkt>("takin_sqw");
+						if(!pFkt)
+						{
+							pmod->unload();
+							continue;
+						}
+
+						g_mapSqw.insert( t_mapSqw::value_type
+						{
+							strModIdent,
+							t_mapSqw::mapped_type { pFkt, strModLongName }
+						});
+					}
+					else
+					{
+						// no valid constructor interface found
+						continue;
+					}
+
+
+					g_vecMods.emplace_back(std::move(pmod));
+					tl::log_info("Loaded plugin: ", strPlugin,
+						" -> ", strModIdent, " (\"", strModLongName, "\").");
 				}
-				else
+				catch(const std::exception& ex)
 				{
-					// no valid constructor interface found
-					continue;
+					tl::log_err("Could not load ", strPlugin, ". Reason: ", ex.what());
 				}
-
-
-				g_vecMods.emplace_back(std::move(pmod));
-				tl::log_info("Loaded plugin: ", strPlugin,
-					" -> ", strModIdent, " (\"", strModLongName, "\").");
-			}
-			catch(const std::exception& ex)
-			{
-				tl::log_err("Could not load ", strPlugin, ". Reason: ", ex.what());
 			}
 		}
+
+		tl::log_debug("Loaded all plugins.");
+		bPluginsLoaded = 1;
 	}
 
-	tl::log_debug("Loaded all plugins.");
-	bPluginsLoaded = 1;
+
+	// also load the external process plugins
+	load_sqw_ext_plugins();
 }
+// --------------------------------------------------------------------------------
 
 
 #else
@@ -312,11 +443,13 @@ void load_sqw_plugins()
 
 void unload_sqw_plugins()
 {
+	unload_sqw_ext_plugins();
 }
 
 void load_sqw_plugins()
 {
-	tl::log_warn("No S(q,w) plugin interface available.");
+	// only load the external process plugins, skip the SO files
+	load_sqw_ext_plugins();
 }
 
 #endif

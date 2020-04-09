@@ -1,6 +1,6 @@
 find_library(Rt_LIBRARIES
 	NAMES librt.so
-	HINTS /usr/lib64/ /usr/lib/ /usr/local/lib64 /usr/local/lib /opt/local/lib
+	HINTS /usr/local/lib64 /usr/local/lib /usr/lib64 /usr/lib /opt/local/lib /usr/lib32 /usr/local/lib32
 	DOC "RT library"
 )
 
@@ -16,7 +16,7 @@ endif()
 
 find_library(Mp_LIBRARIES
 	NAMES libgomp.so libgomp.so.1
-	HINTS /usr/lib64/ /usr/lib/ /usr/local/lib64 /usr/local/lib /opt/local/lib
+	HINTS /usr/local/lib64 /usr/local/lib /usr/lib64 /usr/lib /opt/local/lib /usr/lib32 /usr/local/lib32
 	DOC "MP library"
 )
 

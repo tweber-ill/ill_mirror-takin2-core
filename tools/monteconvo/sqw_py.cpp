@@ -3,6 +3,9 @@
  * @author Tobias Weber <tobias.weber@tum.de>
  * @date aug-2015
  * @license GPLv2
+ *
+ * test:
+ * g++ -DBUILD_APPLI -I. -I/usr/include/python3.7m -o tst tools/monteconvo/sqw_py.cpp tlibs/log/log.cpp tlibs/math/rand.cpp tools/monteconvo/sqwbase.cpp -lboost_system -lboost_filesystem -lboost_python37 -lpython3.7m -lrt -lpthread
  */
 
 #include "sqw_py.h"
@@ -13,6 +16,9 @@
 #include <boost/python/stl_iterator.hpp>
 
 using t_real = t_real_reso;
+
+static const char* pcModIdent = "py";
+static const char* pcModName = "Python Model";
 
 #define MAX_PARAM_VAL_SIZE 128
 
@@ -349,16 +355,15 @@ SqwBase* SqwPy::shallow_copy() const
 
 
 
+
 // ----------------------------------------------------------------------------
 // SO interface
+#ifdef BUILD_PLUGIN
+
 #include <boost/dll/alias.hpp>
 #include "sqw_proc.h"
 #include "sqw_proc_impl.h"
 #include "libs/version.h"
-
-
-static const char* pcModIdent = "py";
-static const char* pcModName = "Python Model";
 
 
 std::tuple<std::string, std::string, std::string> sqw_info()
@@ -397,4 +402,40 @@ BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
 // alternate raw construction interface
 //BOOST_DLL_ALIAS(sqw_construct_raw, takin_sqw_new);
 //BOOST_DLL_ALIAS(sqw_destruct_raw, takin_sqw_del);
+
+#endif
+// ----------------------------------------------------------------------------
+
+
+
+// ----------------------------------------------------------------------------
+// external program
+#ifdef BUILD_APPLI
+
+#include "sqw_proc.h"
+#include "sqw_proc_impl.h"
+#include "libs/version.h"
+
+
+int main(int argc, char** argv)
+{
+	if(argc <= 2)
+	{
+		std::cout << "#\n# This is a Takin plugin module.\n#\n";
+		std::cout << "module_ident: " << pcModIdent << "\n";
+		std::cout << "module_name: " << pcModName << "\n";
+		std::cout << "required_takin_version: " << TAKIN_VER << "\n";
+		std::cout.flush();
+		return 0;
+	}
+
+	const char* pcCfgFile = argv[1];
+	const char* pcSharedMem = argv[2];
+	SqwProc<SqwPy> proc(pcCfgFile, SqwProcStartMode::START_CHILD, pcSharedMem);
+
+	return 0;
+}
+
+
+#endif
 // ----------------------------------------------------------------------------

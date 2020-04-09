@@ -16,11 +16,21 @@
 #include <boost/interprocess/ipc/message_queue.hpp>
 
 
+
+enum class SqwProcStartMode
+{
+	START_PARENT_CREATE_CHILD,
+	START_PARENT_FORK_CHILD,
+	START_CHILD
+};
+
+
 template<class t_sqw>
 class SqwProc : public SqwBase
 {
 private:
 	std::size_t m_iRefCnt = 0;
+
 
 protected:
 	mutable std::shared_ptr<std::mutex> m_pmtx;
@@ -32,9 +42,11 @@ protected:
 	std::shared_ptr<boost::interprocess::message_queue> m_pmsgIn, m_pmsgOut;
 	void *m_pSharedPars = nullptr;
 
+
 public:
 	SqwProc();
-	SqwProc(const char* pcCfg);
+	SqwProc(const char* pcCfg, SqwProcStartMode mode=SqwProcStartMode::START_PARENT_FORK_CHILD,
+			const char* pcProcMemName = nullptr, const char* pcProcExecName = nullptr);
 	explicit SqwProc(const std::string& strCfg);
 	virtual ~SqwProc();
 
