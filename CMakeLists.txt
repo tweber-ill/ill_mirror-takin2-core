@@ -8,14 +8,11 @@
 project(takin)
 cmake_minimum_required(VERSION 3.0)
 
-# release or debug build?
-set(DEBUG FALSE)
+option(DEBUG "debug build" FALSE)
+option(BUILD_FOR_MINGW "build a mingw version" FALSE)
+option(USE_PLUGINS "use the plugin system" TRUE)
+option(USE_STRIP "strip debug info from release binaries" TRUE)
 
-# native or mingw build?
-set(BUILD_FOR_MINGW FALSE)
-#set(BUILD_FOR_MINGW TRUE)
-
-set(USE_PLUGINS TRUE)
 set(USE_TR1_FUNCS FALSE)
 
 
@@ -391,7 +388,7 @@ add_custom_target(prebuild-script
 #		&& cp -v ${PROJECT_SOURCE_DIR}/doc/takin.qch ${PROJECT_SOURCE_DIR}/res/
 #	MAIN_DEPENDENCY takin)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET takin POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:takin>
 		MAIN_DEPENDENCY takin
@@ -427,7 +424,7 @@ target_link_libraries(takinmod_py
 )
 
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET takinmod_py POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:takinmod_py>
 		MAIN_DEPENDENCY takinmod_py
@@ -452,7 +449,7 @@ target_link_libraries(takinmod_jl
 )
 
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET takinmod_jl POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:takinmod_jl>
 		MAIN_DEPENDENCY takinmod_jl
@@ -498,7 +495,7 @@ target_link_libraries(convofit
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET convofit POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:convofit>
 		MAIN_DEPENDENCY convofit
@@ -521,7 +518,7 @@ target_link_libraries(convoseries
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET convoseries POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:convoseries>
 		MAIN_DEPENDENCY convoseries
