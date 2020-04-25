@@ -169,6 +169,7 @@ message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
 
 add_definitions(-DUSE_NET -DUSE_CIF)
 add_definitions(-DNO_LAPACK)
+add_definitions(-DNO_QHULL)
 add_definitions(-DNO_JPEG -DNO_TIFF)
 add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 #add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)

@@ -25,7 +25,7 @@ std::string export_scan_to_gnuplot(
 	const std::string& strFile = "")
 {
 	using t_real = typename t_vec::value_type;
-	
+
 	std::string strSrc =
 R"RAWSTR(#!gnuplot --persist
 
@@ -384,7 +384,7 @@ std::string export_scan_to_hermelin(
 	const std::string& strFile = "")
 {
 	using t_real = typename t_vec::value_type;
-	
+
 	std::string strStoatSrc =
 R"RAWSTR(#!./hermelin -t
 

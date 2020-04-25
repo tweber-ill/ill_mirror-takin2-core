@@ -20,6 +20,9 @@
 #include "libs/version.h"
 #include <sstream>
 
+#ifndef NO_QHULL
+	#include <Qhull.h>
+#endif
 //#define PRIVATE_SRC_VERSION
 
 
@@ -117,7 +120,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dd><a href=\"http://www.netlib.org/lapack\">http://www.netlib.org/lapack</a><br></dd>";
 #endif
 
-#ifndef DNO_FIT
+#ifndef NO_FIT
 	ostrLibs << "<dt>Uses Minuit version 2.</dt>";
 	ostrLibs << "<dd><a href=\"https://root.cern.ch\">https://root.cern.ch</a><br></dd>";
 #endif
@@ -128,6 +131,11 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 #ifdef HAS_COMPLEX_ERF
 	ostrLibs << "<dt>Uses Faddeeva library.</dt>";
 	ostrLibs << "<dd><a href=\"http://ab-initio.mit.edu/wiki/index.php/Faddeeva_Package\">http://ab-initio.mit.edu/wiki/index.php/Faddeeva_Package</a><br></dd>";
+#endif
+
+#ifndef NO_QHULL
+	ostrLibs << "<dt>Uses QHull version " << qh_version << ". " << "</dt>";
+	ostrLibs << "<dd><a href=\"http://www.qhull.org\">http://www.qhull.org</a><br></dd>";
 #endif
 
 	ostrLibs << "<dt>Uses resolution algorithms ported from Rescal version 5.</dt>";

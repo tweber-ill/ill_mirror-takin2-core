@@ -53,6 +53,9 @@ USE_PLUGINS = 1
 # compile the faddeeva functions?
 USE_FADDEEVA = 1
 
+# use the qhull library?
+USE_QHULL = 1
+
 # which ABI to use: C++98 or C++11?
 USE_CPP11_ABI = 1
 
@@ -330,6 +333,14 @@ else
 	FAD_LIBS =
 endif
 
+ifeq (${USE_QHULL}, 1)
+	DEFINES += -DUSE_QHULL -I/usr/local/include/libqhullcpp -I/usr/include/libqhullcpp
+	QH_LIBS += -lqhull_r -lqhullcpp
+else
+	DEFINES += -DNO_QHULL
+	QH_LIBS =
+endif
+
 ifeq ($(USE_PLUGINS), 1)
 	DL_LIBS = -ldl
 else
@@ -487,7 +498,7 @@ all: ${ALL_PROGS}
 
 
 takin: ${OBJ_COMMON} ${OBJ_TAZ}
-	${CC} ${FLAGS} ${FAD_DEFS} ${LIB_DIRS} -o bin/takin $+ ${LIB_MIN} ${LIBS_TAZ} -lboost_program_options
+	${CC} ${FLAGS} ${FAD_DEFS} ${LIB_DIRS} -o bin/takin $+ ${LIB_MIN} ${LIBS_TAZ} ${QH_LIBS} -lboost_program_options
 	${STRIP} bin/takin
 
 montereso: ${OBJ_COMMON} ${OBJ_MONTERESO}

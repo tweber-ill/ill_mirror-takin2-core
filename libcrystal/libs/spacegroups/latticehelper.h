@@ -9,7 +9,7 @@
 #define __LATTICE_HELPER_H__
 
 #include "tlibs/math/linalg.h"
-#include "tlibs/math/geo.h"
+#include "tlibs/math/geo2.h"
 #include "tlibs/phys/lattice.h"
 
 #include "spacegroup.h"
@@ -193,16 +193,7 @@ struct LatticeCommon
 
 				// calculate coordination polyhedron if enough next neighbours are in list
 				if(vecNN.size() >= 4)
-				{
-					atomaux.vecPolys =
-						tl::verts_to_polyhedron<t_vec, std::vector, t_real>(vecNN, g_dEps);
-
-					/*static int iNum = 0;
-					std::ofstream ofstr("/home/tw/tmp/verts_" + tl::var_to_str<int>(iNum++) + ".dat");
-					for(const auto& vert : vecNN)
-						ofstr << vert << "\n";
-					ofstr << "# " << atomaux.vecPolys.size() << " polys\n";*/
-				}
+					atomaux.vecPolys = tl::get_convexhull<t_vec, std::vector, t_real>(vecNN, g_dEps);
 			}
 
 			return atomaux;

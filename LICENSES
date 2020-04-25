@@ -184,10 +184,23 @@ License: GNU LGPL version 2.1 (see below)
 
 
 -------------------------------------------------------------------------------- 
+Qhull
+URL: http://www.qhull.org/
+URL: https://github.com/qhull/qhull
+
+Copyright (c) 1993-2019 by C.B. Barber
+
+License URL: https://github.com/qhull/qhull/blob/master/COPYING.txt
+--------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------- 
 NICOS
+URL: https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/nicos/nicos.git/
 URL: http://forge.frm2.tum.de/cgit/cgit.cgi/frm2/nicos/nicos-core.git/
 
-Copyright (c) 2009-2015 by the NICOS contributors
+Copyright (c) 2009-2020 by the NICOS contributors
 
 License: GNU GPL version 2 (see below)
 --------------------------------------------------------------------------------

@@ -1021,7 +1021,7 @@ void ScanViewerDlg::GenerateExternal(int iLang)
 	textRoot->clear();
 	if(!m_vecX.size() || !m_vecY.size())
 		return;
-	
+
 	std::string strSrc;
 
 	if(iLang == 0)	// gnuplot
@@ -1036,7 +1036,7 @@ void ScanViewerDlg::GenerateExternal(int iLang)
 		strSrc = export_scan_to_hermelin<decltype(m_vecX)>(m_vecX, m_vecY, m_vecYErr, m_strX, m_strY, m_strCmd, m_strCurDir + m_strCurFile);
 	else
 		tl::log_err("Unknown external language.");
-	
+
 	textRoot->setText(strSrc.c_str());
 
 }
