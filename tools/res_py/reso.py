@@ -215,9 +215,9 @@ def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, elli
 	labelQup = "Qup (1/A)"
 
 	if use_tex:
-		labelQpara = "$Q_{\parallel}$ \AA$^{-1}$"
-		labelQperp = "$Q_{\perp}$ \AA$^{-1}$"
-		labelQup = "$Q_{up}$ \AA$^{-1}$"
+		labelQpara = "$Q_{\parallel}$ (\AA$^{-1}$)"
+		labelQperp = "$Q_{\perp}$ (\AA$^{-1}$)"
+		labelQup = "$Q_{up}$ (\AA$^{-1}$)"
 
 
 	# Qpara, E axis
