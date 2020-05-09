@@ -200,7 +200,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 	    ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
 		    (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
-    # Cv scalar: formula 40 in [eck14] 
+    # Cv scalar: formula 40 in [eck14]
     Cv = 0.5*reso.sig2fwhm**2. * pos_z**2. * \
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
@@ -214,7 +214,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
     # [eck14], equ. 54
     therefl = refl * np.sqrt(np.pi / Av[1,1]) # typo in paper?
-    
+
     return [ A, B, C, D, therefl ]
 
 
@@ -469,7 +469,7 @@ if __name__ == "__main__":
         "thetaa" : get_mono_angle(kf, d_ana),
         "angle_ki_Q" : get_angle_ki_Q(ki, kf, Q),
         "angle_kf_Q" : get_angle_kf_Q(ki, kf, Q),
-    
+
         # scattering senses
         "mono_sense" : sc_senses[0],
         "sample_sense" : sc_senses[1],

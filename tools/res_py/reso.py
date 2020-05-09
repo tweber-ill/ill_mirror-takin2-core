@@ -186,9 +186,13 @@ def calc_ellipses(Qres_Q, verbose=True):
 #
 # shows the 2d ellipses
 #
-def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, ellipse_points=128):
+def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, ellipse_points=128, use_tex=False):
 	import mpl_toolkits.mplot3d as mplot3d
+	import matplotlib
 	import matplotlib.pyplot as plot
+
+	matplotlib.rc("text", usetex = use_tex)
+
 
 	ellfkt = lambda rad, rot, phi : \
 		np.dot(rot, np.array([ rad[0]*np.cos(phi), rad[1]*np.sin(phi) ]))
@@ -206,33 +210,42 @@ def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, elli
 	ell_QzE_proj = ellfkt(ellis["fwhms_QzE_proj"]*0.5, ellis["rot_QzE_proj"], phi)
 	ell_QxQy_proj = ellfkt(ellis["fwhms_QxQy_proj"]*0.5, ellis["rot_QxQy_proj"], phi)
 
+	labelQpara = "Qpara (1/A)"
+	labelQperp = "Qperp (1/A)"
+	labelQup = "Qup (1/A)"
+
+	if use_tex:
+		labelQpara = "$Q_{\parallel}$ \AA$^{-1}$"
+		labelQperp = "$Q_{\perp}$ \AA$^{-1}$"
+		labelQup = "$Q_{up}$ \AA$^{-1}$"
+
 
 	# Qpara, E axis
 	fig = plot.figure()
 	subplot_QxE = fig.add_subplot(221)
-	subplot_QxE.set_xlabel("Qpara (1/A)")
+	subplot_QxE.set_xlabel(labelQpara)
 	subplot_QxE.set_ylabel("E (meV)")
 	subplot_QxE.plot(ell_QxE[0], ell_QxE[1], c="black", linestyle="dashed")
 	subplot_QxE.plot(ell_QxE_proj[0], ell_QxE_proj[1], c="black", linestyle="solid")
 
 	# Qperp, E axis
 	subplot_QyE = fig.add_subplot(222)
-	subplot_QyE.set_xlabel("Qperp (1/A)")
+	subplot_QyE.set_xlabel(labelQperp)
 	subplot_QyE.set_ylabel("E (meV)")
 	subplot_QyE.plot(ell_QyE[0], ell_QyE[1], c="black", linestyle="dashed")
 	subplot_QyE.plot(ell_QyE_proj[0], ell_QyE_proj[1], c="black", linestyle="solid")
 
 	# Qup, E axis
 	subplot_QzE = fig.add_subplot(223)
-	subplot_QzE.set_xlabel("Qup (1/A)")
+	subplot_QzE.set_xlabel(labelQup)
 	subplot_QzE.set_ylabel("E (meV)")
 	subplot_QzE.plot(ell_QzE[0], ell_QzE[1], c="black", linestyle="dashed")
 	subplot_QzE.plot(ell_QzE_proj[0], ell_QzE_proj[1], c="black", linestyle="solid")
 
 	# Qpara, Qperp axis
 	subplot_QxQy = fig.add_subplot(224)
-	subplot_QxQy.set_xlabel("Qpara (1/A)")
-	subplot_QxQy.set_ylabel("Qperp (1/A)")
+	subplot_QxQy.set_xlabel(labelQpara)
+	subplot_QxQy.set_ylabel(labelQperp)
 	subplot_QxQy.plot(ell_QxQy[0], ell_QxQy[1], c="black", linestyle="dashed")
 	subplot_QxQy.plot(ell_QxQy_proj[0], ell_QxQy_proj[1], c="black", linestyle="solid")
 	plot.tight_layout()
@@ -242,8 +255,8 @@ def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, elli
 	fig3d = plot.figure()
 	subplot3d = fig3d.add_subplot(111, projection="3d")
 
-	subplot3d.set_xlabel("Qpara (1/A)")
-	subplot3d.set_ylabel("Qperp (1/A)")
+	subplot3d.set_xlabel(labelQpara)
+	subplot3d.set_ylabel(labelQperp)
 	subplot3d.set_zlabel("E (meV)")
 
 	# xE
@@ -259,6 +272,7 @@ def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, elli
 
 	# save plots to files
 	if file != "":
+		import os
 		splitext = os.path.splitext(file)
 		file3d = splitext[0] + "_3d" + splitext[1]
 
@@ -272,3 +286,23 @@ def plot_ellipses(ellis, verbose=True, plot_results=True, file="", dpi=600, elli
 	# show plots
 	if plot_results:
 		plot.show()
+
+
+
+
+#
+# test plot
+#
+if __name__ == "__main__":
+	verbose = True
+
+	mat = np.array(	\
+		[[ 30768.9, 30989.8, 0, -3591.02],	\
+		[ 30989.8, 32994.3, 0, -3893.1 ],	\
+		[ 0, 0, 944.085, 0 ],	\
+		[ -3591.02, -3893.1, 0, 1509.38 ]])
+
+	# describe and plot ellipses
+	ellipses = calc_ellipses(mat, verbose)
+	outfile = ""
+	plot_ellipses(ellipses, verbose, True, outfile, 600, 128, True)
