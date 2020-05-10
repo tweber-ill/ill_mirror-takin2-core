@@ -12,7 +12,7 @@
 EllipseDlg3D::EllipseDlg3D(QWidget* pParent, QSettings* pSett)
 	: QDialog(pParent, Qt::Tool), m_pSettings(pSett)
 {
-	setWindowTitle("Resolution Ellipsoids");
+	setWindowTitle("Resolution Ellipsoids (HWHM Contour Surface)");
 	setSizeGripEnabled(1);
 	if(m_pSettings)
 	{

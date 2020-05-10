@@ -590,7 +590,7 @@ void ResoDlg::Calc()
 
 			ostrRes << "<p><b>Incoherent (Vanadium) energy FWHM</b>: " << dVanadiumFWHM_E << " meV</p>\n\n";
 
-			ostrRes << "<p><b>Resolution Matrix (Q_para, Q_ortho, Q_z, E) in 1/A, meV:</b>\n\n";
+			ostrRes << "<p><b>Resolution Matrix (Q_para, Q_ortho, Q_z, E) in 1/A, meV and using Gaussian sigmas:</b>\n\n";
 			ostrRes << "<blockquote><table border=\"0\" width=\"75%\">\n";
 			for(std::size_t i=0; i<res.reso.size1(); ++i)
 			{

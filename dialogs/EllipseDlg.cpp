@@ -42,8 +42,8 @@ EllipseDlg::EllipseDlg(QWidget* pParent, QSettings* pSett, Qt::WindowFlags fl)
 		m_vecplotwrap.push_back(std::unique_ptr<QwtPlotWrapper>(new QwtPlotWrapper(pPlots[i], 3)));
 		m_vecplotwrap[i]->GetPlot()->setMinimumSize(200,200);
 
-		m_vecplotwrap[i]->GetCurve(0)->setTitle("Projected Ellipse");
-		m_vecplotwrap[i]->GetCurve(1)->setTitle("Sliced Ellipse");
+		m_vecplotwrap[i]->GetCurve(0)->setTitle("Projected Ellipse (HWHM Contour)");
+		m_vecplotwrap[i]->GetCurve(1)->setTitle("Sliced Ellipse (HWHM Contour)");
 
 		QPen penProj, penSlice, penPoints;
 		penProj.setColor(QColor(0, 0x99, 0));
@@ -78,10 +78,12 @@ EllipseDlg::EllipseDlg(QWidget* pParent, QSettings* pSett, Qt::WindowFlags fl)
 	m_bReady = 1;
 }
 
+
 EllipseDlg::~EllipseDlg()
 {
 	m_vecplotwrap.clear();
 }
+
 
 void EllipseDlg::SetTitle(const char* pcTitle)
 {
@@ -280,11 +282,11 @@ void EllipseDlg::Calc()
 
 			std::ostringstream ostrSlope;
 			ostrSlope.precision(g_iPrecGfx);
-			ostrSlope << "Projected ellipse (green):\n";
+			ostrSlope << "Projected ellipse (green, HWHM contour):\n";
 			ostrSlope << "\tSlope: " << m_elliProj[iEll].slope << "\n";
 			ostrSlope << "\tAngle: " << tl::r2d(m_elliProj[iEll].phi) << strDeg << "\n";
 			ostrSlope << "\tArea " << m_elliProj[iEll].area << "\n";
-			ostrSlope << "Sliced ellipse (blue):\n";
+			ostrSlope << "Sliced ellipse (blue, HWHM contour):\n";
 			ostrSlope << "\tSlope: " << m_elliSlice[iEll].slope << "\n";
 			ostrSlope << "\tAngle: " << tl::r2d(m_elliSlice[iEll].phi) << strDeg << "\n";
 			ostrSlope << "\tArea " << m_elliSlice[iEll].area;
