@@ -7,8 +7,8 @@
 	<h1>Convolution Fitting</h1>
 
 		<p>The convolution fitter finds the best least-squares fit of one or several
-		free parameters in an S(q,w) model using a Monte-Carlo convolution approach.
-		The S(q,w) model is fitted to one or more given measurement data files.</p>
+		free parameters in an S(q,E) model using a Monte-Carlo convolution approach.
+		The S(q,E) model is fitted to one or more given measurement data files.</p>
 
 		<p>The fitter is called on the command-line by: "convofit my_fit.job"
 		The input job file "my_fit.job" in this example has the following structure:</p>
@@ -52,19 +52,19 @@
 		    instrument_file "my_instrument.taz"
 
 
-		    ; which S(q,w) model to use?
+		    ; which S(q,E) model to use?
 		    sqw_model       "py"
 
-		    ; S(q,w) input file. Here, a Python script
+		    ; S(q,E) input file. Here, a Python script
 		    sqw_file        "my_sqw.py"
 
 		    ; how is the temperature/field variable named
-		    ; the S(q,w) model? Here, "g_T" and "g_H" are
+		    ; the S(q,E) model? Here, "g_T" and "g_H" are
 		    ; global variables in the "my_sqw.py" script.
 		    sqw_temp_var    "g_T"
 		    sqw_field_var   "g_H"
 
-		    ; fix some variables in the S(q,w) model
+		    ; fix some variables in the S(q,E) model
 		    sqw_set_params  "g_my_param = 12.3"
 
 		    ; flip the sense of the coordinate system
@@ -170,12 +170,12 @@
 		}
 
 
-		; which S(q,w) model parameters should be fitted?
+		; which S(q,E) model parameters should be fitted?
 		; don't remove "scale", "slope" or "offs"!
 		fit_parameters
 		{
 		    ; the fit parameters: "scale", "slope" and "offs" are internal variables,
-		    ; "g_linewidth" is a parameter in the S(q,w) model. In this example,
+		    ; "g_linewidth" is a parameter in the S(q,E) model. In this example,
 		    ; it is a global name in the "my_sqw.py" script.
 		    params  "scale " \
 		            "slope " \

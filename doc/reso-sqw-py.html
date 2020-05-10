@@ -1,12 +1,12 @@
 <html>
 <head>
-	<title>Python S(q,w) Models</title>
+	<title>Python S(q,E) Models</title>
 </head>
 
 <body>
-	<h1>Python S(q,w) Models</h1>
+	<h1>Python S(q,E) Models</h1>
 
-	<p>A S(q,w) <a href="https://www.python.org/" target="_blank">Python</a>
+	<p>A S(q,E) <a href="https://www.python.org/" target="_blank">Python</a>
 	module has to define the two functions "TakinInit" and "TakinSqw".</p>
 
 	<p>"TakinInit" is called after one or several parameters have changed
@@ -18,7 +18,7 @@
 	and returns a single floating-point value S, the dynamical structure factor.
 	The function is called for every Monte-Carlo point.</p>
 
-	<p>All global variables that are defined in an S(q,w) Python module and that
+	<p>All global variables that are defined in an S(q,E) Python module and that
 	are prefixed with "g_" (for "global") are made available as settable parameters
 	in the convolution dialog and as fit parameters for the convolution fitter.</p>
 
@@ -42,7 +42,7 @@ def TakinSqw(h, k, l, E):
 	of the source code distribution):
 	<code><pre>
 #
-# Sample Python S(q,w) module for (anti-)ferromagnetic dispersions
+# Sample Python S(q,E) module for (anti-)ferromagnetic dispersions
 #
 # @author Tobias Weber <tobias.weber@tum.de>
 # @license GPLv2

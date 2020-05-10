@@ -1,12 +1,12 @@
 <html>
 <head>
-	<title>Julia S(q,w) Models</title>
+	<title>Julia S(q,E) Models</title>
 </head>
 
 <body>
-	<h1>Julia S(q,w) Models</h1>
+	<h1>Julia S(q,E) Models</h1>
 
-	<p>Similarly to the Python modules, a S(q,w)
+	<p>Similarly to the Python modules, a S(q,E)
 	<a href="https://julialang.org/" target="_blank">Julia</a>
 	module has to define the two functions "TakinInit" and "TakinSqw".</p>
 
@@ -19,7 +19,7 @@
 	and returns a single floating-point value S, the dynamical structure factor.
 	The function is called for every Monte-Carlo point.</p>
 
-	<p>All global variables that are defined in an S(q,w) Julia module and that
+	<p>All global variables that are defined in an S(q,E) Julia module and that
 	are prefixed with "g_" (for "global") are made available as settable parameters
 	in the convolution dialog and as fit parameters for the convolution fitter.</p>
 
@@ -45,7 +45,7 @@ end
 	of the source code distribution):
 	<code><pre>
 #
-# Sample Julia S(q,w) module for ferromagnetic dispersions
+# Sample Julia S(q,E) module for ferromagnetic dispersions
 # @author Tobias Weber <tobias.weber@tum.de>
 # @license GPLv2
 # @date dec-2016
