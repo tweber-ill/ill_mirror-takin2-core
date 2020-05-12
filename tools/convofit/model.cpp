@@ -90,6 +90,7 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 
 	for(const ublas::vector<t_real_reso>& vecHKLE : vecNeutrons)
 	{
+		// TODO: add option to choose if the model is given as S(Q,E) or |S|^2
 		dS += t_real((*m_pSqw)(vecHKLE[0], vecHKLE[1], vecHKLE[2], vecHKLE[3]));
 
 		for(int i=0; i<4; ++i)

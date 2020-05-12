@@ -280,6 +280,8 @@ void ConvoDlg::Start1D()
 
 				if(iNumNeutrons == 0)
 				{	// if no neutrons are given, just plot the unconvoluted S(q,w)
+					// TODO: add an option to let the user choose if S(Q,E) is
+					// really the dynamical structure factor, or its absolute square
 					dS += (*m_pSqw)(dCurH, dCurK, dCurL, dCurE);
 				}
 				else
@@ -313,6 +315,8 @@ void ConvoDlg::Start1D()
 					{
 						if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
 
+						// TODO: add an option to let the user choose if S(Q,E) is
+						// really the dynamical structure factor, or its absolute square
 						dS += (*m_pSqw)(vecHKLE[0], vecHKLE[1], vecHKLE[2], vecHKLE[3]);
 
 						for(int i=0; i<4; ++i)
@@ -776,6 +780,8 @@ void ConvoDlg::Start2D()
 
 				if(iNumNeutrons == 0)
 				{	// if no neutrons are given, just plot the unconvoluted S(q,w)
+					// TODO: add an option to let the user choose if S(Q,E) is
+					// really the dynamical structure factor, or its absolute square
 					dS += (*m_pSqw)(dCurH, dCurK, dCurL, dCurE);
 				}
 				else
@@ -809,6 +815,8 @@ void ConvoDlg::Start2D()
 					{
 						if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
 
+						// TODO: add an option to let the user choose if S(Q,E) is
+						// really the dynamical structure factor, or its absolute square
 						dS += (*m_pSqw)(vecHKLE[0], vecHKLE[1], vecHKLE[2], vecHKLE[3]);
 
 						for(int i=0; i<4; ++i)
