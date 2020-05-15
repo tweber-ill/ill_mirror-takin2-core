@@ -21,6 +21,8 @@ rm -rf CMakeFiles
 
 rm -f doc/takin.qch
 rm -f doc/takin.qhc
+rm -rf doc/devel/html
+rm -f doc/devel/*.tmp
 
 
 # restore link
