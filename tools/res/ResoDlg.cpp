@@ -16,6 +16,7 @@
 #include "tlibs/string/spec_char.h"
 #include "tlibs/helper/misc.h"
 #include "tlibs/math/math.h"
+#include "tlibs/math/geo.h"
 #include "tlibs/math/rand.h"
 #include "tlibs/phys/lattice.h"
 
@@ -616,9 +617,22 @@ void ResoDlg::Calc()
 				if(iVec != res.reso_v.size()-1)
 					ostrRes << ", ";
 			}
-			ostrRes << "</p>\n";
+			ostrRes << "<br>\n";
+			ostrRes << "<b>Resolution Scalar</b>: " << res.reso_s << "</p>\n";
 
-			ostrRes << "<p><b>Resolution Scalar</b>: " << res.reso_s << "</p>\n";
+
+			{
+				tl::Quadric<t_real_reso> quadr(res.reso, res.reso_v, res.reso_s);
+				int rank,rankext, pos_evals,neg_evals,zero_evals, pos_evalsext,neg_evalsext,zero_evalsext;
+				std::tie(rank,rankext, pos_evals,neg_evals,zero_evals, pos_evalsext,neg_evalsext,zero_evalsext)
+					= quadr.ClassifyQuadric(g_dEps);
+				ostrRes << "<p><b>Resolution Matrix Rank and Signature:</b> ";
+				ostrRes << rank << ", (" << pos_evals << ", " << neg_evals << ", " << zero_evals << ")";
+				ostrRes << "<br>\n";
+				ostrRes << "<b>Extended Resolution Matrix Rank and Signature:</b> ";
+				ostrRes << rankext << ", (" << pos_evalsext << ", " << neg_evalsext << ", " << zero_evalsext << ")";
+				ostrRes << "</p>\n";
+			}
 
 
 			if(m_bHasUB)
@@ -636,7 +650,7 @@ void ResoDlg::Calc()
 					}
 					ostrRes << "</tr>\n";
 
-					if(i!=m_resoHKL.size1()-1)
+					if(i != m_resoHKL.size1()-1)
 						ostrRes << "\n";
 				}
 				ostrRes << "</table></blockquote></p>\n";
@@ -650,6 +664,17 @@ void ResoDlg::Calc()
 				}
 				ostrRes << "</p>\n";
 				//ostrRes << "<p><b>Resolution Scalar</b>: " << res.reso_s << "</p>\n";
+
+				tl::Quadric<t_real_reso> quadr(m_resoHKL, m_reso_vHKL, res.reso_s);
+				int rank,rankext, pos_evals,neg_evals,zero_evals, pos_evalsext,neg_evalsext,zero_evalsext;
+				std::tie(rank,rankext, pos_evals,neg_evals,zero_evals, pos_evalsext,neg_evalsext,zero_evalsext)
+					= quadr.ClassifyQuadric(g_dEps);
+				ostrRes << "<p><b>Resolution Matrix (rlu) Rank and Signature:</b> ";
+				ostrRes << rank << ", (" << pos_evals << ", " << neg_evals << ", " << zero_evals << ")";
+				ostrRes << "<br>\n";
+				ostrRes << "<b>Extended Resolution Matrix (rlu) Rank and Signature:</b> ";
+				ostrRes << rankext << ", (" << pos_evalsext << ", " << neg_evalsext << ", " << zero_evalsext << ")";
+				ostrRes << "</p>\n";
 			}
 
 
