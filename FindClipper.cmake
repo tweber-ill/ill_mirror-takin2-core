@@ -12,11 +12,11 @@ find_library(Clipper_LIBRARIES
 )
 
 if(Clipper_LIBRARIES)
-	set(Clipper_FOUND 1)
+	set(Clipper_FOUND TRUE)
 	message("Clipper include directories: ${Clipper_INCLUDE_DIRS}")
 	message("Clipper library: ${Clipper_LIBRARIES}")
 else()
-	set(Clipper_FOUND 0)
+	set(Clipper_FOUND FALSE)
 	set(Clipper_INCLUDE_DIRS "")
 	set(Clipper_LIBRARIES "")
 	message("Error: Clipper could not be found!")

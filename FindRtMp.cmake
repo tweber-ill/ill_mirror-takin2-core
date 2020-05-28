@@ -5,10 +5,10 @@ find_library(Rt_LIBRARIES
 )
 
 if(Rt_LIBRARIES)
-	set(Rt_FOUND 1)
+	set(Rt_FOUND TRUE)
 	message("RT library: ${Rt_LIBRARIES}")
 else()
-	set(Rt_FOUND 0)
+	set(Rt_FOUND FALSE)
 	message("Error: librt could not be found!")
 endif()
 
@@ -21,9 +21,9 @@ find_library(Mp_LIBRARIES
 )
 
 if(Mp_LIBRARIES)
-	set(Mp_FOUND 1)
+	set(Mp_FOUND TRUE)
 	message("MP library: ${Mp_LIBRARIES}")
 else()
-	set(Mp_FOUND 0)
+	set(Mp_FOUND FALSE)
 	message("Error: libgomp could not be found!")
 endif()

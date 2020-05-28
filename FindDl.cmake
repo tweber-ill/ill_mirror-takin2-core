@@ -5,9 +5,9 @@ find_library(Dl_LIBRARIES
 )
 
 if(Dl_LIBRARIES)
-	set(Dl_FOUND 1)
+	set(Dl_FOUND TRUE)
 	message("DL library: ${Dl_LIBRARIES}")
 else()
-	set(Dl_FOUND 0)
+	set(Dl_FOUND FALSE)
 	message("Error: libdl could not be found!")
 endif()

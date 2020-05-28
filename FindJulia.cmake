@@ -15,12 +15,12 @@ find_library(Julia_LIBRARIES
 )
 
 if(Julia_INCLUDE_DIRS AND Julia_LIBRARIES)
-	set(Julia_FOUND 1)
+	set(Julia_FOUND TRUE)
 
 	message("Julia include directories: ${Julia_INCLUDE_DIRS}")
 	message("Julia library: ${Julia_LIBRARIES}")
 else()
-	set(Julia_FOUND 0)
+	set(Julia_FOUND FALSE)
 
 	message("Error: Julia could not be found!")
 endif()

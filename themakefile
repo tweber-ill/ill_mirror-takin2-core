@@ -797,6 +797,8 @@ obj/AboutDlg.o: dialogs/AboutDlg.cpp dialogs/AboutDlg.h
 clean:
 	find bin -regex 'bin/[_a-zA-Z0-9]*' | xargs rm -f
 	rm -f bin/*.exe
+	rm -f plugins/*.so
+	rm -f plugins/*.dll
 	rm -f obj/*.o
 	rm -f ui/*.h
 	rm -f *.moc

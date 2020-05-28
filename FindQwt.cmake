@@ -15,12 +15,12 @@ find_library(QWT_LIBRARIES
 )
 
 if(QWT_INCLUDE_DIRS AND QWT_LIBRARIES)
-	set(QWT_FOUND 1)
+	set(QWT_FOUND TRUE)
 
 	message("Qwt include directories: ${QWT_INCLUDE_DIRS}")
 	message("Qwt library: ${QWT_LIBRARIES}")
 else()
-	set(QWT_FOUND 0)
+	set(QWT_FOUND FALSE)
 
 	message("Error: Qwt could not be found!")
 endif()
