@@ -60,18 +60,3 @@ Run program with
 
 
 ===============================================================================
-
-
-
-Alternative building path
--------------------------
-
-	* Open "themakefile" in your favourite editor.
-	* Adapt the flags in the first few lines according to your system.
-	* Build Takin using "./build.sh"
-	* Run "./gentab" to create required tables
-	* Run Takin with "./takin".
-
-
-
-===============================================================================
