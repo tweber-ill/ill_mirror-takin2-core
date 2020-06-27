@@ -5,6 +5,11 @@
  * @license GPLv2
  */
 
+// hack because of include file ordering
+#ifdef __MINGW32__
+	#include <boost/asio.hpp>
+#endif
+
 #include "real3d.h"
 #include <QGridLayout>
 

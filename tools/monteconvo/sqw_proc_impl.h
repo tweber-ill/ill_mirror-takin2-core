@@ -18,6 +18,7 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/string.hpp>
+#include <unistd.h>
 
 #define MSG_QUEUE_SIZE 512
 #define PARAM_MEM 1024*1024
@@ -365,7 +366,21 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 			m_pmsgOut = std::make_shared<ipr::message_queue>(ipr::create_only,
 				("takin_sqw_proc_out_" + m_strProcName).c_str(), MSG_QUEUE_SIZE, sizeof(ProcMsg));
 
-			if(mode == SqwProcStartMode::START_PARENT_FORK_CHILD)
+			if(mode == SqwProcStartMode::START_PARENT_CREATE_CHILD)
+			{
+				if(!tl::file_exists(pcProcExecName))
+				{
+					tl::log_err("Child process file \"", pcProcExecName, "\" does not exist.");
+					return;
+				}
+
+				// start child process
+				std::system((std::string(pcProcExecName)
+					+ std::string(" \"") + pcCfg + std::string("\" ")
+					+ m_strProcName + " &").c_str());
+			}
+#ifndef __MINGW32__
+			else if(mode == SqwProcStartMode::START_PARENT_FORK_CHILD)
 			{
 				m_pidChild = fork();
 				if(m_pidChild < 0)
@@ -380,19 +395,7 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 					return;
 				}
 			}
-			else if(mode == SqwProcStartMode::START_PARENT_CREATE_CHILD)
-			{
-				if(!tl::file_exists(pcProcExecName))
-				{
-					tl::log_err("Child process file \"", pcProcExecName, "\" does not exist.");
-					return;
-				}
-
-				// start child process
-				std::system((std::string(pcProcExecName)
-					+ std::string(" \"") + pcCfg + std::string("\" ")
-					+ m_strProcName + " &").c_str());
-			}
+#endif
 
 			tl::log_debug("Waiting for client to become ready...");
 

@@ -73,7 +73,14 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
 
 set(Boost_FIND_QUIETLY FALSE)
-set(BOOST_COMPS program_options iostreams filesystem system)
+
+if(BUILD_FOR_MINGW)
+	set(BOOST_SUFFIX -x64)
+else()
+	set(BOOST_SUFFIX)
+endif()
+
+set(BOOST_COMPS program_options${BOOST_SUFFIX} iostreams${BOOST_SUFFIX} filesystem${BOOST_SUFFIX} system${BOOST_SUFFIX})
 set(BOOST_OPT_COMPS)
 
 if(USE_TR1_FUNCS)
@@ -125,7 +132,7 @@ else()
 	set(Mp_LIBRARIES "")
 endif()
 
-if(USE_PLUGINS)
+if(USE_PLUGINS AND NOT BUILD_FOR_MINGW)
 	find_package(Dl REQUIRED)
 else()
 	set(Dl_LIBRARIES "")
@@ -314,7 +321,7 @@ if(USE_GENTAB)
 	target_link_libraries(gentab
 		${Clipper_LIBRARIES}
 		Qt5::Core Qt5::Gui Qt5::Widgets
-		Boost::iostreams Boost::system Boost::filesystem Boost::program_options
+		Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
 		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	)
 
@@ -391,7 +398,7 @@ target_link_libraries(takin
 	${LIBS_3D}
 	${PNG_LIBRARIES}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
-	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
+	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 )
 
@@ -464,7 +471,7 @@ add_executable(takinmod_jl
 )
 
 target_link_libraries(takinmod_jl
-	Boost::iostreams Boost::system Boost::filesystem
+	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX}
 	${Julia_LIBRARIES}
 	Threads::Threads ${Rt_LIBRARIES}
 )
@@ -512,7 +519,7 @@ set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 target_link_libraries(convofit
 	${LIBS_FIT} ${SOCK2}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
-	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
+	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 
@@ -535,7 +542,7 @@ add_executable(convoseries
 set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
 target_link_libraries(convoseries
-	Boost::iostreams Boost::system Boost::filesystem Boost::program_options
+	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 )
 

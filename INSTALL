@@ -5,14 +5,14 @@ Preparations before compilation
 Install (developer versions of) all required libraries either from your
 system's package manager or directly from the given URLs:
 	* Boost: http://www.boost.org
-	* Qt 4: http://www.qt.io
+	* Qt 5: http://www.qt.io
 	* Qwt 6: http://qwt.sourceforge.net
 	* Clipper: http://www.ysbl.york.ac.uk/~cowtan/clipper/
 	* Minuit 2: http://seal.web.cern.ch/seal/snapshot/work-packages/mathlibs/minuit/release/download.html
 
 For example, on *buntu systems, use the following commands:
 	* sudo su
-	* apt-get install cmake clang build-essential libboost-all-dev libclipper-dev libqt4-dev qt4-dev-tools libqwt-dev python-dev libfreetype6-dev wget
+	* apt-get install cmake clang build-essential libboost-all-dev libclipper-dev qt5-default libqt5svg5-dev qt5-assistant libqwt-qt5-dev libpython3-dev libfreetype6-dev libbz2-dev wget
 	* wget http://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz
 	* tar -xzvf Minuit2-5.34.14.tar.gz
 	* cd Minuit2-5.34.14

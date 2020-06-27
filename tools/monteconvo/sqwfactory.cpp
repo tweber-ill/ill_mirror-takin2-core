@@ -345,7 +345,10 @@ void load_sqw_plugins()
 
 					// import info function
 					if(!pmod->has("takin_sqw_info"))
+					{
+						//tl::log_err(strPlugin, " has no takin_sqw_info function.");
 						continue;
+					}
 					std::function<t_fkt_info> fktInfo =
 						pmod->get<t_pfkt_info>("takin_sqw_info");
 					if(!fktInfo)
