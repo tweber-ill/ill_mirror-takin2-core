@@ -289,7 +289,11 @@ void unload_sqw_plugins()
 	for(auto& pMod : g_vecMods)
 	{
 		std::function<t_fkt_info> fktInfo =
+#ifndef __MINGW32__
 			pMod->get<t_pfkt_info>("takin_sqw_info");
+#else
+			pMod->get<t_fkt_info>("takin_sqw_info");
+#endif
 
 		if(fktInfo)
 		{
@@ -346,13 +350,20 @@ void load_sqw_plugins()
 					// import info function
 					if(!pmod->has("takin_sqw_info"))
 					{
-						//tl::log_err(strPlugin, " has no takin_sqw_info function.");
+						tl::log_err(strPlugin, " has no takin_sqw_info function.");
 						continue;
 					}
 					std::function<t_fkt_info> fktInfo =
+#ifndef __MINGW32__
 						pmod->get<t_pfkt_info>("takin_sqw_info");
+#else
+						pmod->get<t_fkt_info>("takin_sqw_info");
+#endif
 					if(!fktInfo)
+					{
+						tl::log_err(strPlugin, " has no valid takin_sqw_info function.");
 						continue;
+					}
 
 					auto tupInfo = fktInfo();
 					const std::string& strTakVer = std::get<0>(tupInfo);
@@ -381,8 +392,13 @@ void load_sqw_plugins()
 					// import factory function
 					if(pmod->has("takin_sqw_new") && pmod->has("takin_sqw_del"))
 					{
+#ifndef __MINGW32__
 						t_pfkt_raw_new pFktNew = pmod->get<t_pfkt_raw_new>("takin_sqw_new");
 						t_pfkt_raw_del pFktDel = pmod->get<t_pfkt_raw_del>("takin_sqw_del");
+#else
+						t_pfkt_raw_new pFktNew = pmod->get<t_fkt_raw_new>("takin_sqw_new");
+						t_pfkt_raw_del pFktDel = pmod->get<t_fkt_raw_del>("takin_sqw_del");
+#endif
 						if(!pFktNew || !pFktDel)
 						{
 							pmod->unload();
@@ -399,7 +415,11 @@ void load_sqw_plugins()
 					else if(pmod->has("takin_sqw"))
 					{
 						// if raw interface does not exist, try the old shared_ptr one
+#ifndef __MINGW32__
 						t_pfkt pFkt = pmod->get<t_pfkt>("takin_sqw");
+#else
+						t_pfkt pFkt = pmod->get<t_fkt>("takin_sqw");
+#endif
 						if(!pFkt)
 						{
 							pmod->unload();
@@ -414,7 +434,7 @@ void load_sqw_plugins()
 					}
 					else
 					{
-						// no valid constructor interface found
+						tl::log_err("No valid constructor interface found in \"", strPlugin, "\".");
 						continue;
 					}
 
