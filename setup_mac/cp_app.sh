@@ -31,12 +31,11 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/qt5/lib/QtDBus.framework"
 	"/usr/local/opt/qwt/lib/qwt.framework"
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
-	"/usr/local/opt/boost/lib/libboost_system.dylib"
-	"/usr/local/opt/boost/lib/libboost_filesystem.dylib"
-	"/usr/local/opt/boost/lib/libboost_iostreams.dylib"
-	"/usr/local/opt/boost/lib/libboost_regex.dylib"
-	"/usr/local/opt/boost/lib/libboost_program_options.dylib"
-	"/usr/local/opt/boost-python/lib/libboost_python27.dylib"
+	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_regex-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
 	"/usr/local/opt/boost-python3/lib/libboost_python37.dylib"
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
@@ -70,6 +69,7 @@ mkdir -pv "${DST_PLUGIN_DIR}/platforms"
 mkdir -pv "${DST_PLUGIN_DIR}/platformthemes"
 mkdir -pv "${DST_PLUGIN_DIR}/styles"
 mkdir -pv "${PRG}/Contents/MacOS"
+mkdir -pv "${PRG}/Contents/Resources"
 # -----------------------------------------------------------------------------
 
 
@@ -101,6 +101,7 @@ cp -v bin/polextract "${PRG}/Contents/MacOS/"
 # data files
 cp -v setup_mac/Info.plist "${PRG}/Contents/"
 cp -rv data/res "${PRG}/Contents/"
+cp -v data/res/takin.icns "${PRG}/Contents/Resources/"
 # -----------------------------------------------------------------------------
 
 

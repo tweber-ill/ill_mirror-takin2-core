@@ -24,6 +24,7 @@ Debug/*
 Release/*
 build/*
 takin.app/*
+*.dmg
 .DS_*
 .clang/*
 .codelite/*
