@@ -161,7 +161,7 @@ ScatteringTriangle::ScatteringTriangle(ScatteringTriangleScene& scene)
 	m_scene.addItem(m_pNodeKfQ.get());
 	m_scene.addItem(m_pNodeGq.get());
 
-	setAcceptedMouseButtons(0);
+	setAcceptedMouseButtons(Qt::NoButton);
 	m_bReady = m_bUpdate = 1;
 }
 

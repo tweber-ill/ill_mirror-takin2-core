@@ -10,8 +10,13 @@ cmake_minimum_required(VERSION 3.0)
 
 option(DEBUG "debug build" FALSE)
 option(BUILD_FOR_MINGW "build a mingw version" FALSE)
+option(BUILD_FOR_MAC "build a mac version" FALSE)
 option(USE_PLUGINS "use the plugin system" TRUE)
 option(USE_STRIP "strip debug info from release binaries" TRUE)
+option(USE_GENTAB "build setup utilities" TRUE)
+option(USE_RtMp "use auxilliary libraries" TRUE)
+option(USE_Dl "use dl libraries" TRUE)
+option(USE_Py "search for python" TRUE)
 
 set(USE_TR1_FUNCS FALSE)
 
@@ -38,6 +43,7 @@ else()
 	set(Boost_DEBUG FALSE)
 	set(Boost_USE_DEBUG_LIBS FALSE)
 	set(Boost_USE_RELEASE_LIBS TRUE)
+	#set(Boost_USE_STATIC_LIBS TRUE)
 
 	add_definitions(-DNDEBUG -DQT_NO_DEBUG)
 	#add_definitions(-march=native -s)
@@ -53,17 +59,22 @@ add_definitions(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
 add_definitions("-DBUILD_APPLI")
 
 
+set(SOCK2 "")
+
 if(BUILD_FOR_MINGW)
 	# stuff needed by mingw
 	set(SOCK2 "ws2_32")
 	set(USE_GENTAB FALSE)
 	set(USE_RtMp FALSE)
-	set(SEARCH_PY FALSE)
-else()
-	set(SOCK2 "")
-	set(USE_GENTAB TRUE)
-	set(USE_RtMp TRUE)
-	set(SEARCH_PY TRUE)
+	set(USE_Dl FALSE)
+	set(USE_Py FALSE)
+endif()
+
+if(BUILD_FOR_MAC)
+	set(USE_GENTAB FALSE)
+	set(USE_RtMp FALSE)
+	set(USE_Dl FALSE)
+	set(USE_Py TRUE)
 endif()
 
 
@@ -87,7 +98,7 @@ if(USE_TR1_FUNCS)
 	list(APPEND BOOST_COMPS regex)
 endif()
 
-if(SEARCH_PY)
+if(USE_Py)
 	find_package(Python3 COMPONENTS Interpreter Development)
 endif()
 
@@ -132,7 +143,7 @@ else()
 	set(Mp_LIBRARIES "")
 endif()
 
-if(USE_PLUGINS AND NOT BUILD_FOR_MINGW)
+if(USE_PLUGINS AND USE_Dl AND NOT BUILD_FOR_MINGW)
 	find_package(Dl REQUIRED)
 else()
 	set(Dl_LIBRARIES "")

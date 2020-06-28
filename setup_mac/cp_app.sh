@@ -42,8 +42,8 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
-	"/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.7/Python"
 )
+
 
 
 # qt plugins
@@ -96,6 +96,11 @@ cp -v bin/convofit "${PRG}/Contents/MacOS/"
 cp -v bin/convoseries "${PRG}/Contents/MacOS/"
 cp -v bin/sfact "${PRG}/Contents/MacOS/"
 cp -v bin/polextract "${PRG}/Contents/MacOS/"
+
+
+# data files
+cp -v setup_mac/Info.plist "${PRG}/Contents/"
+cp -rv data/res "${PRG}/Contents/"
 # -----------------------------------------------------------------------------
 
 

@@ -19,7 +19,7 @@
 	<key>NSPrincipalClass</key>		<string>NSApplication</string>
 
 	<key>NSHumanReadableCopyright</key>
-		<string>Copyright (C) 2014-2019 by Tobias Weber (TUM, Garching, Germany and ILL, Grenoble, France). Copyleft: GPLv2.</string>
+		<string>Copyright (C) 2014-2020 by Tobias Weber (TUM, Garching, Germany and ILL, Grenoble, France). Copyleft: GPLv2.</string>
 
 	<key>CFBundleDocumentTypes</key>
 	<array>

@@ -121,9 +121,9 @@ ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	QObject::connect(btnParabola, &QToolButton::clicked, pThis, &ScanViewerDlg::FitParabola);
 	QObject::connect(btnSine, &QToolButton::clicked, pThis, &ScanViewerDlg::FitSine);
 #endif
-	QObject::connect(comboX, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::XAxisSelected);
-	QObject::connect(comboY, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::YAxisSelected);
-	QObject::connect(comboMon, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::MonAxisSelected);
+	QObject::connect(comboX, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::XAxisSelected);
+	QObject::connect(comboY, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::YAxisSelected);
+	QObject::connect(comboMon, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::MonAxisSelected);
 	QObject::connect(checkNorm, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), pThis, &ScanViewerDlg::NormaliseStateChanged);
 	//QObject::connect(checkLog, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), pThis, &ScanViewerDlg::LogStateChanged);
 	QObject::connect(spinStart, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), pThis, &ScanViewerDlg::StartOrSkipChanged);
@@ -363,9 +363,9 @@ void ScanViewerDlg::SelectDir()
 }
 
 
-void ScanViewerDlg::XAxisSelected(const QString& strLab) { PlotScan(); }
-void ScanViewerDlg::YAxisSelected(const QString& strLab) { PlotScan(); }
-void ScanViewerDlg::MonAxisSelected(const QString& strLab) { PlotScan(); }
+void ScanViewerDlg::XAxisSelected(int) { PlotScan(); }
+void ScanViewerDlg::YAxisSelected(int) { PlotScan(); }
+void ScanViewerDlg::MonAxisSelected(int) { PlotScan(); }
 void ScanViewerDlg::NormaliseStateChanged(int iState) { PlotScan(); }
 //void ScanViewerDlg::LogStateChanged(int iState) { PlotScan(); }
 void ScanViewerDlg::StartOrSkipChanged(int) { PlotScan(); }

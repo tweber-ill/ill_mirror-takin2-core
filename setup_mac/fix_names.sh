@@ -11,7 +11,7 @@ PRG="takin.app"
 
 TOOL=install_name_tool
 STRIP=strip
-QT_VER="5.12.0"
+QT_VER="5.15.0"
 
 
 # files whose linkage is to be changed

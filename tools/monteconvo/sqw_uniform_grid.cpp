@@ -57,17 +57,17 @@ SqwUniformGrid::SqwUniformGrid(const std::string& strDatFile) : m_strDataFile(st
 
 	m_indexBlockOffset = *_blockOffs.second.get();
 
-	m_hmin = _dims.second[0];
-	m_hmax = _dims.second[1];
-	m_hstep = _dims.second[2];
+	m_hmin = _dims.second.get()[0];
+	m_hmax = _dims.second.get()[1];
+	m_hstep = _dims.second.get()[2];
 
-	m_kmin = _dims.second[3];
-	m_kmax = _dims.second[4];
-	m_kstep = _dims.second[5];
+	m_kmin = _dims.second.get()[3];
+	m_kmax = _dims.second.get()[4];
+	m_kstep = _dims.second.get()[5];
 
-	m_lmin = _dims.second[6];
-	m_lmax = _dims.second[7];
-	m_lstep = _dims.second[8];
+	m_lmin = _dims.second.get()[6];
+	m_lmax = _dims.second.get()[7];
+	m_lstep = _dims.second.get()[8];
 
 	std::size_t numEntries =
 		std::size_t(((m_hmax-m_hmin) / m_hstep)) *

@@ -80,9 +80,9 @@ protected slots:
 	void DirWasModified(const QString&);
 	void SearchProps(const QString&);
 
-	void XAxisSelected(const QString&);
-	void YAxisSelected(const QString&);
-	void MonAxisSelected(const QString&);
+	void XAxisSelected(int);
+	void YAxisSelected(int);
+	void MonAxisSelected(int);
 	void NormaliseStateChanged(int iState);
 	//void LogStateChanged(int iState);
 	void StartOrSkipChanged(int);

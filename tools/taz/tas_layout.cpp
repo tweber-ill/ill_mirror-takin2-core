@@ -82,7 +82,7 @@ TasLayout::TasLayout(TasLayoutScene& scene) : m_scene(scene),
 	scene.addItem(m_pAna.get());
 	scene.addItem(m_pDet.get());
 
-	setAcceptedMouseButtons(0);
+	setAcceptedMouseButtons(Qt::NoButton);
 	m_bUpdate = m_bReady = 1;
 }
 

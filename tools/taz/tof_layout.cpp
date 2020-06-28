@@ -74,7 +74,7 @@ TofLayout::TofLayout(TofLayoutScene& scene) : m_scene(scene)
 	scene.addItem(m_pSample);
 	scene.addItem(m_pDet);
 
-	setAcceptedMouseButtons(0);
+	setAcceptedMouseButtons(Qt::NoButton);
 	m_bUpdate = m_bReady = 1;
 }
 

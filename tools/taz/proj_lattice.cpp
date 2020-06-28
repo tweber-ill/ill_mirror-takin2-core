@@ -76,7 +76,7 @@ ProjLattice::ProjLattice(ProjLatticeScene& scene)
 	: m_scene(scene)
 {
 	setFlag(QGraphicsItem::ItemIgnoresTransformations);
-	setAcceptedMouseButtons(0);
+	setAcceptedMouseButtons(Qt::NoButton);
 	m_bReady = 1;
 }
 
