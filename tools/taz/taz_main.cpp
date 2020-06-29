@@ -118,7 +118,10 @@ protected:
 protected:
 
 public:
-	TakAppl(int argc, char** argv) : QApplication(argc, argv) {}
+	// need a reference to argc, because the QApplication constructor
+	// would otherwise take the temporary stack variable
+	// see: https://doc.qt.io/qt-5/qapplication.html#QApplication
+	TakAppl(/*const*/ int& argc, /*const*/ char** argv) : QApplication(argc, argv) {}
 	virtual ~TakAppl() {}
 
 	void SetTakDlg(std::shared_ptr<TazDlg> pDlg) { m_pTakDlg = pDlg; }
