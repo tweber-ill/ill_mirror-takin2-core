@@ -26,10 +26,11 @@ For example, on *buntu systems, use the following commands:
 
 
 
-Set up other external dependencies:
-------------------------------
+Set up dependencies
+-------------------
 	* cd to Takin dir
-	* ./setup_externals.sh
+	* ./setup/setup_internals.sh
+	* ./setup/setup_externals.sh
 
 
 
@@ -37,8 +38,8 @@ Set up other external dependencies:
 
 
 
-Building Takin using the CMake path
------------------------------------
+Building Takin
+--------------
 
 
 Takin has to be compiled with a fully C++11 compliant compiler, e.g.:
