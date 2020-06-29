@@ -41,7 +41,7 @@ declare -a filestochange=(
 	"${PRG}/Contents/Frameworks/libtiff.5.dylib"
 	"${PRG}/Contents/Frameworks/libboost_iostreams-mt.dylib"
 	"${PRG}/Contents/Frameworks/libboost_filesystem-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_python37.dylib"
+	"${PRG}/Contents/Frameworks/libboost_python38.dylib"
 	"${PRG}/Contents/Frameworks/libboost_regex-mt.dylib"
 	"${PRG}/Contents/Frameworks/libboost_system-mt.dylib"
 	"${PRG}/Contents/Frameworks/libboost_program_options-mt.dylib"
@@ -50,6 +50,8 @@ declare -a filestochange=(
 	"${PRG}/Contents/MacOS/convoseries"
 	"${PRG}/Contents/MacOS/sfact"
 	"${PRG}/Contents/MacOS/polextract"
+	"${PRG}/Contents/MacOS/takinmod_py"
+	"${PRG}/Contents/MacOS/takinmod_jl"
 )
 
 
@@ -102,7 +104,7 @@ declare -a changefrom=(
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_regex-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
-	"/usr/local/opt/boost-python3/lib/libboost_python37.dylib"
+	"/usr/local/opt/boost-python3/lib/libboost_python38.dylib"
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
@@ -160,7 +162,7 @@ declare -a changeto=(
 	"@executable_path/../Frameworks/libboost_iostreams-mt.dylib"
 	"@executable_path/../Frameworks/libboost_regex-mt.dylib"
 	"@executable_path/../Frameworks/libboost_program_options-mt.dylib"
-	"@executable_path/../Frameworks/libboost_python37.dylib"
+	"@executable_path/../Frameworks/libboost_python38.dylib"
 	"@executable_path/../Frameworks/libfreetype.6.dylib"
 	"@executable_path/../Frameworks/libpng16.16.dylib"
 	"@executable_path/../Frameworks/libjpeg.9.dylib"
