@@ -71,6 +71,7 @@ if(BUILD_FOR_MINGW)
 endif()
 
 if(BUILD_FOR_MAC)
+	add_definitions(-mmacosx-version-min=10.10)
 	set(USE_GENTAB FALSE)
 	set(USE_RtMp FALSE)
 	set(USE_Dl FALSE)
