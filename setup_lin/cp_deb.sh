@@ -24,7 +24,8 @@ echo -e "Description: inelastic neutron scattering software" >> ${INSTDIR}/DEBIA
 echo -e "Maintainer: n/a" >> ${INSTDIR}/DEBIAN/control
 echo -e "Architecture: $(dpkg --print-architecture)" >> ${INSTDIR}/DEBIAN/control
 echo -e "Section: base\nPriority: optional" >> ${INSTDIR}/DEBIAN/control
-echo -e "Depends: libstdc++6, libboost-system1.65.1 (>=1.65.1), libboost-filesystem1.65.1 (>=1.65.1), libboost-iostreams1.65.1 (>=1.65.1), libboost-regex1.65.1 (>=1.65.1), libboost-program-options1.65.1 (>=1.65.1), libboost-python1.65.1 (>=1.65.1), libqt5core5a (>=5.9.5), libqt5gui5 (>=5.9.5), libqt5opengl5 (>=5.9.5), libqt5svg5 (>=5.9.5), libqt5xml5 (>=5.9.5), libqwt-qt5-6 (>=6.1.3), libpython3.6 (>=3.6.0), libfreetype6, python3.6 (>=3.6.0), gnuplot, gnuplot-qt\n" >> ${INSTDIR}/DEBIAN/control
+#echo -e "Depends: libstdc++6, libboost-system1.65.1 (>=1.65.1), libboost-filesystem1.65.1 (>=1.65.1), libboost-iostreams1.65.1 (>=1.65.1), libboost-regex1.65.1 (>=1.65.1), libboost-program-options1.65.1 (>=1.65.1), libboost-python1.65.1 (>=1.65.1), libqt5core5a (>=5.9.5), libqt5gui5 (>=5.9.5), libqt5opengl5 (>=5.9.5), libqt5svg5 (>=5.9.5), libqt5xml5 (>=5.9.5), libqwt-qt5-6 (>=6.1.3), libpython3.6 (>=3.6.0), libfreetype6, python3.6 (>=3.6.0), gnuplot, gnuplot-qt\n" >> ${INSTDIR}/DEBIAN/control
+echo -e "Depends: libstdc++6, libboost-system1.71.0 (>=1.71.0), libboost-filesystem1.71.0 (>=1.71.0), libboost-iostreams1.71.0 (>=1.71.0), libboost-regex1.71.0 (>=1.71.0), libboost-program-options1.71.0 (>=1.71.0), libboost-python1.71.0 (>=1.71.0), libqt5core5a (>=5.9.5), libqt5gui5 (>=5.9.5), libqt5opengl5 (>=5.9.5), libqt5svg5 (>=5.9.5), libqt5xml5 (>=5.9.5), libqwt-qt5-6 (>=6.1.3), libpython3.8 (>=3.8.0), libfreetype6, python3.8 (>=3.8.0), gnuplot, gnuplot-qt\n" >> ${INSTDIR}/DEBIAN/control
 
 
 # copy program files
@@ -32,13 +33,24 @@ cp -v bin/takin			${INSTDIR}/usr/local/bin
 cp -v bin/convofit		${INSTDIR}/usr/local/bin
 cp -v bin/convoseries		${INSTDIR}/usr/local/bin
 cp -v bin/sfact			${INSTDIR}/usr/local/bin
+cp -v bin/takinmod_py		${INSTDIR}/usr/local/bin
+cp -v bin/takinmod_jl		${INSTDIR}/usr/local/bin
+
 cp -rv res/*			${INSTDIR}/usr/local/share/takin/res/
+cp -rv doc/* 			${INSTDIR}/usr/local/share/takin/res/doc/
 cp -v COPYING			${INSTDIR}/usr/local/share/takin
 cp -v LICENSES			${INSTDIR}/usr/local/share/takin
 cp -v LITERATURE		${INSTDIR}/usr/local/share/takin
 cp -v AUTHORS			${INSTDIR}/usr/local/share/takin
-cp -v /usr/local/lib/libMinuit2.so* ${INSTDIR}/usr/local/lib
 cp -v takin.desktop		${INSTDIR}/usr/share/applications
+cp -v /usr/local/lib/libMinuit2.so ${INSTDIR}/usr/local/lib
+
+pushd ${INSTDIR}/usr/local/lib
+ln -sf libMinuit2.so libMinuit2.so.0
+ln -sf libMinuit2.so libMinuit2.so.0.0
+ln -sf libMinuit2.so libMinuit2.so.0.0.0
+popd
+
 
 # copy optional external programs
 cp -v bin/cif2xml		${INSTDIR}/usr/local/bin
