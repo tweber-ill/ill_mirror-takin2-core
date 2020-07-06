@@ -42,7 +42,7 @@ cp -v COPYING			${INSTDIR}/usr/local/share/takin
 cp -v LICENSES			${INSTDIR}/usr/local/share/takin
 cp -v LITERATURE		${INSTDIR}/usr/local/share/takin
 cp -v AUTHORS			${INSTDIR}/usr/local/share/takin
-cp -v takin.desktop		${INSTDIR}/usr/share/applications
+cp -v setup_lin/takin.desktop		${INSTDIR}/usr/share/applications
 cp -v /usr/local/lib/libMinuit2.so ${INSTDIR}/usr/local/lib
 
 pushd ${INSTDIR}/usr/local/lib
