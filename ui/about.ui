@@ -149,7 +149,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="labelDOI">
          <property name="text">
-          <string>DOI: &lt;a href=&quot;http://dx.doi.org/10.5281/zenodo.3961492&quot;&gt;10.5281/zenodo.3961492&lt;/a&gt;.</string>
+          <string>DOI: &lt;a href=&quot;http://dx.doi.org/10.5281/zenodo.3961491&quot;&gt;10.5281/zenodo.3961491&lt;/a&gt;.</string>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>
