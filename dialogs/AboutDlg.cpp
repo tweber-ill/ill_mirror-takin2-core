@@ -100,7 +100,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dt>Uses Boost version " << strBoost << ".</dt>";
 	ostrLibs << "<dd><a href=\"http://www.boost.org\">http://www.boost.org</a><br></dd>";
 
-	ostrLibs << "<dt>Uses TLibs version " << TLIBS_VERSION << ".</dt>";
+	ostrLibs << "<dt>Uses tlibs version " << TLIBS_VERSION << ".</dt>";
 #ifdef PRIVATE_SRC_VERSION
 	ostrLibs << "<dd><a href=\"https://github.com/t-weber/tlibs\">https://github.com/t-weber/tlibs</a><br></dd>";
 #else
