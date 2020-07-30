@@ -147,7 +147,7 @@ ResoResults calc_pop(const PopParams& pop)
 	if(!pop.bSampleCub) dMult = 1./16.;
 	t_real dSiSample[] =
 	{
-		dMult * pop.sample_w_perpq *pop.sample_w_perpq /cm/cm,
+		dMult * pop.sample_w_perpq*pop.sample_w_perpq /cm/cm,
 		dMult * pop.sample_w_q*pop.sample_w_q /cm/cm,
 		t_real(1./12.) * pop.sample_h*pop.sample_h /cm/cm
 	};

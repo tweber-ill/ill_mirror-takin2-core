@@ -24,4 +24,5 @@ fi
 
 arg=$1
 LD_LIBRARY_PATH=./lib:${TAKINDIR}/lib:/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH \
-	${TAKINDIR}/bin/takin ${arg}
+	${TAKINBIN} ${arg}
+
