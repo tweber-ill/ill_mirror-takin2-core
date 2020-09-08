@@ -16,6 +16,7 @@
 #include "libs/version.h"
 #include "libs/globals.h"
 
+#include "tlibs/log/debug.h"
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
 
@@ -38,14 +39,13 @@ static inline void get_prog_option(opts::variables_map& map, const char* pcKey, 
 }
 
 
-
 int convofit_main(int argc, char** argv)
 {
 	try
 	{
 		tl::log_info("--------------------------------------------------------------------------------");
-		tl::log_info("This is the Takin command-line convolution fitter, version " TAKIN_VER ".");
-		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2019.");
+		tl::log_info("This is the Takin command-line convolution fitter (convofit), version " TAKIN_VER ".");
+		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2020.");
 		tl::log_info(TAKIN_LICENSE("Takin/Convofit"));
 		tl::log_debug("Resolution calculation uses ", sizeof(t_real_reso)*8, " bit ", tl::get_typename<t_real_reso>(), "s.");
 		tl::log_debug("Fitting uses ", sizeof(tl::t_real_min)*8, " bit ", tl::get_typename<tl::t_real_min>(), "s.");

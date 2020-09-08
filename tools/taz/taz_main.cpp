@@ -15,6 +15,7 @@
 #include "dialogs/NetCacheDlg.h"
 
 #include "tools/monteconvo/ConvoDlg.h"
+#include "tools/monteconvo/monteconvo_main.h"
 #include "tools/convofit/convofit_main.h"
 #include "tools/scanviewer/scanviewer.h"
 
@@ -210,8 +211,9 @@ int main(int argc, char** argv)
 		std::vector<std::string> vecTazFiles;
 		bool bShowHelp = 0;
 		bool bStartTakinMain = 1;
-		bool bStartMonteconvo = 0;
 		bool bStartScanviewer = 0;
+		bool bStartMonteconvo = 0;
+		bool bStartMonteconvoCLI = 0;
 		bool bStartConvofit = 0;
 
 		opts::options_description args("Takin options");
@@ -224,17 +226,21 @@ int main(int argc, char** argv)
 			opts::bool_switch(&bShowHelp),
 			"shows the program options")));
 		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("monteconvo",
-			opts::bool_switch(&bStartMonteconvo),
-			"directly starts the monteconvo tool")));
-		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("scanviewer",
 			opts::bool_switch(&bStartScanviewer),
-			"directly starts the scanviewer tool")));
+			"directly runs the scanviewer tool")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("monteconvo",
+			opts::bool_switch(&bStartMonteconvo),
+			"directly runs the monteconvo tool")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("monteconvo-cli",
+			opts::bool_switch(&bStartMonteconvoCLI),
+			"runs the monteconvo command-line tool")));
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("convofit",
 			opts::bool_switch(&bStartConvofit),
-			"directly starts the convofit tool")));
+			"runs the convofit command-line tool")));
 
 		// positional args
 		opts::positional_options_description args_pos;
@@ -333,10 +339,11 @@ int main(int argc, char** argv)
 		app->addLibraryPath((g_strApp + "/lib/plugins").c_str());
 
 
-		if(bStartConvofit)
-		{
+		// run command-line tools
+		if(bStartMonteconvoCLI)
+			return monteconvo_main(argc, argv);
+		else if(bStartConvofit)
 			return convofit_main(argc, argv);
-		}
 
 
 		// ------------------------------------------------------------

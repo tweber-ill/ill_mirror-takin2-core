@@ -16,6 +16,6 @@ using t_real = t_real_reso;
  */
 void ConvoDlg::StartFit()
 {
-	QMessageBox::information(this, "Info", "Fitting is not yet supported in this GUI program.\n"
-		"Please use \"File\" -> \"Export to Convofit...\" and run the \"convofit\" command-line tool instead.");
+	QMessageBox::information(this, "Info", "Fitting is not yet supported in the GUI.\n"
+		"Please use \"File\" -> \"Export to Convofit...\" and run \"takin --convofit\" in the command line instead.");
 }
