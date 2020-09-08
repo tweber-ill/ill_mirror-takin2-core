@@ -19,6 +19,7 @@ option(USE_Dl "use dl libraries" TRUE)
 option(USE_Py "search for python" TRUE)
 
 set(USE_TR1_FUNCS FALSE)
+set(BUILD_EXT_TOOLS FALSE)
 
 
 if(DEBUG)
@@ -32,8 +33,8 @@ if(DEBUG)
 	set(Boost_USE_RELEASE_LIBS FALSE)
 
 	add_definitions(-DDEBUG)
-	add_definitions(-ggdb)
-	add_definitions(-Wall -Wpedantic -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter)
+	add_compile_options(-ggdb -rdynamic)
+	add_compile_options(-Wall -Wpedantic -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter)
 else()
 	message("Doing a RELEASE build.")
 
@@ -46,14 +47,14 @@ else()
 	#set(Boost_USE_STATIC_LIBS TRUE)
 
 	add_definitions(-DNDEBUG -DQT_NO_DEBUG)
-	#add_definitions(-march=native -s)
+	#add_compile_options(-march=native -s)
 endif()
 
 
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_CXX_STANDARD 11)
-add_definitions(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
-#add_definitions(-fPIC)
+add_compile_options(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
+#add_compile_options(-fPIC)
 
 # for application plugins
 add_definitions("-DBUILD_APPLI")
@@ -71,7 +72,7 @@ if(BUILD_FOR_MINGW)
 endif()
 
 if(BUILD_FOR_MAC)
-	add_definitions(-mmacosx-version-min=10.10)
+	add_compile_options(-mmacosx-version-min=10.10)
 	set(USE_GENTAB FALSE)
 	set(USE_RtMp FALSE)
 	set(USE_Dl FALSE)
@@ -364,12 +365,14 @@ add_executable(takin
 
 	tools/monteconvo/ConvoDlg.cpp tools/monteconvo/ConvoDlg_file.cpp
 	tools/monteconvo/ConvoDlg_sim.cpp tools/monteconvo/ConvoDlg_fit.cpp
-	tools/convofit/convofit_import.cpp
 	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
 	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
 
-	tools/convofit/scan.cpp
+	tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
+	tools/convofit/model.cpp tools/convofit/scan.cpp
+	tools/convofit/convofit_main.cpp
+
 	tools/scanviewer/scanviewer.cpp tools/scanviewer/FitParamDlg.cpp
 	tools/scanpos/ScanPosDlg.cpp
 	tools/powderfit/PowderFitDlg.cpp
@@ -501,72 +504,73 @@ endif()
 
 
 
-if(Minuit2_FOUND)
-# -----------------------------------------------------------------------------
-# convofit, convoseries
-# -----------------------------------------------------------------------------
-add_executable(convofit
-	tools/res/r0.cpp
-	tools/res/cn.cpp tools/res/pop.cpp tools/res/eck.cpp tools/res/viol.cpp
-	#tools/res/simple.cpp
+if(BUILD_EXT_TOOLS AND Minuit2_FOUND)
+	add_definitions(-DCONVOFIT_STANDALONE)
 
-	tools/monteconvo/TASReso.cpp
-	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
-	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
+	# -----------------------------------------------------------------------------
+	# convofit, convoseries
+	# -----------------------------------------------------------------------------
+	add_executable(convofit
+		tools/res/r0.cpp
+		tools/res/cn.cpp tools/res/pop.cpp tools/res/eck.cpp tools/res/viol.cpp
+		#tools/res/simple.cpp
 
-	tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
-	tools/convofit/model.cpp tools/convofit/scan.cpp
-	tools/convofit/convofit_main.cpp
+		tools/monteconvo/TASReso.cpp
+		tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
+		tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
+
+		tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
+		tools/convofit/model.cpp tools/convofit/scan.cpp
+		tools/convofit/convofit_main.cpp
 
 
-	# statically link tlibs externals
-	tlibs/log/log.cpp
-	tlibs/math/rand.cpp
-	tlibs/file/tmp.cpp
-	#tlibs/file/loadinstr.cpp
-	libs/globals.cpp
-)
-
-set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
-
-target_link_libraries(convofit
-	${LIBS_FIT} ${SOCK2}
-	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
-	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
-	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
-)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
-	add_custom_command(TARGET convofit POST_BUILD
-		COMMAND strip -v $<TARGET_FILE:convofit>
-		MAIN_DEPENDENCY convofit
+		# statically link tlibs externals
+		tlibs/log/log.cpp
+		tlibs/math/rand.cpp
+		tlibs/file/tmp.cpp
+		#tlibs/file/loadinstr.cpp
+		libs/globals.cpp
 	)
-endif()
 
-# -----------------------------------------------------------------------------
+	set_target_properties(convofit PROPERTIES COMPILE_FLAGS "-DNO_QT")
 
-add_executable(convoseries
-	tools/convofit/scanseries.cpp
-
-	# statically link tlibs externals
-	tlibs/log/log.cpp
-)
-
-set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
-
-target_link_libraries(convoseries
-	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
-	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
-)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
-	add_custom_command(TARGET convoseries POST_BUILD
-		COMMAND strip -v $<TARGET_FILE:convoseries>
-		MAIN_DEPENDENCY convoseries
+	target_link_libraries(convofit
+		${LIBS_FIT} ${SOCK2}
+		Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
+		Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
+		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	)
-endif()
-# -----------------------------------------------------------------------------
 
+	if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
+		add_custom_command(TARGET convofit POST_BUILD
+			COMMAND strip -v $<TARGET_FILE:convofit>
+			MAIN_DEPENDENCY convofit
+		)
+	endif()
+
+	# -----------------------------------------------------------------------------
+
+	add_executable(convoseries
+		tools/convofit/scanseries.cpp
+
+		# statically link tlibs externals
+		tlibs/log/log.cpp
+	)
+
+	set_target_properties(convoseries PROPERTIES COMPILE_FLAGS "-DNO_QT")
+
+	target_link_libraries(convoseries
+		Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
+		${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
+	)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
+		add_custom_command(TARGET convoseries POST_BUILD
+			COMMAND strip -v $<TARGET_FILE:convoseries>
+			MAIN_DEPENDENCY convoseries
+	)
+	endif()
+	# -----------------------------------------------------------------------------
 endif()
 
 
@@ -576,10 +580,6 @@ endif()
 # install
 # -----------------------------------------------------------------------------
 install(TARGETS takin DESTINATION bin COMPONENT apptakin)
-
-if(Minuit2_FOUND)
-	install(TARGETS convofit convoseries DESTINATION bin COMPONENT appconvofit)
-endif()
 
 if(USE_PLUGINS)
 	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
@@ -593,6 +593,7 @@ if(Julia_FOUND)
 	install(TARGETS takinmod_jl DESTINATION bin COMPONENT apptakinmod_jl)
 endif()
 
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc
 	DESTINATION share/takin COMPONENT takindata1)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons
@@ -604,6 +605,11 @@ install(FILES ${PROJECT_SOURCE_DIR}/takin.sh
 	PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_READ GROUP_READ WORLD_READ
 	DESTINATION bin COMPONENT takinstarter)
 install(FILES ${PROJECT_SOURCE_DIR}/setup_lin/takin.desktop DESTINATION share/applications COMPONENT takindesk)
+
+
+if(BUILD_EXT_TOOLS AND Minuit2_FOUND)
+	install(TARGETS convofit convoseries DESTINATION bin COMPONENT appconvofit)
+endif()
 # -----------------------------------------------------------------------------
 
 

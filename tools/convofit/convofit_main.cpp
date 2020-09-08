@@ -11,10 +11,14 @@
 #include <boost/program_options.hpp>
 
 #include "convofit.h"
+#include "../monteconvo/sqwfactory.h"
+
 #include "libs/version.h"
 #include "libs/globals.h"
+
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
+
 
 namespace asio = boost::asio;
 namespace sys = boost::system;
@@ -34,53 +38,21 @@ static inline void get_prog_option(opts::variables_map& map, const char* pcKey, 
 }
 
 
-int main(int argc, char** argv)
+
+int convofit_main(int argc, char** argv)
 {
 	try
 	{
-		std::ios_base::sync_with_stdio(0);
-
-	#ifdef NO_TERM_CMDS
-		tl::Log::SetUseTermCmds(0);
-	#endif
-
-		// plain C locale
-		/*std::*/setlocale(LC_ALL, "C");
-		std::locale::global(std::locale::classic());
-
-
-		// --------------------------------------------------------------------
-		// install exit signal handlers
-		asio::io_service ioSrv;
-		asio::signal_set sigInt(ioSrv, SIGABRT, SIGTERM, SIGINT);
-		sigInt.async_wait([&ioSrv](const sys::error_code& err, int iSig)
-		{
-			tl::log_warn("Hard exit requested via signal ", iSig, ". This may cause a fault.");
-			if(err) tl::log_err("Error: ", err.message(), ", error category: ", err.category().name(), ".");
-			ioSrv.stop();
-	#ifdef SIGKILL
-			// TODO: use specific PIDs
-			//std::system("killall -s KILL gnuplot");
-			std::raise(SIGKILL);
-	#endif
-			exit(-1);
-		});
-		std::thread thSig([&ioSrv]() { ioSrv.run(); });
-		BOOST_SCOPE_EXIT(&ioSrv, &thSig)
-		{
-			//tl::log_debug("Exiting...");
-			ioSrv.stop();
-			thSig.join();
-		}
-		BOOST_SCOPE_EXIT_END
-		// --------------------------------------------------------------------
-
-
+		tl::log_info("--------------------------------------------------------------------------------");
 		tl::log_info("This is the Takin command-line convolution fitter, version " TAKIN_VER ".");
 		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2019.");
 		tl::log_info(TAKIN_LICENSE("Takin/Convofit"));
 		tl::log_debug("Resolution calculation uses ", sizeof(t_real_reso)*8, " bit ", tl::get_typename<t_real_reso>(), "s.");
 		tl::log_debug("Fitting uses ", sizeof(tl::t_real_min)*8, " bit ", tl::get_typename<tl::t_real_min>(), "s.");
+		tl::log_info("--------------------------------------------------------------------------------");
+
+
+		load_sqw_plugins();
 
 
 		// --------------------------------------------------------------------
@@ -134,6 +106,14 @@ int main(int argc, char** argv)
 			opts::value<decltype(g_iMaxThreads)>(&g_iMaxThreads),
 			"maximum number of threads")));
 
+		// dummy arg if launched from takin executable
+#ifndef CONVOFIT_STANDALONE
+		bool bStartConvofit = 1;
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("convofit",
+			opts::bool_switch(&bStartConvofit),
+			"launch convofit from takin")));
+#endif
 
 		// positional args
 		opts::positional_options_description args_pos;
@@ -157,10 +137,18 @@ int main(int argc, char** argv)
 				log->SetShowThread(1);
 		}
 
-		if(argc <= 1)
+#ifdef CONVOFIT_STANDALONE
+		if(argc <= 1)	// started with "convofit"
+#else
+		if(argc <= 2)	// started with "takin --convofit"
+#endif
 		{
 			std::ostringstream ostrHelp;
+#ifdef CONVOFIT_STANDALONE
 			ostrHelp << "Usage: " << argv[0] << " [options] <job-file 1> <job-file 2> ...\n";
+#else
+			ostrHelp << "Usage: " << argv[0] << " " << argv[1] << " [options] <job-file 1> <job-file 2> ...\n";
+#endif
 			ostrHelp << args;
 			tl::log_info(ostrHelp.str());
 			return -1;
@@ -217,3 +205,51 @@ int main(int argc, char** argv)
 	return 0;
 }
 // ----------------------------------------------------------------------------
+
+
+
+
+#ifdef CONVOFIT_STANDALONE
+int main(int argc, char** argv)
+{
+	std::ios_base::sync_with_stdio(0);
+
+#ifdef NO_TERM_CMDS
+	tl::Log::SetUseTermCmds(0);
+#endif
+
+	// plain C locale
+	/*std::*/setlocale(LC_ALL, "C");
+	std::locale::global(std::locale::classic());
+
+
+	// --------------------------------------------------------------------
+	// install exit signal handlers
+	asio::io_service ioSrv;
+	asio::signal_set sigInt(ioSrv, SIGABRT, SIGTERM, SIGINT);
+	sigInt.async_wait([&ioSrv](const sys::error_code& err, int iSig)
+	{
+		tl::log_warn("Hard exit requested via signal ", iSig, ". This may cause a fault.");
+		if(err) tl::log_err("Error: ", err.message(), ", error category: ", err.category().name(), ".");
+		ioSrv.stop();
+#ifdef SIGKILL
+		// TODO: use specific PIDs
+		//std::system("killall -s KILL gnuplot");
+		std::raise(SIGKILL);
+#endif
+		exit(-1);
+	});
+	std::thread thSig([&ioSrv]() { ioSrv.run(); });
+	BOOST_SCOPE_EXIT(&ioSrv, &thSig)
+	{
+		//tl::log_debug("Exiting...");
+		ioSrv.stop();
+		thSig.join();
+	}
+	BOOST_SCOPE_EXIT_END
+	// --------------------------------------------------------------------
+
+
+	return convofit_main(argc, argc);
+}
+#endif

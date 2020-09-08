@@ -15,6 +15,7 @@
 #include "dialogs/NetCacheDlg.h"
 
 #include "tools/monteconvo/ConvoDlg.h"
+#include "tools/convofit/convofit_main.h"
 #include "tools/scanviewer/scanviewer.h"
 
 #include "tlibs/version.h"
@@ -163,6 +164,7 @@ int main(int argc, char** argv)
 		pid_t pidMain = getpid();
 		std::ios_base::sync_with_stdio(0);
 
+
 #ifdef NO_TERM_CMDS
 		tl::Log::SetUseTermCmds(0);
 #endif
@@ -195,6 +197,7 @@ int main(int argc, char** argv)
 			thSig.join();
 		}
 		BOOST_SCOPE_EXIT_END
+		// --------------------------------------------------------------------
 
 
 		// only for non-standalone minuit
@@ -209,6 +212,7 @@ int main(int argc, char** argv)
 		bool bStartTakinMain = 1;
 		bool bStartMonteconvo = 0;
 		bool bStartScanviewer = 0;
+		bool bStartConvofit = 0;
 
 		opts::options_description args("Takin options");
 		args.add(boost::shared_ptr<opts::option_description>(
@@ -227,6 +231,10 @@ int main(int argc, char** argv)
 			new opts::option_description("scanviewer",
 			opts::bool_switch(&bStartScanviewer),
 			"directly starts the scanviewer tool")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("convofit",
+			opts::bool_switch(&bStartConvofit),
+			"directly starts the convofit tool")));
 
 		// positional args
 		opts::positional_options_description args_pos;
@@ -283,6 +291,7 @@ int main(int argc, char** argv)
 
 		std::unique_ptr<TakAppl> app(new TakAppl(argc, argv));
 
+		// locale
 		std::setlocale(LC_ALL, "C");
 		std::locale::global(std::locale::classic());
 		QLocale::setDefault(QLocale::English);
@@ -322,6 +331,12 @@ int main(int argc, char** argv)
 
 		app->addLibraryPath((g_strApp + "/../lib/plugins").c_str());
 		app->addLibraryPath((g_strApp + "/lib/plugins").c_str());
+
+
+		if(bStartConvofit)
+		{
+			return convofit_main(argc, argv);
+		}
 
 
 		// ------------------------------------------------------------
@@ -511,7 +526,6 @@ int main(int argc, char** argv)
 
 			pScanViewerDlg->show();
 		}
-
 
 		int iRet = app->exec();
 
