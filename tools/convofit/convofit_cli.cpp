@@ -11,6 +11,7 @@
 #include <boost/program_options.hpp>
 
 #include "convofit.h"
+#include "convofit_cli.h"
 #include "../monteconvo/sqwfactory.h"
 
 #include "libs/version.h"

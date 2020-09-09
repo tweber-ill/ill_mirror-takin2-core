@@ -368,11 +368,11 @@ add_executable(takin
 	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
 	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
-	tools/monteconvo/monteconvo_main.cpp
+	tools/monteconvo/monteconvo_cli.cpp
 
 	tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
 	tools/convofit/model.cpp tools/convofit/scan.cpp
-	tools/convofit/convofit_main.cpp
+	tools/convofit/convofit_cli.cpp
 
 	tools/scanviewer/scanviewer.cpp tools/scanviewer/FitParamDlg.cpp
 	tools/scanpos/ScanPosDlg.cpp
@@ -522,7 +522,7 @@ if(BUILD_EXT_TOOLS AND Minuit2_FOUND)
 
 		tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp
 		tools/convofit/model.cpp tools/convofit/scan.cpp
-		tools/convofit/convofit_main.cpp
+		tools/convofit/convofit_cli.cpp
 
 
 		# statically link tlibs externals

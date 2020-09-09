@@ -15,8 +15,8 @@
 #include "dialogs/NetCacheDlg.h"
 
 #include "tools/monteconvo/ConvoDlg.h"
-#include "tools/monteconvo/monteconvo_main.h"
-#include "tools/convofit/convofit_main.h"
+#include "tools/monteconvo/monteconvo_cli.h"
+#include "tools/convofit/convofit_cli.h"
 #include "tools/scanviewer/scanviewer.h"
 
 #include "tlibs/version.h"

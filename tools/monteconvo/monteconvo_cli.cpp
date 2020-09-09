@@ -10,6 +10,7 @@
 #include <boost/scope_exit.hpp>
 #include <boost/program_options.hpp>
 
+#include "monteconvo_cli.h"
 #include "sqwfactory.h"
 
 #include "libs/version.h"
