@@ -6,70 +6,17 @@
  */
 
 #include "ConvoDlg.h"
+#include "libs/version.h"
+
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
 #include "tlibs/math/stat.h"
-#include "libs/version.h"
 
 
 using t_real = t_real_reso;
 using t_stopwatch = tl::Stopwatch<t_real>;
 
-static constexpr const t_real g_dEpsRlu = 1e-3;
-
-
-/**
- * determine the x axis of the scan
- */
-std::tuple<bool, int, std::string, std::vector<std::vector<t_real>>> ConvoDlg::GetScanAxis(bool bIncludeE)
-{
-	const unsigned int iNumSteps = spinStepCnt->value();
-
-	std::vector<t_real> vecH = tl::linspace<t_real,t_real>(
-		spinStartH->value(), spinStopH->value(), iNumSteps);
-	std::vector<t_real> vecK = tl::linspace<t_real,t_real>(
-		spinStartK->value(), spinStopK->value(), iNumSteps);
-	std::vector<t_real> vecL = tl::linspace<t_real,t_real>(
-		spinStartL->value(), spinStopL->value(), iNumSteps);
-	std::vector<t_real> vecE = tl::linspace<t_real,t_real>(
-		spinStartE->value(), spinStopE->value(), iNumSteps);
-
-	std::vector<std::vector<t_real>> vecScanAxes{{ std::move(vecH), std::move(vecK), std::move(vecL) }};
-	if(bIncludeE)
-		vecScanAxes.emplace_back(std::move(vecE));
-
-	const int iScanAxis = comboAxis->currentIndex();
-	int iScanAxisIdx = 0;
-
-	std::string strScanVar = "";
-	// either scan axis is directly selected OR (automatic is set AND the start/stop values are different)
-	if(iScanAxis==1 || (iScanAxis==0 && !tl::float_equal(spinStartH->value(), spinStopH->value(), g_dEpsRlu)))
-	{
-		strScanVar = "h (rlu)";
-		iScanAxisIdx = 0;
-	}
-	else if(iScanAxis==2 || (iScanAxis==0 && !tl::float_equal(spinStartK->value(), spinStopK->value(), g_dEpsRlu)))
-	{
-		strScanVar = "k (rlu)";
-		iScanAxisIdx = 1;
-	}
-	else if(iScanAxis==3 || (iScanAxis==0 && !tl::float_equal(spinStartL->value(), spinStopL->value(), g_dEpsRlu)))
-	{
-		strScanVar = "l (rlu)";
-		iScanAxisIdx = 2;
-	}
-	else if(bIncludeE && (iScanAxis==4 || (iScanAxis==0 && !tl::float_equal(spinStartE->value(), spinStopE->value(), g_dEpsRlu))))
-	{
-		strScanVar = "E (meV)";
-		iScanAxisIdx = 3;
-	}
-	else
-	{
-		return std::make_tuple(false, iScanAxisIdx, strScanVar, vecScanAxes);
-	}
-
-	return std::make_tuple(true, iScanAxisIdx, strScanVar, vecScanAxes);
-}
+static constexpr const t_real g_dEpsRlu = EPS_RLU;
 
 
 /**
@@ -132,7 +79,10 @@ void ConvoDlg::Start1D()
 		int iScanAxisIdx = 0;
 		std::string strScanVar = "";
 		std::vector<std::vector<t_real>> vecAxes;
-		std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = GetScanAxis(true);
+		std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = get_scan_axis<t_real>(
+			true, comboAxis->currentIndex(), spinStepCnt->value(), g_dEpsRlu,
+			spinStartH->value(), spinStopH->value(), spinStartK->value(), spinStopK->value(),
+			spinStartL->value(), spinStopL->value(), spinStartE->value(), spinStopE->value());
 		if(!bScanAxisFound)
 		{
 			//QMessageBox::critical(this, "Error", "No scan variable found.");
@@ -225,6 +175,7 @@ void ConvoDlg::Start1D()
 		ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
 		ostrOut << "# Scale: " << dScale << "\n";
+		ostrOut << "# Slope: " << dSlope << "\n";
 		ostrOut << "# Offset: " << dOffs << "\n";
 		if(m_strLastFile != "")
 			ostrOut << "# File: " << m_strLastFile << "\n";
@@ -519,6 +470,7 @@ void ConvoDlg::Start1D()
 		m_pth = new std::thread(std::move(fkt));
 	}
 }
+
 
 
 /**
@@ -926,6 +878,7 @@ void ConvoDlg::Start2D()
 }
 
 
+
 /**
  * start dispersion plot
  */
@@ -979,7 +932,10 @@ void ConvoDlg::StartDisp()
 		int iScanAxisIdx = 0;
 		std::string strScanVar = "";
 		std::vector<std::vector<t_real>> vecAxes;
-		std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = GetScanAxis(false);
+		std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = get_scan_axis<t_real>(
+			false, comboAxis->currentIndex(), spinStepCnt->value(), g_dEpsRlu,
+			spinStartH->value(), spinStopH->value(), spinStartK->value(), spinStopK->value(),
+			spinStartL->value(), spinStopL->value(), spinStartE->value(), spinStopE->value());
 		if(!bScanAxisFound)
 		{
 			//QMessageBox::critical(this, "Error", "No scan variable found.");

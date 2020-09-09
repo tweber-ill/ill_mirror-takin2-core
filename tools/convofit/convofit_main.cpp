@@ -31,18 +31,11 @@ using t_real = t_real_reso;
 // ----------------------------------------------------------------------------
 // main program
 
-template<class T>
-static inline void get_prog_option(opts::variables_map& map, const char* pcKey, T& var)
-{
-	if(map.count(pcKey))
-		var = map[pcKey].as<T>();
-}
-
-
 int convofit_main(int argc, char** argv)
 {
 	try
 	{
+#ifdef MONTECONVO_STANDALONE	// only show copyright banner if not already displayed from Takin main program
 		tl::log_info("--------------------------------------------------------------------------------");
 		tl::log_info("This is the Takin command-line convolution fitter (convofit), version " TAKIN_VER ".");
 		tl::log_info("Written by Tobias Weber <tweber@ill.fr>, 2014 - 2020.");
@@ -50,7 +43,7 @@ int convofit_main(int argc, char** argv)
 		tl::log_debug("Resolution calculation uses ", sizeof(t_real_reso)*8, " bit ", tl::get_typename<t_real_reso>(), "s.");
 		tl::log_debug("Fitting uses ", sizeof(tl::t_real_min)*8, " bit ", tl::get_typename<tl::t_real_min>(), "s.");
 		tl::log_info("--------------------------------------------------------------------------------");
-
+#endif
 
 		load_sqw_plugins();
 
@@ -108,10 +101,10 @@ int convofit_main(int argc, char** argv)
 
 		// dummy arg if launched from takin executable
 #ifndef CONVOFIT_STANDALONE
-		bool bStartConvofit = 1;
+		bool bStartedFromTakin = 0;
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("convofit",
-			opts::bool_switch(&bStartConvofit),
+			opts::bool_switch(&bStartedFromTakin),
 			"launch convofit from takin")));
 #endif
 
@@ -128,8 +121,6 @@ int convofit_main(int argc, char** argv)
 		opts::store(parsedopts, opts_map);
 		opts::notify(opts_map);
 
-		//get_prog_option<decltype(vecJobs)>(opts_map, "job-file", vecJobs);
-
 
 		if(vecJobs.size() >= 2)
 		{
@@ -137,18 +128,17 @@ int convofit_main(int argc, char** argv)
 				log->SetShowThread(1);
 		}
 
-#ifdef CONVOFIT_STANDALONE
-		if(argc <= 1)	// started with "convofit"
-#else
-		if(argc <= 2)	// started with "takin --convofit"
-#endif
+
+		int args_to_ignore = 1;	// started with "convofit"
+		if(bStartedFromTakin)
+			++args_to_ignore;	// started with "takin --convofit"
+		if(argc <= args_to_ignore)
 		{
 			std::ostringstream ostrHelp;
-#ifdef CONVOFIT_STANDALONE
-			ostrHelp << "Usage: " << argv[0] << " [options] <job-file 1> <job-file 2> ...\n";
-#else
-			ostrHelp << "Usage: " << argv[0] << " " << argv[1] << " [options] <job-file 1> <job-file 2> ...\n";
-#endif
+			ostrHelp << "Usage: ";
+			for(int argidx=0; argidx<args_to_ignore; ++argidx)
+				ostrHelp << argv[argidx] << " ";
+			ostrHelp << "[options] <job-file 1> <job-file 2> ...\n";
 			ostrHelp << args;
 			tl::log_info(ostrHelp.str());
 			return -1;

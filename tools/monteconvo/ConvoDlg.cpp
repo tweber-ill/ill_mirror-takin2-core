@@ -26,6 +26,7 @@
 using t_real = t_real_reso;
 const std::string ConvoDlg::s_strTitle = "Resolution Convolution";
 
+
 ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	: QDialog(pParent, Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowMinMaxButtonsHint),
 		m_pSett(pSett)
@@ -642,7 +643,10 @@ void ConvoDlg::scaleChanged()
 	int iScanAxisIdx = 0;
 	std::string strScanVar = "";
 	std::vector<std::vector<t_real>> vecAxes;
-	std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = GetScanAxis(true);
+	std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = get_scan_axis<t_real>(
+		true, comboAxis->currentIndex(), spinStepCnt->value(), EPS_RLU,
+		spinStartH->value(), spinStopH->value(), spinStartK->value(), spinStopK->value(),
+		spinStartL->value(), spinStopL->value(), spinStartE->value(), spinStopE->value());
 	if(!bScanAxisFound)
 	{
 		tl::log_err("No scan variable found.");

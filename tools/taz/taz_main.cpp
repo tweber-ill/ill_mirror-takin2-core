@@ -276,7 +276,7 @@ int main(int argc, char** argv)
 
 		tl::log_info("--------------------------------------------------------------------------------");
 		tl::log_info("This is Takin version " TAKIN_VER ".");
-		tl::log_info("Authored by Tobias Weber <tweber@ill.fr>, 2014 - 2020.");
+		tl::log_info("Author: Tobias Weber <tweber@ill.fr>, 2014 - 2020.");
 		tl::log_info("Licensed under GPLv2, see the about dialog.");
 		tl::log_info("--------------------------------------------------------------------------------");
 
