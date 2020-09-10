@@ -101,8 +101,8 @@ int convofit_main(int argc, char** argv)
 			"maximum number of threads")));
 
 		// dummy arg if launched from takin executable
-#ifndef CONVOFIT_STANDALONE
 		bool bStartedFromTakin = 0;
+#ifndef CONVOFIT_STANDALONE
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("convofit",
 			opts::bool_switch(&bStartedFromTakin),
@@ -130,7 +130,7 @@ int convofit_main(int argc, char** argv)
 		}
 
 
-		int args_to_ignore = 1;	// started with "convofit"
+		int args_to_ignore = 1;		// started with "convofit"
 		if(bStartedFromTakin)
 			++args_to_ignore;	// started with "takin --convofit"
 		if(argc <= args_to_ignore)
@@ -167,7 +167,6 @@ int convofit_main(int argc, char** argv)
 
 				Convofit convo;
 				return convo.run_job(strJob);
-				//if(argc > 2) tl::log_info("================================================================================");
 			});
 		}
 
@@ -241,6 +240,6 @@ int main(int argc, char** argv)
 	// --------------------------------------------------------------------
 
 
-	return convofit_main(argc, argc);
+	return convofit_main(argc, argv);
 }
 #endif
