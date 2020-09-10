@@ -451,8 +451,16 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 			ofstrAutosave << ostrOut.str() << std::endl;
 		}
 
+
+		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(iNumSteps));
+		std::cout << "\rStep " << iStep+1 << "/" << iNumSteps << ". Estimated stop time: " << strStopTime << "...          ";
+		if(iStep+1 == iNumSteps)
+			std::cout << "\n";
+		std::cout.flush();
+
 		++iStep;
 	}
+	tl::log_info("Convolution simulation finished.");
 
 
 	// approximate chi^2
@@ -799,8 +807,15 @@ static bool start_convo_2d(const ConvoConfig& cfg)
 			ofstrAutosave << ostrOut.str() << std::endl;
 		}
 
+		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(iNumSteps*iNumSteps));
+		std::cout << "\rStep " << iStep+1 << "/" << iNumSteps << ". Estimated stop time: " << strStopTime << "...          ";
+		if(iStep+1 == iNumSteps*iNumSteps)
+			std::cout << "\n";
+		std::cout.flush();
+
 		++iStep;
 	}
+	tl::log_info("Convolution simulation finished.");
 
 	// output elapsed time
 	watch.stop();
@@ -850,8 +865,8 @@ int monteconvo_main(int argc, char** argv)
 			opts::value<decltype(g_iMaxThreads)>(&g_iMaxThreads),
 			"maximum number of threads")));
 		// dummy arg if launched from takin executable
-#ifndef MONTECONVO_STANDALONE
 		bool bStartedFromTakin = 0;
+#ifndef MONTECONVO_STANDALONE
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("monteconvo-cli",
 			opts::bool_switch(&bStartedFromTakin),
@@ -876,6 +891,7 @@ int monteconvo_main(int argc, char** argv)
 		int args_to_ignore = 1;	// started with "monteconvo-cli"
 		if(bStartedFromTakin)
 			++args_to_ignore;	// started with "takin --monteconvo-cli"
+
 		if(argc <= args_to_ignore)
 		{
 			std::ostringstream ostrHelp;

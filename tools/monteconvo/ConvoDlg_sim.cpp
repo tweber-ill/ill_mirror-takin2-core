@@ -846,7 +846,6 @@ void ConvoDlg::Start2D()
 			QMetaObject::invokeMethod(progress, "setValue", Q_ARG(int, iStep+1));
 			QMetaObject::invokeMethod(editStopTime2d, "setText",
 				Q_ARG(const QString&, QString(watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(iNumSteps*iNumSteps)).c_str())));
-
 			++iStep;
 		}
 

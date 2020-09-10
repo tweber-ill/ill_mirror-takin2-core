@@ -22,7 +22,6 @@ if [ ! -f ${TAKINBIN} ]; then
 	fi
 fi
 
-arg=$1
 LD_LIBRARY_PATH=./lib:${TAKINDIR}/lib:/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH \
-	${TAKINBIN} ${arg}
+	${TAKINBIN} "$@"
 

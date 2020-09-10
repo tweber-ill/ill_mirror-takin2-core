@@ -294,6 +294,7 @@ int main(int argc, char** argv)
 		qRegisterMetaType<std::string>("std::string");
 		qRegisterMetaType<CacheVal>("CacheVal");
 
+
 		std::unique_ptr<TakAppl> app(new TakAppl(argc, argv));
 
 		// locale
