@@ -105,7 +105,6 @@ static void show_splash_msg(QApplication *pApp, QSplashScreen *pSplash, const st
 	pApp->processEvents();
 }
 
-#define TAKIN_CHECK " Please check if Takin is correctly installed and the current working directory is set to the Takin main directory."
 // ----------------------------------------------------------------------------
 
 
@@ -396,6 +395,7 @@ int main(int argc, char** argv)
 		}
 
 
+		#define TAKIN_CHECK " Please check if Takin is correctly installed and the current working directory is set to the Takin main directory."
 		show_splash_msg(app.get(), pSplash.get(), strStarting + "\nChecking resources ...");
 
 		// check tables

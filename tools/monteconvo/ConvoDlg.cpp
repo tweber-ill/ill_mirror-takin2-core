@@ -443,24 +443,6 @@ void ConvoDlg::SqwParamsChanged(const std::vector<SqwBase::t_var>& vecVars,
 
 // -----------------------------------------------------------------------------
 
-ResoFocus ConvoDlg::GetFocus() const
-{
-	const int iFocMono = comboFocMono->currentIndex();
-	const int iFocAna = comboFocAna->currentIndex();
-
-	unsigned ifocMode = unsigned(ResoFocus::FOC_UNCHANGED);
-	if(iFocMono == 1) ifocMode |= unsigned(ResoFocus::FOC_MONO_FLAT);	// flat
-	else if(iFocMono == 2) ifocMode |= unsigned(ResoFocus::FOC_MONO_H);	// horizontal
-	else if(iFocMono == 3) ifocMode |= unsigned(ResoFocus::FOC_MONO_V);	// vertical
-	else if(iFocMono == 4) ifocMode |= unsigned(ResoFocus::FOC_MONO_V)|unsigned(ResoFocus::FOC_MONO_H);		// both
-	if(iFocAna == 1) ifocMode |= unsigned(ResoFocus::FOC_ANA_FLAT);		// flat
-	else if(iFocAna == 2) ifocMode |= unsigned(ResoFocus::FOC_ANA_H);	// horizontal
-	else if(iFocAna == 3) ifocMode |= unsigned(ResoFocus::FOC_ANA_V);	// vertical
-	else if(iFocAna == 4) ifocMode |= unsigned(ResoFocus::FOC_ANA_V)|unsigned(ResoFocus::FOC_ANA_H);		// both
-
-	return ResoFocus(ifocMode);
-}
-
 
 /**
  * clear plot curves
@@ -571,44 +553,14 @@ void ConvoDlg::scanCheckToggled(bool bChecked)
 void ConvoDlg::scanFileChanged(const QString& qstrFile)
 {
 	m_bUseScan = 0;
-
-	std::string strFile = qstrFile.toStdString();
-	tl::trim(strFile);
-	if(strFile == "" || !checkScan->isChecked())
+	if(!checkScan->isChecked())
 		return;
 
-	std::vector<std::string> vecFiles;
-	tl::get_tokens<std::string, std::string>(strFile, ";", vecFiles);
-	std::for_each(vecFiles.begin(), vecFiles.end(), [](std::string& str){ tl::trim(str); });
-
-	Filter filter;
-	const bool bFlip = checkFlip->isChecked();
-	m_scan = Scan();
-
-
-	bool bLoaded = ::load_file(vecFiles, m_scan, 1, filter, bFlip);
-
-	// if file was not found, alternatively look in global paths
-	if(!bLoaded)
-	{
-		const std::vector<std::string>& vecGlobPaths = get_global_paths();
-		for(const std::string& strGlobPath : vecGlobPaths)
-		{
-			std::vector<std::string> _vecFiles;
-			for(const std::string& _strFile : vecFiles)
-				_vecFiles.push_back(strGlobPath + "/" + _strFile);
-
-			if((bLoaded = ::load_file(_vecFiles, m_scan, 1, filter, bFlip)))
-				break;
-		}
-	}
-
-	if(!bLoaded)
+	if(!load_scan_file(qstrFile.toStdString(), m_scan, checkFlip->isChecked()))
 	{
 		tl::log_err("Cannot load scan(s).");
 		return;
 	}
-
 
 	if(!m_scan.vecPoints.size())
 	{

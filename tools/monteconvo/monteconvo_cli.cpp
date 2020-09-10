@@ -10,17 +10,31 @@
 #include <boost/scope_exit.hpp>
 #include <boost/program_options.hpp>
 
+#include <vector>
+#include <thread>
+#include <atomic>
+#include <memory>
+#include <string>
+
 #include "monteconvo_cli.h"
+#include "monteconvo_common.h"
 #include "sqwfactory.h"
+
+#include "tools/res/defs.h"
+#include "tools/convofit/scan.h"
+#include "TASReso.h"
 
 #include "libs/version.h"
 #include "libs/globals.h"
 
 #include "tlibs/file/file.h"
+#include "tlibs/file/prop.h"
+#include "tlibs/log/log.h"
 #include "tlibs/log/debug.h"
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
-
+#include "tlibs/math/stat.h"
+#include "tlibs/math/linalg.h"
 
 namespace asio = boost::asio;
 namespace sys = boost::system;
@@ -41,9 +55,9 @@ struct ConvoConfig
 	t_real tolerance{};
 	t_real S_scale{1}, S_slope{0}, S_offs{0};
 
-	int neutron_count{500};
-	int sample_step_count{1};
-	int step_count{256};
+	unsigned int neutron_count{500};
+	unsigned int sample_step_count{1};
+	unsigned int step_count{256};
 
 	bool scan_2d{false};
 	bool recycle_neutrons{true};
@@ -95,11 +109,11 @@ static ConvoConfig load_config(tl::Prop<std::string>& xml)
 
 	// int values
 	boost::optional<int> oiVal;
-	oiVal = xml.QueryOpt<int>(strXmlRoot+"monteconvo/neutron_count"); if(oiVal) cfg.neutron_count = *oiVal;
-	oiVal = xml.QueryOpt<int>(strXmlRoot+"monteconvo/sample_step_count"); if(oiVal) cfg.sample_step_count = *oiVal;
-	oiVal = xml.QueryOpt<int>(strXmlRoot+"monteconvo/step_count"); if(oiVal) cfg.step_count = *oiVal;
-	//oiVal = xml.QueryOpt<int>(strXmlRoot+"convofit/strategy"); if(oiVal) cfg.strategy = *oiVal;
-	//oiVal = xml.QueryOpt<int>(strXmlRoot+"convofit/max_calls"); if(oiVal) cfg.max_calls = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/neutron_count"); if(oiVal) cfg.neutron_count = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/sample_step_count"); if(oiVal) cfg.sample_step_count = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/step_count"); if(oiVal) cfg.step_count = *oiVal;
+	//oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"convofit/strategy"); if(oiVal) cfg.strategy = *oiVal;
+	//oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"convofit/max_calls"); if(oiVal) cfg.max_calls = *oiVal;
 
 	// bool values
 	boost::optional<int> obVal;
@@ -140,13 +154,374 @@ static ConvoConfig load_config(tl::Prop<std::string>& xml)
 
 
 // ----------------------------------------------------------------------------
+static std::shared_ptr<SqwBase> create_sqw_model(const std::string& strSqwIdent, const std::string& _strSqwFile)
+{
+	std::string strSqwFile = _strSqwFile;
+	tl::trim(strSqwFile);
+	strSqwFile = find_file_in_global_paths(strSqwFile);
+
+	if(strSqwFile == "")
+	{
+		tl::log_warn("No S(q,w) config file given.");
+		return nullptr;
+	}
+
+	std::shared_ptr<SqwBase> pSqw = construct_sqw(strSqwIdent, strSqwFile);
+	if(!pSqw)
+	{
+		tl::log_err("Unknown S(q,w) model selected.");
+		return nullptr;
+	}
+
+	if(!pSqw->IsOk())
+	{
+		tl::log_err("Could not create S(q,w).");
+		return nullptr;
+	}
+
+	return pSqw;
+}
+
+
+
+/**
+ * create 1d convolution
+ */
 static bool start_convo_1d(const ConvoConfig& cfg)
 {
-	//createSqwModel(qstrSqwConf);
+	std::shared_ptr<SqwBase> pSqw = create_sqw_model(cfg.sqw, cfg.sqw_conf);
+	if(!pSqw) return false;
+
+
+	bool bUseScan = cfg.has_scanfile;
+	t_real dScale = cfg.S_scale;
+	t_real dSlope = cfg.S_slope;
+	t_real dOffs = cfg.S_offs;
+
+
+	Scan scan;
+	if(bUseScan)
+	{
+		if(!load_scan_file(cfg.scanfile, scan, cfg.flip_coords))
+		{
+			tl::log_err("Cannot load scan(s) \"", cfg.scanfile, "\".");
+			return false;
+		}
+
+		if(!scan.vecPoints.size())
+		{
+			tl::log_err("No points in scan(s) \"", cfg.scanfile, "\".");
+			return false;
+		}
+	}
+
+
+	std::string strAutosave = cfg.autosave;
+	if(strAutosave == "")
+	{
+		strAutosave = "out.dat";
+		tl::log_warn("Output file not set, using \"", strAutosave, "\".");
+	}
+
+
+	tl::Stopwatch<t_real> watch;
+	watch.start();
+
+	const unsigned int iNumNeutrons = cfg.neutron_count;
+	const unsigned int iNumSampleSteps = cfg.sample_step_count;
+	const unsigned int iNumSteps = cfg.step_count;
+
+	bool bScanAxisFound = 0;
+	int iScanAxisIdx = 0;
+	std::string strScanVar = "";
+	std::vector<std::vector<t_real>> vecAxes;
+	std::tie(bScanAxisFound, iScanAxisIdx, strScanVar, vecAxes) = get_scan_axis<t_real>(
+		true, cfg.scanaxis, cfg.step_count, EPS_RLU,
+		cfg.h_from, cfg.h_to, cfg.k_from, cfg.k_to, cfg.l_from, cfg.l_to, cfg.E_from, cfg.E_to);
+	if(!bScanAxisFound)
+	{
+		tl::log_err("No scan variable found.");
+		return false;
+	}
+
+	const std::vector<t_real> *pVecScanX = &vecAxes[iScanAxisIdx];
+	const std::vector<t_real>& vecH = vecAxes[0];
+	const std::vector<t_real>& vecK = vecAxes[1];
+	const std::vector<t_real>& vecL = vecAxes[2];
+	const std::vector<t_real>& vecE = vecAxes[3];
+
+
+	// -------------------------------------------------------------------------
+	// Load reso file
+	TASReso reso;
+
+	std::string _strResoFile = cfg.instr;
+	tl::trim(_strResoFile);
+	const std::string strResoFile = find_file_in_global_paths(_strResoFile);
+
+	tl::log_debug("Loading resolution from \"", strResoFile, "\".");
+	if(strResoFile == "" || !reso.LoadRes(strResoFile.c_str()))
+	{
+		tl::log_err("Could not load resolution file.");
+		return false;
+	}
+	// -------------------------------------------------------------------------
+
+
+	if(bUseScan)	// get crystal definition from scan file
+	{
+		ublas::vector<t_real> vec1 =
+			tl::make_vec({scan.plane.vec1[0], scan.plane.vec1[1], scan.plane.vec1[2]});
+		ublas::vector<t_real> vec2 =
+			tl::make_vec({scan.plane.vec2[0], scan.plane.vec2[1], scan.plane.vec2[2]});
+
+		reso.SetLattice(scan.sample.a, scan.sample.b, scan.sample.c,
+			scan.sample.alpha, scan.sample.beta, scan.sample.gamma,
+			vec1, vec2);
+	}
+	else	// use crystal config file
+	{
+		// -------------------------------------------------------------------------
+		// Load lattice
+		std::string _strLatticeFile = cfg.crys;
+		tl::trim(_strLatticeFile);
+		const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
+
+		tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
+		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+		{
+			tl::log_err("Could not load crystal file.");
+			return false;
+		}
+		// -------------------------------------------------------------------------
+	}
+
+	reso.SetAlgo(ResoAlgo(cfg.algo+1));
+	reso.SetKiFix(cfg.fixedk==0);
+	reso.SetKFix(cfg.kfix);
+	reso.SetOptimalFocus(get_reso_focus(cfg.mono_foc, cfg.ana_foc));
+
+
+	std::ostringstream ostrOut;
+	ostrOut.precision(g_iPrec);
+	ostrOut << "#\n";
+	ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
+	ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
+	ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
+	ostrOut << "# Scale: " << dScale << "\n";
+	ostrOut << "# Slope: " << dSlope << "\n";
+	ostrOut << "# Offset: " << dOffs << "\n";
+	if(cfg.scanfile != "")
+		ostrOut << "# Scan file: " << cfg.scanfile << "\n";
+	ostrOut << "#\n";
+
+	ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+		<< std::left << std::setw(g_iPrec*2) << "k" << " "
+		<< std::left << std::setw(g_iPrec*2) << "l" << " "
+		<< std::left << std::setw(g_iPrec*2) << "E" << " "
+		<< std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
+
+
+	std::vector<t_real_reso> vecQ, vecS, vecScaledS;
+
+	vecQ.reserve(iNumSteps);
+	vecS.reserve(iNumSteps);
+	vecScaledS.reserve(iNumSteps);
+
+	unsigned int iNumThreads = get_max_threads();
+	tl::log_debug("Calculating using ", iNumThreads, " threads.");
+
+	void (*pThStartFunc)() = []{ tl::init_rand(); };
+	tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
+	auto& lstFuts = tp.GetResults();
+
+	for(unsigned int iStep=0; iStep<iNumSteps; ++iStep)
+	{
+		t_real dCurH = vecH[iStep];
+		t_real dCurK = vecK[iStep];
+		t_real dCurL = vecL[iStep];
+		t_real dCurE = vecE[iStep];
+
+		tp.AddTask([&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, pSqw]()
+			-> std::pair<bool, t_real>
+		{
+			t_real dS = 0.;
+			t_real dhklE_mean[4] = {0., 0., 0., 0.};
+
+			if(iNumNeutrons == 0)
+			{	// if no neutrons are given, just plot the unconvoluted S(q,w)
+				// TODO: add an option to let the user choose if S(Q,E) is
+				// really the dynamical structure factor, or its absolute square
+				dS += (*pSqw)(dCurH, dCurK, dCurL, dCurE);
+			}
+			else
+			{	// convolution
+				TASReso localreso = reso;
+				localreso.SetRandomSamplePos(iNumSampleSteps);
+				std::vector<ublas::vector<t_real>> vecNeutrons;
+
+				try
+				{
+					if(!localreso.SetHKLE(dCurH, dCurK, dCurL, dCurE))
+					{
+						std::ostringstream ostrErr;
+						ostrErr << "Invalid crystal position: (" <<
+							dCurH << " " << dCurK << " " << dCurL << ") rlu, "
+							<< dCurE << " meV.";
+						throw tl::Err(ostrErr.str().c_str());
+					}
+				}
+				catch(const std::exception& ex)
+				{
+					tl::log_err(ex.what());
+					return std::pair<bool, t_real>(false, 0.);
+				}
+
+				Ellipsoid4d<t_real> elli =
+					localreso.GenerateMC_deferred(iNumNeutrons, vecNeutrons);
+
+				for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
+				{
+					// TODO: add an option to let the user choose if S(Q,E) is
+					// really the dynamical structure factor, or its absolute square
+					dS += (*pSqw)(vecHKLE[0], vecHKLE[1], vecHKLE[2], vecHKLE[3]);
+
+					for(int i=0; i<4; ++i)
+						dhklE_mean[i] += vecHKLE[i];
+				}
+
+				dS /= t_real(iNumNeutrons*iNumSampleSteps);
+				for(int i=0; i<4; ++i)
+					dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
+
+				if(localreso.GetResoParams().flags & CALC_R0)
+					dS *= localreso.GetResoResults().dR0;
+				if(localreso.GetResoParams().flags & CALC_RESVOL)
+					dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
+			}
+			return std::pair<bool, t_real>(true, dS);
+		});
+	}
+
+	auto iterTask = tp.GetTasks().begin();
+	unsigned int iStep = 0;
+	for(auto &fut : lstFuts)
+	{
+		// deferred (in main thread), eval this task manually
+		if(iNumThreads == 0)
+		{
+			(*iterTask)();
+			++iterTask;
+		}
+
+		std::pair<bool, t_real> pairS = fut.get();
+		if(!pairS.first) break;
+		t_real dS = pairS.second;
+		if(tl::is_nan_or_inf(dS))
+		{
+			dS = t_real(0);
+			tl::log_warn("S(q,w) is invalid.");
+		}
+
+		ostrOut << std::left << std::setw(g_iPrec*2) << vecH[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecK[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecL[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecE[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << dS << "\n";
+
+		const t_real dXVal = (*pVecScanX)[iStep];
+		t_real dYVal = dScale*(dS + dSlope*dXVal) + dOffs;
+		if(dYVal < 0.)
+			dYVal = 0.;
+
+		vecQ.push_back(dXVal);
+		vecS.push_back(dS);
+		vecScaledS.push_back(dYVal);
+
+		static const std::vector<t_real> vecNull;
+		bool bIsLastStep = (iStep == lstFuts.size()-1);
+
+		if(bIsLastStep)
+		{
+			if(bIsLastStep)
+				ostrOut << "# ------------------------- EOF -------------------------\n";
+
+			// autosave output
+			if(strAutosave != "")
+			{
+				std::ofstream ofstrAutosave(strAutosave);
+				ofstrAutosave << ostrOut.str() << std::endl;
+			}
+		}
+
+		++iStep;
+	}
+
+
+	// approximate chi^2
+	if(bUseScan && pSqw)
+	{
+		const std::size_t iNumScanPts = scan.vecPoints.size();
+		std::vector<t_real> vecSFuncY;
+		vecSFuncY.reserve(iNumScanPts);
+
+		for(std::size_t iScanPt=0; iScanPt<iNumScanPts; ++iScanPt)
+		{
+			const ScanPoint& pt = scan.vecPoints[iScanPt];
+			t_real E = pt.E / tl::one_meV;
+			ublas::vector<t_real> vecScanHKLE = tl::make_vec({ pt.h, pt.k, pt.l, E });
+
+
+			// find point on S(q,w) curve closest to scan point
+			std::size_t iMinIdx = 0;
+			t_real dMinDist = std::numeric_limits<t_real>::max();
+			for(std::size_t iStep=0; iStep<iNumSteps; ++iStep)
+			{
+				ublas::vector<t_real> vecCurveHKLE =
+					tl::make_vec({ vecH[iStep], vecK[iStep], vecL[iStep], vecE[iStep] });
+
+				t_real dDist = ublas::norm_2(vecCurveHKLE - vecScanHKLE);
+				if(dDist < dMinDist)
+				{
+					dMinDist = dDist;
+					iMinIdx = iStep;
+				}
+			}
+
+			// add the scaled S value from the closest point
+			vecSFuncY.push_back(vecScaledS[iMinIdx]);
+		}
+
+		t_real tChi2 = tl::chi2_direct<t_real>(iNumScanPts,
+			vecSFuncY.data(), scan.vecCts.data(), scan.vecCtsErr.data());
+		tl::log_info("chi^2 = ", tChi2);
+
+		if(strAutosave != "")
+		{
+			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+			ofstrAutosave << "# chi^2: " << tChi2 << std::endl;
+		}
+	}
+
+
+	// output elapsed time
+	watch.stop();
+
+	if(strAutosave != "")
+	{
+		std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+		ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
+		ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
+	}
+
 	return true;
 }
 
 
+
+/**
+ * create 2d convolution
+ */
 static bool start_convo_2d(const ConvoConfig& cfg)
 {
 	//createSqwModel(qstrSqwConf);

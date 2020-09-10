@@ -25,10 +25,9 @@
 #include "tlibs/file/prop.h"
 
 #include "sqwfactory.h"
-#include "monteconvo.h"
+#include "monteconvo_common.h"
 
 #include "tools/res/defs.h"
-#include "tools/convofit/scan.h"
 
 #include "dialogs/FavDlg.h"
 #include "SqwParamDlg.h"
@@ -83,8 +82,6 @@ protected:
 protected:
 	void LoadSettings();
 	virtual void showEvent(QShowEvent *pEvt) override;
-
-	ResoFocus GetFocus() const;
 
 	void ClearPlot1D();
 	void Start1D();

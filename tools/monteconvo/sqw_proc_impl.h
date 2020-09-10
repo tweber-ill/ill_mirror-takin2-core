@@ -15,10 +15,12 @@
 #include "tlibs/math/rand.h"
 
 #include <signal.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/string.hpp>
-#include <unistd.h>
 
 #define MSG_QUEUE_SIZE 512
 #define PARAM_MEM 1024*1024
@@ -375,9 +377,14 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 				}
 
 				// start child process
-				std::system((std::string(pcProcExecName)
+				if(std::system((std::string(pcProcExecName)
 					+ std::string(" \"") + pcCfg + std::string("\" ")
-					+ m_strProcName + " &").c_str());
+					+ m_strProcName + " &").c_str()) < 0)
+				{
+					const int errnum = errno;
+					tl::log_err("Could not create child process \"", pcProcExecName, "\".",
+						" Error code: ", errnum, ".");
+				}
 			}
 #ifndef __MINGW32__
 			else if(mode == SqwProcStartMode::START_PARENT_FORK_CHILD)

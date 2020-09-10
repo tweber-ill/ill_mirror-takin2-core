@@ -156,7 +156,7 @@ void ConvoDlg::Start1D()
 		reso.SetAlgo(ResoAlgo(comboAlgo->currentIndex()+1));
 		reso.SetKiFix(comboFixedK->currentIndex()==0);
 		reso.SetKFix(spinKfix->value());
-		reso.SetOptimalFocus(GetFocus());
+		reso.SetOptimalFocus(get_reso_focus(comboFocMono->currentIndex(), comboFocAna->currentIndex()));
 
 
 		if(m_pSqw == nullptr || !m_pSqw->IsOk())
@@ -649,7 +649,7 @@ void ConvoDlg::Start2D()
 		reso.SetAlgo(ResoAlgo(comboAlgo->currentIndex()+1));
 		reso.SetKiFix(comboFixedK->currentIndex()==0);
 		reso.SetKFix(spinKfix->value());
-		reso.SetOptimalFocus(GetFocus());
+		reso.SetOptimalFocus(get_reso_focus(comboFocMono->currentIndex(), comboFocAna->currentIndex()));
 
 		if(m_pSqw == nullptr || !m_pSqw->IsOk())
 		{

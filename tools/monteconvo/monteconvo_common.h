@@ -9,6 +9,11 @@
 #define __MONTECONVO_COMMON_H__
 
 #include "tlibs/math/math.h"
+#include "tlibs/string/string.h"
+
+#include "tools/convofit/scan.h"
+#include "TASReso.h"
+
 
 #define EPS_RLU 1e-3
 
@@ -63,6 +68,13 @@ get_scan_axis(bool bIncludeE, int iScanAxis, std::size_t num_steps, t_real eps,
 
 	return std::make_tuple(true, iScanAxisIdx, strScanVar, vecScanAxes);
 }
+
+
+
+extern ResoFocus get_reso_focus(int iFocMono, int iFocAna);
+
+
+extern bool load_scan_file(const std::string& _strFile, Scan& scan, bool bFlipAxis=false);
 
 
 #endif

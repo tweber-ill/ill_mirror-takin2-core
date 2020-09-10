@@ -13,7 +13,7 @@
 #include "../res/ellipse.h"
 #include "../res/mc.h"
 
-#include<vector>
+#include <vector>
 
 
 enum class ResoFocus : unsigned
