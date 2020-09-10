@@ -262,7 +262,7 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 	tl::log_debug("Loading resolution from \"", strResoFile, "\".");
 	if(strResoFile == "" || !reso.LoadRes(strResoFile.c_str()))
 	{
-		tl::log_err("Could not load resolution file.");
+		tl::log_err("Could not load resolution file \"", strResoFile, "\".");
 		return false;
 	}
 	// -------------------------------------------------------------------------
@@ -290,7 +290,7 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 		tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
 		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
 		{
-			tl::log_err("Could not load crystal file.");
+			tl::log_err("Could not load crystal file \"", strLatticeFile, "\".");
 			return false;
 		}
 		// -------------------------------------------------------------------------
@@ -446,12 +446,9 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 			if(bIsLastStep)
 				ostrOut << "# ------------------------- EOF -------------------------\n";
 
-			// autosave output
-			if(strAutosave != "")
-			{
-				std::ofstream ofstrAutosave(strAutosave);
-				ofstrAutosave << ostrOut.str() << std::endl;
-			}
+			// output
+			std::ofstream ofstrAutosave(strAutosave);
+			ofstrAutosave << ostrOut.str() << std::endl;
 		}
 
 		++iStep;
@@ -496,23 +493,19 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 			vecSFuncY.data(), scan.vecCts.data(), scan.vecCtsErr.data());
 		tl::log_info("chi^2 = ", tChi2);
 
-		if(strAutosave != "")
-		{
-			std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-			ofstrAutosave << "# chi^2: " << tChi2 << std::endl;
-		}
+		// output
+		std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+		ofstrAutosave << "# chi^2: " << tChi2 << std::endl;
 	}
 
 
 	// output elapsed time
 	watch.stop();
 
-	if(strAutosave != "")
-	{
-		std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-		ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
-		ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
-	}
+	// output
+	std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+	ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
+	ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
 
 	return true;
 }
@@ -524,7 +517,299 @@ static bool start_convo_1d(const ConvoConfig& cfg)
  */
 static bool start_convo_2d(const ConvoConfig& cfg)
 {
-	//createSqwModel(qstrSqwConf);
+	std::shared_ptr<SqwBase> pSqw = create_sqw_model(cfg.sqw, cfg.sqw_conf);
+	if(!pSqw) return false;
+
+
+	std::string strAutosave = cfg.autosave;
+	if(strAutosave == "")
+	{
+		strAutosave = "out.dat";
+		tl::log_warn("Output file not set, using \"", strAutosave, "\".");
+	}
+
+
+	tl::Stopwatch<t_real> watch;
+	watch.start();
+
+	const unsigned int iNumNeutrons = cfg.neutron_count;
+	const unsigned int iNumSampleSteps = cfg.sample_step_count;
+	const unsigned int iNumSteps = cfg.step_count;
+
+	const t_real dStartHKL[] = { cfg.h_from, cfg.k_from, cfg.l_from, cfg.E_from };
+	const t_real dDeltaHKL1[] =
+	{
+		(cfg.h_to - cfg.h_from) / t_real(iNumSteps),
+		(cfg.k_to - cfg.k_from) / t_real(iNumSteps),
+		(cfg.l_to - cfg.l_from) / t_real(iNumSteps),
+		(cfg.E_to - cfg.E_from) / t_real(iNumSteps)
+	};
+	const t_real dDeltaHKL2[] =
+	{
+		(cfg.h_to_2 - cfg.h_from) / t_real(iNumSteps),
+		(cfg.k_to_2 - cfg.k_from) / t_real(iNumSteps),
+		(cfg.l_to_2 - cfg.l_from) / t_real(iNumSteps),
+		(cfg.E_to_2 - cfg.E_from) / t_real(iNumSteps)
+	};
+
+
+	// -------------------------------------------------------------------------
+	// find axis labels and ranges
+	const int iScanAxis1 = cfg.scanaxis;
+	const int iScanAxis2 = cfg.scanaxis2;
+
+	std::string strScanVar1 = "";
+	t_real dStart1{}, dStop1{};
+	if(iScanAxis1==1 || (iScanAxis1==0 && !tl::float_equal(cfg.h_from, cfg.h_to, EPS_RLU)))
+	{
+		strScanVar1 = "h (rlu)";
+		dStart1 = cfg.h_from;
+		dStop1 = cfg.h_to;
+	}
+	else if(iScanAxis1==2 || (iScanAxis1==0 && !tl::float_equal(cfg.k_from, cfg.k_to, EPS_RLU)))
+	{
+		strScanVar1 = "k (rlu)";
+		dStart1 = cfg.k_from;
+		dStop1 = cfg.k_to;
+	}
+	else if(iScanAxis1==3 || (iScanAxis1==0 && !tl::float_equal(cfg.l_from, cfg.l_to, EPS_RLU)))
+	{
+		strScanVar1 = "l (rlu)";
+		dStart1 = cfg.l_from;
+		dStop1 = cfg.l_to;
+	}
+	else if(iScanAxis1==4 || (iScanAxis1==0 && !tl::float_equal(cfg.E_from, cfg.E_to, EPS_RLU)))
+	{
+		strScanVar1 = "E (meV)";
+		dStart1 = cfg.E_from;
+		dStop1 = cfg.E_to;
+	}
+
+	std::string strScanVar2 = "";
+	t_real dStart2{}, dStop2{};
+	if(iScanAxis2==1 || (iScanAxis2==0 && !tl::float_equal(cfg.h_from, cfg.h_to_2, EPS_RLU)))
+	{
+		strScanVar2 = "h (rlu)";
+		dStart2 = cfg.h_from;
+		dStop2 = cfg.h_to_2;
+	}
+	else if(iScanAxis2==2 || (iScanAxis2==0 && !tl::float_equal(cfg.k_from, cfg.k_to_2, EPS_RLU)))
+	{
+		strScanVar2 = "k (rlu)";
+		dStart2 = cfg.k_from;
+		dStop2 = cfg.k_to_2;
+	}
+	else if(iScanAxis2==3 || (iScanAxis2==0 && !tl::float_equal(cfg.l_from, cfg.l_to_2, EPS_RLU)))
+	{
+		strScanVar2 = "l (rlu)";
+		dStart2 = cfg.l_from;
+		dStop2 = cfg.l_to_2;
+	}
+	else if(iScanAxis2==4 || (iScanAxis2==0 && !tl::float_equal(cfg.E_from, cfg.E_to_2, EPS_RLU)))
+	{
+		strScanVar2 = "E (meV)";
+		dStart2 = cfg.E_from;
+		dStop2 = cfg.E_to_2;
+	}
+
+	// -------------------------------------------------------------------------
+
+
+
+	// -------------------------------------------------------------------------
+	// Load reso file
+	TASReso reso;
+	std::string _strResoFile = cfg.instr;
+	tl::trim(_strResoFile);
+	const std::string strResoFile = find_file_in_global_paths(_strResoFile);
+
+	tl::log_debug("Loading resolution from \"", strResoFile, "\".");
+	if(strResoFile == "" || !reso.LoadRes(strResoFile.c_str()))
+	{
+		tl::log_err("Could not load resolution file \"", strResoFile, "\".");
+		return false;
+	}
+	// -------------------------------------------------------------------------
+
+
+	// -------------------------------------------------------------------------
+	// Load lattice
+	std::string _strLatticeFile = cfg.crys;
+	tl::trim(_strLatticeFile);
+	const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
+
+	tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
+	if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+	{
+		tl::log_err("Could not load crystal file \"", strLatticeFile, "\".");
+		return false;
+	}
+	// -------------------------------------------------------------------------
+
+
+	reso.SetAlgo(ResoAlgo(cfg.algo+1));
+	reso.SetKiFix(cfg.fixedk==0);
+	reso.SetKFix(cfg.kfix);
+	reso.SetOptimalFocus(get_reso_focus(cfg.mono_foc, cfg.ana_foc));
+
+
+	std::ostringstream ostrOut;
+	ostrOut.precision(g_iPrec);
+	ostrOut << "#\n";
+	ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
+	ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
+	ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
+	ostrOut << "#\n";
+	ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
+		<< std::left << std::setw(g_iPrec*2) << "k" << " "
+		<< std::left << std::setw(g_iPrec*2) << "l" << " "
+		<< std::left << std::setw(g_iPrec*2) << "E" << " "
+		<< std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
+
+
+	std::vector<t_real> vecH; vecH.reserve(iNumSteps*iNumSteps);
+	std::vector<t_real> vecK; vecK.reserve(iNumSteps*iNumSteps);
+	std::vector<t_real> vecL; vecL.reserve(iNumSteps*iNumSteps);
+	std::vector<t_real> vecE; vecE.reserve(iNumSteps*iNumSteps);
+
+	for(unsigned int iStepY=0; iStepY<iNumSteps; ++iStepY)
+	{
+		for(unsigned int iStepX=0; iStepX<iNumSteps; ++iStepX)
+		{
+			vecH.push_back(dStartHKL[0] + dDeltaHKL2[0]*t_real(iStepY) + dDeltaHKL1[0]*t_real(iStepX));
+			vecK.push_back(dStartHKL[1] + dDeltaHKL2[1]*t_real(iStepY) + dDeltaHKL1[1]*t_real(iStepX));
+			vecL.push_back(dStartHKL[2] + dDeltaHKL2[2]*t_real(iStepY) + dDeltaHKL1[2]*t_real(iStepX));
+			vecE.push_back(dStartHKL[3] + dDeltaHKL2[3]*t_real(iStepY) + dDeltaHKL1[3]*t_real(iStepX));
+		}
+	}
+
+	unsigned int iNumThreads = get_max_threads();
+	tl::log_debug("Calculating using ", iNumThreads, " threads.");
+
+	void (*pThStartFunc)() = []{ tl::init_rand(); };
+	tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
+	auto& lstFuts = tp.GetResults();
+
+	for(unsigned int iStep=0; iStep<iNumSteps*iNumSteps; ++iStep)
+	{
+		t_real dCurH = vecH[iStep];
+		t_real dCurK = vecK[iStep];
+		t_real dCurL = vecL[iStep];
+		t_real dCurE = vecE[iStep];
+
+		tp.AddTask(
+		[&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, pSqw]()
+			-> std::pair<bool, t_real>
+		{
+			t_real dS = 0.;
+			t_real dhklE_mean[4] = {0., 0., 0., 0.};
+
+			if(iNumNeutrons == 0)
+			{	// if no neutrons are given, just plot the unconvoluted S(q,w)
+				// TODO: add an option to let the user choose if S(Q,E) is
+				// really the dynamical structure factor, or its absolute square
+				dS += (*pSqw)(dCurH, dCurK, dCurL, dCurE);
+			}
+			else
+			{	// convolution
+				TASReso localreso = reso;
+				localreso.SetRandomSamplePos(iNumSampleSteps);
+				std::vector<ublas::vector<t_real>> vecNeutrons;
+
+				try
+				{
+					if(!localreso.SetHKLE(dCurH, dCurK, dCurL, dCurE))
+					{
+						std::ostringstream ostrErr;
+						ostrErr << "Invalid crystal position: (" <<
+							dCurH << " " << dCurK << " " << dCurL << ") rlu, "
+							<< dCurE << " meV.";
+						throw tl::Err(ostrErr.str().c_str());
+					}
+				}
+				catch(const std::exception& ex)
+				{
+					//QMessageBox::critical(this, "Error", ex.what());
+					tl::log_err(ex.what());
+					return std::pair<bool, t_real>(false, 0.);
+				}
+
+				Ellipsoid4d<t_real> elli =
+					localreso.GenerateMC_deferred(iNumNeutrons, vecNeutrons);
+
+				for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
+				{
+					// TODO: add an option to let the user choose if S(Q,E) is
+					// really the dynamical structure factor, or its absolute square
+					dS += (*pSqw)(vecHKLE[0], vecHKLE[1], vecHKLE[2], vecHKLE[3]);
+
+					for(int i=0; i<4; ++i)
+						dhklE_mean[i] += vecHKLE[i];
+				}
+
+				dS /= t_real(iNumNeutrons*iNumSampleSteps);
+				for(int i=0; i<4; ++i)
+					dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
+
+				if(localreso.GetResoParams().flags & CALC_R0)
+					dS *= localreso.GetResoResults().dR0;
+				if(localreso.GetResoParams().flags & CALC_RESVOL)
+					dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
+			}
+			return std::pair<bool, t_real>(true, dS);
+		});
+	}
+
+	auto iterTask = tp.GetTasks().begin();
+	unsigned int iStep = 0;
+	for(auto &fut : lstFuts)
+	{
+		// deferred (in main thread), eval this task manually
+		if(iNumThreads == 0)
+		{
+			(*iterTask)();
+			++iterTask;
+		}
+
+		std::pair<bool, t_real> pairS = fut.get();
+		if(!pairS.first) break;
+		t_real dS = pairS.second;
+		if(tl::is_nan_or_inf(dS))
+		{
+			dS = t_real(0);
+			tl::log_warn("S(q,w) is invalid.");
+		}
+
+		ostrOut << std::left << std::setw(g_iPrec*2) << vecH[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecK[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecL[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << vecE[iStep] << " "
+			<< std::left << std::setw(g_iPrec*2) << dS << "\n";
+
+
+		bool bIsLastStep = (iStep == lstFuts.size()-1);
+
+		if(bIsLastStep)
+		{
+			if(bIsLastStep)
+				ostrOut << "# ------------------------- EOF -------------------------\n";
+
+			// output
+			std::ofstream ofstrAutosave(strAutosave);
+			ofstrAutosave << ostrOut.str() << std::endl;
+		}
+
+		++iStep;
+	}
+
+	// output elapsed time
+	watch.stop();
+
+	// output
+	std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
+	ofstrAutosave << "# Simulation start time: " << watch.GetStartTimeStr() << "\n";
+	ofstrAutosave << "# Simulation stop time: " << watch.GetStopTimeStr() << std::endl;
+
 	return true;
 }
 // ----------------------------------------------------------------------------
