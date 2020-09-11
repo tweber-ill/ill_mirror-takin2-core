@@ -287,6 +287,7 @@ void ConvoDlg::Start1D()
 			});
 		}
 
+		tp.Start();
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)
@@ -788,6 +789,7 @@ void ConvoDlg::Start2D()
 			});
 		}
 
+		tp.Start();
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)
@@ -1012,6 +1014,7 @@ void ConvoDlg::StartDisp()
 			});
 		}
 
+		tp.Start();
 		auto iterTask = tp.GetTasks().begin();
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)

@@ -403,6 +403,7 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 		});
 	}
 
+	tp.Start();
 	auto iterTask = tp.GetTasks().begin();
 	unsigned int iStep = 0;
 	for(auto &fut : lstFuts)
@@ -768,6 +769,7 @@ static bool start_convo_2d(const ConvoConfig& cfg)
 		});
 	}
 
+	tp.Start();
 	auto iterTask = tp.GetTasks().begin();
 	unsigned int iStep = 0;
 	for(auto &fut : lstFuts)

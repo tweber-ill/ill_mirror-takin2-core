@@ -528,6 +528,7 @@ Ellipsoid4d<t_real> TASReso::GenerateMC(std::size_t iNum, std::vector<t_vec>& ve
 				{ mc_neutrons<t_vec>(ell4d, iNumNeutr, this->m_opts, iterBegin); });
 		}
 
+		tp.Start();
 		auto& lstFut = tp.GetResults();
 		for(auto& fut : lstFut)
 			fut.get();

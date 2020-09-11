@@ -17,6 +17,7 @@ option(USE_GENTAB "build setup utilities" TRUE)
 option(USE_RtMp "use auxilliary libraries" TRUE)
 option(USE_Dl "use dl libraries" TRUE)
 option(USE_Py "search for python" TRUE)
+option(USE_CUSTOM_THREADPOOL "use custom threadpool implementation" FALSE)
 
 set(USE_TR1_FUNCS FALSE)
 set(BUILD_EXT_TOOLS FALSE)
@@ -77,6 +78,12 @@ if(BUILD_FOR_MAC)
 	set(USE_RtMp FALSE)
 	set(USE_Dl FALSE)
 	set(USE_Py TRUE)
+endif()
+
+
+if(USE_CUSTOM_THREADPOOL)
+	message("Using custom threadpool implementation.")
+	add_definitions("-DUSE_OWN_THREADPOOL")
 endif()
 
 

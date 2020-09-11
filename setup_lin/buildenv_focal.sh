@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# install all packages needed for building
+# install all packages needed for building on focal (and bionic)
 # @author Tobias Weber <tobias.weber@tum.de>
 # @date 28-jul-20
 # @license GPLv2

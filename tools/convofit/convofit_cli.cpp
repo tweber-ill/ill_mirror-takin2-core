@@ -165,6 +165,7 @@ int convofit_main(int argc, char** argv)
 			});
 		}
 
+		tp.Start();
 		auto& lstFut = tp.GetResults();
 		std::size_t iTask = 0;
 		for(auto& fut : lstFut)
