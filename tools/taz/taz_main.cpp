@@ -209,11 +209,11 @@ int main(int argc, char** argv)
 		// get program options
 		std::vector<std::string> vecTazFiles;
 		bool bShowHelp = 0;
-		bool bStartTakinMain = 1;
 		bool bStartScanviewer = 0;
 		bool bStartMonteconvo = 0;
 		bool bStartMonteconvoCLI = 0;
 		bool bStartConvofit = 0;
+		bool bStartTakinMain = 1, bStartGui = 1;
 
 		opts::options_description args("Takin options");
 		args.add(boost::shared_ptr<opts::option_description>(
@@ -254,8 +254,10 @@ int main(int argc, char** argv)
 		opts::store(parsedopts, opts_map);
 		opts::notify(opts_map);
 
-		if(bStartMonteconvo || bStartScanviewer)
+		if(bStartMonteconvo || bStartScanviewer || bStartMonteconvoCLI || bStartConvofit)
 			bStartTakinMain = 0;
+		if(bStartMonteconvoCLI || bStartConvofit)
+			bStartGui = 0;
 
 		if(bShowHelp)
 		{
@@ -282,11 +284,17 @@ int main(int argc, char** argv)
 		tl::log_debug("Using ", sizeof(t_real_glob)*8, " bit ", tl::get_typename<t_real_glob>(), "s as internal data type.");
 
 
-		#if defined Q_WS_X11 && !defined NO_3D
-			//XInitThreads();
-			QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
-			QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-		#endif
+		std::unique_ptr<QCoreApplication> app;
+		TakAppl *app_gui = nullptr;
+
+		if(bStartGui)
+			app.reset(app_gui = new TakAppl(argc, argv));
+		else
+			app.reset(new QCoreApplication(argc, argv));
+
+		app->setApplicationName("Takin");
+		app->setApplicationVersion(TAKIN_VER);
+
 
 		// qt needs to be able to copy these structs when emitting signals from a different thread
 		qRegisterMetaType<TriangleOptions>("TriangleOptions");
@@ -295,17 +303,46 @@ int main(int argc, char** argv)
 		qRegisterMetaType<CacheVal>("CacheVal");
 
 
-		std::unique_ptr<TakAppl> app(new TakAppl(argc, argv));
-
 		// locale
 		std::setlocale(LC_ALL, "C");
 		std::locale::global(std::locale::classic());
 		QLocale::setDefault(QLocale::English);
 
+
 		tl::init_rand();
 
-		app->setApplicationName("Takin");
-		app->setApplicationVersion(TAKIN_VER);
+		g_strHome = QDir::homePath().toStdString() + "/.takin";
+		g_strApp = QCoreApplication::applicationDirPath().toStdString();
+		tl::log_info("Program path: ", g_strApp);
+		tl::log_info("Home path: ", g_strHome);
+
+		add_resource_path(g_strHome, 0);
+		add_resource_path(g_strApp);
+		add_resource_path(g_strApp + "/..");
+		add_resource_path(g_strApp + "/resources");
+		add_resource_path(g_strApp + "/Resources");
+		add_resource_path(g_strApp + "/../resources");
+		add_resource_path(g_strApp + "/../Resources");
+
+		QCoreApplication::addLibraryPath((g_strApp + "/../lib/plugins").c_str());
+		QCoreApplication::addLibraryPath((g_strApp + "/lib/plugins").c_str());
+
+
+		// run command-line tools
+		if(bStartMonteconvoCLI)
+			return monteconvo_main(argc, argv);
+		else if(bStartConvofit)
+			return convofit_main(argc, argv);
+
+
+		// ------------------------------------------------------------
+		// GUI stuff
+
+		#if defined Q_WS_X11 && !defined NO_3D
+			//XInitThreads();
+			QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
+			QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+		#endif
 
 		QSettings settings("tobis_stuff", "takin");
 
@@ -320,30 +357,6 @@ int main(int argc, char** argv)
 			else
 				tl::log_err("Style \"", strStyle.toStdString(), "\" was not found.");
 		}
-
-
-		g_strHome = QDir::homePath().toStdString() + "/.takin";
-		g_strApp = app->applicationDirPath().toStdString();
-		tl::log_info("Program path: ", g_strApp);
-		tl::log_info("Home path: ", g_strHome);
-
-		add_resource_path(g_strHome, 0);
-		add_resource_path(g_strApp);
-		add_resource_path(g_strApp + "/..");
-		add_resource_path(g_strApp + "/resources");
-		add_resource_path(g_strApp + "/Resources");
-		add_resource_path(g_strApp + "/../resources");
-		add_resource_path(g_strApp + "/../Resources");
-
-		app->addLibraryPath((g_strApp + "/../lib/plugins").c_str());
-		app->addLibraryPath((g_strApp + "/lib/plugins").c_str());
-
-
-		// run command-line tools
-		if(bStartMonteconvoCLI)
-			return monteconvo_main(argc, argv);
-		else if(bStartConvofit)
-			return convofit_main(argc, argv);
 
 
 		// ------------------------------------------------------------
@@ -368,7 +381,7 @@ int main(int argc, char** argv)
 		}
 
 		const std::string strStarting = "Starting up Takin version " TAKIN_VER ".";
-		show_splash_msg(app.get(), pSplash.get(), strStarting);
+		show_splash_msg(app_gui, pSplash.get(), strStarting);
 
 
 		// ------------------------------------------------------------
@@ -397,7 +410,7 @@ int main(int argc, char** argv)
 
 
 		#define TAKIN_CHECK " Please check if Takin is correctly installed and the current working directory is set to the Takin main directory."
-		show_splash_msg(app.get(), pSplash.get(), strStarting + "\nChecking resources ...");
+		show_splash_msg(app_gui, pSplash.get(), strStarting + "\nChecking resources ...");
 
 		// check tables
 		g_bHasElements = (find_resource("res/data/elements.xml") != "");
@@ -493,11 +506,11 @@ int main(int argc, char** argv)
 			}
 
 
-			show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 1/2 ...");
+			show_splash_msg(app_gui, pSplash.get(), strStarting + "\nLoading 1/2 ...");
 			pTakDlg.reset(new TazDlg{nullptr, strLog});
-			app->SetTakDlg(pTakDlg);
-			show_splash_msg(app.get(), pSplash.get(), strStarting + "\nLoading 2/2 ...");
-			app->DoPendingRequests();
+			app_gui->SetTakDlg(pTakDlg);
+			show_splash_msg(app_gui, pSplash.get(), strStarting + "\nLoading 2/2 ...");
+			app_gui->DoPendingRequests();
 
 			if(pSplash) pSplash->finish(pTakDlg.get());
 			if(vecTazFiles.size() >= 1)
@@ -535,7 +548,7 @@ int main(int argc, char** argv)
 			pScanViewerDlg->show();
 		}
 
-		int iRet = app->exec();
+		int iRet = app_gui->exec();
 
 		// ------------------------------------------------------------
 
