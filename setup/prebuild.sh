@@ -9,19 +9,19 @@
 if [[ $# -ge 3 ]]; then
 	UIC="$1"
 	MOC="$2"
-	COLGEN="$(dirname $2)/qcollectiongenerator-qt5"
+	COLGEN="$(dirname $2)/qhelpgenerator"
 
 	TAKINROOT="$3"
 	FORCE=0
 else
 	UIC="$(which uic-qt5)"
 	MOC="$(which moc-qt5)"
-	COLGEN="$(which qcollectiongenerator-qt5)"
+	COLGEN="$(which qhelpgenerator-qt5)"
 
 	if [ $? -ne 0 ]; then
 		UIC="$(which uic)"
 		MOC="$(which moc)"
-		COLGEN="$(which qcollectiongenerator)"
+		COLGEN="$(which qhelpgenerator)"
 	fi
 
 	TAKINROOT=.
