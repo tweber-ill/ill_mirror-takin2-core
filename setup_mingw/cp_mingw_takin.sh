@@ -2,16 +2,22 @@
 #
 # creates a distro for mingw
 # @author Tobias Weber <tobias.weber@tum.de>
+# @date 2016-2020
 # @license GPLv2
 #
 
 
 # installation directory
-INSTDIR=~/.wine/drive_c/takin
+INSTDIR="$1"
+
+if [ "${INSTDIR}" = "" ]; then
+	INSTDIR=~/.wine/drive_c/takin
+fi
+
+mkdir -p ${INSTDIR}
 
 
 # main programs
-mkdir ${INSTDIR}
 cp -v bin/takin.exe		${INSTDIR}/
 cp -v bin/convofit.exe		${INSTDIR}/
 cp -v bin/convoseries.exe	${INSTDIR}/
