@@ -55,7 +55,9 @@ public:
 	// set model variables
 	virtual void SetVars(const std::vector<t_var>&) = 0;
 	virtual void SetFitVars(const std::vector<t_var_fit>& vecFit) { m_vecFit = vecFit; }
+
 	virtual bool SetVarIfAvail(const std::string& strKey, const std::string& strNewVal);
+	virtual bool SetErrIfAvail(const std::string& strKey, const std::string& strNewErr);
 
 	SqwBase() = default;
 	virtual ~SqwBase() = default;

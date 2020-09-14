@@ -10,16 +10,6 @@
 #include <QCheckBox>
 
 
-enum
-{
-	SQW_NAME = 0,
-	SQW_TYPE = 1,
-	SQW_VAL = 2,
-
-	SQW_ERR = 3,
-	SQW_FIT = 4
-};
-
 SqwParamDlg::SqwParamDlg(QWidget* pParent, QSettings* pSett)
 	: QDialog(pParent), m_pSett(pSett)
 {

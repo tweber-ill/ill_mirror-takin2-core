@@ -15,6 +15,17 @@
 #include "sqw.h"
 
 
+enum
+{
+	SQW_NAME = 0,
+	SQW_TYPE = 1,
+	SQW_VAL = 2,
+
+	SQW_ERR = 3,
+	SQW_FIT = 4
+};
+
+
 class SqwParamDlg : public QDialog, Ui::SqwParamDlg
 { Q_OBJECT
 protected:

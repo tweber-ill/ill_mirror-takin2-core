@@ -24,6 +24,15 @@ static constexpr const t_real g_dEpsRlu = EPS_RLU;
  */
 void ConvoDlg::Start1D()
 {
+	StartSim1D(false);
+}
+
+
+/**
+ * create 1d convolution
+ */
+void ConvoDlg::StartSim1D(bool bForceDeferred)
+{
 	m_atStop.store(false);
 	ClearPlot1D();
 
@@ -47,7 +56,6 @@ void ConvoDlg::Start1D()
 	btnStop->setEnabled(true);
 	tabWidget->setCurrentWidget(tabPlot);
 
-	bool bForceDeferred = false;
 	Qt::ConnectionType connty = bForceDeferred
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
@@ -433,14 +441,14 @@ void ConvoDlg::Start1D()
 				vecSFuncY.push_back(m_vecScaledS[iMinIdx]);
 			}
 
-			t_real tChi2 = tl::chi2_direct<t_real>(iNumScanPts,
+			m_chi2 = tl::chi2_direct<t_real>(iNumScanPts,
 				vecSFuncY.data(), m_scan.vecCts.data(), m_scan.vecCtsErr.data());
-			tl::log_info("chi^2 = ", tChi2);
+			tl::log_info("chi^2 = ", m_chi2);
 
 			if(strAutosave != "")
 			{
 				std::ofstream ofstrAutosave(strAutosave, std::ios_base::app);
-				ofstrAutosave << "# chi^2: " << tChi2 << std::endl;
+				ofstrAutosave << "# chi^2: " << m_chi2 << std::endl;
 			}
 		}
 

@@ -441,6 +441,71 @@ void ConvoDlg::SqwParamsChanged(const std::vector<SqwBase::t_var>& vecVars,
 }
 
 
+/**
+ * set a model parameter
+ */
+void ConvoDlg::SetSqwParam(const std::string& name, t_real_reso val)
+{
+	m_pSqw->SetVarIfAvail(name, tl::var_to_str(val));
+
+	// read parameters back in to update paramters dialog
+	emit SqwLoaded(m_pSqw->GetVars(), &m_pSqw->GetFitVars());
+}
+
+
+/**
+ * set model parameters
+ * [ ident, value, error ]
+ */
+void ConvoDlg::SetSqwParams(const std::vector<std::tuple<std::string, std::string, std::string>>& sqwparams)
+{
+	for(const auto& param : sqwparams)
+	{
+		m_pSqw->SetVarIfAvail(std::get<0>(param), std::get<1>(param));
+		if(std::get<2>(param) != "")
+			m_pSqw->SetErrIfAvail(std::get<0>(param), std::get<2>(param));
+	}
+
+	// read parameters back in to update paramters dialog
+	emit SqwLoaded(m_pSqw->GetVars(), &m_pSqw->GetFitVars());
+}
+
+
+/**
+ * get the model parameters
+ * [ ident, type, value, error, fit? ]
+ */
+ConvoDlg::t_sqwparams ConvoDlg::GetSqwParams(bool only_fitparams) const
+{
+	t_sqwparams params;
+
+	std::vector<SqwBase::t_var> vars1 = m_pSqw->GetVars();
+	std::vector<SqwBase::t_var_fit> vars2 = m_pSqw->GetFitVars();
+
+	for(const SqwBase::t_var& var : vars1)
+	{
+		const std::string& strName = std::get<SQW_NAME>(var);
+		std::string strErr;
+		bool bFit = 0;
+
+		// look for associated fit parameters: match with basic variable ident
+		auto iterFit = std::find_if(vars2.begin(), vars2.end(),
+			[&strName](const SqwBase::t_var_fit& varFit) -> bool
+			{ return strName == std::get<0>(varFit); });
+
+		if(iterFit != vars2.end())
+		{
+			strErr = std::get<1>(*iterFit);		// error
+			bFit = std::get<2>(*iterFit);		// "is fit param" flag
+		}
+
+		if((only_fitparams && bFit) || !only_fitparams)
+			params.emplace_back(std::make_tuple(strName, std::get<SQW_TYPE>(var), std::get<SQW_VAL>(var), strErr, bFit));
+	}
+
+	return params;
+}
+
 // -----------------------------------------------------------------------------
 
 

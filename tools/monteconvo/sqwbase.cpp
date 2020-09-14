@@ -30,6 +30,28 @@ bool SqwBase::SetVarIfAvail(const std::string& strKey, const std::string& strNew
 }
 
 
+/**
+ * if the variable "strKey" is known, update its error with the value "strNewErr"
+ */
+bool SqwBase::SetErrIfAvail(const std::string& strKey, const std::string& strNewErr)
+{
+	const std::vector<t_var_fit>& vecVars = GetFitVars();
+	for(const t_var_fit& var : vecVars)
+	{
+		if(strKey == std::get<0>(var))
+		{
+			t_var_fit varNew = var;
+			std::get<1>(varNew) = strNewErr;
+			SetFitVars(std::vector<t_var_fit>({varNew}));
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 const SqwBase& SqwBase::operator=(const SqwBase& sqw)
 {
 	this->m_bOk = sqw.m_bOk;

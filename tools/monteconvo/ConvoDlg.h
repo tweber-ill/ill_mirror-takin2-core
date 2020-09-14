@@ -61,6 +61,9 @@ protected:
 	static const std::string s_strTitle;
 	std::string m_strLastFile;
 
+	t_real_reso m_chi2;
+
+
 protected:
 	std::vector<QDoubleSpinBox*> m_vecSpinBoxes;
 	std::vector<QSpinBox*> m_vecIntSpinBoxes;
@@ -79,6 +82,7 @@ protected:
 	QMenu *m_pMenuRecent = nullptr;
 	QSignalMapper *m_pMapperRecent = nullptr;
 
+
 protected:
 	void LoadSettings();
 	virtual void showEvent(QShowEvent *pEvt) override;
@@ -87,9 +91,26 @@ protected:
 	void Start1D();
 	void Start2D();
 
+
 public:
 	void Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot);
 	void Save(std::map<std::string, std::string>& mapConf, const std::string& strXmlRoot);
+
+	t_real_reso GetChi2() const { return m_chi2; }
+
+	void SetSqwParam(const std::string& name, t_real_reso val);
+
+	// [ ident, value, error ]
+	void SetSqwParams(const std::vector<std::tuple<std::string, std::string, std::string>>& sqwparams);
+
+
+	// [ ident, type, value, error, fit? ]
+	using t_sqwparams = std::vector<std::tuple<std::string, std::string, std::string, std::string, bool>>;
+	t_sqwparams GetSqwParams(bool only_fitparams) const;
+
+
+	void StartSim1D(bool bForceDeferred=false);
+
 
 protected slots:
 	void showSqwParamDlg();
@@ -135,9 +156,11 @@ protected slots:
 
 	void ShowAboutDlg();
 
+
 public:
 	ConvoDlg(QWidget* pParent=0, QSettings* pSett=0);
 	virtual ~ConvoDlg();
+
 
 signals:
 	void SqwLoaded(const std::vector<SqwBase::t_var>&, const std::vector<SqwBase::t_var_fit>*);
