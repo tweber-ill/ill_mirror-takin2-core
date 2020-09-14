@@ -43,6 +43,8 @@ namespace opts = boost::program_options;
 using t_real = t_real_reso;
 
 
+static const std::string g_strXmlRoot("taz/");
+
 
 // ----------------------------------------------------------------------------
 // configuration
@@ -82,70 +84,69 @@ struct ConvoConfig
 /**
  * loads the configuration for the convolution from a job file
  */
-static ConvoConfig load_config(tl::Prop<std::string>& xml)
+static ConvoConfig load_config(const tl::Prop<std::string>& xml)
 {
 	ConvoConfig cfg;
-	const std::string strXmlRoot("taz/");
 
 	// real values
 	boost::optional<t_real> odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/h_from"); if(odVal) cfg.h_from = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/k_from"); if(odVal) cfg.k_from = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/l_from"); if(odVal) cfg.l_from = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/E_from"); if(odVal) cfg.E_from = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/h_to"); if(odVal) cfg.h_to = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/k_to"); if(odVal) cfg.k_to = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/l_to"); if(odVal) cfg.l_to = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/E_to"); if(odVal) cfg.E_to = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/h_to_2"); if(odVal) cfg.h_to_2 = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/k_to_2"); if(odVal) cfg.k_to_2 = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/l_to_2"); if(odVal) cfg.l_to_2 = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/E_to_2"); if(odVal) cfg.E_to_2 = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/kfix"); if(odVal) cfg.kfix = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"convofit/tolerance"); if(odVal) cfg.tolerance = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/S_scale"); if(odVal) cfg.S_scale = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/S_slope"); if(odVal) cfg.S_slope = *odVal;
-	odVal = xml.QueryOpt<t_real>(strXmlRoot+"monteconvo/S_offs"); if(odVal) cfg.S_offs = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/h_from"); if(odVal) cfg.h_from = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/k_from"); if(odVal) cfg.k_from = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/l_from"); if(odVal) cfg.l_from = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/E_from"); if(odVal) cfg.E_from = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/h_to"); if(odVal) cfg.h_to = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/k_to"); if(odVal) cfg.k_to = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/l_to"); if(odVal) cfg.l_to = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/E_to"); if(odVal) cfg.E_to = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/h_to_2"); if(odVal) cfg.h_to_2 = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/k_to_2"); if(odVal) cfg.k_to_2 = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/l_to_2"); if(odVal) cfg.l_to_2 = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/E_to_2"); if(odVal) cfg.E_to_2 = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/kfix"); if(odVal) cfg.kfix = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"convofit/tolerance"); if(odVal) cfg.tolerance = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/S_scale"); if(odVal) cfg.S_scale = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/S_slope"); if(odVal) cfg.S_slope = *odVal;
+	odVal = xml.QueryOpt<t_real>(g_strXmlRoot+"monteconvo/S_offs"); if(odVal) cfg.S_offs = *odVal;
 
 	// int values
 	boost::optional<int> oiVal;
-	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/neutron_count"); if(oiVal) cfg.neutron_count = *oiVal;
-	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/sample_step_count"); if(oiVal) cfg.sample_step_count = *oiVal;
-	oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"monteconvo/step_count"); if(oiVal) cfg.step_count = *oiVal;
-	//oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"convofit/strategy"); if(oiVal) cfg.strategy = *oiVal;
-	//oiVal = xml.QueryOpt<unsigned int>(strXmlRoot+"convofit/max_calls"); if(oiVal) cfg.max_calls = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(g_strXmlRoot+"monteconvo/neutron_count"); if(oiVal) cfg.neutron_count = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(g_strXmlRoot+"monteconvo/sample_step_count"); if(oiVal) cfg.sample_step_count = *oiVal;
+	oiVal = xml.QueryOpt<unsigned int>(g_strXmlRoot+"monteconvo/step_count"); if(oiVal) cfg.step_count = *oiVal;
+	//oiVal = xml.QueryOpt<unsigned int>(g_strXmlRoot+"convofit/strategy"); if(oiVal) cfg.strategy = *oiVal;
+	//oiVal = xml.QueryOpt<unsigned int>(g_strXmlRoot+"convofit/max_calls"); if(oiVal) cfg.max_calls = *oiVal;
 
 	// bool values
 	boost::optional<int> obVal;
-	obVal = xml.QueryOpt<int>(strXmlRoot+"monteconvo/scan_2d"); if(obVal) cfg.scan_2d = *obVal != 0;
-	obVal = xml.QueryOpt<int>(strXmlRoot+"convofit/recycle_neutrons"); if(obVal) cfg.recycle_neutrons = *obVal != 0;
-	obVal = xml.QueryOpt<int>(strXmlRoot+"convofit/normalise"); if(obVal) cfg.normalise = *obVal != 0;
-	obVal = xml.QueryOpt<int>(strXmlRoot+"convofit/flip_coords"); if(obVal) cfg.flip_coords = *obVal != 0;
-	obVal = xml.QueryOpt<int>(strXmlRoot+"monteconvo/has_scanfile"); if(obVal) cfg.has_scanfile = *obVal != 0;
+	obVal = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/scan_2d"); if(obVal) cfg.scan_2d = *obVal != 0;
+	obVal = xml.QueryOpt<int>(g_strXmlRoot+"convofit/recycle_neutrons"); if(obVal) cfg.recycle_neutrons = *obVal != 0;
+	obVal = xml.QueryOpt<int>(g_strXmlRoot+"convofit/normalise"); if(obVal) cfg.normalise = *obVal != 0;
+	obVal = xml.QueryOpt<int>(g_strXmlRoot+"convofit/flip_coords"); if(obVal) cfg.flip_coords = *obVal != 0;
+	obVal = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/has_scanfile"); if(obVal) cfg.has_scanfile = *obVal != 0;
 
 	// indices for gui comboboxes
 	boost::optional<int> oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"monteconvo/algo"); if(oCmb) cfg.algo = *oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"monteconvo/fixedk"); if(oCmb) cfg.fixedk = *oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"monteconvo/mono_foc"); if(oCmb) cfg.mono_foc = *oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"monteconvo/ana_foc"); if(oCmb) cfg.ana_foc = *oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"convofit/scanaxis"); if(oCmb) cfg.scanaxis = *oCmb;
-	oCmb = xml.QueryOpt<int>(strXmlRoot+"convofit/scanaxis2"); if(oCmb) cfg.scanaxis2 = *oCmb;
-	//oCmb = xml.QueryOpt<int>(strXmlRoot+"convofit/minimiser"); if(oCmb) cfg.minimiser = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/algo"); if(oCmb) cfg.algo = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/fixedk"); if(oCmb) cfg.fixedk = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/mono_foc"); if(oCmb) cfg.mono_foc = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/ana_foc"); if(oCmb) cfg.ana_foc = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"convofit/scanaxis"); if(oCmb) cfg.scanaxis = *oCmb;
+	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"convofit/scanaxis2"); if(oCmb) cfg.scanaxis2 = *oCmb;
+	//oCmb = xml.QueryOpt<int>(g_strXmlRoot+"convofit/minimiser"); if(oCmb) cfg.minimiser = *oCmb;
 
 	// string values
 	boost::optional<std::string> osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/crys"); if(osVal) cfg.crys = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/instr"); if(osVal) cfg.instr = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/sqw"); if(osVal) cfg.sqw = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/sqw_conf"); if(osVal) cfg.sqw_conf = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/scanfile"); if(osVal) cfg.scanfile = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"convofit/counter"); if(osVal) cfg.counter = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"convofit/monitor"); if(osVal) cfg.monitor = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"convofit/temp_override"); if(osVal) cfg.temp_override = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"convofit/field_override"); if(osVal) cfg.field_override = *osVal;
-	osVal = xml.QueryOpt<std::string>(strXmlRoot+"monteconvo/autosave"); if(osVal) cfg.autosave = *osVal;
-	//osVal = xml.QueryOpt<std::string>(strXmlRoot+"convofit/sqw_params"); if(osVal) cfg.sqw_params = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/crys"); if(osVal) cfg.crys = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/instr"); if(osVal) cfg.instr = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/sqw"); if(osVal) cfg.sqw = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/sqw_conf"); if(osVal) cfg.sqw_conf = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/scanfile"); if(osVal) cfg.scanfile = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/counter"); if(osVal) cfg.counter = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/monitor"); if(osVal) cfg.monitor = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/temp_override"); if(osVal) cfg.temp_override = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/field_override"); if(osVal) cfg.field_override = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/autosave"); if(osVal) cfg.autosave = *osVal;
+	//osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/sqw_params"); if(osVal) cfg.sqw_params = *osVal;
 
 	return cfg;
 }
@@ -187,10 +188,13 @@ static std::shared_ptr<SqwBase> create_sqw_model(const std::string& strSqwIdent,
 /**
  * create 1d convolution
  */
-static bool start_convo_1d(const ConvoConfig& cfg)
+static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& xml)
 {
 	std::shared_ptr<SqwBase> pSqw = create_sqw_model(cfg.sqw, cfg.sqw_conf);
-	if(!pSqw) return false;
+	if(!pSqw)
+		return false;
+	if(!load_sqw_params(pSqw.get(), xml, g_strXmlRoot+"monteconvo/"))
+		return false;
 
 
 	bool bUseScan = cfg.has_scanfile;
@@ -524,10 +528,13 @@ static bool start_convo_1d(const ConvoConfig& cfg)
 /**
  * create 2d convolution
  */
-static bool start_convo_2d(const ConvoConfig& cfg)
+static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& xml)
 {
 	std::shared_ptr<SqwBase> pSqw = create_sqw_model(cfg.sqw, cfg.sqw_conf);
-	if(!pSqw) return false;
+	if(!pSqw)
+		return false;
+	if(!load_sqw_params(pSqw.get(), xml, g_strXmlRoot+"monteconvo/"))
+		return false;
 
 
 	std::string strAutosave = cfg.autosave;
@@ -951,12 +958,12 @@ int monteconvo_main(int argc, char** argv)
 		if(cfg.scan_2d)
 		{
 			tl::log_info("Performing a 2d convolution simulation.");
-			ok = start_convo_2d(cfg);
+			ok = start_convo_2d(cfg, xml);
 		}
 		else
 		{
 			tl::log_info("Performing a 1d convolution simulation.");
-			ok = start_convo_1d(cfg);
+			ok = start_convo_1d(cfg, xml);
 		}
 
 		if(!ok)

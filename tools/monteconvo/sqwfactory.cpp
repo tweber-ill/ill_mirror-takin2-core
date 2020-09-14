@@ -513,7 +513,7 @@ bool save_sqw_params(const SqwBase* pSqw,
 
 
 bool load_sqw_params(SqwBase* pSqw,
-	tl::Prop<std::string>& xml, const std::string& strXmlRoot)
+	const tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 {
 	if(!pSqw) return 0;
 
