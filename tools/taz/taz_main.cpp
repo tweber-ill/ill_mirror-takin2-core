@@ -243,21 +243,21 @@ int main(int argc, char** argv)
 			opts::bool_switch(&bShowHelp),
 			"shows the program options")));
 		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("scanviewer",
+			new opts::option_description("scans",
 			opts::bool_switch(&bStartScanviewer),
-			"directly runs the scanviewer tool")));
+			"directly runs the scan viewer tool")));
 		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("monteconvo",
+			new opts::option_description("convo",
 			opts::bool_switch(&bStartMonteconvo),
-			"directly runs the monteconvo tool")));
+			"directly runs the convolution simulator/fitter")));
 		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("monteconvo-cli",
+			new opts::option_description("convosim",
 			opts::bool_switch(&bStartMonteconvoCLI),
-			"runs the monteconvo command-line tool")));
+			"runs the convolution simulation command-line tool")));
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("convofit",
 			opts::bool_switch(&bStartConvofit),
-			"runs the convofit command-line tool")));
+			"runs the convolution fitting command-line tool")));
 
 		// positional args
 		opts::positional_options_description args_pos;

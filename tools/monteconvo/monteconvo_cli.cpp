@@ -870,7 +870,7 @@ int monteconvo_main(int argc, char** argv)
 		bool bStartedFromTakin = 0;
 #ifndef MONTECONVO_STANDALONE
 		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("monteconvo-cli",
+			new opts::option_description("convosim",
 			opts::bool_switch(&bStartedFromTakin),
 			"launch convofit from takin")));
 #endif
