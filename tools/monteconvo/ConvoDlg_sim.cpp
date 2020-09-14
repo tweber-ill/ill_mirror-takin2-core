@@ -24,14 +24,14 @@ static constexpr const t_real g_dEpsRlu = EPS_RLU;
  */
 void ConvoDlg::Start1D()
 {
-	StartSim1D(false);
+	StartSim1D(false, tl::get_rand_seed());
 }
 
 
 /**
  * create 1d convolution
  */
-void ConvoDlg::StartSim1D(bool bForceDeferred)
+void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 {
 	m_atStop.store(false);
 	ClearPlot1D();
@@ -41,6 +41,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 	t_real dSlope = tl::str_to_var<t_real>(editSlope->text().toStdString());
 	t_real dOffs = tl::str_to_var<t_real>(editOffs->text().toStdString());
 
+	bool bRecycleNeutrons = checkRnd->isChecked();
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
 	std::string strAutosave = editAutosave->text().toStdString();
@@ -60,8 +61,8 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
-	std::function<void()> fkt = [this, connty, bForceDeferred, bUseScan,
-	dScale, dSlope, dOffs, bLiveResults, bLivePlots, strAutosave]
+	std::function<void()> fkt = [this, connty, bForceDeferred, bUseScan, seed, bRecycleNeutrons,
+		dScale, dSlope, dOffs, bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
@@ -217,8 +218,21 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 		unsigned int iNumThreads = bForceDeferred ? 0 : get_max_threads();
 		tl::log_debug("Calculating using ", iNumThreads, " threads.");
 
-		void (*pThStartFunc)() = []{ tl::init_rand(); };
-		tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
+		// function to be called before each thread
+		auto th_start_func = [seed, bRecycleNeutrons, bForceDeferred]
+		{
+			// TODO: init random seeds for non-deferred, threaded simulation
+			if(bRecycleNeutrons && bForceDeferred)
+				tl::init_rand_seed(seed); 
+			else
+				tl::init_rand(); 
+		};
+
+		// call the start function directly in non-threaded mode
+		if(bForceDeferred)
+			th_start_func();
+
+		tl::ThreadPool<std::pair<bool, t_real>(), decltype(th_start_func)> tp(iNumThreads, &th_start_func);
 		auto& lstFuts = tp.GetResults();
 
 		for(unsigned int iStep=0; iStep<iNumSteps; ++iStep)
@@ -232,7 +246,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 			[&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, this]()
 				-> std::pair<bool, t_real>
 			{
-				if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
+				if(this->StopRequested()) return std::pair<bool, t_real>(false, 0.);
 
 				t_real dS = 0.;
 				t_real dhklE_mean[4] = {0., 0., 0., 0.};
@@ -272,7 +286,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 
 					for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
 					{
-						if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
+						if(this->StopRequested()) return std::pair<bool, t_real>(false, 0.);
 
 						// TODO: add an option to let the user choose if S(Q,E) is
 						// really the dynamical structure factor, or its absolute square
@@ -300,7 +314,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred)
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)
 		{
-			if(m_atStop.load()) break;
+			if(this->StopRequested()) break;
 
 			// deferred (in main thread), eval this task manually
 			if(iNumThreads == 0)
@@ -734,7 +748,7 @@ void ConvoDlg::Start2D()
 			[&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, this]()
 				-> std::pair<bool, t_real>
 			{
-				if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
+				if(this->StopRequested()) return std::pair<bool, t_real>(false, 0.);
 
 				t_real dS = 0.;
 				t_real dhklE_mean[4] = {0., 0., 0., 0.};
@@ -774,7 +788,7 @@ void ConvoDlg::Start2D()
 
 					for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
 					{
-						if(m_atStop.load()) return std::pair<bool, t_real>(false, 0.);
+						if(this->StopRequested()) return std::pair<bool, t_real>(false, 0.);
 
 						// TODO: add an option to let the user choose if S(Q,E) is
 						// really the dynamical structure factor, or its absolute square
@@ -802,7 +816,7 @@ void ConvoDlg::Start2D()
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)
 		{
-			if(m_atStop.load()) break;
+			if(this->StopRequested()) break;
 
 			// deferred (in main thread), eval this task manually
 			if(iNumThreads == 0)
@@ -1012,7 +1026,7 @@ void ConvoDlg::StartDisp()
 			tp.AddTask([dCurH, dCurK, dCurL, this]() ->
 			std::tuple<bool, std::vector<t_real>, std::vector<t_real>>
 			{
-				if(m_atStop.load())
+				if(this->StopRequested())
 					return std::make_tuple(false, std::vector<t_real>(), std::vector<t_real>());
 
 				std::vector<t_real> vecE, vecW;
@@ -1027,7 +1041,7 @@ void ConvoDlg::StartDisp()
 		unsigned int iStep = 0;
 		for(auto &fut : lstFuts)
 		{
-			if(m_atStop.load()) break;
+			if(this->StopRequested()) break;
 
 			// deferred (in main thread), eval this task manually
 			if(iNumThreads == 0)

@@ -540,6 +540,13 @@ void ConvoDlg::Start()
 void ConvoDlg::Stop()
 {
 	m_atStop.store(true);
+
+	/*if(m_pFitThread)
+	{
+		m_pFitThread->terminate();
+		delete m_pFitThread;
+		m_pFitThread = nullptr;
+	}*/
 }
 
 

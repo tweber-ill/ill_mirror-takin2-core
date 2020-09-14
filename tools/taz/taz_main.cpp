@@ -36,6 +36,7 @@
 #include <memory>
 
 #include <QMetaType>
+#include <QTextCursor>
 #include <QDir>
 #include <QMessageBox>
 #include <QSplashScreen>
@@ -127,6 +128,19 @@ public:
 
 	void SetTakDlg(std::shared_ptr<TazDlg> pDlg) { m_pTakDlg = pDlg; }
 
+
+	void DoPendingRequests()
+	{
+		if(!m_pTakDlg) return;
+
+		// user clicked on an associated file to load?
+		if(m_strToLoad != "")
+		{
+			m_pTakDlg->Load(m_strToLoad.c_str());
+		}
+	}
+
+
 	virtual bool event(QEvent *pEvt) override
 	{
 		if(pEvt->type() == QEvent::FileOpen)
@@ -138,15 +152,19 @@ public:
 		return QApplication::event(pEvt);
 	}
 
-	void DoPendingRequests()
-	{
-		if(!m_pTakDlg) return;
 
-		// user clicked on an associated file to load?
-		if(m_strToLoad != "")
+	virtual bool notify(QObject* obj, QEvent* evt) override
+	{
+		try
 		{
-			m_pTakDlg->Load(m_strToLoad.c_str());
+			return QApplication::notify(obj, evt);
 		}
+		catch(const std::exception& ex)
+		{
+			tl::log_err(ex.what());
+		}
+
+		return false;
 	}
 };
 
@@ -301,6 +319,7 @@ int main(int argc, char** argv)
 		qRegisterMetaType<CrystalOptions>("CrystalOptions");
 		qRegisterMetaType<std::string>("std::string");
 		qRegisterMetaType<CacheVal>("CacheVal");
+		qRegisterMetaType<QTextCursor>("QTextCursor");
 
 
 		// locale

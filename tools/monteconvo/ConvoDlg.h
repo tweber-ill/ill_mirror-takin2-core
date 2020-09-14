@@ -38,6 +38,7 @@
 #define CONVO_DISP_CURVE_START 		3
 
 
+
 class ConvoDlg : public QDialog, Ui::ConvoDlg
 { Q_OBJECT
 protected:
@@ -109,7 +110,9 @@ public:
 	t_sqwparams GetSqwParams(bool only_fitparams) const;
 
 
-	void StartSim1D(bool bForceDeferred=false);
+	void StartSim1D(bool bForceDeferred=false, unsigned int seed=tl::get_rand_seed());
+
+	bool StopRequested() const { return m_atStop.load(); }
 
 
 protected slots:
@@ -165,5 +168,6 @@ public:
 signals:
 	void SqwLoaded(const std::vector<SqwBase::t_var>&, const std::vector<SqwBase::t_var_fit>*);
 };
+
 
 #endif
