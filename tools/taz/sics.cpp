@@ -95,6 +95,7 @@ SicsCache::SicsCache(QSettings* pSettings) : m_pSettings(pSettings)
 	for(const std::string& strKey : vecKeysLine)
 		m_strAllKeys += strKey + "\n";
 
+	using namespace boost::placeholders;
 	m_tcp.add_connect(boost::bind(&SicsCache::slot_connected, this, _1, _2));
 	m_tcp.add_disconnect(boost::bind(&SicsCache::slot_disconnected, this, _1, _2));
 	m_tcp.add_receiver(boost::bind(&SicsCache::slot_receive, this, _1));
