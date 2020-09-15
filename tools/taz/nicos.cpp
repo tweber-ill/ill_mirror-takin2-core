@@ -76,6 +76,7 @@ NicosCache::NicosCache(QSettings* pSettings) : m_pSettings(pSettings)
 		//"logbook/remark",
 	});
 
+	using namespace boost::placeholders;
 	m_tcp.add_connect(boost::bind(&NicosCache::slot_connected, this, _1, _2));
 	m_tcp.add_disconnect(boost::bind(&NicosCache::slot_disconnected, this, _1, _2));
 	m_tcp.add_receiver(boost::bind(&NicosCache::slot_receive, this, _1));
