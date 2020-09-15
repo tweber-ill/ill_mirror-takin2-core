@@ -12,6 +12,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/process.hpp>
 
 #include <QApplication>
 #include <QMenuBar>
@@ -32,6 +33,7 @@
 
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
+namespace proc = boost::process;
 
 using t_real = t_real_glob;
 const std::string TazDlg::s_strTitle = "Takin";
@@ -1548,13 +1550,21 @@ void TazDlg::ShowHelp()
 	std::string strHelp = find_resource("res/doc/takin.qhc");
 	if(strHelp != "")
 	{
-		std::string strHelpProg = "assistant";
-		std::string strHelpProgVer = strHelpProg + "-qt5";
+		std::vector<std::string> vecHelpProg{{
+			std::string{"assistant-qt5"},
+			std::string{"assistant"}
+		}};
 
-		if(std::system((strHelpProgVer + " -collectionFile " + strHelp + "&").c_str()) == 0)
-			return;
-		if(std::system((strHelpProg + " -collectionFile " + strHelp + "&").c_str()) == 0)
-			return;
+		for(const std::string strHelpProg : vecHelpProg)
+		{
+			fs::path pathAssistant = proc::search_path(strHelpProg);
+			if(fs::exists(pathAssistant) && pathAssistant!="")
+			{
+				tl::log_debug("Trying to launch help assistant: ", pathAssistant, ".");
+				proc::spawn(pathAssistant, "-collectionFile", strHelp);
+				return;
+			}
+		}
 
 		tl::log_warn("Help viewer not found, trying associated application.");
 	}
