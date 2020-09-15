@@ -11,7 +11,9 @@ PRG="takin.app"
 
 TOOL=install_name_tool
 STRIP=strip
-QT_VER="5.15.0"
+QT_VER=$(ls /usr/local/Cellar/qt)
+
+echo -e "Qt version: ${QT_VER}"
 
 
 # files whose linkage is to be changed
@@ -46,6 +48,9 @@ declare -a filestochange=(
 	"${PRG}/Contents/Frameworks/libboost_system-mt.dylib"
 	"${PRG}/Contents/Frameworks/libboost_program_options-mt.dylib"
 	"${PRG}/Contents/MacOS/takin"
+	"${PRG}/Contents/MacOS/cif2xml"
+	"${PRG}/Contents/MacOS/findsg"
+	"${PRG}/Contents/MacOS/pol"
 	"${PRG}/Contents/MacOS/convofit"
 	"${PRG}/Contents/MacOS/convoseries"
 	"${PRG}/Contents/MacOS/sfact"
