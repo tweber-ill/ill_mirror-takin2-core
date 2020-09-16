@@ -549,7 +549,7 @@ bool load_sqw_params(SqwBase* pSqw,
 	}
 
 	pSqw->SetVars(vecVars);
-	pSqw->SetFitVars(vecVarsFit);
+	pSqw->InitFitVars(vecVarsFit);
 
 	return 1;
 }

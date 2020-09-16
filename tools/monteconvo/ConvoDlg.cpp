@@ -432,7 +432,7 @@ void ConvoDlg::SqwParamsChanged(const std::vector<SqwBase::t_var>& vecVars,
 	if(!m_pSqw) return;
 
 	m_pSqw->SetVars(vecVars);
-	if(pvecVarsFit) m_pSqw->SetFitVars(*pvecVarsFit);
+	if(pvecVarsFit) m_pSqw->InitFitVars(*pvecVarsFit);
 
 #ifndef NDEBUG
 	// check: read parameters back in
@@ -465,6 +465,13 @@ void ConvoDlg::SetSqwParams(const std::vector<std::tuple<std::string, std::strin
 		if(std::get<2>(param) != "")
 			m_pSqw->SetErrIfAvail(std::get<0>(param), std::get<2>(param));
 	}
+
+	/*auto vars = m_pSqw->GetVars();
+	auto fitvars = m_pSqw->GetFitVars();
+	for(const auto& var : vars)
+		std::cout << std::get<0>(var) << " " << std::get<1>(var) << " " << std::get<2>(var) << std::endl;
+	for(const auto& var : fitvars)
+		std::cout << std::get<0>(var) << " " << std::get<1>(var) << " " << std::get<2>(var) << std::endl;*/
 
 	// read parameters back in to update paramters dialog
 	emit SqwLoaded(m_pSqw->GetVars(), &m_pSqw->GetFitVars());
@@ -705,12 +712,12 @@ void ConvoDlg::showSqwParamDlg()
 void ConvoDlg::ShowAboutDlg()
 {
 	std::ostringstream ostrAbout;
-	ostrAbout << "Takin/Monteconvo version " << TAKIN_VER << ".\n";
+	ostrAbout << "Takin/Convo version " << TAKIN_VER << ".\n";
 	ostrAbout << "Written by Tobias Weber <tweber@ill.fr>,\n";
 	ostrAbout << "2015 - 2020.\n";
-	ostrAbout << "\n" << TAKIN_LICENSE("Takin/Monteconvo");
+	ostrAbout << "\n" << TAKIN_LICENSE("Takin/Convo");
 
-	QMessageBox::about(this, "About Monteconvo", ostrAbout.str().c_str());
+	QMessageBox::about(this, "About Convo", ostrAbout.str().c_str());
 }
 
 

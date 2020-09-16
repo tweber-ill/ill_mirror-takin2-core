@@ -1541,7 +1541,7 @@ void TazDlg::ShowAbout()
 
 void TazDlg::ReportBug()
 {
-	QDesktopServices::openUrl(QUrl("https://code.ill.fr/groups/scientific-software/takin/-/issues"));
+	QDesktopServices::openUrl(QUrl("https://code.ill.fr/scientific-software/takin/core/-/issues"));
 }
 
 
@@ -1570,7 +1570,7 @@ void TazDlg::ShowHelp()
 			fs::path pathAssistant = proc::search_path(strHelpProg);
 			if(fs::exists(pathAssistant) && pathAssistant!="")
 			{
-				tl::log_debug("Trying to launch help assistant: ", pathAssistant, ".");
+				tl::log_debug("Trying to launch help viewer: ", pathAssistant, ".");
 				proc::spawn(pathAssistant, "-collectionFile", strHelp);
 				return;
 			}

@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	virtual void SetFitVars(const std::vector<t_var_fit>& vecFit) override
+	virtual void InitFitVars(const std::vector<t_var_fit>& vecFit) override
 	{
 	}
 

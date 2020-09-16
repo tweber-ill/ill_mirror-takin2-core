@@ -56,9 +56,9 @@ public:
 		m_pDelegate->SetVars(vars);
 	}
 
-	virtual void SetFitVars(const std::vector<t_var_fit>& vecFit) override
+	virtual void InitFitVars(const std::vector<t_var_fit>& vecFit) override
 	{
-		m_pDelegate->SetFitVars(vecFit);
+		m_pDelegate->InitFitVars(vecFit);
 	}
 
 	virtual bool SetVarIfAvail(const std::string& strKey, const std::string& strNewVal) override

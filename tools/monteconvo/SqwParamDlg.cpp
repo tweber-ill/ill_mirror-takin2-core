@@ -10,6 +10,7 @@
 #include <QCheckBox>
 
 
+
 SqwParamDlg::SqwParamDlg(QWidget* pParent, QSettings* pSett)
 	: QDialog(pParent), m_pSett(pSett)
 {
@@ -29,6 +30,7 @@ SqwParamDlg::SqwParamDlg(QWidget* pParent, QSettings* pSett)
 	if(m_pSett && m_pSett->contains("monteconvo/param_geo"))
 		restoreGeometry(m_pSett->value("monteconvo/param_geo").toByteArray());
 }
+
 
 SqwParamDlg::~SqwParamDlg()
 {}
@@ -132,6 +134,7 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 	tableParams->setSortingEnabled(bSortTable);
 }
 
+
 void SqwParamDlg::SaveSqwParams()
 {
 	std::vector<SqwBase::t_var> vecVars;
@@ -165,6 +168,7 @@ void SqwParamDlg::showEvent(QShowEvent *pEvt)
 {
 	QDialog::showEvent(pEvt);
 }
+
 
 void SqwParamDlg::ButtonBoxClicked(QAbstractButton *pBtn)
 {

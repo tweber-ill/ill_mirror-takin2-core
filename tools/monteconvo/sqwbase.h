@@ -52,9 +52,12 @@ public:
 	virtual std::vector<t_var> GetVars() const = 0;
 	virtual const std::vector<t_var_fit>& GetFitVars() const { return m_vecFit; }
 
-	// set model variables
+	// updates model variables
 	virtual void SetVars(const std::vector<t_var>&) = 0;
-	virtual void SetFitVars(const std::vector<t_var_fit>& vecFit) { m_vecFit = vecFit; }
+	virtual void SetFitVars(const std::vector<t_var_fit>&);
+
+	// this replaces the current fit variables with the given ones
+	virtual void InitFitVars(const std::vector<t_var_fit>&);
 
 	virtual bool SetVarIfAvail(const std::string& strKey, const std::string& strNewVal);
 	virtual bool SetErrIfAvail(const std::string& strKey, const std::string& strNewErr);
