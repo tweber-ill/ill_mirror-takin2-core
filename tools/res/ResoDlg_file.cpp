@@ -312,11 +312,13 @@ void ResoDlg::Save(std::map<std::string, std::string>& mapConf, const std::strin
 
 	mapConf[strXmlRoot + "reso/use_guide"] = groupGuide->isChecked() ? "1" : "0";
 
+	const char* pcUser = std::getenv("USER");
+	if(!pcUser) pcUser = "";
 	mapConf[strXmlRoot + "meta/comment"] = textComment->toPlainText().toStdString();
 	mapConf[strXmlRoot + "meta/timestamp"] = tl::var_to_str<t_real_reso>(tl::epoch<t_real_reso>());
 	mapConf[strXmlRoot + "meta/version"] = TAKIN_VER;
 	mapConf[strXmlRoot + "meta/info"] = "Created with Takin/Reso.";
-	mapConf[strXmlRoot + "meta/user"] = std::getenv("USER");
+	mapConf[strXmlRoot + "meta/user"] = pcUser;
 }
 
 

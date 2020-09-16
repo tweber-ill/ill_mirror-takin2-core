@@ -264,10 +264,12 @@ void ConvoDlg::Save(std::map<std::string, std::string>& mapConf, const std::stri
 			comboSqw->itemData(comboSqw->currentIndex()).toString().toStdString();
 	}
 
+	const char* pcUser = std::getenv("USER");
+	if(!pcUser) pcUser = "";
 	mapConf[strXmlRoot + "meta/timestamp"] = tl::var_to_str<t_real>(tl::epoch<t_real>());
 	mapConf[strXmlRoot + "meta/version"] = TAKIN_VER;
 	mapConf[strXmlRoot + "meta/info"] = "Created with Takin/Monteconvo.";
-	mapConf[strXmlRoot + "meta/user"] = std::getenv("USER");
+	mapConf[strXmlRoot + "meta/user"] = pcUser;
 }
 
 
