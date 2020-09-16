@@ -652,9 +652,12 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pMenuHelp->addAction(pDevelDoc);
 
 	pMenuHelp->addSeparator();
-
 	QAction *pLog = new QAction("Log...", this);
 	pMenuHelp->addAction(pLog);
+
+	pMenuHelp->addSeparator();
+	QAction *pBugReport = new QAction("Report Bug...", this);
+	pMenuHelp->addAction(pBugReport);
 
 	pMenuHelp->addSeparator();
 
@@ -766,6 +769,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QObject::connect(pHelp, SIGNAL(triggered()), this, SLOT(ShowHelp()));
 	QObject::connect(pDevelDoc, SIGNAL(triggered()), this, SLOT(ShowDevelDoc()));
 	QObject::connect(pLog, SIGNAL(triggered()), this, SLOT(ShowLog()));
+	QObject::connect(pBugReport, SIGNAL(triggered()), this, SLOT(ReportBug()));
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
@@ -900,14 +904,14 @@ TazDlg::~TazDlg()
 	DeleteDialogs();
 
 	// don't delete non-optional sub-modules in DeleteDialogs()
-	if(m_pGotoDlg) { delete m_pGotoDlg; m_pGotoDlg = 0; }
-	if(m_pSettingsDlg) { delete m_pSettingsDlg; m_pSettingsDlg = 0; }
+	if(m_pGotoDlg) { delete m_pGotoDlg; m_pGotoDlg = nullptr; }
+	if(m_pSettingsDlg) { delete m_pSettingsDlg; m_pSettingsDlg = nullptr; }
 
-	if(m_pviewRecip) { delete m_pviewRecip; m_pviewRecip = 0; }
-	if(m_pviewProjRecip) { delete m_pviewProjRecip; m_pviewProjRecip = 0; }
-	if(m_pviewRealLattice) { delete m_pviewRealLattice; m_pviewRealLattice = 0; }
-	if(m_pviewReal) { delete m_pviewReal; m_pviewReal = 0; }
-	if(m_pviewTof) { delete m_pviewTof; m_pviewTof = 0; }
+	if(m_pviewRecip) { delete m_pviewRecip; m_pviewRecip = nullptr; }
+	if(m_pviewProjRecip) { delete m_pviewProjRecip; m_pviewProjRecip = nullptr; }
+	if(m_pviewRealLattice) { delete m_pviewRealLattice; m_pviewRealLattice = nullptr; }
+	if(m_pviewReal) { delete m_pviewReal; m_pviewReal = nullptr; }
+	if(m_pviewTof) { delete m_pviewTof; m_pviewTof = nullptr; }
 
 	comboSpaceGroups->clear();
 }
@@ -915,39 +919,39 @@ TazDlg::~TazDlg()
 
 void TazDlg::DeleteDialogs()
 {
-	if(m_pAboutDlg) { delete m_pAboutDlg; m_pAboutDlg = 0; }
-	if(m_pLogDlg) { delete m_pLogDlg; m_pLogDlg = 0; }
-	if(m_pEllipseDlg) { delete m_pEllipseDlg; m_pEllipseDlg = 0; }
-	if(m_pReso) { delete m_pReso; m_pReso = 0; }
-	if(m_pConvoDlg) { delete m_pConvoDlg; m_pConvoDlg = 0; }
-	if(m_pSpuri) { delete m_pSpuri; m_pSpuri = 0; }
-	if(m_pNeutronDlg) { delete m_pNeutronDlg; m_pNeutronDlg = 0; }
-	if(m_pTofDlg) { delete m_pTofDlg; m_pTofDlg = 0; }
-	if(m_pDWDlg) { delete m_pDWDlg; m_pDWDlg = 0; }
-	if(m_pDynPlaneDlg) { delete m_pDynPlaneDlg; m_pDynPlaneDlg = 0; }
+	if(m_pAboutDlg) { delete m_pAboutDlg; m_pAboutDlg = nullptr; }
+	if(m_pLogDlg) { delete m_pLogDlg; m_pLogDlg = nullptr; }
+	if(m_pEllipseDlg) { delete m_pEllipseDlg; m_pEllipseDlg = nullptr; }
+	if(m_pReso) { delete m_pReso; m_pReso = nullptr; }
+	if(m_pConvoDlg) { delete m_pConvoDlg; m_pConvoDlg = nullptr; }
+	if(m_pSpuri) { delete m_pSpuri; m_pSpuri = nullptr; }
+	if(m_pNeutronDlg) { delete m_pNeutronDlg; m_pNeutronDlg = nullptr; }
+	if(m_pTofDlg) { delete m_pTofDlg; m_pTofDlg = nullptr; }
+	if(m_pDWDlg) { delete m_pDWDlg; m_pDWDlg = nullptr; }
+	if(m_pDynPlaneDlg) { delete m_pDynPlaneDlg; m_pDynPlaneDlg = nullptr; }
 	if(m_pScanViewer) { delete m_pScanViewer; m_pScanViewer = nullptr; }
 	if(m_pScanPos) { delete m_pScanPos; m_pScanPos = nullptr; }
 	if(m_pPowderFit) { delete m_pPowderFit; m_pPowderFit = nullptr; }
 	if(m_pAtomsDlg) { delete m_pAtomsDlg; m_pAtomsDlg = nullptr; }
 	if(m_pDeadAnglesDlg) { delete m_pDeadAnglesDlg; m_pDeadAnglesDlg = nullptr; }
-	if(m_pPowderDlg) { delete m_pPowderDlg; m_pPowderDlg = 0; }
+	if(m_pPowderDlg) { delete m_pPowderDlg; m_pPowderDlg = nullptr; }
 
 #if !defined NO_3D
-	if(m_pRecip3d) { delete m_pRecip3d; m_pRecip3d = 0; }
-	if(m_pReal3d) { delete m_pReal3d; m_pReal3d = 0; }
-	if(m_pBZ3d) { delete m_pBZ3d; m_pBZ3d = 0; }
-	if(m_pEllipseDlg3D) { delete m_pEllipseDlg3D; m_pEllipseDlg3D = 0; }
+	if(m_pRecip3d) { delete m_pRecip3d; m_pRecip3d = nullptr; }
+	if(m_pReal3d) { delete m_pReal3d; m_pReal3d = nullptr; }
+	if(m_pBZ3d) { delete m_pBZ3d; m_pBZ3d = nullptr; }
+	if(m_pEllipseDlg3D) { delete m_pEllipseDlg3D; m_pEllipseDlg3D = nullptr; }
 #endif
 
 #if !defined NO_NET
-	if(m_pSrvDlg) { delete m_pSrvDlg; m_pSrvDlg = 0; }
-	if(m_pScanMonDlg) { delete m_pScanMonDlg; m_pScanMonDlg = 0; }
-	if(m_pNetCacheDlg) { delete m_pNetCacheDlg; m_pNetCacheDlg = 0; }
-	if(m_pNetCache) { delete m_pNetCache; m_pNetCache = 0; }
+	if(m_pSrvDlg) { delete m_pSrvDlg; m_pSrvDlg = nullptr; }
+	if(m_pScanMonDlg) { delete m_pScanMonDlg; m_pScanMonDlg = nullptr; }
+	if(m_pNetCacheDlg) { delete m_pNetCacheDlg; m_pNetCacheDlg = nullptr; }
+	if(m_pNetCache) { delete m_pNetCache; m_pNetCache = nullptr; }
 #endif
 
-	if(m_pSgListDlg) { delete m_pSgListDlg; m_pSgListDlg = 0; }
-	if(m_pFormfactorDlg) { delete m_pFormfactorDlg; m_pFormfactorDlg = 0; }
+	if(m_pSgListDlg) { delete m_pSgListDlg; m_pSgListDlg = nullptr; }
+	if(m_pFormfactorDlg) { delete m_pFormfactorDlg; m_pFormfactorDlg = nullptr; }
 }
 
 
@@ -1532,6 +1536,12 @@ void TazDlg::ShowAbout()
 		m_pAboutDlg = new AboutDlg(this, &m_settings);
 
 	focus_dlg(m_pAboutDlg);
+}
+
+
+void TazDlg::ReportBug()
+{
+	QDesktopServices::openUrl(QUrl("https://code.ill.fr/scientific-software/takin/core/-/issues"));
 }
 
 
