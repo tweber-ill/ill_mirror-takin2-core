@@ -198,9 +198,9 @@ bool TazDlg::Load(const char* pcFile)
 		if(bOk)
 			m_sceneReal.GetTasLayout()->SetScaleFactor(dRealScale);
 
-		unsigned int iNodeReal = 0;
-		for(TasLayoutNode *pNode : m_sceneReal.GetTasLayout()->GetNodes())
+		for(std::size_t iNodeReal=0; iNodeReal<m_sceneReal.GetTasLayout()->GetNodes().size(); ++iNodeReal)
 		{
+			TasLayoutNode *pNode = m_sceneReal.GetTasLayout()->GetNodes()[iNodeReal];
 			std::string strNode = m_sceneReal.GetTasLayout()->GetNodeNames()[iNodeReal];
 
 			bool bOkX=0, bOkY=0;
@@ -208,7 +208,6 @@ bool TazDlg::Load(const char* pcFile)
 			t_real dValY = xml.Query<t_real>(strXmlRoot + "real/" + strNode + "_y", 0., &bOkY);
 
 			pNode->setPos(dValX, dValY);
-			++iNodeReal;
 		}
 
 		int bWSEnabled = xml.Query<int>(strXmlRoot + "real/enable_ws", 0, &bOk);
@@ -328,7 +327,7 @@ bool TazDlg::Load(const char* pcFile)
 	{
 		m_vecDeadAngles.reserve(iNumAngles);
 
-		for(std::size_t iAngle=0; iAngle<iNumAngles; ++iAngle)
+		for(unsigned int iAngle=0; iAngle<iNumAngles; ++iAngle)
 		{
 			DeadAngle<t_real> angle;
 
@@ -425,16 +424,14 @@ bool TazDlg::Save()
 		= {&m_vecEdits_real, &m_vecEdits_recip, &m_vecEdits_plane, &m_vecEdits_monoana};
 	std::vector<const std::vector<std::string>*> vecEditNames
 		= {&m_vecEditNames_real, &m_vecEditNames_recip, &m_vecEditNames_plane, &m_vecEditNames_monoana};
-	unsigned int iIdxEdit = 0;
-	for(const std::vector<QLineEdit*>* pVec : vecEdits)
+	for(std::size_t iIdxEdit=0; iIdxEdit<vecEdits.size(); ++iIdxEdit)
 	{
+		const std::vector<QLineEdit*>* pVec = vecEdits[iIdxEdit];
 		const std::vector<std::string>* pvecName = vecEditNames[iIdxEdit];
 
-		for(unsigned int iEditBox=0; iEditBox<pVec->size(); ++iEditBox)
+		for(std::size_t iEditBox=0; iEditBox<pVec->size(); ++iEditBox)
 			mapConf[strXmlRoot+(*pvecName)[iEditBox]]
 			        = (*pVec)[iEditBox]->text().toStdString();
-
-		++iIdxEdit;
 	}
 
 	mapConf[strXmlRoot + "sample/descr"] = editDescr->text().toStdString();

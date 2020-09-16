@@ -13,6 +13,7 @@ rm -fv obj/*.o
 rm -fv ui/*.h
 rm -fv *.moc
 rm -fv libs/*.moc
+rm -fv libs/qt/*.moc
 rm -fv tools/taz/*.moc
 rm -fv tools/res/*.moc
 rm -fv tools/scanviewer/*.moc
@@ -20,6 +21,7 @@ rm -fv tools/scanpos/*.moc
 rm -fv tools/powderfit/*.moc
 rm -fv tools/monteconvo/*.moc
 rm -fv tools/sglist/*.moc
+rm -fv tools/ffact/*.moc
 rm -fv dialogs/*.moc
 
 rm -fv doc/takin.qch
