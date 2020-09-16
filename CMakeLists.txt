@@ -222,6 +222,7 @@ else()
 	add_definitions(-DNO_HELP_ASSISTANT)
 	add_definitions(-DNO_TERM_CMDS)
 	add_definitions(-DUSE_WIDE_STR)
+	add_definitions(-DNO_IOSTR)
 endif()
 
 # hack to prevent math_fwd.h inclusion

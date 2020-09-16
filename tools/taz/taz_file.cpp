@@ -163,9 +163,9 @@ bool TazDlg::Load(const char* pcFile)
 	std::vector<std::vector<std::string>*> vecEditNames
 		= {&m_vecEditNames_real, &m_vecEditNames_recip,
 			&m_vecEditNames_plane, &m_vecEditNames_monoana};
-	unsigned int iIdxEdit = 0;
-	for(const std::vector<QLineEdit*>* pVec : vecEdits)
+	for(std::size_t iIdxEdit=0; iIdxEdit<vecEdits.size(); ++iIdxEdit)
 	{
+		const std::vector<QLineEdit*>* pVec = vecEdits[iIdxEdit];
 		const std::vector<std::string>* pvecName = vecEditNames[iIdxEdit];
 
 		for(std::size_t iEditBox=0; iEditBox<pVec->size(); ++iEditBox)
@@ -175,8 +175,6 @@ bool TazDlg::Load(const char* pcFile)
 			if(bOk)
 				(*pVec)[iEditBox]->setText(str.c_str());
 		}
-
-		++iIdxEdit;
 	}
 
 	std::string strDescr = xml.Query<std::string>(strXmlRoot+"sample/descr", "", &bOk);
@@ -185,7 +183,7 @@ bool TazDlg::Load(const char* pcFile)
 
 
 	// check boxes
-	for(unsigned int iCheckBox=0; iCheckBox<m_vecCheckBoxesSenses.size(); ++iCheckBox)
+	for(std::size_t iCheckBox=0; iCheckBox<m_vecCheckBoxesSenses.size(); ++iCheckBox)
 	{
 		int iVal = xml.Query<int>(strXmlRoot+m_vecCheckBoxNamesSenses[iCheckBox], 0, &bOk);
 		if(bOk)
@@ -230,9 +228,9 @@ bool TazDlg::Load(const char* pcFile)
 		if(bOk)
 			m_sceneRecip.GetTriangle()->SetScaleFactor(dRecipScale);
 
-		unsigned int iNodeRecip = 0;
-		for(ScatteringTriangleNode *pNode : m_sceneRecip.GetTriangle()->GetNodes())
+		for(std::size_t iNodeRecip=0; iNodeRecip<m_sceneRecip.GetTriangle()->GetNodes().size(); ++iNodeRecip)
 		{
+			ScatteringTriangleNode *pNode = m_sceneRecip.GetTriangle()->GetNodes()[iNodeRecip];
 			std::string strNode = m_sceneRecip.GetTriangle()->GetNodeNames()[iNodeRecip];
 
 			bool bOkX=0, bOkY=0;
@@ -240,7 +238,6 @@ bool TazDlg::Load(const char* pcFile)
 			t_real dValY = xml.Query<t_real>(strXmlRoot + "recip/" + strNode + "_y", 0., &bOkY);
 
 			pNode->setPos(dValX, dValY);
-			++iNodeRecip;
 		}
 
 
@@ -331,7 +328,7 @@ bool TazDlg::Load(const char* pcFile)
 	{
 		m_vecDeadAngles.reserve(iNumAngles);
 
-		for(unsigned int iAngle=0; iAngle<iNumAngles; ++iAngle)
+		for(std::size_t iAngle=0; iAngle<iNumAngles; ++iAngle)
 		{
 			DeadAngle<t_real> angle;
 
@@ -444,40 +441,36 @@ bool TazDlg::Save()
 
 
 	// check boxes
-	for(unsigned int iCheckBox=0; iCheckBox<m_vecCheckBoxesSenses.size(); ++iCheckBox)
+	for(std::size_t iCheckBox=0; iCheckBox<m_vecCheckBoxesSenses.size(); ++iCheckBox)
 		mapConf[strXmlRoot+m_vecCheckBoxNamesSenses[iCheckBox]]
-		        		= (m_vecCheckBoxesSenses[iCheckBox]->isChecked() ? "1" : "0");
+			= (m_vecCheckBoxesSenses[iCheckBox]->isChecked() ? "1" : "0");
 
 
 	// TAS layout
-	unsigned int iNodeReal = 0;
-	for(const TasLayoutNode *pNode : m_sceneReal.GetTasLayout()->GetNodes())
+	for(std::size_t iNodeReal=0; iNodeReal<m_sceneReal.GetTasLayout()->GetNodes().size(); ++iNodeReal)
 	{
+		const TasLayoutNode *pNode = m_sceneReal.GetTasLayout()->GetNodes()[iNodeReal];
 		std::string strNode = m_sceneReal.GetTasLayout()->GetNodeNames()[iNodeReal];
 		std::string strValX = tl::var_to_str(pNode->pos().x());
 		std::string strValY = tl::var_to_str(pNode->pos().y());
 
 		mapConf[strXmlRoot + "real/" + strNode + "_x"] = strValX;
 		mapConf[strXmlRoot + "real/" + strNode + "_y"] = strValY;
-
-		++iNodeReal;
 	}
 	t_real dRealScale = m_sceneReal.GetTasLayout()->GetScaleFactor();
 	mapConf[strXmlRoot + "real/pixels_per_cm"] = tl::var_to_str(dRealScale);
 
 
 	// scattering triangle
-	unsigned int iNodeRecip = 0;
-	for(const ScatteringTriangleNode *pNode : m_sceneRecip.GetTriangle()->GetNodes())
+	for(std::size_t iNodeRecip=0; iNodeRecip<m_sceneRecip.GetTriangle()->GetNodes().size(); ++iNodeRecip)
 	{
+		const ScatteringTriangleNode *pNode = m_sceneRecip.GetTriangle()->GetNodes()[iNodeRecip];
 		std::string strNode = m_sceneRecip.GetTriangle()->GetNodeNames()[iNodeRecip];
 		std::string strValX = tl::var_to_str(pNode->pos().x());
 		std::string strValY = tl::var_to_str(pNode->pos().y());
 
 		mapConf[strXmlRoot + "recip/" + strNode + "_x"] = strValX;
 		mapConf[strXmlRoot + "recip/" + strNode + "_y"] = strValY;
-
-		++iNodeRecip;
 	}
 	t_real dRecipScale = m_sceneRecip.GetTriangle()->GetScaleFactor();
 	mapConf[strXmlRoot + "recip/pixels_per_A-1"] = tl::var_to_str(dRecipScale);
@@ -523,7 +516,7 @@ bool TazDlg::Save()
 
 	// atom positions
 	mapConf[strXmlRoot + "sample/atoms/num"] = tl::var_to_str(m_vecAtoms.size());
-	for(unsigned int iAtom=0; iAtom<m_vecAtoms.size(); ++iAtom)
+	for(std::size_t iAtom=0; iAtom<m_vecAtoms.size(); ++iAtom)
 	{
 		const xtl::AtomPos<t_real>& atom = m_vecAtoms[iAtom];
 
@@ -541,7 +534,7 @@ bool TazDlg::Save()
 
 	// dead angles
 	mapConf[strXmlRoot + "deadangles/num"] = tl::var_to_str(m_vecDeadAngles.size());
-	for(unsigned int iAngle=0; iAngle<m_vecDeadAngles.size(); ++iAngle)
+	for(std::size_t iAngle=0; iAngle<m_vecDeadAngles.size(); ++iAngle)
 	{
 		const DeadAngle<t_real>& angle = m_vecDeadAngles[iAngle];
 
