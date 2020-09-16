@@ -1032,7 +1032,9 @@ void ScatteringTriangle::CalcPeaks(const xtl::LatticeCommon<t_real>& recipcommon
 	// iterate over all bragg peaks
 	const int iMaxPeaks = bIsPowder ? m_iMaxPeaks/2 : m_iMaxPeaks;
 	for(int ih=-iMaxPeaks; ih<=iMaxPeaks; ++ih)
+	{
 		for(int ik=-iMaxPeaks; ik<=iMaxPeaks; ++ik)
+		{
 			for(int il=-iMaxPeaks; il<=iMaxPeaks; ++il)
 			{
 				const t_real h=t_real(ih); const t_real k=t_real(ik); const t_real l=t_real(il);
@@ -1050,7 +1052,7 @@ void ScatteringTriangle::CalcPeaks(const xtl::LatticeCommon<t_real>& recipcommon
 				if(!bHasGenRefl)
 					continue;
 
-				t_vec vecPeak = m_recip.GetPos(h,k,l);
+				t_vec vecPeak = m_recip.GetPos(h, k, l);
 
 				// add peak in 1/A and rlu units (only 1/A vectors are used for kd calculation)
 				lstPeaksForKd.push_back(std::vector<t_real>
@@ -1167,9 +1169,11 @@ void ScatteringTriangle::CalcPeaks(const xtl::LatticeCommon<t_real>& recipcommon
 					}
 				}
 
-				if(bIsPowder)
+				if(bIsPowder && (bHasRefl || m_bShowAllPeaks))
 					powder.AddPeak(ih, ik, il, dF);
 			}
+		}
+	}
 
 	// single crystal
 	if(!bIsPowder)

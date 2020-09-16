@@ -1541,7 +1541,7 @@ void TazDlg::ShowAbout()
 
 void TazDlg::ReportBug()
 {
-	QDesktopServices::openUrl(QUrl("https://code.ill.fr/scientific-software/takin/core/-/issues"));
+	QDesktopServices::openUrl(QUrl("https://code.ill.fr/groups/scientific-software/takin/-/issues"));
 }
 
 

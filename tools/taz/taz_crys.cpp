@@ -14,11 +14,13 @@
 
 using t_real = t_real_glob;
 
+
 static inline QString dtoqstr(t_real dVal, unsigned int iPrec=8)
 {
 	std::string str = tl::var_to_str(dVal, iPrec);
 	return QString(str.c_str());
 }
+
 
 std::ostream& operator<<(std::ostream& ostr, const tl::Lattice<t_real>& lat)
 {
@@ -30,6 +32,7 @@ std::ostream& operator<<(std::ostream& ostr, const tl::Lattice<t_real>& lat)
 	ostr << ", gamma = " << lat.GetGamma();
 	return ostr;
 }
+
 
 void TazDlg::emitSampleParams()
 {
@@ -57,6 +60,7 @@ void TazDlg::emitSampleParams()
 	emit SampleParamsChanged(sampleparams);
 }
 
+
 void TazDlg::SetCrystalType()
 {
 	m_crystalsys = xtl::CrystalSystem::CRYS_NOT_SET;
@@ -70,6 +74,7 @@ void TazDlg::SetCrystalType()
 
 	CheckCrystalType();
 }
+
 
 void TazDlg::CheckCrystalType()
 {
@@ -87,6 +92,7 @@ void TazDlg::CheckCrystalType()
 		editARecip, editBRecip, editCRecip,
 		editAlphaRecip, editBetaRecip, editGammaRecip);
 }
+
 
 void TazDlg::CalcPeaksRecip()
 {
@@ -121,6 +127,7 @@ void TazDlg::CalcPeaksRecip()
 		tl::log_err(ex.what());
 	}
 }
+
 
 void TazDlg::CalcPeaks()
 {
@@ -305,6 +312,7 @@ void TazDlg::CalcPeaks()
 	}
 }
 
+
 void TazDlg::VarsChanged(const CrystalOptions& crys, const TriangleOptions& triag)
 {
 	// update crystal
@@ -447,44 +455,53 @@ void TazDlg::VarsChanged(const CrystalOptions& crys, const TriangleOptions& tria
 	}
 }
 
+
 void TazDlg::RotatePlane(unsigned iAxis, t_real dAngle)
 {
-	m_bReady = false;
+	try
+	{
+		m_bReady = false;
 
-	t_real dX0 = editScatX0->text().toDouble();
-	t_real dX1 = editScatX1->text().toDouble();
-	t_real dX2 = editScatX2->text().toDouble();
-	ublas::vector<t_real> vecX = tl::make_vec({dX0, dX1, dX2});
+		t_real dX0 = editScatX0->text().toDouble();
+		t_real dX1 = editScatX1->text().toDouble();
+		t_real dX2 = editScatX2->text().toDouble();
+		ublas::vector<t_real> vecX = tl::make_vec({dX0, dX1, dX2});
 
-	t_real dY0 = editScatY0->text().toDouble();
-	t_real dY1 = editScatY1->text().toDouble();
-	t_real dY2 = editScatY2->text().toDouble();
-	ublas::vector<t_real> vecY = tl::make_vec({dY0, dY1, dY2});
+		t_real dY0 = editScatY0->text().toDouble();
+		t_real dY1 = editScatY1->text().toDouble();
+		t_real dY2 = editScatY2->text().toDouble();
+		ublas::vector<t_real> vecY = tl::make_vec({dY0, dY1, dY2});
 
-	ublas::vector<t_real> vecZ = tl::cross_3(vecX, vecY);
+		ublas::vector<t_real> vecZ = tl::cross_3(vecX, vecY);
 
-	std::vector<ublas::vector<t_real>> vecOrth =
-		tl::gram_schmidt<ublas::vector<t_real>>
-			({vecX, vecY, vecZ}, 1);
+		std::vector<ublas::vector<t_real>> vecOrth =
+			tl::gram_schmidt<ublas::vector<t_real>>
+				({vecX, vecY, vecZ}, 1);
 
-	ublas::matrix<t_real> matRot =
-		tl::rotation_matrix(vecOrth[iAxis], dAngle);
-	vecX = ublas::prod(matRot, vecOrth[0]);
-	vecY = ublas::prod(matRot, vecOrth[1]);
+		ublas::matrix<t_real> matRot =
+			tl::rotation_matrix(vecOrth[iAxis], dAngle);
+		vecX = ublas::prod(matRot, vecOrth[0]);
+		vecY = ublas::prod(matRot, vecOrth[1]);
 
-	tl::set_eps_0(vecX, g_dEps);
-	tl::set_eps_0(vecY, g_dEps);
+		tl::set_eps_0(vecX, g_dEps);
+		tl::set_eps_0(vecY, g_dEps);
 
-	editScatX0->setText(tl::var_to_str(vecX[0], g_iPrec).c_str());
-	editScatX1->setText(tl::var_to_str(vecX[1], g_iPrec).c_str());
-	editScatX2->setText(tl::var_to_str(vecX[2], g_iPrec).c_str());
-	editScatY0->setText(tl::var_to_str(vecY[0], g_iPrec).c_str());
-	editScatY1->setText(tl::var_to_str(vecY[1], g_iPrec).c_str());
-	editScatY2->setText(tl::var_to_str(vecY[2], g_iPrec).c_str());
+		editScatX0->setText(tl::var_to_str(vecX[0], g_iPrec).c_str());
+		editScatX1->setText(tl::var_to_str(vecX[1], g_iPrec).c_str());
+		editScatX2->setText(tl::var_to_str(vecX[2], g_iPrec).c_str());
+		editScatY0->setText(tl::var_to_str(vecY[0], g_iPrec).c_str());
+		editScatY1->setText(tl::var_to_str(vecY[1], g_iPrec).c_str());
+		editScatY2->setText(tl::var_to_str(vecY[2], g_iPrec).c_str());
 
-	m_bReady = true;
-	CalcPeaks();
+		m_bReady = true;
+		CalcPeaks();
+	}
+	catch(const std::exception& ex)
+	{
+		tl::log_err(ex.what());
+	}
 }
+
 
 void TazDlg::RepopulateSpaceGroups()
 {
@@ -583,6 +600,7 @@ void TazDlg::ShowSpurions()
 	focus_dlg(m_pSpuri);
 }
 
+
 void TazDlg::spurionInfo(const tl::ElasticSpurion& spuri,
 	const std::vector<tl::InelasticSpurion<t_real>>& vecInelCKI,
 	const std::vector<tl::InelasticSpurion<t_real>>& vecInelCKF)
@@ -679,11 +697,13 @@ void TazDlg::InitReso()
 	}
 }
 
+
 void TazDlg::ShowResoParams()
 {
 	InitReso();
 	focus_dlg(m_pReso);
 }
+
 
 void TazDlg::ShowResoEllipses()
 {
@@ -701,17 +721,20 @@ void TazDlg::ShowResoEllipses()
 	focus_dlg(m_pEllipseDlg);
 }
 
+
 void TazDlg::InitResoConv()
 {
 	if(!m_pConvoDlg)
 		m_pConvoDlg = new ConvoDlg(this, &m_settings);
 }
 
+
 void TazDlg::ShowResoConv()
 {
 	InitResoConv();
 	focus_dlg(m_pConvoDlg);
 }
+
 
 #ifndef NO_3D
 void TazDlg::ShowResoEllipses3D()
@@ -771,8 +794,15 @@ void TazDlg::ShowAtomsDlg(bool bOnlyCreate)
 
 void TazDlg::ApplyAtoms(const std::vector<xtl::AtomPos<t_real>>& vecAtoms)
 {
-	m_vecAtoms = vecAtoms;
-	CalcPeaks();
+	try
+	{
+		m_vecAtoms = vecAtoms;
+		CalcPeaks();
+	}
+	catch(const std::exception& ex)
+	{
+		tl::log_err(ex.what());
+	}
 }
 
 
