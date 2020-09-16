@@ -110,7 +110,8 @@ void ConvoDlg::StartFit()
 	t_sqwparams sqwparams = GetSqwParams(true);
 	if(sqwparams.size() == 0)
 	{
-		QMessageBox::critical(this, "Error", "No fit parameters defined.");
+		QMessageBox::critical(this, "Error", "No fit parameters defined."
+			" Please set them up in the model parameters dialog (\"...\" button).");
 		return;
 	}
 
@@ -120,13 +121,35 @@ void ConvoDlg::StartFit()
 	m_atStop.store(false);
 
 
+	// get fit parameters
+	std::ostringstream ostrZeroErr;
+	bool bAnyErrorNonZero = 0;
+
 	minuit::MnUserParameters params;
 	for(const auto& sqwparam : sqwparams)
 	{
 		t_real val = tl::str_to_var<t_real_min>(std::get<2>(sqwparam));
 		t_real err = tl::str_to_var<t_real_min>(std::get<3>(sqwparam));
 		params.Add(std::get<0>(sqwparam), val, err);
+
+		if(tl::float_equal(err, t_real{0}))
+			ostrZeroErr << std::get<0>(sqwparam) << ", ";
+		else
+			bAnyErrorNonZero = 1;
 	}
+
+	if(ostrZeroErr.str() != "")
+	{
+		std::string msg = "The error of the following parameters is zero:\n\n"
+			+ ostrZeroErr.str() + "\n\nno fitting will be done for them."
+			" Please set the errors to non-zero in the model parameters dialog (\"...\" button).";
+
+		QMessageBox::warning(this, "Warning", msg.c_str());
+	}
+
+	// nothing to be done if all errors are zero
+	if(!bAnyErrorNonZero)
+		return;
 
 
 	// minimise
