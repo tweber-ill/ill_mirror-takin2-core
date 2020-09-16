@@ -197,14 +197,8 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		return false;
 
 
-	bool bUseScan = cfg.has_scanfile;
-	t_real dScale = cfg.S_scale;
-	t_real dSlope = cfg.S_slope;
-	t_real dOffs = cfg.S_offs;
-
-
 	Scan scan;
-	if(bUseScan)
+	if(cfg.has_scanfile)
 	{
 		if(!load_scan_file(cfg.scanfile, scan, cfg.flip_coords))
 		{
@@ -230,10 +224,6 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 	tl::Stopwatch<t_real> watch;
 	watch.start();
-
-	const unsigned int iNumNeutrons = cfg.neutron_count;
-	const unsigned int iNumSampleSteps = cfg.sample_step_count;
-	const unsigned int iNumSteps = cfg.step_count;
 
 	bool bScanAxisFound = 0;
 	int iScanAxisIdx = 0;
@@ -272,7 +262,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	// -------------------------------------------------------------------------
 
 
-	if(bUseScan)	// get crystal definition from scan file
+	if(cfg.has_scanfile)	// get crystal definition from scan file
 	{
 		ublas::vector<t_real> vec1 =
 			tl::make_vec({scan.plane.vec1[0], scan.plane.vec1[1], scan.plane.vec1[2]});
@@ -310,11 +300,11 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	ostrOut.precision(g_iPrec);
 	ostrOut << "#\n";
 	ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
-	ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
-	ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
-	ostrOut << "# Scale: " << dScale << "\n";
-	ostrOut << "# Slope: " << dSlope << "\n";
-	ostrOut << "# Offset: " << dOffs << "\n";
+	ostrOut << "# MC neutrons: " << cfg.neutron_count << "\n";
+	ostrOut << "# MC sample steps: " << cfg.sample_step_count << "\n";
+	ostrOut << "# Scale: " << cfg.S_scale << "\n";
+	ostrOut << "# Slope: " << cfg.S_slope << "\n";
+	ostrOut << "# Offset: " << cfg.S_offs << "\n";
 	if(cfg.scanfile != "")
 		ostrOut << "# Scan file: " << cfg.scanfile << "\n";
 	ostrOut << "#\n";
@@ -328,9 +318,9 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 	std::vector<t_real_reso> vecQ, vecS, vecScaledS;
 
-	vecQ.reserve(iNumSteps);
-	vecS.reserve(iNumSteps);
-	vecScaledS.reserve(iNumSteps);
+	vecQ.reserve(cfg.step_count);
+	vecS.reserve(cfg.step_count);
+	vecScaledS.reserve(cfg.step_count);
 
 	unsigned int iNumThreads = get_max_threads();
 	tl::log_debug("Calculating using ", iNumThreads, " threads.");
@@ -339,20 +329,20 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
 	auto& lstFuts = tp.GetResults();
 
-	for(unsigned int iStep=0; iStep<iNumSteps; ++iStep)
+	for(unsigned int iStep=0; iStep<cfg.step_count; ++iStep)
 	{
 		t_real dCurH = vecH[iStep];
 		t_real dCurK = vecK[iStep];
 		t_real dCurL = vecL[iStep];
 		t_real dCurE = vecE[iStep];
 
-		tp.AddTask([&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, pSqw]()
+		tp.AddTask([&reso, dCurH, dCurK, dCurL, dCurE, pSqw, &cfg]()
 			-> std::pair<bool, t_real>
 		{
 			t_real dS = 0.;
 			t_real dhklE_mean[4] = {0., 0., 0., 0.};
 
-			if(iNumNeutrons == 0)
+			if(cfg.neutron_count == 0)
 			{	// if no neutrons are given, just plot the unconvoluted S(q,w)
 				// TODO: add an option to let the user choose if S(Q,E) is
 				// really the dynamical structure factor, or its absolute square
@@ -361,7 +351,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 			else
 			{	// convolution
 				TASReso localreso = reso;
-				localreso.SetRandomSamplePos(iNumSampleSteps);
+				localreso.SetRandomSamplePos(cfg.sample_step_count);
 				std::vector<ublas::vector<t_real>> vecNeutrons;
 
 				try
@@ -382,7 +372,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 				}
 
 				Ellipsoid4d<t_real> elli =
-					localreso.GenerateMC_deferred(iNumNeutrons, vecNeutrons);
+					localreso.GenerateMC_deferred(cfg.neutron_count, vecNeutrons);
 
 				for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
 				{
@@ -394,9 +384,9 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 						dhklE_mean[i] += vecHKLE[i];
 				}
 
-				dS /= t_real(iNumNeutrons*iNumSampleSteps);
+				dS /= t_real(cfg.neutron_count*cfg.sample_step_count);
 				for(int i=0; i<4; ++i)
-					dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
+					dhklE_mean[i] /= t_real(cfg.neutron_count*cfg.sample_step_count);
 
 				if(localreso.GetResoParams().flags & CALC_R0)
 					dS *= localreso.GetResoResults().dR0;
@@ -435,7 +425,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 			<< std::left << std::setw(g_iPrec*2) << dS << "\n";
 
 		const t_real dXVal = (*pVecScanX)[iStep];
-		t_real dYVal = dScale*(dS + dSlope*dXVal) + dOffs;
+		t_real dYVal = cfg.S_scale*(dS + cfg.S_slope*dXVal) + cfg.S_offs;
 		if(dYVal < 0.)
 			dYVal = 0.;
 
@@ -457,9 +447,9 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		}
 
 
-		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(iNumSteps));
-		std::cout << "\rStep " << iStep+1 << "/" << iNumSteps << ". Estimated stop time: " << strStopTime << "...          ";
-		if(iStep+1 == iNumSteps)
+		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(cfg.step_count));
+		std::cout << "\rStep " << iStep+1 << "/" << cfg.step_count << ". Estimated stop time: " << strStopTime << "...          ";
+		if(iStep+1 == cfg.step_count)
 			std::cout << "\n";
 		std::cout.flush();
 
@@ -469,7 +459,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 
 	// approximate chi^2
-	if(bUseScan && pSqw)
+	if(cfg.has_scanfile && pSqw)
 	{
 		const std::size_t iNumScanPts = scan.vecPoints.size();
 		std::vector<t_real> vecSFuncY;
@@ -485,7 +475,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 			// find point on S(q,w) curve closest to scan point
 			std::size_t iMinIdx = 0;
 			t_real dMinDist = std::numeric_limits<t_real>::max();
-			for(std::size_t iStep=0; iStep<iNumSteps; ++iStep)
+			for(std::size_t iStep=0; iStep<cfg.step_count; ++iStep)
 			{
 				ublas::vector<t_real> vecCurveHKLE =
 					tl::make_vec({ vecH[iStep], vecK[iStep], vecL[iStep], vecE[iStep] });
@@ -548,53 +538,46 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	tl::Stopwatch<t_real> watch;
 	watch.start();
 
-	const unsigned int iNumNeutrons = cfg.neutron_count;
-	const unsigned int iNumSampleSteps = cfg.sample_step_count;
-	const unsigned int iNumSteps = cfg.step_count;
-
 	const t_real dStartHKL[] = { cfg.h_from, cfg.k_from, cfg.l_from, cfg.E_from };
 	const t_real dDeltaHKL1[] =
 	{
-		(cfg.h_to - cfg.h_from) / t_real(iNumSteps),
-		(cfg.k_to - cfg.k_from) / t_real(iNumSteps),
-		(cfg.l_to - cfg.l_from) / t_real(iNumSteps),
-		(cfg.E_to - cfg.E_from) / t_real(iNumSteps)
+		(cfg.h_to - cfg.h_from) / t_real(cfg.step_count),
+		(cfg.k_to - cfg.k_from) / t_real(cfg.step_count),
+		(cfg.l_to - cfg.l_from) / t_real(cfg.step_count),
+		(cfg.E_to - cfg.E_from) / t_real(cfg.step_count)
 	};
 	const t_real dDeltaHKL2[] =
 	{
-		(cfg.h_to_2 - cfg.h_from) / t_real(iNumSteps),
-		(cfg.k_to_2 - cfg.k_from) / t_real(iNumSteps),
-		(cfg.l_to_2 - cfg.l_from) / t_real(iNumSteps),
-		(cfg.E_to_2 - cfg.E_from) / t_real(iNumSteps)
+		(cfg.h_to_2 - cfg.h_from) / t_real(cfg.step_count),
+		(cfg.k_to_2 - cfg.k_from) / t_real(cfg.step_count),
+		(cfg.l_to_2 - cfg.l_from) / t_real(cfg.step_count),
+		(cfg.E_to_2 - cfg.E_from) / t_real(cfg.step_count)
 	};
 
 
 	// -------------------------------------------------------------------------
 	// find axis labels and ranges
-	const int iScanAxis1 = cfg.scanaxis;
-	const int iScanAxis2 = cfg.scanaxis2;
-
 	std::string strScanVar1 = "";
 	t_real dStart1{}, dStop1{};
-	if(iScanAxis1==1 || (iScanAxis1==0 && !tl::float_equal(cfg.h_from, cfg.h_to, EPS_RLU)))
+	if(cfg.scanaxis==1 || (cfg.scanaxis==0 && !tl::float_equal(cfg.h_from, cfg.h_to, EPS_RLU)))
 	{
 		strScanVar1 = "h (rlu)";
 		dStart1 = cfg.h_from;
 		dStop1 = cfg.h_to;
 	}
-	else if(iScanAxis1==2 || (iScanAxis1==0 && !tl::float_equal(cfg.k_from, cfg.k_to, EPS_RLU)))
+	else if(cfg.scanaxis==2 || (cfg.scanaxis==0 && !tl::float_equal(cfg.k_from, cfg.k_to, EPS_RLU)))
 	{
 		strScanVar1 = "k (rlu)";
 		dStart1 = cfg.k_from;
 		dStop1 = cfg.k_to;
 	}
-	else if(iScanAxis1==3 || (iScanAxis1==0 && !tl::float_equal(cfg.l_from, cfg.l_to, EPS_RLU)))
+	else if(cfg.scanaxis==3 || (cfg.scanaxis==0 && !tl::float_equal(cfg.l_from, cfg.l_to, EPS_RLU)))
 	{
 		strScanVar1 = "l (rlu)";
 		dStart1 = cfg.l_from;
 		dStop1 = cfg.l_to;
 	}
-	else if(iScanAxis1==4 || (iScanAxis1==0 && !tl::float_equal(cfg.E_from, cfg.E_to, EPS_RLU)))
+	else if(cfg.scanaxis==4 || (cfg.scanaxis==0 && !tl::float_equal(cfg.E_from, cfg.E_to, EPS_RLU)))
 	{
 		strScanVar1 = "E (meV)";
 		dStart1 = cfg.E_from;
@@ -603,25 +586,25 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 	std::string strScanVar2 = "";
 	t_real dStart2{}, dStop2{};
-	if(iScanAxis2==1 || (iScanAxis2==0 && !tl::float_equal(cfg.h_from, cfg.h_to_2, EPS_RLU)))
+	if(cfg.scanaxis2==1 || (cfg.scanaxis2==0 && !tl::float_equal(cfg.h_from, cfg.h_to_2, EPS_RLU)))
 	{
 		strScanVar2 = "h (rlu)";
 		dStart2 = cfg.h_from;
 		dStop2 = cfg.h_to_2;
 	}
-	else if(iScanAxis2==2 || (iScanAxis2==0 && !tl::float_equal(cfg.k_from, cfg.k_to_2, EPS_RLU)))
+	else if(cfg.scanaxis2==2 || (cfg.scanaxis2==0 && !tl::float_equal(cfg.k_from, cfg.k_to_2, EPS_RLU)))
 	{
 		strScanVar2 = "k (rlu)";
 		dStart2 = cfg.k_from;
 		dStop2 = cfg.k_to_2;
 	}
-	else if(iScanAxis2==3 || (iScanAxis2==0 && !tl::float_equal(cfg.l_from, cfg.l_to_2, EPS_RLU)))
+	else if(cfg.scanaxis2==3 || (cfg.scanaxis2==0 && !tl::float_equal(cfg.l_from, cfg.l_to_2, EPS_RLU)))
 	{
 		strScanVar2 = "l (rlu)";
 		dStart2 = cfg.l_from;
 		dStop2 = cfg.l_to_2;
 	}
-	else if(iScanAxis2==4 || (iScanAxis2==0 && !tl::float_equal(cfg.E_from, cfg.E_to_2, EPS_RLU)))
+	else if(cfg.scanaxis2==4 || (cfg.scanaxis2==0 && !tl::float_equal(cfg.E_from, cfg.E_to_2, EPS_RLU)))
 	{
 		strScanVar2 = "E (meV)";
 		dStart2 = cfg.E_from;
@@ -673,8 +656,8 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	ostrOut.precision(g_iPrec);
 	ostrOut << "#\n";
 	ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
-	ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
-	ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
+	ostrOut << "# MC neutrons: " << cfg.neutron_count << "\n";
+	ostrOut << "# MC sample steps: " << cfg.sample_step_count << "\n";
 	ostrOut << "#\n";
 	ostrOut << std::left << std::setw(g_iPrec*2) << "# h" << " "
 		<< std::left << std::setw(g_iPrec*2) << "k" << " "
@@ -683,14 +666,14 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		<< std::left << std::setw(g_iPrec*2) << "S(Q,E)" << "\n";
 
 
-	std::vector<t_real> vecH; vecH.reserve(iNumSteps*iNumSteps);
-	std::vector<t_real> vecK; vecK.reserve(iNumSteps*iNumSteps);
-	std::vector<t_real> vecL; vecL.reserve(iNumSteps*iNumSteps);
-	std::vector<t_real> vecE; vecE.reserve(iNumSteps*iNumSteps);
+	std::vector<t_real> vecH; vecH.reserve(cfg.step_count*cfg.step_count);
+	std::vector<t_real> vecK; vecK.reserve(cfg.step_count*cfg.step_count);
+	std::vector<t_real> vecL; vecL.reserve(cfg.step_count*cfg.step_count);
+	std::vector<t_real> vecE; vecE.reserve(cfg.step_count*cfg.step_count);
 
-	for(unsigned int iStepY=0; iStepY<iNumSteps; ++iStepY)
+	for(unsigned int iStepY=0; iStepY<cfg.step_count; ++iStepY)
 	{
-		for(unsigned int iStepX=0; iStepX<iNumSteps; ++iStepX)
+		for(unsigned int iStepX=0; iStepX<cfg.step_count; ++iStepX)
 		{
 			vecH.push_back(dStartHKL[0] + dDeltaHKL2[0]*t_real(iStepY) + dDeltaHKL1[0]*t_real(iStepX));
 			vecK.push_back(dStartHKL[1] + dDeltaHKL2[1]*t_real(iStepY) + dDeltaHKL1[1]*t_real(iStepX));
@@ -706,7 +689,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	tl::ThreadPool<std::pair<bool, t_real>()> tp(iNumThreads, pThStartFunc);
 	auto& lstFuts = tp.GetResults();
 
-	for(unsigned int iStep=0; iStep<iNumSteps*iNumSteps; ++iStep)
+	for(unsigned int iStep=0; iStep<cfg.step_count*cfg.step_count; ++iStep)
 	{
 		t_real dCurH = vecH[iStep];
 		t_real dCurK = vecK[iStep];
@@ -714,13 +697,13 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		t_real dCurE = vecE[iStep];
 
 		tp.AddTask(
-		[&reso, dCurH, dCurK, dCurL, dCurE, iNumNeutrons, iNumSampleSteps, pSqw]()
+		[&reso, dCurH, dCurK, dCurL, dCurE, pSqw, &cfg]()
 			-> std::pair<bool, t_real>
 		{
 			t_real dS = 0.;
 			t_real dhklE_mean[4] = {0., 0., 0., 0.};
 
-			if(iNumNeutrons == 0)
+			if(cfg.neutron_count == 0)
 			{	// if no neutrons are given, just plot the unconvoluted S(q,w)
 				// TODO: add an option to let the user choose if S(Q,E) is
 				// really the dynamical structure factor, or its absolute square
@@ -729,7 +712,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 			else
 			{	// convolution
 				TASReso localreso = reso;
-				localreso.SetRandomSamplePos(iNumSampleSteps);
+				localreso.SetRandomSamplePos(cfg.sample_step_count);
 				std::vector<ublas::vector<t_real>> vecNeutrons;
 
 				try
@@ -751,7 +734,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 				}
 
 				Ellipsoid4d<t_real> elli =
-					localreso.GenerateMC_deferred(iNumNeutrons, vecNeutrons);
+					localreso.GenerateMC_deferred(cfg.neutron_count, vecNeutrons);
 
 				for(const ublas::vector<t_real>& vecHKLE : vecNeutrons)
 				{
@@ -763,9 +746,9 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 						dhklE_mean[i] += vecHKLE[i];
 				}
 
-				dS /= t_real(iNumNeutrons*iNumSampleSteps);
+				dS /= t_real(cfg.neutron_count*cfg.sample_step_count);
 				for(int i=0; i<4; ++i)
-					dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
+					dhklE_mean[i] /= t_real(cfg.neutron_count*cfg.sample_step_count);
 
 				if(localreso.GetResoParams().flags & CALC_R0)
 					dS *= localreso.GetResoResults().dR0;
@@ -816,9 +799,9 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 			ofstrAutosave << ostrOut.str() << std::endl;
 		}
 
-		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(iNumSteps*iNumSteps));
-		std::cout << "\rStep " << iStep+1 << "/" << iNumSteps << ". Estimated stop time: " << strStopTime << "...          ";
-		if(iStep+1 == iNumSteps*iNumSteps)
+		std::string strStopTime = watch.GetEstStopTimeStr(t_real(iStep+1)/t_real(cfg.step_count*cfg.step_count));
+		std::cout << "\rStep " << iStep+1 << "/" << cfg.step_count << ". Estimated stop time: " << strStopTime << "...          ";
+		if(iStep+1 == cfg.step_count*cfg.step_count)
 			std::cout << "\n";
 		std::cout.flush();
 
