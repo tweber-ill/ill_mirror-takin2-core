@@ -10,19 +10,22 @@
 #include <QMutex>
 #include <QMessageBox>
 
-#include <Minuit2/FCNBase.h>
-#include <Minuit2/MnFcn.h>
-#include <Minuit2/FunctionMinimum.h>
-#include <Minuit2/MnMigrad.h>
-#include <Minuit2/MnSimplex.h>
-#include <Minuit2/MnPrint.h>
-
 #include <vector>
 #include <string>
 #include <exception>
 
 using t_real = t_real_reso;
 using t_real_min = double;
+
+
+#ifndef NO_FIT
+
+#include <Minuit2/FCNBase.h>
+#include <Minuit2/MnFcn.h>
+#include <Minuit2/FunctionMinimum.h>
+#include <Minuit2/MnMigrad.h>
+#include <Minuit2/MnSimplex.h>
+#include <Minuit2/MnPrint.h>
 
 
 namespace minuit = ROOT::Minuit2;
@@ -210,3 +213,14 @@ void ConvoDlg::StartFit()
 		this->SetSqwParams(newsqwparams);
 	}
 }
+
+#else
+
+
+void ConvoDlg::StartFit()
+{
+	QMessageBox::critical(this, "Error", "This package of Takin was compiled without the fitting option.");
+}
+
+
+#endif
