@@ -429,6 +429,7 @@ int main(int argc, char** argv)
 		std::cout << "#\n# This is a Takin plugin module.\n#\n";
 		std::cout << "module_ident: " << pcModIdent << "\n";
 		std::cout << "module_name: " << pcModName << "\n";
+		std::cout << "module_type: sqw\n";
 		std::cout << "required_takin_version: " << TAKIN_VER << "\n";
 		std::cout.flush();
 		return 0;

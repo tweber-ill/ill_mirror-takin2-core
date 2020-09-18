@@ -18,20 +18,18 @@ mkdir -p ${INSTDIR}
 
 
 # main programs
-cp -v bin/takin.exe		${INSTDIR}/
-cp -v bin/convofit.exe		${INSTDIR}/
-cp -v bin/convoseries.exe	${INSTDIR}/
-cp -v bin/sfact.exe		${INSTDIR}/
-cp -v COPYING			${INSTDIR}/
-cp -v LICENSES			${INSTDIR}/
-cp -v LITERATURE		${INSTDIR}/
-cp -v AUTHORS			${INSTDIR}/
+cp -v bin/*.exe		${INSTDIR}/
+cp -v COPYING		${INSTDIR}/
+cp -v LICENSES		${INSTDIR}/
+cp -v LITERATURE	${INSTDIR}/
+cp -v AUTHORS		${INSTDIR}/
 
 
 # examples
-cp -rv examples ${INSTDIR}/
-cp -rv takin-data/samples ${INSTDIR}/
-cp -rv takin-data/instruments ${INSTDIR}/
+cp -rv examples 		${INSTDIR}/
+cp -rv data/samples 		${INSTDIR}/
+cp -rv data/instruments 	${INSTDIR}/
+cp -rv data/demos 		${INSTDIR}/
 
 
 # resources
@@ -75,7 +73,7 @@ cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/qwt-qt5.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libfreetype-6.dll	${INSTDIR}/
 
 #cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/liblapack.dll		${INSTDIR}/
-#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/liblapacke.dll		${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/liblapacke.dll	${INSTDIR}/
 #cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libblas.dll		${INSTDIR}/
 #cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libquadmath-0.dll	${INSTDIR}/
 #cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgfortran-5.dll	${INSTDIR}/

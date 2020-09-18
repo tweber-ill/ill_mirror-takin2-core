@@ -115,7 +115,7 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 		t_tupEdit("main/font_gen", g_fontGen.toString().toStdString().c_str(), editGenFont),
 
 		// external tools
-		t_tupEdit("tools/cif2xml", "cif2xml", editCif),
+		t_tupEdit("tools/cif2xml", "takin_cif2xml", editCif),
 		t_tupEdit("tools/gpl", "gnuplot", editGpl)
 	};
 

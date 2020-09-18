@@ -92,9 +92,9 @@ done
 
 # copy binaries
 cp -v bin/takin "${PRG}/Contents/MacOS/"
-cp -v bin/cif2xml "${PRG}/Contents/MacOS/"
-cp -v bin/findsg "${PRG}/Contents/MacOS/"
-cp -v bin/pol "${PRG}/Contents/MacOS/"
+cp -v bin/takin_cif2xml "${PRG}/Contents/MacOS/"
+cp -v bin/takin_findsg "${PRG}/Contents/MacOS/"
+cp -v bin/takin_pol "${PRG}/Contents/MacOS/"
 cp -v bin/takinmod_py "${PRG}/Contents/MacOS/"
 cp -v bin/takinmod_jl "${PRG}/Contents/MacOS/"
 cp -v bin/convofit "${PRG}/Contents/MacOS/"

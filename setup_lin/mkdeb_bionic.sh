@@ -56,9 +56,9 @@ popd
 
 
 # copy optional external programs
-cp -v bin/cif2xml	${INSTDIR}/usr/local/bin
-cp -v bin/findsg	${INSTDIR}/usr/local/bin
-cp -v bin/pol		${INSTDIR}/usr/local/bin
+cp -v bin/takin_cif2xml		${INSTDIR}/usr/local/bin
+cp -v bin/takin_findsg		${INSTDIR}/usr/local/bin
+cp -v bin/takin_pol		${INSTDIR}/usr/local/bin
 
 
 # permissions

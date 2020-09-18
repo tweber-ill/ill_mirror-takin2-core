@@ -34,7 +34,7 @@ bool g_bThreadedGL = 0;
 std::string g_strApp;
 std::string g_strHome;
 
-std::string g_strCifTool = "cif2xml";
+std::string g_strCifTool = "takin_cif2xml";
 std::string g_strGplTool = "gnuplot";
 
 std::size_t GFX_NUM_POINTS = 512;
