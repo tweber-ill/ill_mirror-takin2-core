@@ -11,7 +11,6 @@
 #include <boost/version.hpp>
 #include <qwt_global.h>
 #include "tlibs/version.h"
-#include "libcrystal/version.h"
 
 #include "tlibs/string/string.h"
 #include "libs/formfactors/formfact.h"
@@ -105,14 +104,6 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dd><a href=\"https://github.com/t-weber/tlibs\">https://github.com/t-weber/tlibs</a><br></dd>";
 #else
 	ostrLibs << "<dd><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git</a><br></dd>";
-#endif
-
-	ostrLibs << "<dt>Uses LibCrystal version " << LIBCRYSTAL_VERSION << ".</dt>";
-#ifdef PRIVATE_SRC_VERSION
-	ostrLibs << "<dd><a href=\"https://github.com/t-weber/libcrystal\">https://github.com/t-weber/libcrystal</a><br></dd>";
-#else
-	// TODO
-	ostrLibs << "<dd><br></dd>";
 #endif
 
 #ifndef NO_LAPACK

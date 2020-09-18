@@ -8,9 +8,11 @@
 project(takin)
 cmake_minimum_required(VERSION 3.0)
 
+message("System name: ${CMAKE_SYSTEM_NAME}.")
+
+
 option(DEBUG "debug build" FALSE)
 option(BUILD_FOR_MINGW "build a mingw version" FALSE)
-option(BUILD_FOR_MAC "build a mac version" FALSE)
 option(USE_PLUGINS "use the plugin system" TRUE)
 option(USE_STRIP "strip debug info from release binaries" TRUE)
 option(USE_GENTAB "build setup utilities" TRUE)
@@ -64,6 +66,8 @@ add_definitions(-DBUILD_APPLI)
 set(SOCK2 "")
 
 if(BUILD_FOR_MINGW)
+	message("Setting MinGW options.")
+
 	# stuff needed by mingw
 	set(SOCK2 "ws2_32")
 	set(USE_GENTAB FALSE)
@@ -72,7 +76,9 @@ if(BUILD_FOR_MINGW)
 	set(USE_Py FALSE)
 endif()
 
-if(BUILD_FOR_MAC)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	message("Setting Darwin options.")
+
 	add_compile_options(-mmacosx-version-min=10.10)
 	set(USE_GENTAB FALSE)
 	set(USE_RtMp FALSE)
@@ -411,8 +417,6 @@ add_executable(takin
 	tlibs/string/spec_char.cpp
 	tlibs/helper/flags.cpp  tlibs/version.cpp
 
-	libcrystal/version.cpp
-
 	./3rdparty/Faddeeva.cc
 )
 
@@ -431,8 +435,9 @@ target_link_libraries(takin
 
 # pre-build
 add_custom_target(prebuild-script
-	COMMAND ${PROJECT_SOURCE_DIR}/setup/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR}
-)
+	COMMAND pushd ${PROJECT_SOURCE_DIR} 
+		&& ./setup/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR} 
+		&& popd)
 
 
 # post-build

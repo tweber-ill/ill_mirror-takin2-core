@@ -782,7 +782,7 @@ bool TazDlg::Import(const char* pcFile)
 
 #ifdef USE_CIF
 
-#include "libcrystal/libs/xtl_xml.h"
+#include "libs/xtal/xtl_xml.h"
 #include "tlibs/helper/proc.h"
 
 bool TazDlg::ImportCIF()

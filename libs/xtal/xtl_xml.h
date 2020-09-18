@@ -10,7 +10,7 @@
 
 #include "tlibs/log/log.h"
 #include "tlibs/file/prop.h"
-#include "spacegroups/spacegroup.h"
+#include "libs/spacegroups/spacegroup.h"
 
 #include <memory>
 #include <iostream>
