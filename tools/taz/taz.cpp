@@ -583,6 +583,9 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pPowder->setIcon(load_icon("res/icons/weather-snow.svg"));
 	pMenuCalc->addAction(pPowder);
 
+	QAction *pPowderFit = new QAction("Powder Fitting...", this);
+	pMenuCalc->addAction(pPowderFit);
+
 	pMenuCalc->addSeparator();
 
 	QAction *pDynPlane = new QAction("Kinematic Plane...", this);
@@ -627,13 +630,10 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QAction *pScanViewer = new QAction("Scan Viewer...", this);
 	pMenuTools->addAction(pScanViewer);
 
-	QAction *pScanPos = new QAction("Scan Positions Plot...", this);
+	QAction *pScanPos = new QAction("Scan Positions Plotter...", this);
 	pMenuTools->addAction(pScanPos);
 
-	pMenuTools->addSeparator();
-
-	QAction *pPowderFit = new QAction("Powder Fitting...", this);
-	pMenuTools->addAction(pPowderFit);
+	//pMenuTools->addSeparator();
 
 
 
