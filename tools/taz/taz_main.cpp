@@ -41,6 +41,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStyleFactory>
+#include <QGL>
 
 #include <unistd.h>
 
@@ -123,8 +124,11 @@ public:
 	// need a reference to argc, because the QApplication constructor
 	// would otherwise take the temporary stack variable
 	// see: https://doc.qt.io/qt-5/qapplication.html#QApplication
-	TakAppl(/*const*/ int& argc, /*const*/ char** argv) : QApplication(argc, argv) {}
-	virtual ~TakAppl() {}
+	TakAppl(/*const*/ int& argc, /*const*/ char** argv) : QApplication(argc, argv)
+	{}
+
+	virtual ~TakAppl() 
+	{}
 
 	void SetTakDlg(std::shared_ptr<TazDlg> pDlg) { m_pTakDlg = pDlg; }
 
@@ -306,9 +310,23 @@ int main(int argc, char** argv)
 		TakAppl *app_gui = nullptr;
 
 		if(bStartGui)
+		{
+#if defined Q_WS_X11 && !defined NO_3D
+			//XInitThreads();
+			QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
+#endif
+
+#if !defined NO_3D
+			//QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+			QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+#endif
+
 			app.reset(app_gui = new TakAppl(argc, argv));
+		}
 		else
+		{
 			app.reset(new QCoreApplication(argc, argv));
+		}
 
 		app->setApplicationName("Takin");
 		app->setApplicationVersion(TAKIN_VER);
@@ -357,12 +375,6 @@ int main(int argc, char** argv)
 		// ------------------------------------------------------------
 		// GUI stuff
 
-		#if defined Q_WS_X11 && !defined NO_3D
-			//XInitThreads();
-			QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
-			QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-		#endif
-
 		QSettings settings("tobis_stuff", "takin");
 
 
@@ -372,7 +384,7 @@ int main(int argc, char** argv)
 			QString strStyle = settings.value("main/gui_style_value", "").toString();
 			QStyle *pStyle = QStyleFactory::create(strStyle);
 			if(pStyle)
-				QApplication::setStyle(pStyle);
+				app_gui->setStyle(pStyle);
 			else
 				tl::log_err("Style \"", strStyle.toStdString(), "\" was not found.");
 		}
@@ -493,38 +505,6 @@ int main(int argc, char** argv)
 
 		if(bStartTakinMain)
 		{
-			{
-	#ifdef IS_EXPERIMENTAL_BUILD
-				int iPrevDaysSinceEpoch = 0;
-				if(settings.contains("debug/last_warned"))
-					iPrevDaysSinceEpoch = settings.value("debug/last_warned").toInt();
-				int iDaysSinceEpoch = tl::epoch_dur<tl::t_dur_days<int>>().count();
-
-				std::string strExp = "This " BOOST_PLATFORM " version of Takin is still experimental, "
-					"does not include all features and may show unexpected behaviour. Please report "
-					"bugs to tobias.weber@tum.de. Thanks!";
-				tl::log_warn(strExp);
-				//tl::log_debug("Days since last warning: ", iDaysSinceEpoch-iPrevDaysSinceEpoch, ".");
-
-				// show warning message box every 5 days
-				if(iDaysSinceEpoch - iPrevDaysSinceEpoch >= 5)
-				{
-					QMessageBox::warning(0, "Takin", strExp.c_str());
-					settings.setValue("debug/last_warned", iDaysSinceEpoch);
-				}
-	#endif
-
-			/*// Warnings due to version changes
-				if(settings.value("debug/last_warning_shown", 0).toInt() < 1)
-				{
-					QMessageBox::warning(0, "Takin", "Please beware that in this version "
-						"the correction factors for the resolution convolution have been re-worked. "
-						"Any global scaling factors will have changed.");
-					settings.setValue("debug/last_warning_shown", 1);
-				}*/
-			}
-
-
 			show_splash_msg(app_gui, pSplash.get(), strStarting + "\nLoading 1/2 ...");
 			pTakDlg.reset(new TazDlg{nullptr, strLog});
 			app_gui->SetTakDlg(pTakDlg);

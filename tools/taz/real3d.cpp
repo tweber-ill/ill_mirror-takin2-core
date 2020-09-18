@@ -69,6 +69,13 @@ Real3DDlg::Real3DDlg(QWidget* pParent, QSettings *pSettings)
 }
 
 
+Real3DDlg::~Real3DDlg()
+{
+	if(m_pPlot)
+		m_pPlot->SetEnabled(0);
+}
+
+
 void Real3DDlg::CalcPeaks(const tl::Brillouin3D<t_real_glob>& ws,
 	const xtl::LatticeCommon<t_real_glob>& lattice)
 {
@@ -250,6 +257,7 @@ void Real3DDlg::CalcPeaks(const tl::Brillouin3D<t_real_glob>& ws,
 }
 
 
+
 // ----------------------------------------------------------------------------
 
 
@@ -269,11 +277,14 @@ void Real3DDlg::closeEvent(QCloseEvent* pEvt)
 	QDialog::closeEvent(pEvt);
 }
 
+
 void Real3DDlg::hideEvent(QHideEvent *pEvt)
 {
 	if(m_pPlot) m_pPlot->SetEnabled(0);
 	QDialog::hideEvent(pEvt);
 }
+
+
 void Real3DDlg::showEvent(QShowEvent *pEvt)
 {
 	QDialog::showEvent(pEvt);

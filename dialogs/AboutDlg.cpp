@@ -248,12 +248,6 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";
 #endif
 
-#if defined IS_EXPERIMENTAL_BUILD
-	ostrFeat << "<li>";
-	ostrFeat << "<font color=\"#ff0000\"><b>Experimental build.</b></font>";
-	ostrFeat << "</li>";
-#endif
-
 	ostrFeat << "</ul>";
 	ostrLibs << "</body></html>";
 	labelFeatures->setText(ostrFeat.str().c_str());

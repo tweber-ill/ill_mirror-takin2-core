@@ -35,7 +35,7 @@ protected:
 
 public:
 	BZ3DDlg(QWidget* pParent, QSettings* = 0);
-	virtual ~BZ3DDlg() = default;
+	virtual ~BZ3DDlg();
 
 	void RenderBZ(const tl::Brillouin3D<t_real_glob>& bz,
 		const xtl::LatticeCommon<t_real_glob>& lattice,

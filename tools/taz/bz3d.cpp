@@ -74,6 +74,13 @@ BZ3DDlg::BZ3DDlg(QWidget* pParent, QSettings *pSettings)
 }
 
 
+BZ3DDlg::~BZ3DDlg()
+{
+	if(m_pPlot)
+		m_pPlot->SetEnabled(0);
+}
+
+
 // ----------------------------------------------------------------------------
 
 
@@ -260,6 +267,7 @@ void BZ3DDlg::RecipParamsChanged(const RecipParams& recip)
 
 // ----------------------------------------------------------------------------
 
+
 void BZ3DDlg::keyPressEvent(QKeyEvent* pEvt)
 {
 	if(m_pPlot)
@@ -268,6 +276,7 @@ void BZ3DDlg::keyPressEvent(QKeyEvent* pEvt)
 	QDialog::keyPressEvent(pEvt);
 }
 
+
 void BZ3DDlg::closeEvent(QCloseEvent* pEvt)
 {
 	if(m_pSettings)
@@ -275,16 +284,20 @@ void BZ3DDlg::closeEvent(QCloseEvent* pEvt)
 	QDialog::closeEvent(pEvt);
 }
 
+
 void BZ3DDlg::hideEvent(QHideEvent *pEvt)
 {
-	if(m_pPlot) m_pPlot->SetEnabled(0);
+	if(m_pPlot)
+		m_pPlot->SetEnabled(0);
 	QDialog::hideEvent(pEvt);
 }
+
 
 void BZ3DDlg::showEvent(QShowEvent *pEvt)
 {
 	QDialog::showEvent(pEvt);
-	if(m_pPlot) m_pPlot->SetEnabled(1);
+	if(m_pPlot)
+		m_pPlot->SetEnabled(1);
 }
 
 

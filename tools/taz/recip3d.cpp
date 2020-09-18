@@ -73,6 +73,7 @@ Recip3DDlg::~Recip3DDlg()
 {
 	if(m_pPlot)
 	{
+		m_pPlot->SetEnabled(0);
 		delete m_pPlot;
 		m_pPlot = 0;
 	}
@@ -302,6 +303,7 @@ void Recip3DDlg::RecipParamsChanged(const RecipParams& recip)
 	}
 }
 
+
 void Recip3DDlg::keyPressEvent(QKeyEvent* pEvt)
 {
 	if(m_pPlot)
@@ -310,6 +312,7 @@ void Recip3DDlg::keyPressEvent(QKeyEvent* pEvt)
 	QDialog::keyPressEvent(pEvt);
 }
 
+
 void Recip3DDlg::closeEvent(QCloseEvent *pEvt)
 {
 	if(m_pSettings)
@@ -317,11 +320,14 @@ void Recip3DDlg::closeEvent(QCloseEvent *pEvt)
 	QDialog::closeEvent(pEvt);
 }
 
+
 void Recip3DDlg::hideEvent(QHideEvent *pEvt)
 {
 	if(m_pPlot) m_pPlot->SetEnabled(0);
 	QDialog::hideEvent(pEvt);
 }
+
+
 void Recip3DDlg::showEvent(QShowEvent *pEvt)
 {
 	QDialog::showEvent(pEvt);

@@ -58,7 +58,7 @@ add_compile_options(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
 #add_compile_options(-fPIC)
 
 # for application plugins
-add_definitions("-DBUILD_APPLI")
+add_definitions(-DBUILD_APPLI)
 
 
 set(SOCK2 "")
@@ -83,7 +83,7 @@ endif()
 
 if(USE_CUSTOM_THREADPOOL)
 	message("Using custom threadpool implementation.")
-	add_definitions("-DUSE_OWN_THREADPOOL")
+	add_definitions(-DUSE_OWN_THREADPOOL)
 endif()
 
 
@@ -207,6 +207,7 @@ add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 #add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)
 add_definitions(-DTLIBS_INC_HDR_IMPLS)
 add_definitions(-DHAS_COMPLEX_ERF)
+#add_definitions(-DREINIT_3D_DLGS)
 
 if(USE_PLUGINS)
 	add_definitions(-DUSE_PLUGINS)

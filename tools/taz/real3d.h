@@ -30,7 +30,7 @@ protected:
 
 public:
 	Real3DDlg(QWidget* pParent, QSettings* = 0);
-	virtual ~Real3DDlg() = default;
+	virtual ~Real3DDlg();
 
 	void CalcPeaks(const tl::Brillouin3D<t_real_glob>& ws,
 		const xtl::LatticeCommon<t_real_glob>& realcommon);

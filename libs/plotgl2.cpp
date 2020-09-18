@@ -76,11 +76,13 @@ void PlotGl2::SetEnabled(bool b)
 		QTimer::stop();
 }
 
+
 void PlotGl2::SetColor(t_real r, t_real g, t_real b, t_real a)
 {
 	t_real pfCol[] = {r, g, b, a};
 	tl::gl_traits<t_real>::SetMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, pfCol);
 }
+
 
 void PlotGl2::SetColor(std::size_t iIdx)
 {
@@ -307,6 +309,7 @@ void PlotGl2::timerEvent(QTimerEvent *pEvt)
 void PlotGl2::tick(t_real dTime)
 {
 	if(!m_bEnabled) return;
+	//tl::log_debug("tick: ", dTime);
 
 	// cycle between dNum1 and dNum2
 	auto fktCycle = [](t_real dTime, t_real dNum1, t_real dNum2) -> t_real
@@ -396,6 +399,7 @@ void PlotGl2::paintGL()
 	// draw objects
 	for(std::size_t iObjIdx : GetObjSortOrder())
 	{
+		//tl::log_debug("Plotting object ", iObjIdx);
 		if(iObjIdx >= m_vecObjs.size())
 			continue;
 		const PlotObjGl& obj = m_vecObjs[iObjIdx];
@@ -549,12 +553,14 @@ void PlotGl2::clear()
 	m_vecObjs.clear();
 }
 
+
 void PlotGl2::SetObjectColor(std::size_t iObjIdx, const std::vector<t_real>& vecCol)
 {
 	if(m_vecObjs.size() <= iObjIdx)
 		return;
 	m_vecObjs[iObjIdx].vecColor = vecCol;
 }
+
 
 void PlotGl2::SetObjectLabel(std::size_t iObjIdx, const std::string& strLab)
 {
@@ -563,6 +569,7 @@ void PlotGl2::SetObjectLabel(std::size_t iObjIdx, const std::string& strLab)
 	m_vecObjs[iObjIdx].strLabel = strLab;
 }
 
+
 void PlotGl2::SetObjectUseLOD(std::size_t iObjIdx, bool bLOD)
 {
 	if(m_vecObjs.size() <= iObjIdx)
@@ -570,12 +577,14 @@ void PlotGl2::SetObjectUseLOD(std::size_t iObjIdx, bool bLOD)
 	m_vecObjs[iObjIdx].bUseLOD = bLOD;
 }
 
+
 void PlotGl2::SetObjectCull(std::size_t iObjIdx, bool bCull)
 {
 	if(m_vecObjs.size() <= iObjIdx)
 		return;
 	m_vecObjs[iObjIdx].bCull = bCull;
 }
+
 
 void PlotGl2::SetObjectAnimation(std::size_t iObjIdx, bool bAnim)
 {
@@ -692,6 +701,7 @@ void PlotGl2::mousePressEvent(QMouseEvent *event)
 	}
 }
 
+
 void PlotGl2::mouseReleaseEvent(QMouseEvent *event)
 {
 	if((event->buttons() & Qt::LeftButton) == 0)
@@ -700,6 +710,7 @@ void PlotGl2::mouseReleaseEvent(QMouseEvent *event)
 	if((event->buttons() & Qt::RightButton) == 0)
 		m_bMouseScaleActive = 0;
 }
+
 
 void PlotGl2::mouseMoveEvent(QMouseEvent *pEvt)
 {
