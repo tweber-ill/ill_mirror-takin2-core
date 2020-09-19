@@ -213,7 +213,6 @@ add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 #add_definitions(${Boost_CXX_FLAGS} -DBOOST_FILESYSTEM_NO_DEPRECATED -DBOOST_ERROR_CODE_HEADER_ONLY)
 add_definitions(-DTLIBS_INC_HDR_IMPLS)
 add_definitions(-DHAS_COMPLEX_ERF)
-#add_definitions(-DREINIT_3D_DLGS)
 
 if(USE_PLUGINS)
 	add_definitions(-DUSE_PLUGINS)

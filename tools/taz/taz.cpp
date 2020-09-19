@@ -1270,10 +1270,6 @@ void TazDlg::RecipProjChanged()
 
 void TazDlg::Show3D()
 {
-#ifdef REINIT_3D_DLGS
-	if(m_pRecip3d) { m_pRecip3d->close(); delete m_pRecip3d; m_pRecip3d = 0; }
-#endif
-
 	if(!m_pRecip3d)
 	{
 		m_pRecip3d = new Recip3DDlg(this, &m_settings);
@@ -1298,10 +1294,6 @@ void TazDlg::Show3D()
 
 void TazDlg::Show3DReal()
 {
-#ifdef REINIT_3D_DLGS
-	if(m_pReal3d) { m_pReal3d->close(); delete m_pReal3d; m_pReal3d = 0; }
-#endif
-
 	if(!m_pReal3d)
 		m_pReal3d = new Real3DDlg(this, &m_settings);
 
@@ -1316,10 +1308,6 @@ void TazDlg::Show3DReal()
 
 void TazDlg::Show3DBZ()
 {
-#ifdef REINIT_3D_DLGS
-	if(m_pBZ3d) { m_pBZ3d->close(); delete m_pBZ3d; m_pBZ3d = 0; }
-#endif
-
 	if(!m_pBZ3d)
 	{
 		m_pBZ3d = new BZ3DDlg(this, &m_settings);

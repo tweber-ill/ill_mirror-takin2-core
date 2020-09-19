@@ -40,17 +40,17 @@ PlotGl::PlotGl(QWidget* pParent, QSettings *pSettings, t_real dMouseScale) :
 	t_qglwidget(pParent), m_pSettings(pSettings),
 	m_bEnabled(true), m_matProj(tl::unit_m<t_mat4>(4)), m_matView(tl::unit_m<t_mat4>(4))
 {
-#ifndef USING_FRAMEWORKS
-	setFormat(GetGlFormat(QSurfaceFormat::defaultFormat()));
-#endif
+	QSurfaceFormat form{QSurfaceFormat::defaultFormat()};
+	form.setProfile(QSurfaceFormat::CoreProfile);
+	form.setVersion(2, 1);
+	form.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	setFormat(form);
 
 	m_dMouseRot[0] = m_dMouseRot[1] = 0.;
 	m_dMouseScale = dMouseScale;
 	updateViewMatrix();
 
-	//setAutoBufferSwap(0);
 	setUpdatesEnabled(1);
-
 	QTimer::setSingleShot(0);
 }
 
@@ -58,15 +58,6 @@ PlotGl::PlotGl(QWidget* pParent, QSettings *pSettings, t_real dMouseScale) :
 PlotGl::~PlotGl()
 {
 	SetEnabled(0);
-}
-
-
-QSurfaceFormat PlotGl::GetGlFormat(QSurfaceFormat form)
-{
-	form.setProfile(QSurfaceFormat::CoreProfile);
-	form.setVersion(2, 1);
-	form.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	return form;
 }
 // ----------------------------------------------------------------------------
 
@@ -342,8 +333,13 @@ void PlotGl::tick(t_real dTime)
  */
 void PlotGl::paintGL()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if(!m_bEnabled) return;
+
+	//QPainter painter{this};
+	//painter.setRenderHint(QPainter::Antialiasing);
+	//painter.beginNativePainting();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// does the projection matrix have to be reset?
 	if(m_bResetPrespective)
@@ -545,7 +541,9 @@ void PlotGl::paintGL()
 		glPopMatrix();
 	}
 
-	//swapBuffers();
+
+	//painter.endNativePainting();
+	//painter.end();
 }
 
 
@@ -746,8 +744,8 @@ void PlotGl::mouseMoveEvent(QMouseEvent *pEvt)
 
 
 	// scale coordinates to [-1 .. 1] range
-	t_real dMouseX = 2.*dNewX/**m_size.dDPIScale*//t_real(m_size.iW) - 1.;
-	t_real dMouseY = -(2.*dNewY/**m_size.dDPIScale*//t_real(m_size.iH) - 1.);
+	t_real dMouseX = 2.*dNewX /**m_size.dDPIScale*/ /t_real(m_size.iW) - 1.;
+	t_real dMouseY = -(2.*dNewY /**m_size.dDPIScale*/ /t_real(m_size.iH) - 1.);
 	//tl::log_debug("mouse: ", dNewX, " ", dNewY, ", scaled mouse: ", dMouseX, " ", dMouseY);
 
 	bool bHasSelected = 0;
