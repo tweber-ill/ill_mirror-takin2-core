@@ -183,7 +183,6 @@ void PlotGl::initializeGL()
 	m_pFont = new tl::GlFontMap<t_real>(g_strFontGL.c_str(), g_iFontGLSize);
 
 	QTimer::start(g_iTimerInterval);
-
 	QWidget::setMouseTracking(1);
 }
 
@@ -222,8 +221,8 @@ void PlotGl::resizeGL(int w, int h)
 
 	m_size.iW = w;
 	m_size.iH = h;
-
 	m_size.dDPIScale = devicePixelRatioF();
+	//tl::log_debug("gl resize: ", m_size.iW, "x", m_size.iH, ", dpi: ", m_size.dDPIScale);
 
 	glViewport(0, 0, w, h);
 	SetPerspective(w, h);
@@ -719,12 +718,12 @@ void PlotGl::mouseReleaseEvent(QMouseEvent *event)
 
 void PlotGl::mouseMoveEvent(QMouseEvent *pEvt)
 {
+	t_real dNewX = t_real(pEvt->POS_F().x());
+	t_real dNewY = t_real(pEvt->POS_F().y());
+
 	bool bUpdateView = 0;
 	if(m_bMouseRotateActive)
 	{
-		t_real dNewX = t_real(pEvt->POS_F().x());
-		t_real dNewY = t_real(pEvt->POS_F().y());
-
 		m_dMouseRot[0] += dNewX - m_dMouseBegin[0];
 		m_dMouseRot[1] += dNewY - m_dMouseBegin[1];
 
@@ -736,8 +735,6 @@ void PlotGl::mouseMoveEvent(QMouseEvent *pEvt)
 
 	if(m_bMouseScaleActive)
 	{
-		t_real dNewY = t_real(pEvt->POS_F().y());
-
 		m_dMouseScale *= 1.-(dNewY - m_dMouseScaleBegin)/t_real(height()) * 2.;
 		m_dMouseScaleBegin = dNewY;
 
@@ -749,8 +746,9 @@ void PlotGl::mouseMoveEvent(QMouseEvent *pEvt)
 
 
 	// scale coordinates to [-1 .. 1] range
-	t_real dMouseX = 2.*pEvt->POS_F().x()*m_size.dDPIScale/t_real(m_size.iW) - 1.;
-	t_real dMouseY = -(2.*pEvt->POS_F().y()*m_size.dDPIScale/t_real(m_size.iH) - 1.);
+	t_real dMouseX = 2.*dNewX/**m_size.dDPIScale*//t_real(m_size.iW) - 1.;
+	t_real dMouseY = -(2.*dNewY/**m_size.dDPIScale*//t_real(m_size.iH) - 1.);
+	//tl::log_debug("mouse: ", dNewX, " ", dNewY, ", scaled mouse: ", dMouseX, " ", dMouseY);
 
 	bool bHasSelected = 0;
 	if(m_bEnabled)
@@ -767,6 +765,7 @@ void PlotGl::mouseMoveEvent(QMouseEvent *pEvt)
 			}
 		}
 	}
+
 	if(!bHasSelected)
 		m_sigHover(nullptr);
 }
@@ -805,7 +804,8 @@ void PlotGl::updateViewMatrix()
 	t_mat4 matR1 = tl::rotation_matrix_3d_x(tl::d2r<t_real>(-90. + m_dMouseRot[1]));
 	matR0.resize(4,4,1); matR1.resize(4,4,1);
 	matR0(3,3) = matR1(3,3) = 1.;
-	for(short i=0; i<3; ++i) matR0(i,3)=matR0(3,i)=matR1(i,3)=matR1(3,i)=0.;
+	for(short i=0; i<3; ++i)
+		matR0(i,3) = matR0(3,i) = matR1(i,3) = matR1(3,i) = 0.;
 	t_mat4 matRot0 = matR0, matRot1 = matR1;
 
 	t_mat4 matTrans = tl::make_mat<t_mat4>(
