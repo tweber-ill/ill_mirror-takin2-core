@@ -37,19 +37,18 @@ static const int g_iTimerInterval = int(t_real(1e3) / t_real(RENDER_FPS));
 
 
 PlotGl::PlotGl(QWidget* pParent, QSettings *pSettings, t_real dMouseScale) :
-#ifdef USING_FRAMEWORKS
-	t_qglwidget(pParent),	// leads to averse reactions when setting the format
-#else
-	t_qglwidget(GetGlFormat(QGLFormat::defaultFormat()), pParent),
-#endif
-	m_pSettings(pSettings),
+	t_qglwidget(pParent), m_pSettings(pSettings),
 	m_bEnabled(true), m_matProj(tl::unit_m<t_mat4>(4)), m_matView(tl::unit_m<t_mat4>(4))
 {
+#ifndef USING_FRAMEWORKS
+	setFormat(GetGlFormat(QSurfaceFormat::defaultFormat()));
+#endif
+
 	m_dMouseRot[0] = m_dMouseRot[1] = 0.;
 	m_dMouseScale = dMouseScale;
 	updateViewMatrix();
 
-	setAutoBufferSwap(0);
+	//setAutoBufferSwap(0);
 	setUpdatesEnabled(1);
 
 	QTimer::setSingleShot(0);
@@ -62,15 +61,11 @@ PlotGl::~PlotGl()
 }
 
 
-QGLFormat PlotGl::GetGlFormat(QGLFormat form)
+QSurfaceFormat PlotGl::GetGlFormat(QSurfaceFormat form)
 {
-	form.setProfile(QGLFormat::CoreProfile);
-	//form.setVersion(2,1);
-	form.setVersion(1,5);
-	//form.setDirectRendering(0);
-	form.setDoubleBuffer(1);
-	//form.setOverlay(0);
-	//form.setSampleBuffers(1);
+	form.setProfile(QSurfaceFormat::CoreProfile);
+	form.setVersion(2, 1);
+	form.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	return form;
 }
 // ----------------------------------------------------------------------------
@@ -111,9 +106,8 @@ void PlotGl::SetColor(std::size_t iIdx)
 
 void PlotGl::initializeGL()
 {
-	QGLFormat form = format();
-	std::string strDB = form.doubleBuffer() ? "double-buffered" : "single-buffered";
-	tl::log_debug("Renderer started using ", strDB, " GL version ",
+	QSurfaceFormat form = format();
+	tl::log_debug("Renderer started using GL version ",
 		form.majorVersion(), ".", form.minorVersion(), ".");
 
 	glClearColor(1.,1.,1.,0.);
@@ -340,7 +334,7 @@ void PlotGl::tick(t_real dTime)
 	}
 
 	if(isVisible())
-		updateGL();
+		update();
 }
 
 
@@ -552,7 +546,7 @@ void PlotGl::paintGL()
 		glPopMatrix();
 	}
 
-	swapBuffers();
+	//swapBuffers();
 }
 
 

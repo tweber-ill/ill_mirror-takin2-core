@@ -40,7 +40,6 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStyleFactory>
-#include <QGL>
 
 #include <unistd.h>
 
@@ -310,13 +309,8 @@ int main(int argc, char** argv)
 
 		if(bStartGui)
 		{
-#if defined Q_WS_X11 && !defined NO_3D
-			//XInitThreads();
-			QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
-#endif
-
 #if !defined NO_3D
-			//QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+			//QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
 			QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
 

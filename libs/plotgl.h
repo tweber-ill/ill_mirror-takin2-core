@@ -11,7 +11,7 @@
 #include "plotgl.h"
 #include <QTimer>
 #include <QtWidgets>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 #include <vector>
 
@@ -29,7 +29,7 @@ namespace ublas = boost::numeric::ublas;
 namespace sig = boost::signals2;
 
 
-using t_qglwidget = QGLWidget;
+using t_qglwidget = QOpenGLWidget;
 
 
 /**
@@ -143,7 +143,7 @@ protected:
 	virtual void resizeGL(int w, int h) override;
 	virtual void paintGL() override;
 
-	static QGLFormat GetGlFormat(QGLFormat form);
+	static QSurfaceFormat GetGlFormat(QSurfaceFormat form);
 	void updateViewMatrix();
 	void mouseSelectObj(t_real_glob dX, t_real_glob dY);
 
