@@ -16,7 +16,6 @@
 
 #include "libs/globals.h"
 #include "libs/plotgl.h"
-#include "libs/plotgl2.h"
 #include "libs/spacegroups/latticehelper.h"
 #include "tlibs/phys/bz.h"
 
@@ -28,7 +27,7 @@ class BZ3DDlg : public QDialog
 protected:
 	QSettings *m_pSettings = nullptr;
 	QStatusBar *m_pStatus = nullptr;
-	std::unique_ptr<PlotGl_iface> m_pPlot;
+	std::unique_ptr<PlotGl> m_pPlot;
 
 	boost::optional<std::size_t> m_iqIdx;
 	ublas::vector<t_real_glob> m_vecq, m_vecq_rlu;

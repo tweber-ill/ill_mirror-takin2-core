@@ -29,7 +29,6 @@ bool g_bHasSpaceGroups = 0;
 bool g_bShowFsq = 1;
 bool g_b3dBZ = 1;
 bool g_bUseGlobalPaths = 1;
-bool g_bThreadedGL = 0;
 
 std::string g_strApp;
 std::string g_strHome;

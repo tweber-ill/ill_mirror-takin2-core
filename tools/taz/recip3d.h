@@ -17,7 +17,6 @@
 #include "tlibs/phys/lattice.h"
 
 #include "libs/plotgl.h"
-#include "libs/plotgl2.h"
 #include "libs/spacegroups/spacegroup.h"
 #include "libs/spacegroups/latticehelper.h"
 #include "libs/globals.h"
@@ -30,7 +29,7 @@ class Recip3DDlg : public QDialog
 protected:
 	QSettings* m_pSettings = nullptr;
 	QStatusBar *m_pStatus = nullptr;
-	PlotGl_iface* m_pPlot = nullptr;
+	PlotGl* m_pPlot = nullptr;
 	t_real_glob m_dMaxPeaks = 4.;
 	t_real_glob m_dPlaneDistTolerance = 0.01;
 

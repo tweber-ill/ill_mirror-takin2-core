@@ -22,13 +22,13 @@ EllipseDlg3D::EllipseDlg3D(QWidget* pParent, QSettings* pSett)
 	}
 
 	t_real_reso dScale = 10.;
-	PlotGl_iface* pPlotLeft = make_gl_plotter(g_bThreadedGL, this, m_pSettings, dScale);
+	PlotGl* pPlotLeft = new PlotGl(this, m_pSettings, dScale);
 	pPlotLeft->SetEnabled(0);
 	pPlotLeft->SetPrec(g_iPrecGfx);
 	pPlotLeft->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_pPlots.push_back(pPlotLeft);
 
-	PlotGl_iface* pPlotRight = make_gl_plotter(g_bThreadedGL, this, m_pSettings, dScale);
+	PlotGl* pPlotRight = new PlotGl(this, m_pSettings, dScale);
 	pPlotRight->SetEnabled(0);
 	pPlotRight->SetPrec(g_iPrecGfx);
 	pPlotRight->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -57,13 +57,13 @@ EllipseDlg3D::EllipseDlg3D(QWidget* pParent, QSettings* pSett)
 	else
 		resize(800, 600);
 
-	for(PlotGl_iface* pPlot : m_pPlots)
+	for(PlotGl* pPlot : m_pPlots)
 		pPlot->SetEnabled(1);
 }
 
 EllipseDlg3D::~EllipseDlg3D()
 {
-	for(PlotGl_iface* pPlot : m_pPlots)
+	for(PlotGl* pPlot : m_pPlots)
 		delete pPlot;
 	m_pPlots.clear();
 }
@@ -243,7 +243,7 @@ void EllipseDlg3D::SetParams(const EllipseDlgParams& params)
 
 void EllipseDlg3D::keyPressEvent(QKeyEvent* pEvt)
 {
-	for(PlotGl_iface* pPlot : m_pPlots)
+	for(PlotGl* pPlot : m_pPlots)
 		pPlot->keyPressEvent(pEvt);
 
 	QDialog::keyPressEvent(pEvt);
