@@ -117,10 +117,10 @@ void PlotGl::initializeGL()
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
-#ifdef USE_MULTI_TEXTURES
-	glEnable(GL_MULTISAMPLE);
-	glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-#endif
+
+	//glEnable(GL_MULTISAMPLE);
+	//glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
@@ -165,9 +165,7 @@ void PlotGl::initializeGL()
 		glEndList();
 	}
 
-#ifdef USE_MULTI_TEXTURES
-	glActiveTexture(GL_TEXTURE0);
-#endif
+	//glActiveTexture(GL_TEXTURE0);
 
 	if(g_strFontGL == "") g_strFontGL = DEF_FONT;
 	if(g_iFontGLSize <= 0) g_iFontGLSize = DEF_FONT_SIZE;
@@ -317,8 +315,8 @@ void PlotGl::tick(t_real dTime)
 	{	// look for objects with animation
 		for(PlotObjGl& obj : m_vecObjs)
 		{
-			if(!obj.bAnimated) continue;
-
+			if(!obj.bAnimated)
+				continue;
 			obj.dScaleMult = fktCycle(2.*dTime, 0.5, 2.);
 		}
 	}
@@ -540,7 +538,6 @@ void PlotGl::paintGL()
 		glPopAttrib();
 		glPopMatrix();
 	}
-
 
 	//painter.endNativePainting();
 	//painter.end();

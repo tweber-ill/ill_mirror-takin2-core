@@ -125,7 +125,7 @@ public:
 	TakAppl(/*const*/ int& argc, /*const*/ char** argv) : QApplication(argc, argv)
 	{}
 
-	virtual ~TakAppl() 
+	virtual ~TakAppl()
 	{}
 
 	void SetTakDlg(std::shared_ptr<TazDlg> pDlg) { m_pTakDlg = pDlg; }
