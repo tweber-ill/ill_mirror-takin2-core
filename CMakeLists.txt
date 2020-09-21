@@ -205,7 +205,7 @@ endif()
 message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
 
 
-add_definitions(-DUSE_NET -DUSE_CIF)
+add_definitions(-DUSE_CIF)
 add_definitions(-DNO_LAPACK)
 add_definitions(-DNO_QHULL)
 add_definitions(-DNO_JPEG -DNO_TIFF)
@@ -307,14 +307,12 @@ if(OPENGL_FOUND AND FREETYPE_FOUND)
 		include_directories("/usr/include/GL" "/usr/include/OpenGL" "/usr/x86_64-w64-mingw32/sys-root/mingw/include/GL")
 	endif()
 
-	add_definitions(-DUSE_3D)
-
 	set(SRCS_3D
+		tlibs/gfx/gl.cpp
 		libs/plotgl.cpp tools/taz/recip3d.cpp
 		tools/taz/real3d.cpp tools/taz/bz3d.cpp dialogs/EllipseDlg3D.cpp
-
-		tlibs/gfx/gl.cpp
 	)
+
 	set(LIBS_3D
 		${FREETYPE_LIBRARY}
 		Qt5::OpenGL ${OPENGL_LIBRARIES}

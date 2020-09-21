@@ -40,6 +40,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStyleFactory>
+#include <QSurfaceFormat>
 
 #include <unistd.h>
 
@@ -312,6 +313,13 @@ int main(int argc, char** argv)
 #if !defined NO_3D
 			//QCoreApplication::setAttribute(Qt::AA_X11InitThreads, true);
 			QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+
+			QSurfaceFormat form{QSurfaceFormat::defaultFormat()};
+			form.setProfile(QSurfaceFormat::CoreProfile /*QSurfaceFormat::NoProfile*/);
+			form.setRenderableType(QSurfaceFormat::OpenGL);
+			form.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+			form.setVersion(2, 1);
+			QSurfaceFormat::setDefaultFormat(form);
 #endif
 
 			app.reset(app_gui = new TakAppl(argc, argv));

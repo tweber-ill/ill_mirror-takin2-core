@@ -22,7 +22,6 @@
 #ifndef NO_QHULL
 	#include <Qhull.h>
 #endif
-//#define PRIVATE_SRC_VERSION
 
 
 #define __STR__(VAR) #VAR				// string of macro
@@ -46,15 +45,13 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	labelVersion->setText("Version " TAKIN_VER ".");
 	labelWritten->setText("Written by Tobias Weber <tweber@ill.fr>.");
 	labelYears->setText("2014 - 2017 for Technische Universität München (TUM), Garching, Germany"
-		";\n2017 - 2020 for Institut Laue-Langevin (ILL), Grenoble, France."); 
-		// ... but developed as private project before June, 2019 ;)
+		";\n2017 - 2020 for Institut Laue-Langevin (ILL), Grenoble, France.");
 
-#ifdef PRIVATE_SRC_VERSION
-	labelRepo->setText("Source repo: <a href=\"https://github.com/t-weber/takin\">https://github.com/t-weber/takin</a>.");
-#else
+	// old takin 1 repos:
+	//labelRepo->setText("Source repo: <a href=\"https://github.com/t-weber/takin\">https://github.com/t-weber/takin</a>.");
 	//labelRepo->setText("Source repo: <br><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tastools.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tastools.git</a>.");
+	// takin 2 repo:
 	labelRepo->setText("Source repos: <br><a href=\"https://code.ill.fr/scientific-software/takin\">https://code.ill.fr/scientific-software/takin</a>.");
-#endif
 
 	labelDesc->setText("Overviews of Takin can be found here:"
 		"<ul>"
@@ -100,11 +97,10 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dd><a href=\"http://www.boost.org\">http://www.boost.org</a><br></dd>";
 
 	ostrLibs << "<dt>Uses tlibs version " << TLIBS_VERSION << ".</dt>";
-#ifdef PRIVATE_SRC_VERSION
-	ostrLibs << "<dd><a href=\"https://github.com/t-weber/tlibs\">https://github.com/t-weber/tlibs</a><br></dd>";
-#else
-	ostrLibs << "<dd><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git</a><br></dd>";
-#endif
+
+	//ostrLibs << "<dd><a href=\"https://github.com/t-weber/tlibs\">https://github.com/t-weber/tlibs</a><br></dd>";
+	//ostrLibs << "<dd><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git</a><br></dd>";
+	labelRepo->setText("Source repos: <br><a href=\"https://code.ill.fr/scientific-software/takin/tlibs\">https://code.ill.fr/scientific-software/takin/tlibs</a>.");
 
 #ifndef NO_LAPACK
 	ostrLibs << "<dt>Uses Lapack/e version 3.</dt>";
@@ -152,7 +148,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "<ul>";
 
 	ostrFeat << "<li>";
-#if defined NO_NET || !defined USE_NET
+#if defined NO_NET
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";
@@ -161,7 +157,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";
 
 	ostrFeat << "<li>";
-#if defined NO_PLUGINS || !defined USE_PLUGINS
+#if !defined USE_PLUGINS
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";
@@ -192,7 +188,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";*/
 
 	ostrFeat << "<li>";
-#if defined NO_CIF || !defined USE_CIF
+#if !defined USE_CIF
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";
@@ -201,7 +197,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "</li>";
 
 	ostrFeat << "<li>";
-#if defined NO_3D || !defined USE_3D
+#if defined NO_3D
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
 #else
 	ostrFeat << "<b>Enabled</b>";

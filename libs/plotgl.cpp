@@ -40,12 +40,6 @@ PlotGl::PlotGl(QWidget* pParent, QSettings *pSettings, t_real dMouseScale) :
 	t_qglwidget(pParent), m_pSettings(pSettings),
 	m_bEnabled(true), m_matProj(tl::unit_m<t_mat4>(4)), m_matView(tl::unit_m<t_mat4>(4))
 {
-	QSurfaceFormat form{QSurfaceFormat::defaultFormat()};
-	form.setProfile(QSurfaceFormat::CoreProfile);
-	form.setVersion(2, 1);
-	form.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	setFormat(form);
-
 	m_dMouseRot[0] = m_dMouseRot[1] = 0.;
 	m_dMouseScale = dMouseScale;
 	updateViewMatrix();
@@ -98,8 +92,7 @@ void PlotGl::SetColor(std::size_t iIdx)
 void PlotGl::initializeGL()
 {
 	QSurfaceFormat form = format();
-	tl::log_debug("Renderer started using GL version ",
-		form.majorVersion(), ".", form.minorVersion(), ".");
+	tl::log_debug("Renderer started using GL version ", form.majorVersion(), ".", form.minorVersion(), ".");
 
 	glClearColor(1.,1.,1.,0.);
 	glShadeModel(GL_SMOOTH);
