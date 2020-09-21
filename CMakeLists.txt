@@ -432,9 +432,7 @@ target_link_libraries(takin
 
 # pre-build
 add_custom_target(prebuild-script
-	COMMAND pushd ${PROJECT_SOURCE_DIR} 
-		&& ./setup/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR} 
-		&& popd)
+	COMMAND cd ${PROJECT_SOURCE_DIR} && ./setup/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR})
 
 
 # post-build
