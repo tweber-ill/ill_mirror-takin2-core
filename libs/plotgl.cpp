@@ -160,9 +160,13 @@ void PlotGl::initializeGL()
 
 	//glActiveTexture(GL_TEXTURE0);
 
-	if(g_strFontGL == "") g_strFontGL = DEF_FONT;
-	if(g_iFontGLSize <= 0) g_iFontGLSize = DEF_FONT_SIZE;
-	m_pFont = new tl::GlFontMap<t_real>(g_strFontGL.c_str(), g_iFontGLSize);
+	if(g_strFontGL == "")
+		g_strFontGL = DEF_FONT;
+	if(g_iFontGLSize <= 0)
+		g_iFontGLSize = DEF_FONT_SIZE;
+
+	std::string strFont = find_resource(g_strFontGL);
+	m_pFont = new tl::GlFontMap<t_real>(strFont.c_str(), g_iFontGLSize);
 
 	QTimer::start(g_iTimerInterval);
 	QWidget::setMouseTracking(1);

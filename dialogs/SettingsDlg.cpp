@@ -110,7 +110,7 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 		t_tupEdit("net/ydat_6", "iscan getcounts", edit6_yDat),
 
 		// misc
-		t_tupEdit("gl/font", "", editGLFont),
+		t_tupEdit("gl/font", g_strFontGL.c_str(), editGLFont),
 		t_tupEdit("main/font_gfx", g_fontGfx.toString().toStdString().c_str(), editGfxFont),
 		t_tupEdit("main/font_gen", g_fontGen.toString().toStdString().c_str(), editGenFont),
 

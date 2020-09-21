@@ -77,6 +77,7 @@ void add_resource_path(const std::string& strPath, bool bToBack)
 
 std::string find_resource(const std::string& strFile, bool bLogErr)
 {
+	// relative paths
 	for(const std::string& strPrefix : s_vecInstallPaths)
 	{
 		std::string _strFile = strPrefix + "/" + strFile;
@@ -88,6 +89,10 @@ std::string find_resource(const std::string& strFile, bool bLogErr)
 		else if(tl::file_exists((_strFile + ".bz2").c_str()))
 			return _strFile + ".bz2";
 	}
+
+	// absolute path
+	if(tl::file_exists(strFile.c_str()))
+		return strFile;
 
 	if(bLogErr)
 		tl::log_err("Could not find resource file \"", strFile, "\".");

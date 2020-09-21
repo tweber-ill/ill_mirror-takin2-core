@@ -18,6 +18,7 @@ fi
 
 FADD=http://ab-initio.mit.edu/Faddeeva
 TANGOICONS=http://tango.freedesktop.org/releases/tango-icon-theme-0.8.90.tar.gz
+DEJAVUFONTS=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
 
 SCATLENS=https://www.ncnr.nist.gov/resources/n-lengths/list.html
 MAGFFACT_J0_1=https://www.ill.eu/sites/ccsl/ffacts/ffactnode5.html
@@ -100,6 +101,35 @@ function dl_tangoicons
 
 	cd ..
 	mv -v tmp/*.svg res/icons/
+}
+
+
+
+#
+# deja vu fonts
+#
+function dl_dejavufonts
+{
+#	rm -f tmp/dejavu-fonts-ttf-2.37.tar.bz2
+
+	if [ ! -f tmp/dejavu-fonts-ttf-2.37.tar.bz2  ]; then
+		echo -e "Downloading Deja Vu fonts...\n"
+
+		if ! wget ${DEJAVUFONTS} -O tmp/dejavu-fonts.tar.bz2; then
+			echo -e "Error: Cannot download Tango icons.";
+			return -1;
+		fi
+	fi
+
+
+	echo -e "Extracting Deja Vu fonts...\n"
+	cd tmp
+
+	${GTAR} --wildcards -xjvf dejavu-fonts.tar.bz2 */ttf/DejaVuSansMono.ttf --strip-components=2
+	${GTAR} --wildcards -xjvf dejavu-fonts.tar.bz2 */ttf/DejaVuSans.ttf --strip-components=2
+
+	cd ..
+	mv -v tmp/*.ttf res/fonts/
 }
 
 
@@ -288,6 +318,8 @@ echo -e "-----------------------------------------------------------------------
 dl_fadd
 echo -e "--------------------------------------------------------------------------------"
 dl_tangoicons
+echo -e "--------------------------------------------------------------------------------"
+dl_dejavufonts
 echo -e "--------------------------------------------------------------------------------"
 
 echo -e "\nAfter successfully obtaining all resource files, the program ./gentab has to be run!\n"
