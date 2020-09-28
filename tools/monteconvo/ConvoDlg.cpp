@@ -225,9 +225,13 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	// actions menu
 	QMenu *pMenuConvoActions = new QMenu("Actions", this);
 
-	QAction *pActionStart = new QAction("Start Convolution", this);
+	QAction *pActionStart = new QAction("Start Convolution Simulation", this);
 	pActionStart->setIcon(load_icon("res/icons/media-playback-start.svg"));
 	pMenuConvoActions->addAction(pActionStart);
+
+	QAction *pActionStartFit = new QAction("Start Convolution Fit", this);
+	pActionStartFit->setIcon(load_icon("res/icons/media-playback-start.svg"));
+	pMenuConvoActions->addAction(pActionStartFit);
 
 	QAction *pActionDisp = new QAction("Plot Dispersion", this);
 	pMenuConvoActions->addAction(pActionDisp);
@@ -289,6 +293,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	QObject::connect(pSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
 	QObject::connect(pConvofit, SIGNAL(triggered()), this, SLOT(SaveConvofit()));
 	QObject::connect(pActionStart, SIGNAL(triggered()), this, SLOT(Start()));
+	QObject::connect(pActionStartFit, SIGNAL(triggered()), this, SLOT(StartFit()));
 	QObject::connect(pActionDisp, SIGNAL(triggered()), this, SLOT(StartDisp()));
 	QObject::connect(pExportPlot, SIGNAL(triggered()), m_plotwrap.get(), SLOT(SavePlot()));
 	QObject::connect(pExportPlot2d, SIGNAL(triggered()), m_plotwrap2d.get(), SLOT(SavePlot()));

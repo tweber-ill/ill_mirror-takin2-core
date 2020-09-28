@@ -54,7 +54,7 @@ public:
 
 	virtual ~MinuitFunc() = default;
 
-	
+
 	virtual t_real_min operator()(const std::vector<t_real_min>& params) const override
 	{
 		std::lock_guard<QMutex> _lock{m_mtxMinuit};
@@ -192,8 +192,15 @@ void ConvoDlg::StartFit()
 		tl::log_err(ex.what());
 	}
 
+
+	std::ostringstream ostr_fitresults;
+	ostr_fitresults.precision(g_iPrec);
+
 	if(!mini_valid || !mini)
+	{
 		QMessageBox::critical(this, "Error", "Convolution fitter did not converge.");
+		ostr_fitresults << "# Warning: Convolution fit did not converge.\n";
+	}
 
 
 	// get back minimised parameters, [ident, val, err]
@@ -205,6 +212,12 @@ void ConvoDlg::StartFit()
 		for(std::size_t paramidx=0; paramidx<sqwparams.size(); ++paramidx)
 		{
 			const std::string& name = std::get<0>(sqwparams[paramidx]);
+
+			t_real_min dVal = mini->UserState().Value(name);
+			t_real_min dErr = mini->UserState().Error(name);
+
+			ostr_fitresults << "# Fitted Variable: " << name << " = " << dVal << " +- " << dErr << "\n";
+
 			std::string val = tl::var_to_str(mini->UserState().Value(name));
 			std::string err = tl::var_to_str(mini->UserState().Error(name));
 
@@ -212,7 +225,15 @@ void ConvoDlg::StartFit()
 		}
 		this->SetSqwParams(newsqwparams);
 	}
+
+
+	QString strResults = "# --------------------------------------------------------------------------------\n";
+	strResults += ostr_fitresults.str().c_str();
+	strResults += "# --------------------------------------------------------------------------------\n";
+	strResults += textResult->toPlainText();
+	textResult->setPlainText(strResults);
 }
+
 
 #else
 
