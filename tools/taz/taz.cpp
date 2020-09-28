@@ -547,6 +547,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pMenuReso->addSeparator();
 
 	QAction *pResoConv = new QAction("Convolution...", this);
+	pResoConv->setIcon(load_icon("res/icons/utilities-system-monitor.svg"));
 	pMenuReso->addAction(pResoConv);
 
 
@@ -829,6 +830,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pResoTools->setWindowTitle("Resolution");
 	pResoTools->addAction(pResoParams);
 	pResoTools->addAction(pResoEllipses);
+	pResoTools->addAction(pResoConv);
 	addToolBar(pResoTools);
 
 	// calc

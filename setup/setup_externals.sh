@@ -92,12 +92,13 @@ function dl_tangoicons
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/devices/network-wireless.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/mimetypes/image-x-generic.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/mimetypes/x-office-spreadsheet-template.svg --strip-components=3
-	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/apps/accessories-calculator.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/status/network-transmit-receive.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/status/network-offline.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/status/dialog-information.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/status/weather-snow.svg --strip-components=3
+	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/apps/accessories-calculator.svg --strip-components=3
 	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/apps/help-browser.svg --strip-components=3
+	${GTAR} --wildcards -xzvf tango-icon-theme.tar.gz */scalable/apps/utilities-system-monitor.svg --strip-components=3
 
 	cd ..
 	mv -v tmp/*.svg res/icons/
