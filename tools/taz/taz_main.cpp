@@ -384,10 +384,13 @@ int main(int argc, char** argv)
 		{
 			QString strStyle = settings.value("main/gui_style_value", "").toString();
 			QStyle *pStyle = QStyleFactory::create(strStyle);
-			if(pStyle)
+			if(strStyle!="" && pStyle)
 				app_gui->setStyle(pStyle);
 			else
 				tl::log_err("Style \"", strStyle.toStdString(), "\" was not found.");
+		}
+		else
+		{
 		}
 
 

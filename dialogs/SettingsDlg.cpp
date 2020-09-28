@@ -392,10 +392,18 @@ void SettingsDlg::SetGlobals() const
 		g_strGplTool = find_program_binary(editGpl->text().toStdString());
 
 
+	// if no GUI style has been set, use a safe default
+	if(!m_pSettings->contains("main/gui_style_value"))
+	{
+		int iGUIDefault = comboGUI->findText("Fusion", Qt::MatchContains);
+		if(iGUIDefault >= 0)
+			comboGUI->setCurrentIndex(iGUIDefault);
+	}
+
 	// GUI style
 	QString strStyle = comboGUI->currentText();
 	QStyle *pStyle = QStyleFactory::create(strStyle);
-	if(pStyle)
+	if(strStyle!="" && pStyle)
 		QApplication::setStyle(pStyle);
 	else
 		tl::log_err("Style \"", strStyle.toStdString(), "\" was not found.");
