@@ -304,38 +304,6 @@ void SettingsDlg::SaveSettings()
 }
 
 
-static inline std::string find_program_binary(const std::string& strExe)
-{
-	// if the given binary file exists, directly use it
-	if(tl::file_exists(strExe.c_str()))
-	{
-		tl::log_info("Found external tool: \"", strExe, "\".");
-		return strExe;
-	}
-
-	// try prefixing it with possible application paths
-	std::vector<std::string> vecPaths =
-	{
-		g_strApp + "/" + strExe,
-		g_strApp + "/" + strExe + ".exe",
-		"/usr/local/bin/" + strExe,
-		"/usr/bin/" + strExe,
-	};
-
-	for(const std::string& strPath : vecPaths)
-	{
-		//tl::log_debug("Trying to find ", strPath, "...");
-		if(tl::file_exists(strPath.c_str()))
-		{
-			tl::log_info("Found external tool in program path: \"", strPath, "\".");
-			return strPath;
-		}
-	}
-
-	return strExe;
-}
-
-
 void SettingsDlg::SetGlobals() const
 {
 	// precisions

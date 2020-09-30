@@ -28,7 +28,10 @@
 #include "tlibs/string/spec_char.h"
 #include "tlibs/string/string.h"
 #include "tlibs/helper/flags.h"
+#include "tlibs/helper/proc.h"
 #include "tlibs/log/log.h"
+#include "tlibs/file/prop.h"
+
 #include "libs/qt/recent.h"
 
 namespace algo = boost::algorithm;
@@ -634,7 +637,67 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QAction *pScanPos = new QAction("Scan Positions Plotter...", this);
 	pMenuTools->addAction(pScanPos);
 
-	//pMenuTools->addSeparator();
+
+	// add menu entries for external tools
+	std::string strTools = find_resource("res/conf/tools.xml");
+	if(strTools != "")
+	{
+		tl::Prop<std::string> propTools;
+		if(propTools.Load(strTools.c_str(), tl::PropType::XML))
+		{
+			// add all menu entries
+			for(std::size_t entry=0; 1; ++entry)
+			{
+				std::ostringstream _xmlpath;
+				_xmlpath << "tools/entry_" << entry;
+				std::string xmlpath = _xmlpath.str();
+				if(!propTools.Exists(xmlpath))
+					break;
+				
+				std::string tooltype = propTools.Query<std::string>(xmlpath + "/type", "");
+
+				if(tooltype == "separator")
+				{
+					pMenuTools->addSeparator();
+				}
+				else if(tooltype == "program")
+				{
+					std::string toolname = propTools.Query<std::string>(xmlpath + "/name", "");
+					std::string toolprog = propTools.Query<std::string>(xmlpath + "/program", "");
+
+					if(toolname == "")
+					{
+						tl::log_err("Invalid tool name");
+						continue;
+					}
+
+					std::string toolbin = find_program_binary(toolprog, false);
+					if(toolbin == "")
+					{
+						tl::log_err("Tool binary \"", toolprog, "\" was not found.");
+						continue;
+					}
+
+					// add menu item for external tool
+					QAction *actionTool = new QAction(toolname.c_str(), this);
+					pMenuTools->addAction(actionTool);
+					QObject::connect(actionTool, &QAction::triggered, [toolbin]()
+					{
+						// run exernal tool process
+						tl::PipeProc<char> proc(toolbin.c_str(), false);
+					});
+				}
+			}
+		}
+		else
+		{
+			tl::log_err("Cannot load tool configuration file \"", strTools, "\".");
+		}
+	}
+	else
+	{
+		tl::log_err("No tool configuration file found.");
+	}
 
 
 

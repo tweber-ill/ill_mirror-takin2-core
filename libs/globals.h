@@ -52,6 +52,8 @@ extern const std::vector<std::string>& get_global_paths();
 extern void clear_global_paths();
 extern std::string find_file_in_global_paths(const std::string& strFile, bool bAlsoTryFileOnly=true);
 
+extern std::string find_program_binary(const std::string& strExe, bool log_messages=true);
+
 extern unsigned int get_max_threads();
 
 extern std::string get_gpltool_version();
