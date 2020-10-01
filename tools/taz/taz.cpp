@@ -568,9 +568,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	pMenuCalc->addSeparator();
 
-	QAction *pSgList = new QAction("Space Groups...", this);
-	pMenuCalc->addAction(pSgList);
-
 	QAction *pFormfactor = nullptr;
 	if(g_bHasFormfacts && g_bHasScatlens)
 	{
@@ -631,20 +628,17 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	// tools menu
 	QMenu *pMenuTools = new QMenu("Tools", this);
 
-	QAction *pScanViewer = new QAction("Scan Viewer...", this);
-	pMenuTools->addAction(pScanViewer);
-
-	QAction *pScanPos = new QAction("Scan Positions Plotter...", this);
-	pMenuTools->addAction(pScanPos);
-
-
 	// add menu entries for external tools
 	std::string strTools = find_resource("res/conf/tools.xml");
+	bool toolconfloaded = false;
 	if(strTools != "")
 	{
 		tl::Prop<std::string> propTools;
 		if(propTools.Load(strTools.c_str(), tl::PropType::XML))
 		{
+			// to avoid two separators in a row
+			bool bJustAddedSeparator = false;
+
 			// add all menu entries
 			for(std::size_t entry=0; 1; ++entry)
 			{
@@ -656,10 +650,12 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 				
 				std::string tooltype = propTools.Query<std::string>(xmlpath + "/type", "");
 
-				if(tooltype == "separator")
+				if(tooltype == "separator" && !bJustAddedSeparator)
 				{
 					pMenuTools->addSeparator();
+					bJustAddedSeparator = true;
 				}
+				// external tools
 				else if(tooltype == "program")
 				{
 					std::string toolname = propTools.Query<std::string>(xmlpath + "/name", "");
@@ -681,13 +677,50 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 					// add menu item for external tool
 					QAction *actionTool = new QAction(toolname.c_str(), this);
 					pMenuTools->addAction(actionTool);
+					bJustAddedSeparator = false;
+
 					QObject::connect(actionTool, &QAction::triggered, [toolbin]()
 					{
 						// run exernal tool process
 						tl::PipeProc<char> proc(toolbin.c_str(), false);
 					});
 				}
+				// internal tools
+				else if(tooltype == "program_internal")
+				{
+					std::string toolname = propTools.Query<std::string>(xmlpath + "/name", "");
+					std::string toolprog = propTools.Query<std::string>(xmlpath + "/program", "");
+
+					QAction *actionTool = new QAction(toolname.c_str(), this);
+
+					if(toolprog == "takin_scanviewer")
+					{
+						QObject::connect(actionTool, &QAction::triggered, this, &TazDlg::ShowScanViewer);
+					}
+					else if(toolprog == "takin_scanpos")
+					{
+						QObject::connect(actionTool, &QAction::triggered, this, &TazDlg::ShowScanPos);
+					}
+					else if(toolprog == "takin_sgbrowser")
+					{
+						QObject::connect(actionTool, &QAction::triggered, this, &TazDlg::ShowSgListDlg);
+					}
+					else
+					{
+						tl::log_err("Unknown internal tool \"", toolprog, "\".");
+						delete actionTool;
+						actionTool = nullptr;
+					}
+
+					if(actionTool)
+					{
+						pMenuTools->addAction(actionTool);
+						bJustAddedSeparator = false;
+					}
+				}
 			}
+
+			toolconfloaded = true;
 		}
 		else
 		{
@@ -699,6 +732,25 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 		tl::log_err("No tool configuration file found.");
 	}
 
+	// default tools menu configuration, if nothing else given
+	if(!toolconfloaded)
+	{
+		tl::log_warn("No tool configuration given, loading internal defaults.");
+
+		QAction *pScanViewer = new QAction("Scan Viewer...", this);
+		QObject::connect(pScanViewer, &QAction::triggered, this, &TazDlg::ShowScanViewer);
+		pMenuTools->addAction(pScanViewer);
+
+		QAction *pScanPos = new QAction("Scan Positions Plotter...", this);
+		QObject::connect(pScanPos, &QAction::triggered, this, &TazDlg::ShowScanPos);
+		pMenuTools->addAction(pScanPos);
+
+		pMenuTools->addSeparator();
+
+		QAction *pSgList = new QAction("Space Groups...", this);
+		QObject::connect(pSgList, &QAction::triggered, this, &TazDlg::ShowSgListDlg);
+		pMenuTools->addAction(pSgList);
+	}
 
 
 	// --------------------------------------------------------------------------------
@@ -762,8 +814,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 #ifdef USE_CIF
 	QObject::connect(pImportCIF, SIGNAL(triggered()), this, SLOT(ImportCIF()));
 #endif
-	QObject::connect(pScanViewer, SIGNAL(triggered()), this, SLOT(ShowScanViewer()));
-	QObject::connect(pScanPos, SIGNAL(triggered()), this, SLOT(ShowScanPos()));
 	QObject::connect(pPowderFit, SIGNAL(triggered()), this, SLOT(ShowPowderFit()));
 	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDlg()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
@@ -824,8 +874,6 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QObject::connect(pNetCache, SIGNAL(triggered()), this, SLOT(ShowNetCache()));
 	QObject::connect(pNetScanMon, SIGNAL(triggered()), this, SLOT(ShowNetScanMonitor()));
 #endif
-
-	QObject::connect(pSgList, SIGNAL(triggered()), this, SLOT(ShowSgListDlg()));
 
 	if(pFormfactor)
 		QObject::connect(pFormfactor, SIGNAL(triggered()), this, SLOT(ShowFormfactorDlg()));
