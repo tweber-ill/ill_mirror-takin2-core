@@ -6,7 +6,7 @@
 #
 
 TAKINDIR=$(dirname $0)
-echo -e "Takin directory: ${TAKINDIR}"
+echo "Takin directory: ${TAKINDIR}"
 
 
 # look for binary in bin folder
