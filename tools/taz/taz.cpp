@@ -647,7 +647,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 				std::string xmlpath = _xmlpath.str();
 				if(!propTools.Exists(xmlpath))
 					break;
-				
+
 				std::string tooltype = propTools.Query<std::string>(xmlpath + "/type", "");
 
 				if(tooltype == "separator" && !bJustAddedSeparator)
@@ -667,7 +667,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 						continue;
 					}
 
-					std::string toolbin = find_program_binary(toolprog, false);
+					std::string toolbin = find_program_binary(toolprog);
 					if(toolbin == "")
 					{
 						tl::log_err("Tool binary \"", toolprog, "\" was not found.");
@@ -682,7 +682,11 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 					QObject::connect(actionTool, &QAction::triggered, [toolbin]()
 					{
 						// run exernal tool process
+						tl::log_debug("Running process \"", toolbin, "\"...");
+
 						tl::PipeProc<char> proc(toolbin.c_str(), false);
+						if(!proc.IsReady())
+							tl::log_err("Process \"", toolbin, "\" could not be created.");
 					});
 				}
 				// internal tools
