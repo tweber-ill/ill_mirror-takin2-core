@@ -184,110 +184,86 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 
 
-	QObject::connect(m_pSettingsDlg, SIGNAL(SettingsChanged()), this, SLOT(SettingsChanged()));
+	QObject::connect(m_pSettingsDlg, &SettingsDlg::SettingsChanged, this, &TazDlg::SettingsChanged);
 
-	QObject::connect(&m_sceneReal, SIGNAL(nodeEvent(bool)), this, SLOT(RealNodeEvent(bool)));
-	QObject::connect(&m_sceneRecip, SIGNAL(nodeEvent(bool)), this, SLOT(RecipNodeEvent(bool)));
-	QObject::connect(&m_sceneTof, SIGNAL(nodeEvent(bool)), this, SLOT(TofNodeEvent(bool)));
+	QObject::connect(&m_sceneReal, &TasLayoutScene::nodeEvent, this, &TazDlg::RealNodeEvent);
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::nodeEvent, this, &TazDlg::RecipNodeEvent);
+	QObject::connect(&m_sceneTof, &TofLayoutScene::nodeEvent, this, &TazDlg::TofNodeEvent);
 
 	// TAS
-	QObject::connect(&m_sceneRecip, SIGNAL(triangleChanged(const TriangleOptions&)),
-		&m_sceneReal, SLOT(triangleChanged(const TriangleOptions&)));
-	QObject::connect(&m_sceneReal, SIGNAL(tasChanged(const TriangleOptions&)),
-		&m_sceneRecip, SLOT(tasChanged(const TriangleOptions&)));
-	QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-		&m_sceneReal, SLOT(recipParamsChanged(const RecipParams&)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::triangleChanged, &m_sceneReal, &TasLayoutScene::triangleChanged);
+	QObject::connect(&m_sceneReal, &TasLayoutScene::tasChanged, &m_sceneRecip, &ScatteringTriangleScene::tasChanged);
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, &m_sceneReal, &TasLayoutScene::recipParamsChanged);
 
 	// TOF
-	QObject::connect(&m_sceneRecip, SIGNAL(triangleChanged(const TriangleOptions&)),
-		&m_sceneTof, SLOT(triangleChanged(const TriangleOptions&)));
-	QObject::connect(&m_sceneTof, SIGNAL(tasChanged(const TriangleOptions&)),
-		&m_sceneRecip, SLOT(tasChanged(const TriangleOptions&)));
-	QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-		&m_sceneTof, SLOT(recipParamsChanged(const RecipParams&)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::triangleChanged, &m_sceneTof, &TofLayoutScene::triangleChanged);
+	QObject::connect(&m_sceneTof, &TofLayoutScene::tasChanged, &m_sceneRecip, &ScatteringTriangleScene::tasChanged);
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, &m_sceneTof, &TofLayoutScene::recipParamsChanged);
 
 	// connections between instruments
-	QObject::connect(&m_sceneTof, SIGNAL(tasChanged(const TriangleOptions&)),
-		&m_sceneReal, SLOT(triangleChanged(const TriangleOptions&)));
-	QObject::connect(&m_sceneReal, SIGNAL(tasChanged(const TriangleOptions&)),
-		&m_sceneTof, SLOT(triangleChanged(const TriangleOptions&)));
+	QObject::connect(&m_sceneTof, &TofLayoutScene::tasChanged, &m_sceneReal, &TasLayoutScene::triangleChanged);
+	QObject::connect(&m_sceneReal, &TasLayoutScene::tasChanged, &m_sceneTof, &TofLayoutScene::triangleChanged);
 
 	// scale factor
 	if(m_pviewRecip)
-		QObject::connect(m_pviewRecip, SIGNAL(scaleChanged(t_real_glob)),
-			&m_sceneRecip, SLOT(scaleChanged(t_real_glob)));
+		QObject::connect(m_pviewRecip, &ScatteringTriangleView::scaleChanged, &m_sceneRecip, &ScatteringTriangleScene::scaleChanged);
 	if(m_pviewProjRecip)
-		QObject::connect(m_pviewProjRecip, SIGNAL(scaleChanged(t_real_glob)),
-			&m_sceneProjRecip, SLOT(scaleChanged(t_real_glob)));
+		QObject::connect(m_pviewProjRecip, &ProjLatticeView::scaleChanged, &m_sceneProjRecip, &ProjLatticeScene::scaleChanged);
 	if(m_pviewRealLattice)
-		QObject::connect(m_pviewRealLattice, SIGNAL(scaleChanged(t_real_glob)),
-			&m_sceneRealLattice, SLOT(scaleChanged(t_real_glob)));
+		QObject::connect(m_pviewRealLattice, &LatticeView::scaleChanged, &m_sceneRealLattice, &LatticeScene::scaleChanged);
 	if(m_pviewReal)
-		QObject::connect(m_pviewReal, SIGNAL(scaleChanged(t_real_glob)),
-			&m_sceneReal, SLOT(scaleChanged(t_real_glob)));
+		QObject::connect(m_pviewReal, &TasLayoutView::scaleChanged, &m_sceneReal, &TasLayoutScene::scaleChanged);
 	if(m_pviewTof)
-		QObject::connect(m_pviewTof, SIGNAL(scaleChanged(t_real_glob)),
-			&m_sceneTof, SLOT(scaleChanged(t_real_glob)));
+		QObject::connect(m_pviewTof, &TofLayoutView::scaleChanged, &m_sceneTof, &TofLayoutScene::scaleChanged);
 
 	// parameter dialogs
-	QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-		&m_dlgRecipParam, SLOT(paramsChanged(const RecipParams&)));
-	QObject::connect(&m_sceneReal, SIGNAL(paramsChanged(const RealParams&)),
-		&m_dlgRealParam, SLOT(paramsChanged(const RealParams&)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, &m_dlgRecipParam, &RecipParamDlg::paramsChanged);
+	QObject::connect(&m_sceneReal, &TasLayoutScene::paramsChanged, &m_dlgRealParam, &RealParamDlg::paramsChanged);
 
 	// cursor position
-	QObject::connect(&m_sceneRecip, SIGNAL(coordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)),
-		this, SLOT(RecipCoordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)));
-	QObject::connect(&m_sceneProjRecip, SIGNAL(coordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)),
-		this, SLOT(RecipCoordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)));
-	QObject::connect(&m_sceneRealLattice, SIGNAL(coordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)),
-		this, SLOT(RealCoordsChanged(t_real_glob, t_real_glob, t_real_glob, bool, t_real_glob, t_real_glob, t_real_glob)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::coordsChanged, this, &TazDlg::RecipCoordsChanged);
+	QObject::connect(&m_sceneProjRecip, &ProjLatticeScene::coordsChanged, this, &TazDlg::RecipCoordsChanged);
+	QObject::connect(&m_sceneRealLattice, &LatticeScene::coordsChanged, this, &TazDlg::RealCoordsChanged);
 
-	QObject::connect(&m_sceneRecip, SIGNAL(spurionInfo(const tl::ElasticSpurion&, const std::vector<tl::InelasticSpurion<t_real_glob>>&, const std::vector<tl::InelasticSpurion<t_real_glob>>&)),
-		this, SLOT(spurionInfo(const tl::ElasticSpurion&, const std::vector<tl::InelasticSpurion<t_real_glob>>&, const std::vector<tl::InelasticSpurion<t_real_glob>>&)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::spurionInfo, this, &TazDlg::spurionInfo);
 
-	QObject::connect(m_pGotoDlg, SIGNAL(vars_changed(const CrystalOptions&, const TriangleOptions&)),
-		this, SLOT(VarsChanged(const CrystalOptions&, const TriangleOptions&)));
-	QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-		m_pGotoDlg, SLOT(RecipParamsChanged(const RecipParams&)));
+	QObject::connect(m_pGotoDlg, &GotoDlg::vars_changed, this, &TazDlg::VarsChanged);
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pGotoDlg, &GotoDlg::RecipParamsChanged);
 
-	QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-		this, SLOT(recipParamsChanged(const RecipParams&)));
+	QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, this, &TazDlg::recipParamsChanged);
 
 
 	for(QLineEdit* pEdit : m_vecEdits_monoana)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(UpdateDs()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::UpdateDs);
 
 	for(QLineEdit* pEdit : m_vecEdits_real)
 	{
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CheckCrystalType()));
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcPeaks()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::CheckCrystalType);
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::CalcPeaks);
 	}
 
 	for(QLineEdit* pEdit : m_vecEdits_plane)
-	{
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcPeaks()));
-	}
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::CalcPeaks);
 
 	//for(QDoubleSpinBox* pSpin : m_vecSpinBoxesSample)
 	//	QObject::connect(pSpin, SIGNAL(valueChanged(t_real)), this, SLOT(CalcPeaks()));
 
 	for(QLineEdit* pEdit : m_vecEdits_recip)
 	{
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CheckCrystalType()));
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcPeaksRecip()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::CheckCrystalType);
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TazDlg::CalcPeaksRecip);
 	}
 
-	QObject::connect(checkSenseM, SIGNAL(stateChanged(int)), this, SLOT(UpdateMonoSense()));
-	QObject::connect(checkSenseS, SIGNAL(stateChanged(int)), this, SLOT(UpdateSampleSense()));
-	QObject::connect(checkSenseA, SIGNAL(stateChanged(int)), this, SLOT(UpdateAnaSense()));
+	QObject::connect(checkSenseM, &QCheckBox::stateChanged, this, &TazDlg::UpdateMonoSense);
+	QObject::connect(checkSenseS, &QCheckBox::stateChanged, this, &TazDlg::UpdateSampleSense);
+	QObject::connect(checkSenseA, &QCheckBox::stateChanged, this, &TazDlg::UpdateAnaSense);
 
-	QObject::connect(editSpaceGroupsFilter, SIGNAL(textEdited(const QString&)), this, SLOT(RepopulateSpaceGroups()));
-	QObject::connect(comboSpaceGroups, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCrystalType()));
-	QObject::connect(comboSpaceGroups, SIGNAL(currentIndexChanged(int)), this, SLOT(CalcPeaks()));
-	QObject::connect(checkPowder, SIGNAL(stateChanged(int)), this, SLOT(CalcPeaks()));
+	QObject::connect(editSpaceGroupsFilter, &QLineEdit::textEdited, this, &TazDlg::RepopulateSpaceGroups);
+	QObject::connect(comboSpaceGroups, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &TazDlg::SetCrystalType);
+	QObject::connect(comboSpaceGroups, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &TazDlg::CalcPeaks);
+	QObject::connect(checkPowder, &QCheckBox::stateChanged, this, &TazDlg::CalcPeaks);
 
-	QObject::connect(btnAtoms, SIGNAL(clicked(bool)), this, SLOT(ShowAtomsDlg()));
+	QObject::connect(btnAtoms, &QPushButton::clicked, this, &TazDlg::ShowAtomsDlg);
 
 
 
@@ -810,84 +786,84 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pMenuBar->addMenu(pMenuHelp);
 
 
-	QObject::connect(pNew, SIGNAL(triggered()), this, SLOT(New()));
-	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(Load()));
-	QObject::connect(pSave, SIGNAL(triggered()), this, SLOT(Save()));
-	QObject::connect(pSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
-	QObject::connect(pImport, SIGNAL(triggered()), this, SLOT(Import()));
+	QObject::connect(pNew, &QAction::triggered, this, &TazDlg::New);
+	QObject::connect(pLoad, &QAction::triggered, this, static_cast<bool (TazDlg::*)()>(&TazDlg::Load));
+	QObject::connect(pSave, &QAction::triggered, this, &TazDlg::Save);
+	QObject::connect(pSaveAs, &QAction::triggered, this, &TazDlg::SaveAs);
+	QObject::connect(pImport, &QAction::triggered, this, static_cast<bool (TazDlg::*)()>(&TazDlg::Import));
 #ifdef USE_CIF
-	QObject::connect(pImportCIF, SIGNAL(triggered()), this, SLOT(ImportCIF()));
+	QObject::connect(pImportCIF, &QAction::triggered, this, static_cast<bool (TazDlg::*)()>(&TazDlg::ImportCIF));
 #endif
-	QObject::connect(pPowderFit, SIGNAL(triggered()), this, SLOT(ShowPowderFit()));
-	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDlg()));
-	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
+	QObject::connect(pPowderFit, &QAction::triggered, this, &TazDlg::ShowPowderFit);
+	QObject::connect(pSettings, &QAction::triggered, this, &TazDlg::ShowSettingsDlg);
+	QObject::connect(pExit, &QAction::triggered, this, &TazDlg::close);
 
-	QObject::connect(m_pSmallq, SIGNAL(toggled(bool)), this, SLOT(EnableSmallq(bool)));
-	QObject::connect(m_pCoordAxes, SIGNAL(toggled(bool)), this, SLOT(EnableCoordAxes(bool)));
-	QObject::connect(m_pBZ, SIGNAL(toggled(bool)), this, SLOT(EnableBZ(bool)));
-	QObject::connect(m_pWS, SIGNAL(toggled(bool)), this, SLOT(EnableWS(bool)));
-	QObject::connect(m_pAllPeaks, SIGNAL(toggled(bool)), this, SLOT(ShowAllPeaks(bool)));
+	QObject::connect(m_pSmallq, &QAction::toggled, this, &TazDlg::EnableSmallq);
+	QObject::connect(m_pCoordAxes, &QAction::toggled, this, &TazDlg::EnableCoordAxes);
+	QObject::connect(m_pBZ, &QAction::toggled, this, &TazDlg::EnableBZ);
+	QObject::connect(m_pWS, &QAction::toggled, this, &TazDlg::EnableWS);
+	QObject::connect(m_pAllPeaks, &QAction::toggled, this, &TazDlg::ShowAllPeaks);
 
 	for(QAction* pAct : {m_pEwaldSphereNone, m_pEwaldSphereKi, m_pEwaldSphereKf})
-		QObject::connect(pAct, SIGNAL(triggered()), this, SLOT(ShowEwaldSphere()));
+		QObject::connect(pAct, &QAction::triggered, this, &TazDlg::ShowEwaldSphere);
 
-	QObject::connect(m_pShowRealQDir, SIGNAL(toggled(bool)), this, SLOT(EnableRealQDir(bool)));
+	QObject::connect(m_pShowRealQDir, &QAction::toggled, this, &TazDlg::EnableRealQDir);
 
-	QObject::connect(m_pSnapSmallq, SIGNAL(toggled(bool)), &m_sceneRecip, SLOT(setSnapq(bool)));
-	QObject::connect(pKeepAbsKiKf, SIGNAL(toggled(bool)), &m_sceneRecip, SLOT(setKeepAbsKiKf(bool)));
+	QObject::connect(m_pSnapSmallq, &QAction::toggled, &m_sceneRecip, &ScatteringTriangleScene::setSnapq);
+	QObject::connect(pKeepAbsKiKf, &QAction::toggled, &m_sceneRecip, &ScatteringTriangleScene::setKeepAbsKiKf);
 
-	QObject::connect(pRecipParams, SIGNAL(triggered()), this, SLOT(ShowRecipParams()));
-	QObject::connect(pRealParams, SIGNAL(triggered()), this, SLOT(ShowRealParams()));
+	QObject::connect(pRecipParams, &QAction::triggered, this, &TazDlg::ShowRecipParams);
+	QObject::connect(pRealParams, &QAction::triggered, this, &TazDlg::ShowRealParams);
 
 	for(QAction *pProj : {m_pProjGnom, m_pProjStereo, m_pProjPara, m_pProjPersp})
-		QObject::connect(pProj, SIGNAL(triggered()), this, SLOT(RecipProjChanged()));
+		QObject::connect(pProj, &QAction::triggered, this, &TazDlg::RecipProjChanged);
 
 #if !defined NO_3D
-	QObject::connect(pView3D, SIGNAL(triggered()), this, SLOT(Show3D()));
-	QObject::connect(pView3DReal, SIGNAL(triggered()), this, SLOT(Show3DReal()));
-	QObject::connect(pView3DBZ, SIGNAL(triggered()), this, SLOT(Show3DBZ()));
-	QObject::connect(pResoEllipses3D, SIGNAL(triggered()), this, SLOT(ShowResoEllipses3D()));
+	QObject::connect(pView3D, &QAction::triggered, this, &TazDlg::Show3D);
+	QObject::connect(pView3DReal, &QAction::triggered, this, &TazDlg::Show3DReal);
+	QObject::connect(pView3DBZ, &QAction::triggered, this, &TazDlg::Show3DBZ);
+	QObject::connect(pResoEllipses3D, &QAction::triggered, this, &TazDlg::ShowResoEllipses3D);
 #endif
 
-	QObject::connect(pRecipExport, SIGNAL(triggered()), this, SLOT(ExportRecip()));
-	QObject::connect(pBZ3DExport, SIGNAL(triggered()), this, SLOT(ExportBZ3DModel()));
-	QObject::connect(pProjExport, SIGNAL(triggered()), this, SLOT(ExportProj()));
-	QObject::connect(pRealExport, SIGNAL(triggered()), this, SLOT(ExportReal()));
-	QObject::connect(pTofExport, SIGNAL(triggered()), this, SLOT(ExportTof()));
-	QObject::connect(pRealLatticeExport, SIGNAL(triggered()), this, SLOT(ExportRealLattice()));
+	QObject::connect(pRecipExport, &QAction::triggered, this, &TazDlg::ExportRecip);
+	QObject::connect(pBZ3DExport, &QAction::triggered, this, &TazDlg::ExportBZ3DModel);
+	QObject::connect(pProjExport, &QAction::triggered, this, &TazDlg::ExportProj);
+	QObject::connect(pRealExport, &QAction::triggered, this, &TazDlg::ExportReal);
+	QObject::connect(pTofExport, &QAction::triggered, this, &TazDlg::ExportTof);
+	QObject::connect(pRealLatticeExport, &QAction::triggered, this, &TazDlg::ExportRealLattice);
 
-	QObject::connect(pExportUC, SIGNAL(triggered()), this, SLOT(ExportUCModel()));
+	QObject::connect(pExportUC, &QAction::triggered, this, &TazDlg::ExportUCModel);
 
-	QObject::connect(pResoParams, SIGNAL(triggered()), this, SLOT(ShowResoParams()));
-	QObject::connect(pResoEllipses, SIGNAL(triggered()), this, SLOT(ShowResoEllipses()));
-	QObject::connect(pResoConv, SIGNAL(triggered()), this, SLOT(ShowResoConv()));
+	QObject::connect(pResoParams, &QAction::triggered, this, &TazDlg::ShowResoParams);
+	QObject::connect(pResoEllipses, &QAction::triggered, this, &TazDlg::ShowResoEllipses);
+	QObject::connect(pResoConv, &QAction::triggered, this, &TazDlg::ShowResoConv);
 
-	QObject::connect(pNeutronProps, SIGNAL(triggered()), this, SLOT(ShowNeutronDlg()));
-	QObject::connect(pCompProps, SIGNAL(triggered()), this, SLOT(ShowTofDlg()));
-	QObject::connect(m_pGoto, SIGNAL(triggered()), this, SLOT(ShowGotoDlg()));
-	QObject::connect(pPowder, SIGNAL(triggered()), this, SLOT(ShowPowderDlg()));
-	QObject::connect(pSpuri, SIGNAL(triggered()), this, SLOT(ShowSpurions()));
-	QObject::connect(pDW, SIGNAL(triggered()), this, SLOT(ShowDWDlg()));
-	QObject::connect(pDynPlane, SIGNAL(triggered()), this, SLOT(ShowDynPlaneDlg()));
-	QObject::connect(pDeadAngles, SIGNAL(triggered()), this, SLOT(ShowDeadAnglesDlg()));
+	QObject::connect(pNeutronProps, &QAction::triggered, this, &TazDlg::ShowNeutronDlg);
+	QObject::connect(pCompProps, &QAction::triggered, this, &TazDlg::ShowTofDlg);
+	QObject::connect(m_pGoto, &QAction::triggered, this, &TazDlg::ShowGotoDlg);
+	QObject::connect(pPowder, &QAction::triggered, this, &TazDlg::ShowPowderDlg);
+	QObject::connect(pSpuri, &QAction::triggered, this, &TazDlg::ShowSpurions);
+	QObject::connect(pDW, &QAction::triggered, this, &TazDlg::ShowDWDlg);
+	QObject::connect(pDynPlane, &QAction::triggered, this, &TazDlg::ShowDynPlaneDlg);
+	QObject::connect(pDeadAngles, &QAction::triggered, this, &TazDlg::ShowDeadAnglesDlg);
 
 #if !defined NO_NET
-	QObject::connect(pConn, SIGNAL(triggered()), this, SLOT(ShowConnectDlg()));
-	QObject::connect(pDisconn, SIGNAL(triggered()), this, SLOT(Disconnect()));
-	QObject::connect(pNetRefresh, SIGNAL(triggered()), this, SLOT(NetRefresh()));
-	QObject::connect(pNetCache, SIGNAL(triggered()), this, SLOT(ShowNetCache()));
-	QObject::connect(pNetScanMon, SIGNAL(triggered()), this, SLOT(ShowNetScanMonitor()));
+	QObject::connect(pConn, &QAction::triggered, this, &TazDlg::ShowConnectDlg);
+	QObject::connect(pDisconn, &QAction::triggered, this, &TazDlg::Disconnect);
+	QObject::connect(pNetRefresh, &QAction::triggered, this, &TazDlg::NetRefresh);
+	QObject::connect(pNetCache, &QAction::triggered, this, &TazDlg::ShowNetCache);
+	QObject::connect(pNetScanMon, &QAction::triggered, this, &TazDlg::ShowNetScanMonitor);
 #endif
 
 	if(pFormfactor)
-		QObject::connect(pFormfactor, SIGNAL(triggered()), this, SLOT(ShowFormfactorDlg()));
+		QObject::connect(pFormfactor, &QAction::triggered, this, &TazDlg::ShowFormfactorDlg);
 
-	QObject::connect(pHelp, SIGNAL(triggered()), this, SLOT(ShowHelp()));
-	QObject::connect(pDevelDoc, SIGNAL(triggered()), this, SLOT(ShowDevelDoc()));
-	QObject::connect(pLog, SIGNAL(triggered()), this, SLOT(ShowLog()));
-	QObject::connect(pBugReport, SIGNAL(triggered()), this, SLOT(ReportBug()));
-	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
-	QObject::connect(pAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+	QObject::connect(pHelp, &QAction::triggered, this, &TazDlg::ShowHelp);
+	QObject::connect(pDevelDoc, &QAction::triggered, this, &TazDlg::ShowDevelDoc);
+	QObject::connect(pLog, &QAction::triggered, this, &TazDlg::ShowLog);
+	QObject::connect(pBugReport, &QAction::triggered, this, &TazDlg::ReportBug);
+	QObject::connect(pAbout, &QAction::triggered, this, &TazDlg::ShowAbout);
+	QObject::connect(pAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
 
 	setMenuBar(pMenuBar);
@@ -903,20 +879,15 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	if(m_pviewTof) m_pviewTof->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	if(m_pviewRecip)
-		QObject::connect(m_pviewRecip, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(RecipContextMenu(const QPoint&)));
+		QObject::connect(m_pviewRecip, &ScatteringTriangleView::customContextMenuRequested, this, &TazDlg::RecipContextMenu);
 	if(m_pviewProjRecip)
-		QObject::connect(m_pviewProjRecip, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(RecipContextMenu(const QPoint&)));
+		QObject::connect(m_pviewProjRecip, &ProjLatticeView::customContextMenuRequested, this, &TazDlg::RecipContextMenu);
 	if(m_pviewRealLattice)
-		QObject::connect(m_pviewRealLattice, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(RealContextMenu(const QPoint&)));
+		QObject::connect(m_pviewRealLattice, &LatticeView::customContextMenuRequested, this, &TazDlg::RealContextMenu);
 	if(m_pviewReal)
-		QObject::connect(m_pviewReal, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(RealContextMenu(const QPoint&)));
+		QObject::connect(m_pviewReal, &TasLayoutView::customContextMenuRequested, this, &TazDlg::RealContextMenu);
 	if(m_pviewTof)
-		QObject::connect(m_pviewTof, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(RealContextMenu(const QPoint&)));
+		QObject::connect(m_pviewTof, &TofLayoutView::customContextMenuRequested, this, &TazDlg::RealContextMenu);
 
 
 	// --------------------------------------------------------------------------------
@@ -1180,8 +1151,7 @@ void TazDlg::ShowNeutronDlg()
 	if(!m_pNeutronDlg)
 	{
 		m_pNeutronDlg = new NeutronDlg(this, &m_settings);
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pNeutronDlg, SLOT(paramsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pNeutronDlg, &NeutronDlg::paramsChanged);
 		m_sceneRecip.emitAllParams();
 	}
 
@@ -1217,8 +1187,7 @@ void TazDlg::ShowPowderDlg()
 	if(!m_pPowderDlg)
 	{
 		m_pPowderDlg = new PowderDlg(this, &m_settings);
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pPowderDlg, SLOT(paramsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pPowderDlg, &PowderDlg::paramsChanged);
 		m_sceneRecip.emitAllParams();
 	}
 
@@ -1249,8 +1218,7 @@ void TazDlg::ShowDynPlaneDlg()
 	if(!m_pDynPlaneDlg)
 	{
 		m_pDynPlaneDlg = new DynPlaneDlg(this, &m_settings);
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pDynPlaneDlg, SLOT(RecipParamsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pDynPlaneDlg, &DynPlaneDlg::RecipParamsChanged);
 		m_sceneRecip.emitAllParams();
 	}
 
@@ -1395,8 +1363,7 @@ void TazDlg::Show3D()
 		m_pRecip3d->SetPlaneDistTolerance(dTol);
 
 		// also track current Q position
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pRecip3d, SLOT(RecipParamsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pRecip3d, &Recip3DDlg::RecipParamsChanged);
 		m_sceneRecip.emitAllParams();
 	}
 
@@ -1430,8 +1397,7 @@ void TazDlg::Show3DBZ()
 		m_pBZ3d = new BZ3DDlg(this, &m_settings);
 
 		// also track current q position
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pBZ3d, SLOT(RecipParamsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pBZ3d, &BZ3DDlg::RecipParamsChanged);
 		m_sceneRecip.emitAllParams();
 	}
 
@@ -1614,8 +1580,7 @@ void TazDlg::ShowDeadAnglesDlg()
 	if(!m_pDeadAnglesDlg)
 	{
 		m_pDeadAnglesDlg = new DeadAnglesDlg(this, &m_settings);
-		QObject::connect(m_pDeadAnglesDlg, SIGNAL(ApplyDeadAngles(const std::vector<DeadAngle<t_real_glob>>&)),
-			this, SLOT(ApplyDeadAngles(const std::vector<DeadAngle<t_real_glob>>&)));
+		QObject::connect(m_pDeadAnglesDlg, &DeadAnglesDlg::ApplyDeadAngles, this, &TazDlg::ApplyDeadAngles);
 	}
 
 	m_pDeadAnglesDlg->SetDeadAngles(m_vecDeadAngles);

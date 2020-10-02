@@ -40,9 +40,10 @@ class SpurionDlg : public QDialog, Ui::SpurionDlg
 		void CalcBragg();
 
 		void cursorMoved(const QPointF& pt);
-		void paramsChanged(const RecipParams& parms);
-
 		void SaveTable();
+
+	public slots:
+		void paramsChanged(const RecipParams& parms);
 
 	protected:
 		virtual void showEvent(QShowEvent *pEvt) override;

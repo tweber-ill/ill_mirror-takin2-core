@@ -106,9 +106,11 @@ class PowderDlg : public QDialog, Ui::PowderDlg
 		virtual void dragEnterEvent(QDragEnterEvent *pEvt) override;
 		virtual void dropEvent(QDropEvent *pEvt) override;
 
-		void paramsChanged(const RecipParams& parms);
 		void SetExtKi();
 		void SetExtKf();
+
+	public slots:
+		void paramsChanged(const RecipParams& parms);
 
 	protected:
 		virtual void showEvent(QShowEvent *pEvt) override;

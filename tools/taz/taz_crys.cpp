@@ -590,9 +590,7 @@ void TazDlg::ShowSpurions()
 	if(!m_pSpuri)
 	{
 		m_pSpuri = new SpurionDlg(this, &m_settings);
-
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pSpuri, SLOT(paramsChanged(const RecipParams&)));
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pSpuri, &SpurionDlg::paramsChanged);
 
 		m_sceneRecip.emitAllParams();
 	}
@@ -677,14 +675,10 @@ void TazDlg::InitReso()
 	{
 		m_pReso = new ResoDlg(this, &m_settings);
 
-		QObject::connect(this, SIGNAL(ResoParamsChanged(const ResoParams&)),
-			m_pReso, SLOT(ResoParamsChanged(const ResoParams&)));
-		QObject::connect(&m_sceneRecip, SIGNAL(paramsChanged(const RecipParams&)),
-			m_pReso, SLOT(RecipParamsChanged(const RecipParams&)));
-		QObject::connect(&m_sceneReal, SIGNAL(paramsChanged(const RealParams&)),
-			m_pReso, SLOT(RealParamsChanged(const RealParams&)));
-		QObject::connect(this, SIGNAL(SampleParamsChanged(const SampleParams&)),
-			m_pReso, SLOT(SampleParamsChanged(const SampleParams&)));
+		QObject::connect(this, &TazDlg::ResoParamsChanged, m_pReso, &ResoDlg::ResoParamsChanged);
+		QObject::connect(&m_sceneRecip, &ScatteringTriangleScene::paramsChanged, m_pReso, &ResoDlg::RecipParamsChanged);
+		QObject::connect(&m_sceneReal, &TasLayoutScene::paramsChanged, m_pReso, &ResoDlg::RealParamsChanged);
+		QObject::connect(this, &TazDlg::SampleParamsChanged, m_pReso, &ResoDlg::SampleParamsChanged);
 
 		UpdateDs();
 		UpdateMonoSense();
@@ -712,8 +706,7 @@ void TazDlg::ShowResoEllipses()
 	if(!m_pEllipseDlg)
 	{
 		m_pEllipseDlg = new EllipseDlg(this, &m_settings);
-		QObject::connect(m_pReso, SIGNAL(ResoResultsSig(const EllipseDlgParams&)),
-			m_pEllipseDlg, SLOT(SetParams(const EllipseDlgParams&)));
+		QObject::connect(m_pReso, &ResoDlg::ResoResultsSig, m_pEllipseDlg, &EllipseDlg::SetParams);
 
 		m_pReso->EmitResults();
 	}
@@ -744,9 +737,7 @@ void TazDlg::ShowResoEllipses3D()
 	if(!m_pEllipseDlg3D)
 	{
 		m_pEllipseDlg3D = new EllipseDlg3D(this, &m_settings);
-		QObject::connect(m_pReso,
-			SIGNAL(ResoResultsSig(const EllipseDlgParams&)),
-			m_pEllipseDlg3D, SLOT(SetParams(const EllipseDlgParams&)));
+		QObject::connect(m_pReso, &ResoDlg::ResoResultsSig, m_pEllipseDlg3D, &EllipseDlg3D::SetParams);
 
 		m_pReso->EmitResults();
 	}
@@ -777,8 +768,7 @@ void TazDlg::ShowAtomsDlg(bool bOnlyCreate)
 	if(!m_pAtomsDlg)
 	{
 		m_pAtomsDlg = new AtomsDlg(this, &m_settings);
-		QObject::connect(m_pAtomsDlg, SIGNAL(ApplyAtoms(const std::vector<xtl::AtomPos<t_real_glob>>&)),
-			this, SLOT(ApplyAtoms(const std::vector<xtl::AtomPos<t_real_glob>>&)));
+		QObject::connect(m_pAtomsDlg, &AtomsDlg::ApplyAtoms, this, &TazDlg::ApplyAtoms);
 	}
 
 	m_pAtomsDlg->SetAtoms(m_vecAtoms);

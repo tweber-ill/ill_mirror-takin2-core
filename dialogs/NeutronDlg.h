@@ -53,9 +53,11 @@ class NeutronDlg : public QDialog, Ui::NeutronDlg
 
 		void Eval(const QString&);
 
-		void paramsChanged(const RecipParams& parms);
 		void SetExtKi();
 		void SetExtKf();
+
+	public slots:
+		void paramsChanged(const RecipParams& parms);
 
 	protected:
 		virtual void showEvent(QShowEvent *pEvt) override;

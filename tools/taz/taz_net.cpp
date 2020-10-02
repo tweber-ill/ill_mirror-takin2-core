@@ -12,17 +12,18 @@
 
 #define DEFAULT_MSG_TIMEOUT 4000
 
+
 void TazDlg::ShowConnectDlg()
 {
 	if(!m_pSrvDlg)
 	{
 		m_pSrvDlg = new SrvDlg(this, &m_settings);
-		QObject::connect(m_pSrvDlg, SIGNAL(ConnectTo(int, const QString&, const QString&, const QString&, const QString&)),
-			this, SLOT(ConnectTo(int, const QString&, const QString&, const QString&, const QString&)));
+		QObject::connect(m_pSrvDlg, &SrvDlg::ConnectTo, this, &TazDlg::ConnectTo);
 	}
 
 	focus_dlg(m_pSrvDlg);
 }
+
 
 void TazDlg::ConnectTo(int iSys, const QString& _strHost, const QString& _strPort,
 	const QString& _strUser, const QString& _strPass)
@@ -45,12 +46,9 @@ void TazDlg::ConnectTo(int iSys, const QString& _strHost, const QString& _strPor
 	}
 
 
-	QObject::connect(m_pNetCache, SIGNAL(vars_changed(const CrystalOptions&, const TriangleOptions&)),
-		this, SLOT(VarsChanged(const CrystalOptions&, const TriangleOptions&)));
-	QObject::connect(m_pNetCache, SIGNAL(connected(const QString&, const QString&)),
-		this, SLOT(Connected(const QString&, const QString&)));
-	QObject::connect(m_pNetCache, SIGNAL(disconnected()),
-		this, SLOT(Disconnected()));
+	QObject::connect(m_pNetCache, &NetCache::vars_changed, this, &TazDlg::VarsChanged);
+	QObject::connect(m_pNetCache, &NetCache::connected, this, &TazDlg::Connected);
+	QObject::connect(m_pNetCache, &NetCache::disconnected, this, &TazDlg::Disconnected);
 
 	if(!m_pNetCacheDlg)
 		m_pNetCacheDlg = new NetCacheDlg(this, &m_settings);
@@ -60,10 +58,8 @@ void TazDlg::ConnectTo(int iSys, const QString& _strHost, const QString& _strPor
 	m_pNetCacheDlg->ClearAll();
 	m_pScanMonDlg->ClearPlot();
 
-	QObject::connect(m_pNetCache, SIGNAL(updated_cache_value(const std::string&, const CacheVal&)),
-		m_pNetCacheDlg, SLOT(UpdateValue(const std::string&, const CacheVal&)));
-	QObject::connect(m_pNetCache, SIGNAL(updated_cache_value(const std::string&, const CacheVal&)),
-		m_pScanMonDlg, SLOT(UpdateValue(const std::string&, const CacheVal&)));
+	QObject::connect(m_pNetCache, &NetCache::updated_cache_value, m_pNetCacheDlg, &NetCacheDlg::UpdateValue);
+	QObject::connect(m_pNetCache, &NetCache::updated_cache_value, m_pScanMonDlg, &ScanMonDlg::UpdateValue);
 
 
 	// no manual node movement
@@ -74,21 +70,18 @@ void TazDlg::ConnectTo(int iSys, const QString& _strHost, const QString& _strPor
 	m_pNetCache->connect(strHost, strPort, strUser, strPass);
 }
 
+
 void TazDlg::Disconnect()
 {
 	if(m_pNetCache)
 	{
 		m_pNetCache->disconnect();
 
-		QObject::disconnect(m_pNetCache, SIGNAL(vars_changed(const CrystalOptions&, const TriangleOptions&)),
-			this, SLOT(VarsChanged(const CrystalOptions&, const TriangleOptions&)));
-		QObject::disconnect(m_pNetCache, SIGNAL(connected(const QString&, const QString&)),
-			this, SLOT(Connected(const QString&, const QString&)));
-		QObject::disconnect(m_pNetCache, SIGNAL(disconnected()),
-			this, SLOT(Disconnected()));
+		QObject::disconnect(m_pNetCache, &NetCache::vars_changed, this, &TazDlg::VarsChanged);
+		QObject::disconnect(m_pNetCache, &NetCache::connected, this, &TazDlg::Connected);
+		QObject::disconnect(m_pNetCache, &NetCache::disconnected, this, &TazDlg::Disconnected);
 
-		QObject::disconnect(m_pNetCache, SIGNAL(updated_cache_value(const std::string&, const CacheVal&)),
-			m_pNetCacheDlg, SLOT(UpdateValue(const std::string&, const CacheVal&)));
+		QObject::disconnect(m_pNetCache, &NetCache::updated_cache_value, m_pNetCacheDlg, &NetCacheDlg::UpdateValue);
 
 		delete m_pNetCache;
 		m_pNetCache = nullptr;
@@ -102,6 +95,7 @@ void TazDlg::Disconnect()
 	statusBar()->showMessage("Disconnected.", DEFAULT_MSG_TIMEOUT);
 }
 
+
 void TazDlg::ShowNetCache()
 {
 	if(!m_pNetCacheDlg)
@@ -109,6 +103,7 @@ void TazDlg::ShowNetCache()
 
 	focus_dlg(m_pNetCacheDlg);
 }
+
 
 void TazDlg::ShowNetScanMonitor()
 {
@@ -118,6 +113,7 @@ void TazDlg::ShowNetScanMonitor()
 	focus_dlg(m_pScanMonDlg);
 }
 
+
 void TazDlg::NetRefresh()
 {
 	if(m_pNetCache)
@@ -125,6 +121,7 @@ void TazDlg::NetRefresh()
 	else
 		QMessageBox::warning(this, "Warning", "Not connected to an instrument server.");
 }
+
 
 void TazDlg::Connected(const QString& strHost, const QString& strSrv)
 {
@@ -134,6 +131,7 @@ void TazDlg::Connected(const QString& strHost, const QString& strSrv)
 	setWindowTitle((s_strTitle + " - ").c_str() + strHost + ":" + strSrv);
 	statusBar()->showMessage("Connected to " + strHost + " on port " + strSrv + ".", DEFAULT_MSG_TIMEOUT);
 }
+
 
 void TazDlg::Disconnected()
 {
