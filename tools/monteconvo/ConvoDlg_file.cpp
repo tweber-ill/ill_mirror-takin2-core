@@ -526,7 +526,7 @@ void ConvoDlg::browseScanFiles()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_scan", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
-		"Open S(q,w) File...", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN);;All files (*.*)",
+		"Open S(q,w) File...", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN);;All files (*.* *)",
 		nullptr, fileopt);
 	if(strFile == "")
 		return;
