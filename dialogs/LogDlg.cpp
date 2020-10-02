@@ -31,14 +31,14 @@ LogDlg::LogDlg(QWidget* pParent, QSettings *pSett, const std::string& strLogFile
 		m_pFileWatcher.reset(new QFileSystemWatcher(this));
 		m_pFileWatcher->addPath(strLogFile.c_str());
 
-		QObject::connect(m_pFileWatcher.get(), SIGNAL(fileChanged(const QString&)),
-			this, SLOT(LogFileChanged(const QString&)));
+		QObject::connect(m_pFileWatcher.get(), &QFileSystemWatcher::fileChanged,
+			this, &LogDlg::LogFileChanged);
 
 		LogFileChanged(strLogFile.c_str());
 	}
 	else
 	{
-		editOut->setPlainText("Error: No log data found!");
+		editOut->setPlainText("Error: No log data was found!");
 	}
 }
 

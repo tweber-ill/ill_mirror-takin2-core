@@ -49,10 +49,10 @@ PowderFitDlg::PowderFitDlg(QWidget* pParent, QSettings *pSett)
 			editAngleErrs->setText(m_pSettings->value("powderfit/dtt").toString());
 	}
 
-	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+	QObject::connect(buttonBox, &QDialogButtonBox::clicked, this, &PowderFitDlg::ButtonBoxClicked);
 
 	for(QLineEdit* pEdit : {editD, editKi, editGs, editAngles, editAngleErrs})
-		QObject::connect(pEdit, SIGNAL(textChanged(const QString&)), this, SLOT(Calc()));
+		QObject::connect(pEdit, &QLineEdit::textChanged, this, &PowderFitDlg::Calc);
 
 	Calc();
 }

@@ -780,10 +780,9 @@ bool TazDlg::Import(const char* pcFile)
 //--------------------------------------------------------------------------------
 // CIF importing
 
-#ifdef USE_CIF
-
 #include "libs/xtal/xtl_xml.h"
 #include "tlibs/helper/proc.h"
+
 
 bool TazDlg::ImportCIF()
 {
@@ -990,15 +989,6 @@ bool TazDlg::ImportCIF(const char* pcFile)
 	return true;
 }
 
-
-#else
-
-
-bool TazDlg::ImportCIF() { return false; }
-bool TazDlg::ImportCIFFile(const QString&) { return false; }
-bool TazDlg::ImportCIF(const char*) { return false; }
-
-#endif
 
 //--------------------------------------------------------------------------------
 

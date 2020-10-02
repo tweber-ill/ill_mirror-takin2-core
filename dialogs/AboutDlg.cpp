@@ -187,6 +187,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << " support for Julia scripting.";
 	ostrFeat << "</li>";*/
 
+/*
 	ostrFeat << "<li>";
 #if !defined USE_CIF
 	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
@@ -195,6 +196,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 #endif
 	ostrFeat << " support for CIF importing.";
 	ostrFeat << "</li>";
+*/
 
 	ostrFeat << "<li>";
 #if defined NO_3D

@@ -205,7 +205,6 @@ endif()
 message("Qt moc: ${QT_MOC_EXECUTABLE}\nQt uic: ${QT_UIC_EXECUTABLE}")
 
 
-add_definitions(-DUSE_CIF)
 add_definitions(-DNO_LAPACK)
 add_definitions(-DNO_QHULL)
 add_definitions(-DNO_JPEG -DNO_TIFF)

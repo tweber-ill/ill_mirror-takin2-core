@@ -1146,8 +1146,8 @@ void ScanViewerDlg::ChangedPath()
 		// watch directory for changes
 		m_pWatcher.reset(new QFileSystemWatcher(this));
 		m_pWatcher->addPath(m_strCurDir.c_str());
-		QObject::connect(m_pWatcher.get(), SIGNAL(directoryChanged(const QString&)),
-			this, SLOT(DirWasModified(const QString&)));
+		QObject::connect(m_pWatcher.get(), &QFileSystemWatcher::directoryChanged,
+			this, &ScanViewerDlg::DirWasModified);
 	}
 }
 

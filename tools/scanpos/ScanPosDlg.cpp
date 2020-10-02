@@ -35,14 +35,14 @@ ScanPosDlg::ScanPosDlg(QWidget* pParent, QSettings *pSett)
 			restoreGeometry(m_pSettings->value("scanpos/geo").toByteArray());
 	}
 
-	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
-	QObject::connect(editBragg, SIGNAL(textChanged(const QString&)), this, SLOT(UpdatePlot()));
-	QObject::connect(editPlane, SIGNAL(textChanged(const QString&)), this, SLOT(UpdatePlot()));
-	QObject::connect(editPos, SIGNAL(textChanged()), this, SLOT(UpdatePlot()));
-	QObject::connect(checkFlip, SIGNAL(toggled(bool)), this, SLOT(UpdatePlot()));
-	QObject::connect(check3D, SIGNAL(toggled(bool)), this, SLOT(UpdatePlot()));
-	QObject::connect(btnFromScan, SIGNAL(clicked()), this, SLOT(LoadPlaneFromFile()));
-	QObject::connect(btnAddFromScan, SIGNAL(clicked()), this, SLOT(LoadPosFromFile()));
+	QObject::connect(buttonBox, &QDialogButtonBox::clicked, this, &ScanPosDlg::ButtonBoxClicked);
+	QObject::connect(editBragg, &QLineEdit::textChanged, this, &ScanPosDlg::UpdatePlot);
+	QObject::connect(editPlane, &QLineEdit::textChanged, this, &ScanPosDlg::UpdatePlot);
+	QObject::connect(editPos, &QPlainTextEdit::textChanged, this, &ScanPosDlg::UpdatePlot);
+	QObject::connect(checkFlip, &QCheckBox::toggled, this, &ScanPosDlg::UpdatePlot);
+	QObject::connect(check3D, &QCheckBox::toggled, this, &ScanPosDlg::UpdatePlot);
+	QObject::connect(btnFromScan, &QPushButton::clicked, this, &ScanPosDlg::LoadPlaneFromFile);
+	QObject::connect(btnAddFromScan, &QPushButton::clicked, this, &ScanPosDlg::LoadPosFromFile);
 }
 
 

@@ -27,10 +27,10 @@ RealParamDlg::RealParamDlg(QWidget* pParent, QSettings* pSett)
 	this->setupUi(this);
 
 	for(QLineEdit* pEdit : { editVec1, editVec2 })
-		QObject::connect(pEdit, SIGNAL(textChanged(const QString&)), this, SLOT(CalcVecs()));
+		QObject::connect(pEdit, &QLineEdit::textChanged, this, &RealParamDlg::CalcVecs);
 	for(QLineEdit* pEdit : { editRotCoords, editRotTo, editRotKi, editRotNorm,
 		editRotBaseX, editRotBaseY, editRotBaseZ })
-		QObject::connect(pEdit, SIGNAL(textChanged(const QString&)), this, SLOT(CalcCrystalRot()));
+		QObject::connect(pEdit, &QLineEdit::textChanged, this, &RealParamDlg::CalcCrystalRot);
 
 	if(m_pSettings)
 	{

@@ -28,18 +28,18 @@ SgListDlg::SgListDlg(QWidget *pParent)
 
 	SetupSpacegroups();
 
-	QObject::connect(listSGs, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-		this, SLOT(SGSelected(QListWidgetItem*, QListWidgetItem*)));
-	QObject::connect(checkMatrices, SIGNAL(toggled(bool)), this, SLOT(UpdateSG()));
+	QObject::connect(listSGs, &QListWidget::currentItemChanged, this, &SgListDlg::SGSelected);
+	QObject::connect(checkMatrices, &QCheckBox::toggled, this, &SgListDlg::UpdateSG);
 
 	for(QSpinBox* pSpin : {spinH, spinK, spinL})
-		QObject::connect(pSpin, SIGNAL(valueChanged(int)), this, SLOT(RecalcBragg()));
+		QObject::connect(pSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+			this, &SgListDlg::RecalcBragg);
 
 	for(QDoubleSpinBox* pSpin : {spinX, spinY, spinZ, spinW})
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcTrafo()));
+		QObject::connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+			this, &SgListDlg::CalcTrafo);
 
-	QObject::connect(editFilter, SIGNAL(textEdited(const QString&)),
-		this, SLOT(SearchSG(const QString&)));
+	QObject::connect(editFilter, &QLineEdit::textEdited, this, &SgListDlg::SearchSG);
 
 
 	if(m_settings.contains("sglist/geo"))

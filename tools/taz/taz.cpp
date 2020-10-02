@@ -311,7 +311,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	recentimport.FillMenu(m_pMenuRecentImport, m_pMapperRecentImport);
 	pMenuFile->addMenu(m_pMenuRecentImport);
 
-#ifdef USE_CIF
+
 	QAction *pImportCIF = new QAction("Import CIF...", this);
 	pImportCIF->setIcon(load_icon("res/icons/drive-harddisk.svg"));
 	pMenuFile->addAction(pImportCIF);
@@ -323,7 +323,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 		this, SLOT(ImportCIFFile(const QString&)));
 	recentimportCIF.FillMenu(m_pMenuRecentImportCIF, m_pMapperRecentImportCIF);
 	pMenuFile->addMenu(m_pMenuRecentImportCIF);
-#endif
+
 
 	pMenuFile->addSeparator();
 
@@ -791,9 +791,8 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QObject::connect(pSave, &QAction::triggered, this, &TazDlg::Save);
 	QObject::connect(pSaveAs, &QAction::triggered, this, &TazDlg::SaveAs);
 	QObject::connect(pImport, &QAction::triggered, this, static_cast<bool (TazDlg::*)()>(&TazDlg::Import));
-#ifdef USE_CIF
 	QObject::connect(pImportCIF, &QAction::triggered, this, static_cast<bool (TazDlg::*)()>(&TazDlg::ImportCIF));
-#endif
+
 	QObject::connect(pPowderFit, &QAction::triggered, this, &TazDlg::ShowPowderFit);
 	QObject::connect(pSettings, &QAction::triggered, this, &TazDlg::ShowSettingsDlg);
 	QObject::connect(pExit, &QAction::triggered, this, &TazDlg::close);

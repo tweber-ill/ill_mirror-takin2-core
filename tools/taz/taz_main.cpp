@@ -68,7 +68,7 @@ namespace opts = boost::program_options;
 // logging
 static bool add_logfile(std::ofstream* postrLog, bool bAdd=1)
 {
-	if(!postrLog || !postrLog->is_open())
+	if(!postrLog || !*postrLog)
 	{
 		tl::log_err("Cannot open log file.");
 		return 0;
