@@ -219,7 +219,7 @@ QwtPlotWrapper::~QwtPlotWrapper()
 }
 
 
-	bool QwtPlotWrapper::HasTrackerSignal() const { return 1; }
+bool QwtPlotWrapper::HasTrackerSignal() const { return 1; }
 
 
 void QwtPlotWrapper::SetData(const std::vector<t_real_qwt>& vecX, const std::vector<t_real_qwt>& vecY,
