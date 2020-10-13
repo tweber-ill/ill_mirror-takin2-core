@@ -143,102 +143,48 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	// Features
 
 	std::ostringstream ostrFeat;
-	ostrFeat << "<html><body>";
-	ostrFeat << "<h3>Compiled-in features for this version:</h3>";
-	ostrFeat << "<ul>";
+	ostrFeat << "Feature flags: ";
 
-	ostrFeat << "<li>";
-#if defined NO_NET
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_NET
+	ostrFeat << "Network, ";
 #endif
-	ostrFeat << " support for networking.";
-	ostrFeat << "</li>";
 
-	ostrFeat << "<li>";
-#if !defined USE_PLUGINS
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if defined USE_PLUGINS
+	ostrFeat << "Plugins, ";
 #endif
-	ostrFeat << " support for plugins.";
-	ostrFeat << "</li>";
 
-/*	ostrFeat << "<li>";
-#if defined NO_PY
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_3D
+	ostrFeat << "GL, ";
 #endif
-	ostrFeat << " support for Python scripting";
-#if !defined NO_PY && defined PY_VER
-	ostrFeat << " (version " << __STR_DEREF__(PY_VER) << ")";
-#endif
-	ostrFeat << ".";
-	ostrFeat << "</li>";*/
 
-/*	ostrFeat << "<li>";
-#if defined NO_JL
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_FIT
+	ostrFeat << "Fitting, ";
 #endif
-	ostrFeat << " support for Julia scripting.";
-	ostrFeat << "</li>";*/
 
-/*
-	ostrFeat << "<li>";
-#if !defined USE_CIF
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_LAPACK
+	ostrFeat << "Lapack, ";
 #endif
-	ostrFeat << " support for CIF importing.";
-	ostrFeat << "</li>";
-*/
 
-	ostrFeat << "<li>";
-#if defined NO_3D
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if defined HAS_COMPLEX_ERF
+	ostrFeat << "Faddeeva, ";
 #endif
-	ostrFeat << " support for 3D drawing.";
-	ostrFeat << "</li>";
 
-	ostrFeat << "<li>";
-#if defined NO_FIT
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_QHULL
+	ostrFeat << "QHull, ";
 #endif
-	ostrFeat << " support for fitting.";
-	ostrFeat << "</li>";
 
-	ostrFeat << "<li>";
-#if defined NO_IOSTR
-	ostrFeat << "<font color=\"#ff0000\"><b>Disabled</b></font>";
-#else
-	ostrFeat << "<b>Enabled</b>";
+#if !defined NO_IOSTR
+	ostrFeat << "Boost.Iostr, ";
 #endif
-	ostrFeat << " support for compression.";
-	ostrFeat << "</li>";
 
 #if defined USE_BOOST_REX
-	ostrFeat << "<li>";
-	ostrFeat << "Switched to Boost regex instead of standard.";
-	ostrFeat << "</li>";
+	ostrFeat << "Boost.Regex, ";
 #endif
 
 #if defined _GLIBCXX_USE_CXX11_ABI
-	ostrFeat << "<li>";
-	ostrFeat << "Compiled for C++11 binary interface.";
-	ostrFeat << "</li>";
+	ostrFeat << "C++11-abi.";
 #endif
 
-	ostrFeat << "</ul>";
-	ostrLibs << "</body></html>";
 	labelFeatures->setText(ostrFeat.str().c_str());
 
 
@@ -250,7 +196,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrConst << "<html><body>";
 	ostrConst << "<dl>";
 
-	ostrConst << "<dt>Physical constants from Boost Units.</dt>";
+	ostrConst << "<dt>Physical constants from Boost.Units.</dt>";
 	ostrConst << "<dd><a href=\"http://www.boost.org/doc/libs/release/libs/units/\">http://www.boost.org/doc/libs/release/libs/units/</a><br></dd>";
 
 	std::shared_ptr<const xtl::SpaceGroups<t_real_glob>> sgs = xtl::SpaceGroups<t_real_glob>::GetInstance();
