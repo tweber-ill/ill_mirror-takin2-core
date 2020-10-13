@@ -45,7 +45,7 @@ cp -v COPYING			${INSTDIR}/usr/local/share/takin
 cp -v LICENSES			${INSTDIR}/usr/local/share/takin
 cp -v LITERATURE		${INSTDIR}/usr/local/share/takin
 cp -v AUTHORS			${INSTDIR}/usr/local/share/takin
-cp -v setup_lin/takin.desktop		${INSTDIR}/usr/share/applications
+cp -v setup_lin/takin.desktop	${INSTDIR}/usr/share/applications
 cp -v /usr/local/lib/libMinuit2.so ${INSTDIR}/usr/local/lib
 
 pushd ${INSTDIR}/usr/local/lib
@@ -59,6 +59,11 @@ popd
 cp -v bin/takin_cif2xml		${INSTDIR}/usr/local/bin
 cp -v bin/takin_findsg		${INSTDIR}/usr/local/bin
 cp -v bin/takin_pol		${INSTDIR}/usr/local/bin
+cp -v bin/takin_structfact	${INSTDIR}/usr/local/bin
+cp -v bin/takin_magstructfact	${INSTDIR}/usr/local/bin
+cp -v bin/takin_scanbrowser	${INSTDIR}/usr/local/bin
+cp -v bin/takin_magsgbrowser	${INSTDIR}/usr/local/bin
+cp -v bin/takin_moldyn		${INSTDIR}/usr/local/bin
 
 
 # permissions
