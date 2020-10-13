@@ -26,13 +26,11 @@ FavDlg::FavDlg(QWidget* pParent, QSettings* pSett) : QDialog(pParent), m_pSettin
 	btnAdd->setIcon(load_icon("res/icons/list-add.svg"));
 	btnDel->setIcon(load_icon("res/icons/list-remove.svg"));
 
-	QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
-
-	QObject::connect(btnAdd, SIGNAL(clicked()), this, SLOT(AddPosToList()));
-	QObject::connect(btnDel, SIGNAL(clicked()), this, SLOT(RemPosFromList()));
-	QObject::connect(listSeq, SIGNAL(itemSelectionChanged()), this, SLOT(ListItemSelected()));
-	QObject::connect(listSeq, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-		this, SLOT(ListItemDoubleClicked(QListWidgetItem*)));
+	connect(buttonBox, &QDialogButtonBox::clicked, this, &FavDlg::ButtonBoxClicked);
+	connect(btnAdd, &QToolButton::clicked, this, static_cast<void (FavDlg::*)()>(&FavDlg::AddPosToList));
+	connect(btnDel, &QToolButton::clicked, this, static_cast<void (FavDlg::*)()>(&FavDlg::RemPosFromList));
+	connect(listSeq, &QListWidget::itemSelectionChanged, this, &FavDlg::ListItemSelected);
+	connect(listSeq, &QListWidget::itemDoubleClicked, this, &FavDlg::ListItemDoubleClicked);
 
 	if(m_pSettings)
 	{

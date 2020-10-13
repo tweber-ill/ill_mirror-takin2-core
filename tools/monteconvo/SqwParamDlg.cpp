@@ -24,7 +24,7 @@ SqwParamDlg::SqwParamDlg(QWidget* pParent, QSettings* pSett)
 
 	tableParams->verticalHeader()->setDefaultSectionSize(tableParams->verticalHeader()->minimumSectionSize()+2);
 
-	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+	connect(buttonBox, &QDialogButtonBox::clicked, this, &SqwParamDlg::ButtonBoxClicked);
 
 
 	if(m_pSett && m_pSett->contains("monteconvo/param_geo"))

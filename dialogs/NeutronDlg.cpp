@@ -46,16 +46,16 @@ NeutronDlg::NeutronDlg(QWidget* pParent, QSettings *pSett)
 
 	setupConstants();
 
-	QObject::connect(editLam, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronLam()));
-	QObject::connect(editE, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronE()));
-	QObject::connect(editOm, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronOm()));
-	QObject::connect(editF, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronF()));
-	QObject::connect(editV, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronv()));
-	QObject::connect(editK, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronk()));
-	QObject::connect(editT, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronT()));
+	connect(editLam, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronLam);
+	connect(editE, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronE);
+	connect(editOm, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronOm);
+	connect(editF, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronF);
+	connect(editV, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronv);
+	connect(editK, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronk);
+	connect(editT, &QLineEdit::textEdited, this, &NeutronDlg::CalcNeutronT);
 
-	QObject::connect(btnSyncKi, SIGNAL(clicked()), this, SLOT(SetExtKi()));
-	QObject::connect(btnSyncKf, SIGNAL(clicked()), this, SLOT(SetExtKf()));
+	connect(btnSyncKi, &QPushButton::clicked, this, &NeutronDlg::SetExtKi);
+	connect(btnSyncKf, &QPushButton::clicked, this, &NeutronDlg::SetExtKf);
 
 	CalcNeutronLam();
 
@@ -66,24 +66,25 @@ NeutronDlg::NeutronDlg(QWidget* pParent, QSettings *pSett)
 	std::vector<QRadioButton*> radioReci = { /*radioBraggReciN,*/ radioBraggReciLam, 
 		radioBraggReciQ, radioBraggReciTT };
 
-	QObject::connect(editBraggReciT, SIGNAL(textEdited(const QString&)), this, SLOT(RecipThetaEdited()));
-	QObject::connect(editBraggReciTT, SIGNAL(textEdited(const QString&)), this, SLOT(RecipTwoThetaEdited()));
+	connect(editBraggReciT, &QLineEdit::textEdited, this, &NeutronDlg::RecipThetaEdited);
+	connect(editBraggReciTT, &QLineEdit::textEdited, this, &NeutronDlg::RecipTwoThetaEdited);
 
-	QObject::connect(editBraggReciLam, SIGNAL(textEdited(const QString&)), this, SLOT(RecipLamEdited()));
-	QObject::connect(editBraggReciK, SIGNAL(textEdited(const QString&)), this, SLOT(RecipKEdited()));
+	connect(editBraggReciLam, &QLineEdit::textEdited, this, &NeutronDlg::RecipLamEdited);
+	connect(editBraggReciK, &QLineEdit::textEdited, this, &NeutronDlg::RecipKEdited);
 
-	QObject::connect(editBraggReciQ, SIGNAL(textEdited(const QString&)), this, SLOT(RecipGEdited()));
-	QObject::connect(editBraggRecid, SIGNAL(textEdited(const QString&)), this, SLOT(RecipDEdited()));
+	connect(editBraggReciQ, &QLineEdit::textEdited, this, &NeutronDlg::RecipGEdited);
+	connect(editBraggRecid, &QLineEdit::textEdited, this, &NeutronDlg::RecipDEdited);
 
 	for(QLineEdit* pEdit : editsReci)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcBraggRecip()));
+		connect(pEdit, &QLineEdit::textEdited, this, &NeutronDlg::CalcBraggRecip);
+
 	for(QRadioButton* pRadio : radioReci)
 	{
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(EnableRecipEdits()));
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcBraggRecip()));
+		connect(pRadio, &QRadioButton::toggled, this, &NeutronDlg::EnableRecipEdits);
+		connect(pRadio, &QRadioButton::toggled, this, &NeutronDlg::CalcBraggRecip);
 	}
 
-	QObject::connect(editEval, SIGNAL(textEdited(const QString&)), this, SLOT(Eval(const QString&)));
+	connect(editEval, &QLineEdit::textEdited, this, &NeutronDlg::Eval);
 
 
 	EnableRecipEdits();

@@ -283,76 +283,65 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	m_pMenuBar->addMenu(pMenuHelp);
 
 
-	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(accept()));
-	QObject::connect(pNew, SIGNAL(triggered()), this, SLOT(New()));
-	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(Load()));
-	QObject::connect(pSave, SIGNAL(triggered()), this, SLOT(Save()));
-	QObject::connect(pSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
-	QObject::connect(pConvofit, SIGNAL(triggered()), this, SLOT(SaveConvofit()));
-	QObject::connect(pActionStart, SIGNAL(triggered()), this, SLOT(Start()));
-	QObject::connect(pActionStartFit, SIGNAL(triggered()), this, SLOT(StartFit()));
-	QObject::connect(pActionDisp, SIGNAL(triggered()), this, SLOT(StartDisp()));
-	QObject::connect(pExportPlot, SIGNAL(triggered()), m_plotwrap.get(), SLOT(SavePlot()));
-	QObject::connect(pExportPlot2d, SIGNAL(triggered()), m_plotwrap2d.get(), SLOT(SavePlot()));
-	QObject::connect(pExportPlotGpl, SIGNAL(triggered()), m_plotwrap.get(), SLOT(ExportGpl()));
-	QObject::connect(pExportPlot2dGpl, SIGNAL(triggered()), m_plotwrap2d.get(), SLOT(ExportGpl()));
-	QObject::connect(pSaveResults, SIGNAL(triggered()), this, SLOT(SaveResult()));
-	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAboutDlg()));
+	connect(pExit, &QAction::triggered, this, &ConvoDlg::accept);
+	connect(pNew, &QAction::triggered, this, &ConvoDlg::New);
+	connect(pLoad, &QAction::triggered, this, static_cast<void (ConvoDlg::*)()>(&ConvoDlg::Load));
+	connect(pSave, &QAction::triggered, this, static_cast<void (ConvoDlg::*)()>(&ConvoDlg::Save));
+	connect(pSaveAs, &QAction::triggered, this, &ConvoDlg::SaveAs);
+	connect(pConvofit, &QAction::triggered, this, &ConvoDlg::SaveConvofit);
+	connect(pActionStart, &QAction::triggered, this, &ConvoDlg::Start);
+	connect(pActionStartFit, &QAction::triggered, this, &ConvoDlg::StartFit);
+	connect(pActionDisp, &QAction::triggered, this, &ConvoDlg::StartDisp);
+	connect(pExportPlot, &QAction::triggered, m_plotwrap.get(), &QwtPlotWrapper::SavePlot);
+	connect(pExportPlot2d, &QAction::triggered, m_plotwrap2d.get(), &QwtPlotWrapper::SavePlot);
+	connect(pExportPlotGpl, &QAction::triggered, m_plotwrap.get(), &QwtPlotWrapper::ExportGpl);
+	connect(pExportPlot2dGpl, &QAction::triggered, m_plotwrap2d.get(), &QwtPlotWrapper::ExportGpl);
+	connect(pSaveResults, &QAction::triggered, this, &ConvoDlg::SaveResult);
+	connect(pAbout, &QAction::triggered, this, &ConvoDlg::ShowAboutDlg);
 
 	this->layout()->setMenuBar(m_pMenuBar);
 	// --------------------------------------------------------------------
 
 
 	m_pSqwParamDlg = new SqwParamDlg(this, m_pSett);
-	QObject::connect(this,
-		SIGNAL(SqwLoaded(const std::vector<SqwBase::t_var>&,
-		const std::vector<SqwBase::t_var_fit>*)),
-		m_pSqwParamDlg, SLOT(SqwLoaded(const std::vector<SqwBase::t_var>&,
-		const std::vector<SqwBase::t_var_fit>*)));
-	QObject::connect(m_pSqwParamDlg,
-		SIGNAL(SqwParamsChanged(const std::vector<SqwBase::t_var>&, const std::vector<SqwBase::t_var_fit>*)),
-		this, SLOT(SqwParamsChanged(const std::vector<SqwBase::t_var>&,
-			const std::vector<SqwBase::t_var_fit>*)));
+	connect(this, &ConvoDlg::SqwLoaded, m_pSqwParamDlg, &SqwParamDlg::SqwLoaded);
+	connect(m_pSqwParamDlg, &SqwParamDlg::SqwParamsChanged, this, &ConvoDlg::SqwParamsChanged);
 
 	m_pFavDlg = new FavDlg(this, m_pSett);
-	QObject::connect(m_pFavDlg, SIGNAL(ChangePos(const struct FavHklPos&)),
-		this, SLOT(ChangePos(const struct FavHklPos&)));
+	connect(m_pFavDlg, &FavDlg::ChangePos, this, &ConvoDlg::ChangePos);
 
-	//QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+	connect(btnBrowseCrys, &QToolButton::clicked, this, &ConvoDlg::browseCrysFiles);
+	connect(btnBrowseRes, &QToolButton::clicked, this, &ConvoDlg::browseResoFiles);
+	connect(btnBrowseSqw, &QPushButton::clicked, this, &ConvoDlg::browseSqwFiles);
+	connect(btnBrowseScan, &QToolButton::clicked, this, &ConvoDlg::browseScanFiles);
+	connect(btnBrowseAutosave, &QToolButton::clicked, this, &ConvoDlg::browseAutosaveFile);
+	connect(btnFav, &QPushButton::clicked, this, &ConvoDlg::ShowFavourites);
+	connect(btnSqwParams, &QToolButton::clicked, this, &ConvoDlg::showSqwParamDlg);
 
-	QObject::connect(btnBrowseCrys, SIGNAL(clicked()), this, SLOT(browseCrysFiles()));
-	QObject::connect(btnBrowseRes, SIGNAL(clicked()), this, SLOT(browseResoFiles()));
-	QObject::connect(btnBrowseSqw, SIGNAL(clicked()), this, SLOT(browseSqwFiles()));
-	QObject::connect(btnBrowseScan, SIGNAL(clicked()), this, SLOT(browseScanFiles()));
-	QObject::connect(btnBrowseAutosave, SIGNAL(clicked()), this, SLOT(browseAutosaveFile()));
+	connect(comboSqw, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ConvoDlg::SqwModelChanged);
+	connect(editSqw, &QLineEdit::textChanged, this, &ConvoDlg::createSqwModel);
+	connect(editScan, &QLineEdit::textChanged, this, &ConvoDlg::scanFileChanged);
 
-	QObject::connect(btnFav, SIGNAL(clicked()), this, SLOT(ShowFavourites()));
-	QObject::connect(btnSqwParams, SIGNAL(clicked()), this, SLOT(showSqwParamDlg()));
+	connect(editScale, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
+	connect(editSlope, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
+	connect(editOffs, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
 
-	QObject::connect(comboSqw, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(SqwModelChanged(int)));
-	QObject::connect(editSqw, SIGNAL(textChanged(const QString&)),
-		this, SLOT(createSqwModel(const QString&)));
-	QObject::connect(editScan, SIGNAL(textChanged(const QString&)),
-		this, SLOT(scanFileChanged(const QString&)));
+	connect(btnStart, &QPushButton::clicked, this, &ConvoDlg::Start);
+	connect(btnStartFit, &QPushButton::clicked, this, &ConvoDlg::StartFit);
+	connect(btnStop, &QPushButton::clicked, this, &ConvoDlg::Stop);
 
-	QObject::connect(editScale, SIGNAL(textChanged(const QString&)), this, SLOT(scaleChanged()));
-	QObject::connect(editSlope, SIGNAL(textChanged(const QString&)), this, SLOT(scaleChanged()));
-	QObject::connect(editOffs, SIGNAL(textChanged(const QString&)), this, SLOT(scaleChanged()));
+	connect(checkScan, &QCheckBox::toggled, this, &ConvoDlg::scanCheckToggled);
 
-	QObject::connect(btnStart, SIGNAL(clicked()), this, SLOT(Start()));
-	QObject::connect(btnStartFit, SIGNAL(clicked()), this, SLOT(StartFit()));
-	QObject::connect(btnStop, SIGNAL(clicked()), this, SLOT(Stop()));
-
-	QObject::connect(checkScan, SIGNAL(toggled(bool)), this, SLOT(scanCheckToggled(bool)));
-
-	QObject::connect(pHK, SIGNAL(triggered()), this, SLOT(ChangeHK()));
-	QObject::connect(pHL, SIGNAL(triggered()), this, SLOT(ChangeHL()));
-	QObject::connect(pKL, SIGNAL(triggered()), this, SLOT(ChangeKL()));
+	connect(pHK, &QAction::triggered, this, &ConvoDlg::ChangeHK);
+	connect(pHL, &QAction::triggered, this, &ConvoDlg::ChangeHL);
+	connect(pKL, &QAction::triggered, this, &ConvoDlg::ChangeKL);
 
 	for(QDoubleSpinBox* pSpin : {spinStartH, spinStartK, spinStartL, spinStartE,
 		spinStopH, spinStopK, spinStopL, spinStopE})
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(UpdateCurFavPos()));
+	{
+		connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), 
+			this, &ConvoDlg::UpdateCurFavPos);
+	}
 
 	LoadSettings();
 }

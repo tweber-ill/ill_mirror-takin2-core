@@ -59,7 +59,7 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 	btnLoad->setIcon(load_icon("res/icons/document-open.svg"));
 
 	setupAlgos();
-	QObject::connect(comboAlgo, SIGNAL(currentIndexChanged(int)), this, SLOT(AlgoChanged()));
+	connect(comboAlgo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ResoDlg::AlgoChanged);
 	comboAlgo->setCurrentIndex(1);
 
 	groupGuide->setChecked(false);
@@ -159,33 +159,32 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 
 	ReadLastConfig();
 
-	QObject::connect(groupGuide, SIGNAL(toggled(bool)), this, SLOT(Calc()));
-
 	for(QDoubleSpinBox* pSpinBox : m_vecSpinBoxes)
-		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
+		connect(pSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ResoDlg::Calc);
 	for(QSpinBox* pSpinBox : m_vecIntSpinBoxes)
-		QObject::connect(pSpinBox, SIGNAL(valueChanged(int)), this, SLOT(Calc()));
+		connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &ResoDlg::Calc);
 	for(QLineEdit* pEditBox : m_vecEditBoxes)
-		QObject::connect(pEditBox, SIGNAL(textChanged(const QString&)), this, SLOT(Calc()));
+		connect(pEditBox, &QLineEdit::textChanged, this, &ResoDlg::Calc);
 	for(QLineEdit* pEditBox : m_vecPosEditBoxes)
-		QObject::connect(pEditBox, SIGNAL(textEdited(const QString&)), this, SLOT(RefreshQEPos()));
+		connect(pEditBox, &QLineEdit::textEdited, this, &ResoDlg::RefreshQEPos);
 	for(QRadioButton* pRadio : m_vecRadioPlus)
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+		connect(pRadio, &QRadioButton::toggled, this, &ResoDlg::Calc);
 	for(QCheckBox* pCheck : m_vecCheckBoxes)
-		QObject::connect(pCheck, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+		connect(pCheck, &QCheckBox::toggled, this, &ResoDlg::Calc);
 	for(QComboBox* pCombo : m_vecComboBoxes)
-		QObject::connect(pCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(Calc()));
-	QObject::connect(comboAlgo, SIGNAL(currentIndexChanged(int)), this, SLOT(Calc()));
+		connect(pCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ResoDlg::Calc);
+	connect(comboAlgo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ResoDlg::Calc);
 
-	connect(checkElli4dAutoCalc, SIGNAL(stateChanged(int)), this, SLOT(checkAutoCalcElli4dChanged()));
-	connect(btnCalcElli4d, SIGNAL(clicked()), this, SLOT(CalcElli4d()));
-	connect(btnMCGenerate, SIGNAL(clicked()), this, SLOT(MCGenerate()));
-	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
-	connect(btnSave, SIGNAL(clicked()), this, SLOT(SaveRes()));
-	connect(btnLoad, SIGNAL(clicked()), this, SLOT(LoadRes()));
-	connect(btnTOFCalc, SIGNAL(clicked()), this, SLOT(ShowTOFCalcDlg()));
-	connect(btnMonoRefl, SIGNAL(clicked()), this, SLOT(LoadMonoRefl()));
-	connect(btnAnaEffic, SIGNAL(clicked()), this, SLOT(LoadAnaEffic()));
+	connect(groupGuide, &QGroupBox::toggled, this, &ResoDlg::Calc);
+	connect(checkElli4dAutoCalc, &QCheckBox::stateChanged, this, &ResoDlg::checkAutoCalcElli4dChanged);
+	connect(btnCalcElli4d, &QPushButton::clicked, this, &ResoDlg::CalcElli4d);
+	connect(btnMCGenerate, &QPushButton::clicked, this, &ResoDlg::MCGenerate);
+	connect(buttonBox, &QDialogButtonBox::clicked, this, &ResoDlg::ButtonBoxClicked);
+	connect(btnSave, &QPushButton::clicked, this, &ResoDlg::SaveRes);
+	connect(btnLoad, &QPushButton::clicked, this, &ResoDlg::LoadRes);
+	connect(btnTOFCalc, &QPushButton::clicked, this, &ResoDlg::ShowTOFCalcDlg);
+	connect(btnMonoRefl, &QToolButton::clicked, this, &ResoDlg::LoadMonoRefl);
+	connect(btnAnaEffic, &QToolButton::clicked, this, &ResoDlg::LoadAnaEffic);
 
 	m_bDontCalc = 0;
 	RefreshQEPos();

@@ -35,16 +35,17 @@ FormfactorDlg::FormfactorDlg(QWidget* pParent, QSettings *pSettings)
 		m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Scattering Wavenumber Q (1/A)");
 		m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Atomic Form Factor f (e-)");
 		if(m_plotwrap->HasTrackerSignal())
-			connect(m_plotwrap->GetPicker(), SIGNAL(moved(const QPointF&)),
-				this, SLOT(cursorMoved(const QPointF&)));
+			connect(m_plotwrap->GetPicker(), &QwtPlotPicker::moved, this, &FormfactorDlg::cursorMoved);
 
 		// connections
-		QObject::connect(listAtoms, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-			this, SLOT(AtomSelected(QListWidgetItem*, QListWidgetItem*)));
-		QObject::connect(editFilter, SIGNAL(textEdited(const QString&)),
-			this, SLOT(SearchAtom(const QString&)));
+		connect(listAtoms, &QListWidget::currentItemChanged, this, &FormfactorDlg::AtomSelected);
+		connect(editFilter, &QLineEdit::textEdited, this, &FormfactorDlg::SearchAtom);
+
 		for(QDoubleSpinBox* pSpin : {spinXQMin, spinXQMax})
-			QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(RefreshAtom()));
+		{
+			connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), 
+				this, &FormfactorDlg::RefreshAtom);
+		}
 
 		SearchAtom("H");
 	}
@@ -63,21 +64,24 @@ FormfactorDlg::FormfactorDlg(QWidget* pParent, QSettings *pSettings)
 		m_plotwrap_m->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Scattering Wavenumber Q (1/A)");
 		m_plotwrap_m->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Magnetic Form Factor f_M");
 		if(m_plotwrap_m->HasTrackerSignal())
-			connect(m_plotwrap_m->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+			connect(m_plotwrap_m->GetPicker(), &QwtPlotPicker::moved, this, &FormfactorDlg::cursorMoved);
 
 		// connections
-		QObject::connect(listMAtoms, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-			this, SLOT(MagAtomSelected(QListWidgetItem*, QListWidgetItem*)));
-		QObject::connect(editMFilter, SIGNAL(textEdited(const QString&)),
-			this, SLOT(SearchMagAtom(const QString&)));
+		connect(listMAtoms, &QListWidget::currentItemChanged, this, &FormfactorDlg::MagAtomSelected);
+		connect(editMFilter, &QLineEdit::textEdited, this, &FormfactorDlg::SearchMagAtom);
+		connect(editOrbital, &QLineEdit::textEdited, this, &FormfactorDlg::CalcTermSymbol);
 
 		for(QDoubleSpinBox* pSpin : {spinL, spinS, spinJ})
-			QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(Calcg()));
-		for(QDoubleSpinBox* pSpin : {sping, spinL, spinS, spinJ, spinMagQMin, spinMagQMax})
-			QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(RefreshMagAtom()));
+		{
+			connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), 
+				this, &FormfactorDlg::Calcg);
+		}
 
-		QObject::connect(editOrbital, SIGNAL(textEdited(const QString&)),
-			this, SLOT(CalcTermSymbol(const QString&)));
+		for(QDoubleSpinBox* pSpin : {sping, spinL, spinS, spinJ, spinMagQMin, spinMagQMax})
+		{
+			connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+				this, &FormfactorDlg::RefreshMagAtom);
+		}
 	}
 	else
 	{
@@ -95,13 +99,11 @@ FormfactorDlg::FormfactorDlg(QWidget* pParent, QSettings *pSettings)
 		m_plotwrapSc->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Element");
 		m_plotwrapSc->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Scattering Length b (fm)");
 		if(m_plotwrapSc->HasTrackerSignal())
-			connect(m_plotwrapSc->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+			connect(m_plotwrapSc->GetPicker(), &QwtPlotPicker::moved, this, &FormfactorDlg::cursorMoved);
 
 		// connections
-		QObject::connect(radioCoherent, SIGNAL(toggled(bool)),
-			this, SLOT(PlotScatteringLengths()));
-		QObject::connect(editSLSearch, SIGNAL(textEdited(const QString&)),
-			this, SLOT(SearchSLAtom(const QString&)));
+		connect(radioCoherent, &QRadioButton::toggled, this, &FormfactorDlg::PlotScatteringLengths);
+		connect(editSLSearch, &QLineEdit::textEdited, this, &FormfactorDlg::SearchSLAtom);
 
 		PlotScatteringLengths();
 	}
@@ -121,15 +123,14 @@ FormfactorDlg::FormfactorDlg(QWidget* pParent, QSettings *pSettings)
 		m_plotwrapElem->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Element");
 		m_plotwrapElem->GetPlot()->setAxisTitle(QwtPlot::yLeft, "");
 		if(m_plotwrapElem->HasTrackerSignal())
-			connect(m_plotwrapElem->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+			connect(m_plotwrapElem->GetPicker(), &QwtPlotPicker::moved, this, &FormfactorDlg::cursorMoved);
 
 		// connections
 		for(QRadioButton *pRadio : {radioElemMass, radioElemRadCov, radioElemRadVdW, 
 			radioElemIon, radioElemAffin, radioElemMelt, radioElemBoil})
-			QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(PlotElements()));
+			connect(pRadio, &QRadioButton::toggled, this, &FormfactorDlg::PlotElements);
 
-		QObject::connect(editElemSearch, SIGNAL(textEdited(const QString&)),
-			this, SLOT(SearchElement(const QString&)));
+		connect(editElemSearch, &QLineEdit::textEdited, this, &FormfactorDlg::SearchElement);
 
 		PlotElements();
 	}
