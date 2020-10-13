@@ -11,6 +11,8 @@
 #include "tlibs/string/string.h"
 #include "tlibs/helper/misc.h"
 #include "tlibs/time/chrono.h"
+#include "libs/globals.h"
+#include "libs/globals_qt.h"
 
 #include <algorithm>
 #include <fstream>
@@ -29,10 +31,6 @@
 #include <QPainter>
 #include <QCoreApplication>
 
-
-// TODO: get rid of these dependencies from globals.h and globals_qt.h!
-extern unsigned int g_iPrec;
-extern QFont g_fontGfx;
 
 
 class MyQwtPlotZoomer : public QwtPlotZoomer
