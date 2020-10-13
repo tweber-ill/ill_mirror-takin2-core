@@ -195,10 +195,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 	m_pMenuRecent = new QMenu("Recently Loaded", this);
 	RecentFiles recent(m_pSett, "monteconvo/recent");
-	m_pMapperRecent = new QSignalMapper(m_pMenuRecent);
-	QObject::connect(m_pMapperRecent, SIGNAL(mapped(const QString&)),
-		this, SLOT(Load(const QString&)));
-	recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ Load(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecent);
 
 	QAction *pSave = new QAction("Save", this);

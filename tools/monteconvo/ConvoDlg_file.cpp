@@ -97,7 +97,7 @@ void ConvoDlg::Load(const QString& _strFile)
 		RecentFiles recent(m_pSett, "monteconvo/recent");
 		recent.AddFile(m_strLastFile.c_str());
 		recent.SaveList();
-		recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+		recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ Load(str.c_str()); });
 	}
 }
 
@@ -134,7 +134,7 @@ void ConvoDlg::SaveAs()
 		RecentFiles recent(m_pSett, "monteconvo/recent");
 		recent.AddFile(m_strLastFile.c_str());
 		recent.SaveList();
-		recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+		recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ Load(str.c_str()); });
 	}
 }
 

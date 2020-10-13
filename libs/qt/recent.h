@@ -11,8 +11,12 @@
 #include <QSettings>
 #include <QString>
 #include <QStringList>
-#include <QSignalMapper>
 #include <QMenu>
+#include <QAction>
+
+#include <algorithm>
+#include <iostream>
+
 
 
 template<class t_cont, class t_str = typename t_cont::value_type>
@@ -43,20 +47,96 @@ class RecentFiles
 		t_lstFiles m_lstFiles;
 		std::size_t m_iMaxFiles = 16;
 
+
 	public:
-		RecentFiles(QSettings *pSett, const char* pcKey);
-		virtual ~RecentFiles();
+		RecentFiles(QSettings *pSett, const char* pcKey)
+			: m_pSettings(pSett), m_strKey(pcKey)
+		{			
+			LoadList();	
+		}
 
-		void LoadList();
-		void SaveList();
+		virtual ~RecentFiles() = default;
 
-		bool HasFile(const char* pcFile) const;
-		void AddFile(const char* pcFile);
-		void RemoveFile(const char* pcFile);
 
-		void SetMaxSize(std::size_t iMaxFiles);
+		void LoadList()
+		{
+			QString strKey(m_strKey.c_str());
+			QStringList lstStr = m_pSettings->value(strKey).value<QStringList>();
+			lstStr.removeDuplicates();
+			m_lstFiles = qstrlist_to_cont<t_lstFiles>(lstStr);
 
-		void FillMenu(QMenu*, QSignalMapper*);
+			if(m_lstFiles.size() > m_iMaxFiles)
+				m_lstFiles.resize(m_iMaxFiles);
+		}
+
+
+		void SaveList()
+		{
+			QString strKey(m_strKey.c_str());
+			QStringList lstStr = cont_to_qstrlist<t_lstFiles>(m_lstFiles);
+			m_pSettings->setValue(strKey, lstStr);
+		}
+
+
+		bool HasFile(const char* pcFile) const
+		{
+			t_lstFiles::const_iterator iter = std::find(m_lstFiles.begin(), m_lstFiles.end(), std::string(pcFile));
+			return (iter != m_lstFiles.end());
+		}
+
+
+		void AddFile(const char* pcFile)
+		{
+			//if(HasFile(pcFile))
+			//	return;
+			RemoveFile(pcFile);
+
+			m_lstFiles.push_front(std::string(pcFile));
+			if(m_lstFiles.size() > m_iMaxFiles)
+				m_lstFiles.resize(m_iMaxFiles);
+		}
+
+
+		void RemoveFile(const char* pcFile)
+		{
+			t_lstFiles::iterator iter = std::remove(m_lstFiles.begin(), m_lstFiles.end(), std::string(pcFile));
+			//if(iter != m_lstFiles.end())
+			//	m_lstFiles = t_lstFiles(m_lstFiles.begin(), iter);
+			if(iter != m_lstFiles.end())
+				m_lstFiles.resize(m_lstFiles.size()-1);
+		}
+
+
+		void SetMaxSize(std::size_t iMaxFiles)
+		{
+			m_iMaxFiles = iMaxFiles;
+			if(m_lstFiles.size() > iMaxFiles)
+				m_lstFiles.resize(iMaxFiles);
+		}
+
+
+		template<class t_func>
+		void FillMenu(QMenu* pMenu, t_func func)
+		{
+			// clear old actions
+			QList<QAction*> lstActions = pMenu->actions();
+			for(int iAction=0; iAction<lstActions.size(); ++iAction)
+			{
+				delete lstActions[iAction];
+				lstActions[iAction] = nullptr;
+			}
+			pMenu->clear();
+
+			// setup new actions
+			for(const t_lstFiles::value_type& str : m_lstFiles)
+			{
+				QAction *pAction = new QAction(pMenu);
+				QObject::connect(pAction, &QAction::triggered, [str, func]()->void { func(str.c_str()); });
+
+				pAction->setText(str.c_str());
+				pMenu->addAction(pAction);
+			}
+		}
 };
 
 #endif

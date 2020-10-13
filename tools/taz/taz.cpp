@@ -283,10 +283,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	m_pMenuRecent = new QMenu("Recently Loaded", this);
 	RecentFiles recent(&m_settings, "main/recent");
-	m_pMapperRecent = new QSignalMapper(m_pMenuRecent);
-	QObject::connect(m_pMapperRecent, SIGNAL(mapped(const QString&)),
-		this, SLOT(LoadFile(const QString&)));
-	recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ LoadFile(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecent);
 
 	QAction *pSave = new QAction("Save", this);
@@ -305,10 +302,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	m_pMenuRecentImport = new QMenu("Recently Imported Data Files", this);
 	RecentFiles recentimport(&m_settings, "main/recent_import");
-	m_pMapperRecentImport = new QSignalMapper(m_pMenuRecentImport);
-	QObject::connect(m_pMapperRecentImport, SIGNAL(mapped(const QString&)),
-		this, SLOT(ImportFile(const QString&)));
-	recentimport.FillMenu(m_pMenuRecentImport, m_pMapperRecentImport);
+	recentimport.FillMenu(m_pMenuRecentImport, [this](const std::string& str){ ImportFile(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecentImport);
 
 
@@ -318,10 +312,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	m_pMenuRecentImportCIF = new QMenu("Recently Imported CIFs", this);
 	RecentFiles recentimportCIF(&m_settings, "main/recent_import_cif");
-	m_pMapperRecentImportCIF = new QSignalMapper(m_pMenuRecentImportCIF);
-	QObject::connect(m_pMapperRecentImportCIF, SIGNAL(mapped(const QString&)),
-		this, SLOT(ImportCIFFile(const QString&)));
-	recentimportCIF.FillMenu(m_pMenuRecentImportCIF, m_pMapperRecentImportCIF);
+	recentimportCIF.FillMenu(m_pMenuRecentImportCIF, [this](const std::string& str){ ImportCIFFile(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecentImportCIF);
 
 

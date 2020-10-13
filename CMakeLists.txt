@@ -405,7 +405,7 @@ add_executable(takin
 	${SRCS_3D}
 
 	#tlibs/file/loadinstr.cpp
-	libs/qt/recent.cpp  tlibs/file/x3d.cpp
+	tlibs/file/x3d.cpp
 	tlibs/log/log.cpp tlibs/log/debug.cpp
 	tlibs/math/rand.cpp
 	tlibs/string/spec_char.cpp

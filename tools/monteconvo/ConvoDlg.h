@@ -12,7 +12,6 @@
 #include <QSettings>
 #include <QMenuBar>
 #include <QMenu>
-#include <QSignalMapper>
 
 #include <thread>
 #include <atomic>
@@ -81,7 +80,6 @@ protected:
 
 	// recent files
 	QMenu *m_pMenuRecent = nullptr;
-	QSignalMapper *m_pMapperRecent = nullptr;
 
 
 protected:

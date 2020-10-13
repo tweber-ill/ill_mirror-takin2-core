@@ -21,7 +21,6 @@
 #include <QMenu>
 #include <QSettings>
 #include <QVariant>
-#include <QSignalMapper>
 
 #include <string>
 #include <vector>
@@ -120,10 +119,6 @@ class TazDlg : public QMainWindow, Ui::TazDlg
 
 		QMenu *m_pMenuViewRecip = nullptr;
 		QMenu *m_pMenuViewReal = nullptr;
-
-		QSignalMapper *m_pMapperRecent = nullptr;
-		QSignalMapper *m_pMapperRecentImport = nullptr;
-		QSignalMapper *m_pMapperRecentImportCIF = nullptr;
 		QMenu *m_pMenuRecent = nullptr;
 		QMenu *m_pMenuRecentImport = nullptr;
 		QMenu *m_pMenuRecentImportCIF = nullptr;

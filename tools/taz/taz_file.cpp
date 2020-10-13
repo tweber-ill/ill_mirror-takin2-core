@@ -383,7 +383,7 @@ bool TazDlg::Load(const char* pcFile)
 	RecentFiles recent(&m_settings, "main/recent");
 	recent.AddFile(strFile1.c_str());
 	recent.SaveList();
-	recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ LoadFile(str.c_str()); });
 
 
 
@@ -576,7 +576,7 @@ bool TazDlg::Save()
 	RecentFiles recent(&m_settings, "main/recent");
 	recent.AddFile(m_strCurFile.c_str());
 	recent.SaveList();
-	recent.FillMenu(m_pMenuRecent, m_pMapperRecent);
+	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ LoadFile(str.c_str()); });
 
 	return true;
 }
@@ -754,7 +754,7 @@ bool TazDlg::Import(const char* pcFile)
 		RecentFiles recent(&m_settings, "main/recent_import");
 		recent.AddFile(strFile1.c_str());
 		recent.SaveList();
-		recent.FillMenu(m_pMenuRecentImport, m_pMapperRecentImport);
+		recent.FillMenu(m_pMenuRecentImport, [this](const std::string& str){ ImportFile(str.c_str()); });
 
 		CalcPeaks();
 
@@ -976,7 +976,7 @@ bool TazDlg::ImportCIF(const char* pcFile)
 		RecentFiles recent(&m_settings, "main/recent_import_cif");
 		recent.AddFile(strFile1.c_str());
 		recent.SaveList();
-		recent.FillMenu(m_pMenuRecentImportCIF, m_pMapperRecentImportCIF);
+		recent.FillMenu(m_pMenuRecentImportCIF, [this](const std::string& str){ ImportCIFFile(str.c_str()); });
 
 		CalcPeaks();
 	}
