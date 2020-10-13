@@ -51,7 +51,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	//labelRepo->setText("Source repo: <a href=\"https://github.com/t-weber/takin\">https://github.com/t-weber/takin</a>.");
 	//labelRepo->setText("Source repo: <br><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tastools.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tastools.git</a>.");
 	// takin 2 repo:
-	labelRepo->setText("Source repos: <br><a href=\"https://code.ill.fr/scientific-software/takin\">https://code.ill.fr/scientific-software/takin</a>.");
+	labelRepo->setText("Source repository: <a href=\"https://code.ill.fr/scientific-software/takin\">https://code.ill.fr/scientific-software/takin</a>.");
 
 	labelDesc->setText("Overviews of Takin can be found here:"
 		"<ul>"
@@ -97,10 +97,9 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dd><a href=\"http://www.boost.org\">http://www.boost.org</a><br></dd>";
 
 	ostrLibs << "<dt>Uses tlibs version " << TLIBS_VERSION << ".</dt>";
-
 	//ostrLibs << "<dd><a href=\"https://github.com/t-weber/tlibs\">https://github.com/t-weber/tlibs</a><br></dd>";
 	//ostrLibs << "<dd><a href=\"https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git\">https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/mira/tlibs.git</a><br></dd>";
-	labelRepo->setText("Source repos: <br><a href=\"https://code.ill.fr/scientific-software/takin/tlibs\">https://code.ill.fr/scientific-software/takin/tlibs</a>.");
+	ostrLibs << "<dd><a href=\"https://code.ill.fr/scientific-software/takin/tlibs\">https://code.ill.fr/scientific-software/takin/tlibs</a><br></dd>";
 
 #ifndef NO_LAPACK
 	ostrLibs << "<dt>Uses Lapack/e version 3.</dt>";

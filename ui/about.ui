@@ -111,6 +111,9 @@
          <property name="text">
           <string>DOI: &lt;a href=&quot;http://dx.doi.org/10.5281/zenodo.3961491&quot;&gt;10.5281/zenodo.3961491&lt;/a&gt;.</string>
          </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
          <property name="openExternalLinks">
           <bool>true</bool>
          </property>
