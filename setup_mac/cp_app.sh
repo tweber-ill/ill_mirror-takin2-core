@@ -36,7 +36,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_regex-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
-	"/usr/local/opt/boost-python3/lib/libboost_python38.dylib"
+	"/usr/local/opt/boost-python3/lib/libboost_python38-mt.dylib"
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
@@ -97,16 +97,21 @@ cp -v bin/takin_findsg "${PRG}/Contents/MacOS/"
 cp -v bin/takin_pol "${PRG}/Contents/MacOS/"
 cp -v bin/takinmod_py "${PRG}/Contents/MacOS/"
 cp -v bin/takinmod_jl "${PRG}/Contents/MacOS/"
-cp -v bin/convofit "${PRG}/Contents/MacOS/"
-cp -v bin/convoseries "${PRG}/Contents/MacOS/"
-cp -v bin/sfact "${PRG}/Contents/MacOS/"
-cp -v bin/polextract "${PRG}/Contents/MacOS/"
+cp -v bin/takin_structfact "${PRG}/Contents/MacOS/"
+cp -v bin/takin_magstructfact "${PRG}/Contents/MacOS/"
+cp -v bin/takin_scanbrowser "${PRG}/Contents/MacOS/"
+cp -v bin/takin_magsgbrowser "${PRG}/Contents/MacOS/"
+cp -v bin/takin_moldyn "${PRG}/Contents/MacOS/"
+
+cp -v bin/takin_convofit "${PRG}/Contents/MacOS/"
+cp -v bin/takin_convoseries "${PRG}/Contents/MacOS/"
+cp -v bin/takin_polextract "${PRG}/Contents/MacOS/"
 
 
 # data files
 cp -v setup_mac/Info.plist "${PRG}/Contents/"
 cp -rv data/res "${PRG}/Contents/"
-cp -v data/res/takin.icns "${PRG}/Contents/Resources/"
+cp -v data/res/icons/takin.icns "${PRG}/Contents/Resources/"
 cp -rv doc/* "${PRG}/Contents/res/doc/"
 # -----------------------------------------------------------------------------
 
