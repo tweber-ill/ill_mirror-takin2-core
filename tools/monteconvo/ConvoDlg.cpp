@@ -219,6 +219,13 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	pMenuFile->addAction(pExit);
 
 
+	// view menu
+	QMenu *pMenuView = new QMenu("View", this);
+
+	QAction *pActionLogY = new QAction("Toggle Logarithmic Scale", this);
+	pMenuView->addAction(pActionLogY);
+
+
 	// actions menu
 	QMenu *pMenuConvoActions = new QMenu("Actions", this);
 
@@ -278,6 +285,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 
 	m_pMenuBar->addMenu(pMenuFile);
+	m_pMenuBar->addMenu(pMenuView);
 	m_pMenuBar->addMenu(pMenuConvoActions);
 	m_pMenuBar->addMenu(pMenuPlots);
 	m_pMenuBar->addMenu(pMenuHelp);
@@ -289,6 +297,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	connect(pSave, &QAction::triggered, this, static_cast<void (ConvoDlg::*)()>(&ConvoDlg::Save));
 	connect(pSaveAs, &QAction::triggered, this, &ConvoDlg::SaveAs);
 	connect(pConvofit, &QAction::triggered, this, &ConvoDlg::SaveConvofit);
+	connect(pActionLogY, &QAction::triggered, m_plotwrap.get(), &QwtPlotWrapper::ToggleLogY);
 	connect(pActionStart, &QAction::triggered, this, &ConvoDlg::Start);
 	connect(pActionStartFit, &QAction::triggered, this, &ConvoDlg::StartFit);
 	connect(pActionDisp, &QAction::triggered, this, &ConvoDlg::StartDisp);
