@@ -135,6 +135,8 @@ protected:
 	QwtPlotZoomer *m_pZoomer = nullptr;
 	QwtPlotPanner *m_pPanner = nullptr;
 
+	int m_curYScaler = 0;
+
 	std::vector<MyQwtCurve*> m_vecCurves;	// 1d plots
 	QwtPlotSpectrogram *m_pSpec = nullptr;	// 2d plot
 
@@ -169,6 +171,7 @@ public slots:
 	void setAxisTitle(int iAxis, const QString& str);
 	void scaleColorBar();
 	void setZoomBase(const QRectF&);
+	void ToggleLogY();
 	void doUpdate();
 
 	void SavePlotGraphics() const;	// save plot graphics

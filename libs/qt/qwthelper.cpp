@@ -24,6 +24,7 @@
 #include <qwt_plot_renderer.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_engine.h>
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -81,6 +82,8 @@ protected:
 			m_pPlotWrap->SavePlotGraphics();
 		else if(iKey == Qt::Key_G)
 			m_pPlotWrap->ExportGpl();
+		else if(iKey == Qt::Key_L)
+			m_pPlotWrap->ToggleLogY();
 		else
 			QwtPlotPicker::widgetKeyPressEvent(pEvt);
 	}
@@ -218,6 +221,24 @@ QwtPlotWrapper::~QwtPlotWrapper()
 
 
 bool QwtPlotWrapper::HasTrackerSignal() const { return 1; }
+
+
+void QwtPlotWrapper::ToggleLogY()
+{
+	if(!m_pPlot) return;
+
+	if(m_curYScaler == 0)
+	{
+		m_pPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine{10});
+		m_curYScaler = 1;
+	}
+	else if(m_curYScaler == 1)
+	{
+		m_pPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine{});
+		m_curYScaler = 0;
+	}
+	m_pPlot->replot();
+}
 
 
 void QwtPlotWrapper::SetData(const std::vector<t_real_qwt>& vecX, const std::vector<t_real_qwt>& vecY,
