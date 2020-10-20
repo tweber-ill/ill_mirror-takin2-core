@@ -23,11 +23,11 @@
 class SqwBase
 {
 public:
-	// basic fields: ident, type, value
+	// basic fields: [ ident, type, value ]
 	using t_var = std::tuple<std::string, std::string, std::string>;
 
-	// extended fields: ident, error, is fit var?
-	using t_var_fit = std::tuple<std::string, std::string, bool>;
+	// extended fields: [ ident, error, is fit var?, range ]
+	using t_var_fit = std::tuple<std::string, std::string, bool, std::string>;
 
 
 protected:
@@ -61,6 +61,7 @@ public:
 
 	virtual bool SetVarIfAvail(const std::string& strKey, const std::string& strNewVal);
 	virtual bool SetErrIfAvail(const std::string& strKey, const std::string& strNewErr);
+	virtual bool SetRangeIfAvail(const std::string& strKey, const std::string& strNewRange);
 
 	SqwBase() = default;
 	virtual ~SqwBase() = default;
@@ -83,6 +84,7 @@ std::string vec_to_str(const t_vec& vec)
 		ostr << t << " ";
 	return ostr.str();
 }
+
 
 template<class t_vec>
 t_vec str_to_vec(const std::string& str)

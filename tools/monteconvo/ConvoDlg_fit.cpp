@@ -133,6 +133,7 @@ void ConvoDlg::StartFit()
 	{
 		t_real val = tl::str_to_var<t_real_min>(std::get<2>(sqwparam));
 		t_real err = tl::str_to_var<t_real_min>(std::get<3>(sqwparam));
+		std::string strRange = std::get<5>(sqwparam);	// TODO
 		params.Add(std::get<0>(sqwparam), val, err);
 
 		if(tl::float_equal(err, t_real{0}))
@@ -165,6 +166,7 @@ void ConvoDlg::StartFit()
 
 		minuit::MnStrategy strat(spinStrategy->value());
 		std::unique_ptr<minuit::MnApplication> minimiser;
+
 		if(comboFitter->currentIndex() == 0)
 		{
 			minimiser.reset(new minuit::MnSimplex(fkt, params, strat));

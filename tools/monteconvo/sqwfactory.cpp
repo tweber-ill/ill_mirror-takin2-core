@@ -502,10 +502,12 @@ bool save_sqw_params(const SqwBase* pSqw,
 	{
 		const std::string& strVar = std::get<0>(var);
 		const std::string& strErr = std::get<1>(var);
+		const std::string& strRange = std::get<3>(var);
 		const bool bFit = std::get<2>(var);
 
 		mapConf[strXmlRoot + "sqw_errors/" + strVar] = strErr;
 		mapConf[strXmlRoot + "sqw_fitvar/" + strVar] = bFit ? "1" : "0";
+		mapConf[strXmlRoot + "sqw_ranges/" + strVar] = strRange;
 	}
 
 	return 1;
@@ -539,11 +541,14 @@ bool load_sqw_params(SqwBase* pSqw,
 
 		boost::optional<std::string> opErr =
 			xml.QueryOpt<std::string>(strXmlRoot + "sqw_errors/" + strChild);
+		boost::optional<std::string> opRange =
+			xml.QueryOpt<std::string>(strXmlRoot + "sqw_ranges/" + strChild);
 		boost::optional<bool> opFit =
 			xml.QueryOpt<bool>(strXmlRoot + "sqw_fitvar/" + strChild);
 		SqwBase::t_var_fit varFit;
 		std::get<0>(varFit) = strChild;
 		std::get<1>(varFit) = opErr ? *opErr : "0";
+		std::get<3>(varFit) = opRange ? *opRange : "open : open";
 		std::get<2>(varFit) = opFit ? *opFit : 0;
 		vecVarsFit.emplace_back(std::move(varFit));
 	}

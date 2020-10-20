@@ -103,8 +103,8 @@ public:
 	void SetSqwParams(const std::vector<std::tuple<std::string, std::string, std::string>>& sqwparams);
 
 
-	// [ ident, type, value, error, fit? ]
-	using t_sqwparams = std::vector<std::tuple<std::string, std::string, std::string, std::string, bool>>;
+	// [ ident, type, value, error, fit?, range ]
+	using t_sqwparams = std::vector<std::tuple<std::string, std::string, std::string, std::string, bool, std::string>>;
 	t_sqwparams GetSqwParams(bool only_fitparams) const;
 
 

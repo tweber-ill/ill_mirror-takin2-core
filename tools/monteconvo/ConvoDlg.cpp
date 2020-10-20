@@ -464,6 +464,8 @@ void ConvoDlg::SetSqwParams(const std::vector<std::tuple<std::string, std::strin
 		m_pSqw->SetVarIfAvail(std::get<0>(param), std::get<1>(param));
 		if(std::get<2>(param) != "")
 			m_pSqw->SetErrIfAvail(std::get<0>(param), std::get<2>(param));
+		//if(std::get<3>(param) != "")
+		//	m_pSqw->SetRangeIfAvail(std::get<0>(param), std::get<3>(param));
 	}
 
 	/*auto vars = m_pSqw->GetVars();
@@ -492,7 +494,7 @@ ConvoDlg::t_sqwparams ConvoDlg::GetSqwParams(bool only_fitparams) const
 	for(const SqwBase::t_var& var : vars1)
 	{
 		const std::string& strName = std::get<SQW_NAME>(var);
-		std::string strErr;
+		std::string strErr, strRange;
 		bool bFit = 0;
 
 		// look for associated fit parameters: match with basic variable ident
@@ -503,11 +505,12 @@ ConvoDlg::t_sqwparams ConvoDlg::GetSqwParams(bool only_fitparams) const
 		if(iterFit != vars2.end())
 		{
 			strErr = std::get<1>(*iterFit);		// error
+			strRange = std::get<3>(*iterFit);	// range
 			bFit = std::get<2>(*iterFit);		// "is fit param" flag
 		}
 
 		if((only_fitparams && bFit) || !only_fitparams)
-			params.emplace_back(std::make_tuple(strName, std::get<SQW_TYPE>(var), std::get<SQW_VAL>(var), strErr, bFit));
+			params.emplace_back(std::make_tuple(strName, std::get<SQW_TYPE>(var), std::get<SQW_VAL>(var), strErr, bFit, strRange));
 	}
 
 	return params;

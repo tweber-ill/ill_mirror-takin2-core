@@ -21,7 +21,6 @@ bool SqwBase::SetVarIfAvail(const std::string& strKey, const std::string& strNew
 			t_var varNew = var;
 			std::get<2>(varNew) = strNewVal;
 			SetVars(std::vector<t_var>({varNew}));
-
 			return true;
 		}
 	}
@@ -40,6 +39,24 @@ bool SqwBase::SetErrIfAvail(const std::string& strKey, const std::string& strNew
 		if(strKey == std::get<0>(var))
 		{
 			std::get<1>(var) = strNewErr;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
+ * if the variable "strKey" is known, update its range with the value "strNewRange"
+ */
+bool SqwBase::SetRangeIfAvail(const std::string& strKey, const std::string& strNewRange)
+{
+	for(t_var_fit& var : m_vecFit)
+	{
+		if(strKey == std::get<0>(var))
+		{
+			std::get<3>(var) = strNewRange;
 			return true;
 		}
 	}
@@ -74,6 +91,7 @@ void SqwBase::SetFitVars(const std::vector<t_var_fit>& vecFitVars)
 		{
 			std::get<1>(*iter) = std::get<1>(var);
 			std::get<2>(*iter) = std::get<2>(var);
+			std::get<3>(*iter) = std::get<3>(var);
 		}
 		else
 		{

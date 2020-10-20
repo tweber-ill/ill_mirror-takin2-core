@@ -22,7 +22,8 @@ enum
 	SQW_VAL = 2,
 
 	SQW_ERR = 3,
-	SQW_FIT = 4
+	SQW_RANGE = 4,
+	SQW_FIT = 5,
 };
 
 

@@ -47,6 +47,7 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 	tableParams->setColumnWidth(SQW_TYPE, 75);
 	tableParams->setColumnWidth(SQW_VAL, 175);
 	tableParams->setColumnWidth(SQW_ERR, 100);
+	tableParams->setColumnWidth(SQW_RANGE, 175);
 	tableParams->setColumnWidth(SQW_FIT, 50);
 
 	int iRow=0;
@@ -56,6 +57,7 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 		const std::string& strType = std::get<SQW_TYPE>(var);
 		const std::string& strVal = std::get<SQW_VAL>(var);
 		const std::string* pstrErr = nullptr;
+		const std::string* pstrRange = nullptr;
 		bool bFit = 0;
 
 		// look for associated fit parameters, if given
@@ -70,6 +72,7 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 			{
 				pstrErr = &std::get<1>(*iterFit);	// error
 				bFit = std::get<2>(*iterFit);		// "is fit param" flag
+				pstrRange = &std::get<3>(*iterFit);	// range
 			}
 		}
 
@@ -118,6 +121,19 @@ void SqwParamDlg::SqwLoaded(const std::vector<SqwBase::t_var>& vecVars,
 		pItemErr->setText(pstrErr ? pstrErr->c_str() : "0");
 
 
+		// range
+		QTableWidgetItem *pItemRange = tableParams->item(iRow, SQW_RANGE);
+		if(!pItemRange)
+		{
+			pItemRange = new QTableWidgetItem();
+			tableParams->setItem(iRow, SQW_RANGE, pItemRange);
+		}
+		std::string strRange = pstrRange ? pstrRange->c_str() : "";
+		if(strRange == "") strRange = "open : open";
+		pItemRange->setFlags(pItemRange->flags() | Qt::ItemIsEditable);
+		pItemRange->setText(strRange.c_str());
+
+
 		// is fit param?
 		QCheckBox *pItemFit = reinterpret_cast<QCheckBox*>(tableParams->cellWidget(iRow, SQW_FIT));
 		if(!pItemFit)
@@ -152,8 +168,8 @@ void SqwParamDlg::SaveSqwParams()
 		SqwBase::t_var_fit varFit;
 		std::get<0>(varFit) = std::get<SQW_NAME>(var);
 		std::get<1>(varFit) = tableParams->item(iRow, SQW_ERR)->text().toStdString();
-		std::get<2>(varFit) = reinterpret_cast<QCheckBox*>(
-			tableParams->cellWidget(iRow, SQW_FIT))->isChecked();
+		std::get<3>(varFit) = tableParams->item(iRow, SQW_RANGE)->text().toStdString();
+		std::get<2>(varFit) = reinterpret_cast<QCheckBox*>(tableParams->cellWidget(iRow, SQW_FIT))->isChecked();
 
 		vecVars.push_back(std::move(var));
 		vecVarsFit.push_back(std::move(varFit));
