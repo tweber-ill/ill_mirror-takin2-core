@@ -161,7 +161,6 @@ void ConvoDlg::StartFit()
 
 	try
 	{
-
 		MinuitFunc fkt{this, &sqwparams};
 
 		minuit::MnStrategy strat(spinStrategy->value());
@@ -207,6 +206,7 @@ void ConvoDlg::StartFit()
 	if(mini)
 	{
 		tl::log_debug("Final fit results:\n", *mini);
+		ostr_fitresults << "# Fit chi^2: " << GetChi2() << "\n";
 
 		std::vector<std::tuple<std::string, std::string, std::string>> newsqwparams;
 		for(std::size_t paramidx=0; paramidx<sqwparams.size(); ++paramidx)
