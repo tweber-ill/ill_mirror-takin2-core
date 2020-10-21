@@ -118,7 +118,7 @@ void ConvoDlg::StartFit()
 	if(sqwparams.size() == 0)
 	{
 		QMessageBox::critical(this, "Error", "No fit parameters defined."
-			" Please set them up in the model parameters dialog (\"...\" button).");
+			" Please set them up in the model parameters dialog (\"Parameters...\" button).");
 		return;
 	}
 
