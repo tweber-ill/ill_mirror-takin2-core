@@ -106,10 +106,8 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dd><a href=\"http://www.netlib.org/lapack\">http://www.netlib.org/lapack</a><br></dd>";
 #endif
 
-#ifndef NO_FIT
 	ostrLibs << "<dt>Uses Minuit version 2.</dt>";
 	ostrLibs << "<dd><a href=\"https://root.cern.ch\">https://root.cern.ch</a><br></dd>";
-#endif
 
 	ostrLibs << "<dt>Uses Clipper crystallography library.</dt>";
 	ostrLibs << "<dd><a href=\"http://www.ysbl.york.ac.uk/~cowtan/clipper\">http://www.ysbl.york.ac.uk/~cowtan/clipper</a><br></dd>";
@@ -154,10 +152,6 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 
 #if !defined NO_3D
 	ostrFeat << "GL, ";
-#endif
-
-#if !defined NO_FIT
-	ostrFeat << "Fitting, ";
 #endif
 
 #if !defined NO_LAPACK

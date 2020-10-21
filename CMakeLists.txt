@@ -129,10 +129,10 @@ endif()
 find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} OPTIONAL_COMPONENTS ${BOOST_OPT_COMPS})
 find_package(Threads REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg)
-find_package(PNG REQUIRED)
 find_package(Qwt REQUIRED)
+find_package(Minuit2 REQUIRED)
+find_package(PNG REQUIRED)
 find_package(Julia)
-find_package(Minuit2)
 find_package(ZLIB)
 find_package(BZip2)
 
@@ -246,6 +246,9 @@ include_directories("${Qt5Core_INCLUDE_DIRS}" "${Qt5Gui_INCLUDE_DIRS}" "${Qt5Wid
 include_directories("${QWT_INCLUDE_DIRS}")
 include_directories("${ZLIB_INCLUDE_DIRS}")
 include_directories("${BZIP2_INCLUDE_DIR}")
+include_directories("${Minuit2_INCLUDE_DIRS}")
+
+set(LIBS_FIT ${Minuit2_LIBRARIES})
 
 
 
@@ -269,18 +272,6 @@ if(Julia_FOUND)
 else()
 	message("Disabling jl scripting support.")
 	add_definitions(-DNO_JL)
-endif()
-
-
-
-# fitting support
-if(Minuit2_FOUND)
-	message("Enabling fitting support.")
-	include_directories("${Minuit2_INCLUDE_DIRS}")
-	set(LIBS_FIT ${Minuit2_LIBRARIES})
-else()
-	message("Disabling fitting support.")
-	add_definitions(-DNO_FIT)
 endif()
 
 
@@ -511,7 +502,7 @@ endif()
 
 
 
-if(BUILD_EXT_TOOLS AND Minuit2_FOUND)
+if(BUILD_EXT_TOOLS)
 	add_definitions(-DCONVOFIT_STANDALONE)
 
 	# -----------------------------------------------------------------------------
@@ -614,7 +605,7 @@ install(FILES ${PROJECT_SOURCE_DIR}/takin.sh
 install(FILES ${PROJECT_SOURCE_DIR}/setup_lin/takin.desktop DESTINATION share/applications COMPONENT takindesk)
 
 
-if(BUILD_EXT_TOOLS AND Minuit2_FOUND)
+if(BUILD_EXT_TOOLS)
 	install(TARGETS convofit convoseries DESTINATION bin COMPONENT appconvofit)
 endif()
 # -----------------------------------------------------------------------------

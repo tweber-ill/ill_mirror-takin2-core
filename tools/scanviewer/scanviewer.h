@@ -8,6 +8,8 @@
 #ifndef __TAZ_SCANVIEWER_H__
 #define __TAZ_SCANVIEWER_H__
 
+#include "ui/ui_scanviewer.h"
+
 #include <QDialog>
 #include <QSettings>
 #include <QFileSystemWatcher>
@@ -20,7 +22,6 @@
 #include "libs/qt/qthelper.h"
 #include "libs/qt/qwthelper.h"
 #include "libs/globals.h"
-#include "ui/ui_scanviewer.h"
 #include "FitParamDlg.h"
 
 
@@ -60,14 +61,12 @@ protected:
 	virtual void closeEvent(QCloseEvent* pEvt) override;
 	virtual void keyPressEvent(QKeyEvent* pEvt) override;
 
-#ifndef NO_FIT
 	template<std::size_t iNumArgs, class t_func>
 	bool Fit(t_func&& func,
 		const std::vector<std::string>& vecParamNames,
 		std::vector<t_real_glob>& vecVals,
 		std::vector<t_real_glob>& vecErrs,
 		const std::vector<bool>& vecFixed);
-#endif
 
 protected slots:
 	void GenerateExternal(int iLang=0);
@@ -84,7 +83,6 @@ protected slots:
 	void YAxisSelected(int);
 	void MonAxisSelected(int);
 	void NormaliseStateChanged(int iState);
-	//void LogStateChanged(int iState);
 	void StartOrSkipChanged(int);
 
 	void ShowFitParams();
@@ -96,7 +94,6 @@ protected slots:
 	void FitSine();
 
 	void CalcPol();
-	//void openExternally();
 };
 
 

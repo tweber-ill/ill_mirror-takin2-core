@@ -32,12 +32,10 @@
 #include "tlibs/log/log.h"
 #include "tlibs/helper/misc.h"
 
-#ifndef NO_FIT
-	#include "tlibs/fit/minuit.h"
-	#include "tlibs/fit/interpolation.h"
-	#include "tlibs/fit/swarm.h"
-	using tl::t_real_min;
-#endif
+#include "tlibs/fit/minuit.h"
+#include "tlibs/fit/interpolation.h"
+#include "tlibs/fit/swarm.h"
+using tl::t_real_min;
 
 #ifdef USE_WIDE_STR
 	#define T_STR std::wstring
@@ -112,7 +110,7 @@ ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	QObject::connect(btnBrowse, &QToolButton::clicked, pThis, &ScanViewerDlg::SelectDir);
 	for(QLineEdit* pEdit : {editPolVec1, editPolVec2, editPolCur1, editPolCur2})
 		QObject::connect(pEdit, &QLineEdit::textEdited, pThis, &ScanViewerDlg::CalcPol);
-#ifndef NO_FIT
+
 	QObject::connect(btnParam, &QToolButton::clicked, pThis, &ScanViewerDlg::ShowFitParams);
 	QObject::connect(btnGauss, &QToolButton::clicked, pThis, &ScanViewerDlg::FitGauss);
 	QObject::connect(btnLorentz, &QToolButton::clicked, pThis, &ScanViewerDlg::FitLorentz);
@@ -120,12 +118,11 @@ ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	QObject::connect(btnLine, &QToolButton::clicked, pThis, &ScanViewerDlg::FitLine);
 	QObject::connect(btnParabola, &QToolButton::clicked, pThis, &ScanViewerDlg::FitParabola);
 	QObject::connect(btnSine, &QToolButton::clicked, pThis, &ScanViewerDlg::FitSine);
-#endif
+
 	QObject::connect(comboX, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::XAxisSelected);
 	QObject::connect(comboY, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::YAxisSelected);
 	QObject::connect(comboMon, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), pThis, &ScanViewerDlg::MonAxisSelected);
 	QObject::connect(checkNorm, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), pThis, &ScanViewerDlg::NormaliseStateChanged);
-	//QObject::connect(checkLog, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), pThis, &ScanViewerDlg::LogStateChanged);
 	QObject::connect(spinStart, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), pThis, &ScanViewerDlg::StartOrSkipChanged);
 	QObject::connect(spinStop, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), pThis, &ScanViewerDlg::StartOrSkipChanged);
 	QObject::connect(spinSkip, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), pThis, &ScanViewerDlg::StartOrSkipChanged);
@@ -174,16 +171,6 @@ ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 
 	m_bDoUpdate = 1;
 	ChangedPath();
-
-#ifdef NO_FIT
-	btnParam->setEnabled(false);
-	btnGauss->setEnabled(false);
-	btnLorentz->setEnabled(false);
-	btnVoigt->setEnabled(false);
-	btnLine->setEnabled(false);
-	btnParabola->setEnabled(false);
-	btnSine->setEnabled(false);
-#endif
 
 #ifndef HAS_COMPLEX_ERF
 	btnVoigt->setEnabled(false);
@@ -367,7 +354,6 @@ void ScanViewerDlg::XAxisSelected(int) { PlotScan(); }
 void ScanViewerDlg::YAxisSelected(int) { PlotScan(); }
 void ScanViewerDlg::MonAxisSelected(int) { PlotScan(); }
 void ScanViewerDlg::NormaliseStateChanged(int iState) { PlotScan(); }
-//void ScanViewerDlg::LogStateChanged(int iState) { PlotScan(); }
 void ScanViewerDlg::StartOrSkipChanged(int) { PlotScan(); }
 
 
@@ -1218,8 +1204,6 @@ void ScanViewerDlg::UpdateFileList()
 
 
 
-#ifndef NO_FIT
-
 void ScanViewerDlg::ShowFitParams()
 {
 	focus_dlg(m_pFitParamDlg);
@@ -1862,17 +1846,6 @@ void ScanViewerDlg::FitVoigt()
 		m_pFitParamDlg->SetSlopeErr(vecErrs[5]);
 	}
 }
-#endif
-
-#else	// NO_FIT
-
-void ScanViewerDlg::ShowFitParams() {}
-void ScanViewerDlg::FitGauss() {}
-void ScanViewerDlg::FitLorentz() {}
-void ScanViewerDlg::FitVoigt() {}
-void ScanViewerDlg::FitLine() {}
-void ScanViewerDlg::FitSine() {}
-
 #endif
 
 

@@ -23,8 +23,6 @@ using t_real = t_real_reso;
 using t_real_min = double;
 
 
-#ifndef NO_FIT
-
 #include <Minuit2/FCNBase.h>
 #include <Minuit2/MnFcn.h>
 #include <Minuit2/FunctionMinimum.h>
@@ -295,15 +293,3 @@ void ConvoDlg::StartFit()
 	strResults += textResult->toPlainText();
 	textResult->setPlainText(strResults);
 }
-
-
-#else
-
-
-void ConvoDlg::StartFit()
-{
-	QMessageBox::critical(this, "Error", "This package of Takin was compiled without the fitting option.");
-}
-
-
-#endif
