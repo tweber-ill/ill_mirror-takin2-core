@@ -34,15 +34,15 @@ DynPlaneDlg::DynPlaneDlg(QWidget* pParent, QSettings *pSettings)
 	m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Q (1/A)");
 	m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::yLeft, "E (meV)");
 	if(m_plotwrap->HasTrackerSignal())
-		connect(m_plotwrap->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrap->GetPicker(), &QwtPlotPicker::moved, this, &DynPlaneDlg::cursorMoved);
 
 
-	QObject::connect(comboFixedE, SIGNAL(currentIndexChanged(int)), this, SLOT(FixedKiKfToggled()));
+	QObject::connect(comboFixedE, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &DynPlaneDlg::FixedKiKfToggled);
 
 	std::vector<QDoubleSpinBox*> vecSpinBoxes = {spinEiEf, spinMinQ, spinMaxQ, spinAngle};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxes)
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
-	QObject::connect(btnSync, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+		QObject::connect(pSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &DynPlaneDlg::Calc);
+	QObject::connect(btnSync, &QPushButton::toggled, this, &DynPlaneDlg::Calc);
 
 
 	if(m_pSettings)

@@ -68,8 +68,7 @@ PowderDlg::PowderDlg(QWidget* pParent, QSettings* pSett)
 	m_plotwrapN->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Scattering Angle");
 	m_plotwrapN->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Intensity");
 	if(m_plotwrapN->HasTrackerSignal())
-		connect(m_plotwrapN->GetPicker(), SIGNAL(moved(const QPointF&)),
-			this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapN->GetPicker(), &QwtPlotPicker::moved, this, &PowderDlg::cursorMoved);
 
 	// x-rax
 	m_plotwrapX.reset(new QwtPlotWrapper(plotX));
@@ -77,16 +76,14 @@ PowderDlg::PowderDlg(QWidget* pParent, QSettings* pSett)
 	m_plotwrapX->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Scattering Angle");
 	m_plotwrapX->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Intensity");
 	if(m_plotwrapX->HasTrackerSignal())
-		connect(m_plotwrapX->GetPicker(), SIGNAL(moved(const QPointF&)),
-			this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapX->GetPicker(), &QwtPlotPicker::moved, this, &PowderDlg::cursorMoved);
 
 	// angles vs ki
 	m_plotwrapAnglesKi.reset(new QwtPlotWrapper(plotLines, POWDER_MAX_CURVES));
 	m_plotwrapAnglesKi->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Incident Wavenumber ki");
 	m_plotwrapAnglesKi->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Scattering Angle");
 	if(m_plotwrapAnglesKi->HasTrackerSignal())
-		connect(m_plotwrapAnglesKi->GetPicker(), SIGNAL(moved(const QPointF&)),
-			this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapAnglesKi->GetPicker(), &QwtPlotPicker::moved, this, &PowderDlg::cursorMoved);
 	// -------------------------------------------------------------------------
 
 
@@ -107,23 +104,24 @@ PowderDlg::PowderDlg(QWidget* pParent, QSettings* pSett)
 	std::vector<QLineEdit*> vecEditsUC = {editA, editB, editC, editAlpha, editBeta, editGamma};
 	for(QLineEdit* pEdit : vecEditsUC)
 	{
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CheckCrystalType()));
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcPeaks()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &PowderDlg::CheckCrystalType);
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &PowderDlg::CalcPeaks);
 	}
-	QObject::connect(spinLam, SIGNAL(valueChanged(double)), this, SLOT(CalcPeaks()));
-	QObject::connect(spinOrder, SIGNAL(valueChanged(int)), this, SLOT(CalcPeaks()));
-	QObject::connect(checkUniquePeaks, SIGNAL(toggled(bool)), this, SLOT(CalcPeaks()));
 
-	QObject::connect(editSpaceGroupsFilter, SIGNAL(textChanged(const QString&)), this, SLOT(RepopulateSpaceGroups()));
-	QObject::connect(comboSpaceGroups, SIGNAL(currentIndexChanged(int)), this, SLOT(SpaceGroupChanged()));
+	QObject::connect(spinLam, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &PowderDlg::CalcPeaks);
+	QObject::connect(spinOrder, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &PowderDlg::CalcPeaks);
+	QObject::connect(checkUniquePeaks, &QCheckBox::toggled, this, &PowderDlg::CalcPeaks);
 
-	QObject::connect(btnSaveTable, SIGNAL(clicked()), this, SLOT(SaveTable()));
-	QObject::connect(btnSave, SIGNAL(clicked()), this, SLOT(SavePowder()));
-	QObject::connect(btnLoad, SIGNAL(clicked()), this, SLOT(LoadPowder()));
-	QObject::connect(btnAtoms, SIGNAL(clicked()), this, SLOT(ShowAtomDlg()));
+	QObject::connect(editSpaceGroupsFilter, &QLineEdit::textChanged, this, &PowderDlg::RepopulateSpaceGroups);
+	QObject::connect(comboSpaceGroups, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &PowderDlg::SpaceGroupChanged);
 
-	QObject::connect(btnSyncKi, SIGNAL(clicked()), this, SLOT(SetExtKi()));
-	QObject::connect(btnSyncKf, SIGNAL(clicked()), this, SLOT(SetExtKf()));
+	QObject::connect(btnSaveTable, &QPushButton::clicked, this, &PowderDlg::SaveTable);
+	QObject::connect(btnSave, &QPushButton::clicked, this, &PowderDlg::SavePowder);
+	QObject::connect(btnLoad, &QPushButton::clicked, this, &PowderDlg::LoadPowder);
+	QObject::connect(btnAtoms, &QPushButton::clicked, this, &PowderDlg::ShowAtomDlg);
+
+	QObject::connect(btnSyncKi, &QToolButton::clicked, this, &PowderDlg::SetExtKi);
+	QObject::connect(btnSyncKf, &QToolButton::clicked, this, &PowderDlg::SetExtKf);
 
 	m_bDontCalc = 0;
 	RepopulateSpaceGroups();
@@ -930,8 +928,7 @@ void PowderDlg::ShowAtomDlg()
 		m_pAtomsDlg = new AtomsDlg(this, m_pSettings);
 		m_pAtomsDlg->setWindowTitle(m_pAtomsDlg->windowTitle() + QString(" (Powder)"));
 
-		QObject::connect(m_pAtomsDlg, SIGNAL(ApplyAtoms(const std::vector<xtl::AtomPos<t_real_glob>>&)),
-			this, SLOT(ApplyAtoms(const std::vector<xtl::AtomPos<t_real_glob>>&)));
+		QObject::connect(m_pAtomsDlg, &AtomsDlg::ApplyAtoms, this, &PowderDlg::ApplyAtoms);
 	}
 
 	m_pAtomsDlg->SetAtoms(m_vecAtoms);

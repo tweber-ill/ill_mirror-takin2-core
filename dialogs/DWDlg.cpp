@@ -35,7 +35,7 @@ DWDlg::DWDlg(QWidget* pParent, QSettings *pSettings)
 	// Bose Factor stuff
 	std::vector<QDoubleSpinBox*> vecSpinBoxesBose = {spinBoseT, spinBoseEMin, spinBoseEMax};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxesBose)
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcBose()));
+		QObject::connect(pSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &DWDlg::CalcBose);
 
 	m_plotwrapBose.reset(new QwtPlotWrapper(plotBose, 2));
 
@@ -54,7 +54,7 @@ DWDlg::DWDlg(QWidget* pParent, QSettings *pSettings)
 	m_plotwrapBose->GetCurve(1)->setPen(penCurveBoseNeg);
 
 	if(m_plotwrapBose->HasTrackerSignal())
-		connect(m_plotwrapBose->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapBose->GetPicker(), &QwtPlotPicker::moved, this, &DWDlg::cursorMoved);
 
 	m_pLegendBose = new QwtLegend();
 	m_plotwrapBose->GetPlot()->insertLegend(m_pLegendBose, QwtPlot::TopLegend);
@@ -69,13 +69,13 @@ DWDlg::DWDlg(QWidget* pParent, QSettings *pSettings)
 	// DW Factor stuff
 	std::vector<QDoubleSpinBox*> vecSpinBoxes = {spinAMU_deb, spinTD_deb, spinT_deb, spinMinQ_deb, spinMaxQ_deb};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxes)
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcDW()));
+		QObject::connect(pSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &DWDlg::CalcDW);
 
 	m_plotwrapDW.reset(new QwtPlotWrapper(plot, 1));
 	m_plotwrapDW->GetCurve(0)->setTitle("Debye-Waller Factor");
 
 	if(m_plotwrapDW->HasTrackerSignal())
-		connect(m_plotwrapDW->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapDW->GetPicker(), &QwtPlotPicker::moved, this, &DWDlg::cursorMoved);
 
 	m_plotwrapDW->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Q (1/A)");
 	m_plotwrapDW->GetPlot()->setAxisTitle(QwtPlot::yLeft, "DW Factor");
@@ -87,13 +87,13 @@ DWDlg::DWDlg(QWidget* pParent, QSettings *pSettings)
 	// Ana Factor stuff
 	std::vector<QDoubleSpinBox*> vecSpinBoxesAna = {spinAnad, spinMinkf, spinMaxkf};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxesAna)
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcAna()));
+		QObject::connect(pSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &DWDlg::CalcAna);
 
 	m_plotwrapAna.reset(new QwtPlotWrapper(plotAna, 1));
 	m_plotwrapAna->GetCurve(0)->setTitle("Analyser Factor");
 
 	if(m_plotwrapAna->HasTrackerSignal())
-		connect(m_plotwrapAna->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapAna->GetPicker(), &QwtPlotPicker::moved, this, &DWDlg::cursorMoved);
 
 	m_plotwrapAna->GetPlot()->setAxisTitle(QwtPlot::xBottom, "kf (1/A)");
 	m_plotwrapAna->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Intensity (a.u.)");
@@ -105,14 +105,14 @@ DWDlg::DWDlg(QWidget* pParent, QSettings *pSettings)
 	// Lorentz Factor stuff
 	std::vector<QDoubleSpinBox*> vecSpinBoxesLor = {spinMin2Th, spinMax2Th};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxesLor)
-		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcLorentz()));
-	QObject::connect(checkPol, SIGNAL(toggled(bool)), this, SLOT(CalcLorentz()));
+		QObject::connect(pSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &DWDlg::CalcLorentz);
+	QObject::connect(checkPol, &QCheckBox::toggled, this, &DWDlg::CalcLorentz);
 
 	m_plotwrapLor.reset(new QwtPlotWrapper(plotLorentz, 1));
 	m_plotwrapLor->GetCurve(0)->setTitle("Lorentz Factor");
 
 	if(m_plotwrapLor->HasTrackerSignal())
-		connect(m_plotwrapLor->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrapLor->GetPicker(), &QwtPlotPicker::moved, this, &DWDlg::cursorMoved);
 
 	m_plotwrapLor->GetPlot()->setAxisTitle(QwtPlot::xBottom, "Scattering Angle (deg)");
 	m_plotwrapLor->GetPlot()->setAxisTitle(QwtPlot::yLeft, "Lorentz Factor");

@@ -60,25 +60,25 @@ SpurionDlg::SpurionDlg(QWidget* pParent, QSettings *pSett)
 	m_plotwrap->GetCurve(0)->setTitle("Bragg Tail");
 
 	if(m_plotwrap->HasTrackerSignal())
-		connect(m_plotwrap->GetPicker(), SIGNAL(moved(const QPointF&)), this, SLOT(cursorMoved(const QPointF&)));
+		connect(m_plotwrap->GetPicker(), &QwtPlotPicker::moved, this, &SpurionDlg::cursorMoved);
 
 	m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::xBottom, "q (1/A)");
 	m_plotwrap->GetPlot()->setAxisTitle(QwtPlot::yLeft, "E (meV)");
 
 
-	QObject::connect(radioFixedEi, SIGNAL(toggled(bool)), this, SLOT(ChangedKiKfMode()));
+	QObject::connect(radioFixedEi, &QRadioButton::toggled, this, &SpurionDlg::ChangedKiKfMode);
 
-	QObject::connect(radioFixedEi, SIGNAL(toggled(bool)), this, SLOT(Calc()));
-	QObject::connect(btnSync, SIGNAL(toggled(bool)), this, SLOT(Calc()));
-	QObject::connect(spinE, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
+	QObject::connect(radioFixedEi, &QRadioButton::toggled, this, &SpurionDlg::Calc);
+	QObject::connect(btnSync, &QPushButton::toggled, this, &SpurionDlg::Calc);
+	QObject::connect(spinE, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SpurionDlg::Calc);
 
-	QObject::connect(checkFilter, SIGNAL(toggled(bool)), this, SLOT(CalcInel()));
-	QObject::connect(spinOrder, SIGNAL(valueChanged(int)), this, SLOT(CalcInel()));
+	QObject::connect(checkFilter, &QCheckBox::toggled, this, &SpurionDlg::CalcInel);
+	QObject::connect(spinOrder, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SpurionDlg::CalcInel);
 
-	QObject::connect(spinMinQ, SIGNAL(valueChanged(double)), this, SLOT(CalcBragg()));
-	QObject::connect(spinMaxQ, SIGNAL(valueChanged(double)), this, SLOT(CalcBragg()));
+	QObject::connect(spinMinQ, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SpurionDlg::CalcBragg);
+	QObject::connect(spinMaxQ, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &SpurionDlg::CalcBragg);
 
-	QObject::connect(btnSaveTable, SIGNAL(clicked()), this, SLOT(SaveTable()));
+	QObject::connect(btnSaveTable, &QPushButton::clicked, this, &SpurionDlg::SaveTable);
 
 	Calc();
 

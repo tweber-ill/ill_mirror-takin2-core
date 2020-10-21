@@ -79,13 +79,13 @@ TOFDlg::TOFDlg(QWidget* pParent, QSettings *pSett)
 		radioChopperL, radioChopperR, radioChopperOm, radioChopperT };
 
 	for(QLineEdit* pEdit : editsChopper)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcChopper()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TOFDlg::CalcChopper);
 	for(QRadioButton* pRadio : radioChopper)
 	{
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(EnableChopperEdits()));
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcChopper()));
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::EnableChopperEdits);
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::CalcChopper);
 	}
-	QObject::connect(checkChopperCounterRot, SIGNAL(toggled(bool)), this, SLOT(CalcChopper()));
+	QObject::connect(checkChopperCounterRot, &QCheckBox::toggled, this, &TOFDlg::CalcChopper);
 
 	EnableChopperEdits();
 	CalcChopper();
@@ -97,11 +97,11 @@ TOFDlg::TOFDlg(QWidget* pParent, QSettings *pSett)
 	std::vector<QRadioButton*> radioDiv = { radioDivL, radioDivW, radioDivAng };
 
 	for(QLineEdit* pEdit : editsDiv)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcDiv()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TOFDlg::CalcDiv);
 	for(QRadioButton* pRadio : radioDiv)
 	{
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(EnableDivEdits()));
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcDiv()));
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::EnableDivEdits);
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::CalcDiv);
 	}
 
 	EnableDivEdits();
@@ -114,11 +114,11 @@ TOFDlg::TOFDlg(QWidget* pParent, QSettings *pSett)
 	std::vector<QRadioButton*> radioSel = { radioSelLam, radioSelTh, radioSelL, radioSelOm };
 
 	for(QLineEdit* pEdit : editsSel)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcSel()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TOFDlg::CalcSel);
 	for(QRadioButton* pRadio : radioSel)
 	{
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(EnableSelEdits()));
-		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcSel()));
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::EnableSelEdits);
+		QObject::connect(pRadio, &QRadioButton::toggled, this, &TOFDlg::CalcSel);
 	}
 
 	EnableSelEdits();
@@ -130,7 +130,7 @@ TOFDlg::TOFDlg(QWidget* pParent, QSettings *pSett)
 	std::vector<QLineEdit*> editsFoc = { editFocL1, editFocL2, editFocTT };
 
 	for(QLineEdit* pEdit : editsFoc)
-		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcFoc()));
+		QObject::connect(pEdit, &QLineEdit::textEdited, this, &TOFDlg::CalcFoc);
 
 	CalcFoc();
 }
