@@ -69,4 +69,4 @@ void SrvDlg::accept()
 	QDialog::accept();
 }
 
-#include "SrvDlg.moc"
+#include "moc_SrvDlg.cpp"

@@ -212,4 +212,4 @@ void DeadAnglesDlg::closeEvent(QCloseEvent* pEvt)
 }
 
 
-#include "DeadAnglesDlg.moc"
+#include "moc_DeadAnglesDlg.cpp"

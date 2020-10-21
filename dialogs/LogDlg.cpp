@@ -74,4 +74,4 @@ void LogDlg::accept()
 	QDialog::accept();
 }
 
-#include "LogDlg.moc"
+#include "moc_LogDlg.cpp"

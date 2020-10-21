@@ -980,4 +980,4 @@ void PowderDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "PowderDlg.moc"
+#include "moc_PowderDlg.cpp"

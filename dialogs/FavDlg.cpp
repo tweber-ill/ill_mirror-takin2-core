@@ -225,4 +225,4 @@ void FavDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 }
 
 
-#include "FavDlg.moc"
+#include "moc_FavDlg.cpp"

@@ -381,4 +381,4 @@ void EllipseDlg::closeEvent(QCloseEvent *pEvt)
 }
 
 
-#include "EllipseDlg.moc"
+#include "moc_EllipseDlg.cpp"

@@ -181,4 +181,4 @@ void NetCacheDlg::ClearAll()
 }
 
 
-#include "NetCacheDlg.moc"
+#include "moc_NetCacheDlg.cpp"

@@ -1849,4 +1849,4 @@ void ScanViewerDlg::FitVoigt()
 #endif
 
 
-#include "scanviewer.moc"
+#include "moc_scanviewer.cpp"

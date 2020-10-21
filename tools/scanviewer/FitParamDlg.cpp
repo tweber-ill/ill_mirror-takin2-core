@@ -50,4 +50,4 @@ void FitParamDlg::accept()
 }
 
 
-#include "FitParamDlg.moc"
+#include "moc_FitParamDlg.cpp"

@@ -225,4 +225,4 @@ void DynPlaneDlg::accept()
 }
 
 
-#include "DynPlaneDlg.moc"
+#include "moc_DynPlaneDlg.cpp"

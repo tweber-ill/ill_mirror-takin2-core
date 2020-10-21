@@ -391,7 +391,7 @@ void RealLattice::ClearPeaks()
 {
 	m_ws.Clear();
 	m_ws3.Clear();
-	
+
 	m_vecWS3VertsUnproj.clear();
 	m_vecWS3Verts.clear();
 
@@ -585,4 +585,4 @@ void LatticeView::wheelEvent(QWheelEvent *pEvt)
 }
 
 
-#include "real_lattice.moc"
+#include "moc_real_lattice.cpp"

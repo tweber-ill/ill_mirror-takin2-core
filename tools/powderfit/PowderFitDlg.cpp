@@ -255,4 +255,4 @@ void PowderFitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 }
 
 
-#include "PowderFitDlg.moc"
+#include "moc_PowderFitDlg.cpp"

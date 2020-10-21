@@ -206,4 +206,4 @@ void SqwParamDlg::ButtonBoxClicked(QAbstractButton *pBtn)
 }
 
 
-#include "SqwParamDlg.moc"
+#include "moc_SqwParamDlg.cpp"

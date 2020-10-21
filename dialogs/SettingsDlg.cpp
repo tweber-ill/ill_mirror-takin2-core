@@ -503,4 +503,4 @@ void SettingsDlg::ButtonBoxClicked(QAbstractButton *pBtn)
 }
 
 
-#include "SettingsDlg.moc"
+#include "moc_SettingsDlg.cpp"

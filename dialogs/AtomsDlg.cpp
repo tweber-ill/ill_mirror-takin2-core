@@ -255,4 +255,4 @@ void AtomsDlg::closeEvent(QCloseEvent* pEvt)
 }
 
 
-#include "AtomsDlg.moc"
+#include "moc_AtomsDlg.cpp"

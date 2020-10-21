@@ -367,4 +367,4 @@ void SgListDlg::CalcTrafo()
 }
 
 
-#include "SgListDlg.moc"
+#include "moc_SgListDlg.cpp"

@@ -213,4 +213,4 @@ void RecipParamDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "RecipParamDlg.moc"
+#include "moc_RecipParamDlg.cpp"

@@ -587,4 +587,4 @@ void SicsCache::update_live_plot()
 }
 
 
-#include "sics.moc"
+#include "moc_sics.cpp"

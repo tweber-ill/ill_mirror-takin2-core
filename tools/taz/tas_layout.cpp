@@ -869,4 +869,4 @@ void TasLayoutView::wheelEvent(QWheelEvent *pEvt)
 }
 
 
-#include "tas_layout.moc"
+#include "moc_tas_layout.cpp"

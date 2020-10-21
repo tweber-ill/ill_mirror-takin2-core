@@ -350,4 +350,4 @@ void ScanPosDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 }
 
 
-#include "ScanPosDlg.moc"
+#include "moc_ScanPosDlg.cpp"

@@ -329,5 +329,6 @@ void NicosCache::slot_receive(const std::string& str)
 		emit vars_changed(crys, triag);
 }
 
-#include "net.moc"
-#include "nicos.moc"
+
+#include "moc_net.cpp"
+#include "moc_nicos.cpp"

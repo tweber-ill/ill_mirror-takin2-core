@@ -263,4 +263,4 @@ void AboutDlg::accept()
 }
 
 
-#include "AboutDlg.moc"
+#include "moc_AboutDlg.cpp"

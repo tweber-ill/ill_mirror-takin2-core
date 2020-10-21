@@ -408,4 +408,4 @@ void TOFDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "TOFDlg.moc"
+#include "moc_TOFDlg.cpp"

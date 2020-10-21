@@ -848,7 +848,7 @@ void NeutronDlg::CalcBraggRecip()
 		try
 		{
 			tt = tl::bragg_recip_twotheta(Q, lam, t_real(iOrder));
-	
+
 			std::string strTT = tl::var_to_str<t_real>(tl::r2d(tt/rads), g_iPrec);
 			std::string strT = tl::var_to_str<t_real>(tl::r2d(t_real(0.5)*tt/rads), g_iPrec);
 
@@ -898,4 +898,4 @@ void NeutronDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "NeutronDlg.moc"
+#include "moc_NeutronDlg.cpp"

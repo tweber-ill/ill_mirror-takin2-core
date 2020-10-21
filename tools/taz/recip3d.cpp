@@ -335,4 +335,4 @@ void Recip3DDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "recip3d.moc"
+#include "moc_recip3d.cpp"

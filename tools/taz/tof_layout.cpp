@@ -600,4 +600,4 @@ void TofLayoutView::wheelEvent(QWheelEvent *pEvt)
 }
 
 
-#include "tof_layout.moc"
+#include "moc_tof_layout.cpp"

@@ -908,4 +908,4 @@ void set_zoomer_base(QwtPlotZoomer *pZoomer,
 }
 
 
-#include "qwthelper.moc"
+#include "moc_qwthelper.cpp"

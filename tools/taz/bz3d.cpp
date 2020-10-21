@@ -301,4 +301,4 @@ void BZ3DDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "bz3d.moc"
+#include "moc_bz3d.cpp"

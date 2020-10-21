@@ -1669,4 +1669,5 @@ void TazDlg::ShowDevelDoc()
 	QMessageBox::critical(this, "Error", "Documentation could not be displayed.");
 }
 
-#include "taz.moc"
+
+#include "moc_taz.cpp"

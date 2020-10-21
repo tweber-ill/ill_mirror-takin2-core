@@ -301,5 +301,5 @@ void DWDlg::accept()
 }
 
 
-#include "DWDlg.moc"
+#include "moc_DWDlg.cpp"
 

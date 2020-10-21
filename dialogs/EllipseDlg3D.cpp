@@ -250,4 +250,4 @@ void EllipseDlg3D::keyPressEvent(QKeyEvent* pEvt)
 }
 
 
-#include "EllipseDlg3D.moc"
+#include "moc_EllipseDlg3D.cpp"

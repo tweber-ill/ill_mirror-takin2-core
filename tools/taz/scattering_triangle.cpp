@@ -1991,4 +1991,4 @@ bool ScatteringTriangleView::event(QEvent *pEvt)
 }
 
 
-#include "scattering_triangle.moc"
+#include "moc_scattering_triangle.cpp"

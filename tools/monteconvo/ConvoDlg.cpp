@@ -724,4 +724,4 @@ void ConvoDlg::ShowAboutDlg()
 }
 
 
-#include "ConvoDlg.moc"
+#include "moc_ConvoDlg.cpp"

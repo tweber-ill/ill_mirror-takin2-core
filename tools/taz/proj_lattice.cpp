@@ -404,4 +404,4 @@ void ProjLatticeView::wheelEvent(QWheelEvent *pEvt)
 }
 
 
-#include "proj_lattice.moc"
+#include "moc_proj_lattice.cpp"

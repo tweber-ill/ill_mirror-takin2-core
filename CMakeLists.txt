@@ -98,6 +98,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}" "."
 set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${PROJECT_SOURCE_DIR}/ui")
 
 set(Boost_FIND_QUIETLY FALSE)
 
@@ -316,8 +317,8 @@ endif()
 
 
 
-set(CMAKE_AUTOMOC OFF)
-set(CMAKE_AUTOUIC OFF)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC OFF)
 
 
@@ -420,7 +421,7 @@ target_link_libraries(takin
 
 # pre-build
 add_custom_target(prebuild-script
-	COMMAND cd ${PROJECT_SOURCE_DIR} && ./setup/prebuild.sh ${QT_UIC_EXECUTABLE} ${QT_MOC_EXECUTABLE} ${PROJECT_SOURCE_DIR})
+	COMMAND cd ${PROJECT_SOURCE_DIR} && ./setup/prebuild.sh ${PROJECT_SOURCE_DIR} ${QT_MOC_EXECUTABLE})
 
 
 # post-build

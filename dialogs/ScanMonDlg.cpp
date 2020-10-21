@@ -195,4 +195,4 @@ void ScanMonDlg::ClearPlot()
 }
 
 
-#include "ScanMonDlg.moc"
+#include "moc_ScanMonDlg.cpp"

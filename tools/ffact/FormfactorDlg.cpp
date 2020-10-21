@@ -843,5 +843,4 @@ void FormfactorDlg::accept()
 }
 
 
-
-#include "FormfactorDlg.moc"
+#include "moc_FormfactorDlg.cpp"

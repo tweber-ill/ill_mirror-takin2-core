@@ -456,4 +456,4 @@ void RealParamDlg::showEvent(QShowEvent *pEvt)
 
 // ----------------------------------------------------------------------------
 
-#include "RealParamDlg.moc"
+#include "moc_RealParamDlg.cpp"

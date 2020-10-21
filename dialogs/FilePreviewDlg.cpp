@@ -103,4 +103,4 @@ void FilePreviewDlg::FileSelected(const QString& qstrFile)
 }
 
 
-#include "FilePreviewDlg.moc"
+#include "moc_FilePreviewDlg.cpp"

@@ -292,4 +292,4 @@ void Real3DDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "real3d.moc"
+#include "moc_real3d.cpp"

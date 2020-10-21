@@ -1234,4 +1234,4 @@ void ResoDlg::showEvent(QShowEvent *event)
 }
 
 
-#include "ResoDlg.moc"
+#include "moc_ResoDlg.cpp"

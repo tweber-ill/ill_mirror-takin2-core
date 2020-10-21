@@ -727,4 +727,4 @@ void GotoDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 }
 
 
-#include "GotoDlg.moc"
+#include "moc_GotoDlg.cpp"

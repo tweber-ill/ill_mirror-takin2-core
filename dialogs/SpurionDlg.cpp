@@ -265,4 +265,4 @@ void SpurionDlg::showEvent(QShowEvent *pEvt)
 }
 
 
-#include "SpurionDlg.moc"
+#include "moc_SpurionDlg.cpp"
