@@ -14,6 +14,11 @@
 #include <string>
 #include <exception>
 
+#include <boost/optional.hpp>
+
+#include "tlibs/string/string.h"
+
+
 using t_real = t_real_reso;
 using t_real_min = double;
 
@@ -26,7 +31,6 @@ using t_real_min = double;
 #include <Minuit2/MnMigrad.h>
 #include <Minuit2/MnSimplex.h>
 #include <Minuit2/MnPrint.h>
-
 
 namespace minuit = ROOT::Minuit2;
 
@@ -128,19 +132,75 @@ void ConvoDlg::StartFit()
 	std::ostringstream ostrZeroErr;
 	bool bAnyErrorNonZero = 0;
 
+
+	std::ostringstream ostrFitParamMsg;
+	ostrFitParamMsg.precision(g_iPrec);
+	ostrFitParamMsg << "Using fitting parameters:\n";
+	ostrFitParamMsg
+		<< std::setw(15) << std::left << "Name"
+		<< std::setw(15) << std::left << "Initial" 
+		<< std::setw(15) << std::left << "Error" 
+		<< std::setw(30) << std::left << "Limits" 
+		<< "\n";
+
 	minuit::MnUserParameters params;
 	for(const auto& sqwparam : sqwparams)
 	{
+		// set value and error
+		const std::string& varname = std::get<0>(sqwparam);
 		t_real val = tl::str_to_var<t_real_min>(std::get<2>(sqwparam));
 		t_real err = tl::str_to_var<t_real_min>(std::get<3>(sqwparam));
-		std::string strRange = std::get<5>(sqwparam);	// TODO
-		params.Add(std::get<0>(sqwparam), val, err);
+		params.Add(varname, val, err);
 
+		// set parameter limits if given
+		boost::optional<t_real_min> limLower, limUpper;
+		std::string strLimits = std::get<5>(sqwparam);
+		std::vector<std::string> vecLimits;
+		tl::get_tokens<std::string, std::string>(strLimits, ":;|", vecLimits);
+		if(vecLimits.size() == 2)
+		{
+			tl::trim(vecLimits[0]);
+			tl::trim(vecLimits[1]);
+
+			if(vecLimits[0]!="" && tl::str_to_lower(vecLimits[0])!="open" && tl::str_to_lower(vecLimits[0])!="none")
+			{
+				limLower = tl::str_to_var<t_real_min>(vecLimits[0]);
+				params.SetLowerLimit(varname, *limLower);
+			}
+			if(vecLimits[1]!="" && tl::str_to_lower(vecLimits[1])!="open" && tl::str_to_lower(vecLimits[1])!="none")
+			{
+				limUpper = tl::str_to_var<t_real_min>(vecLimits[1]);
+				params.SetUpperLimit(varname, *limUpper);
+			}
+		}
+
+		// look for variables which have zero error (and thus cannot be fitted)
 		if(tl::float_equal(err, t_real{0}))
-			ostrZeroErr << std::get<0>(sqwparam) << ", ";
+			ostrZeroErr << varname << ", ";
 		else
 			bAnyErrorNonZero = 1;
+
+		std::ostringstream ostrLim;
+		ostrLim.precision(g_iPrec);
+		if(limLower)
+			ostrLim << *limLower;
+		else
+			ostrLim << "open";
+		ostrLim << " : ";
+		if(limUpper)
+			ostrLim << *limUpper;
+		else
+			ostrLim << "open";
+
+		ostrFitParamMsg
+			<< std::setw(15) << std::left << varname
+			<< std::setw(15) << std::left << val
+			<< std::setw(15) << std::left << err
+			<< std::setw(30) << std::left << ostrLim.str()
+			<< "\n";
 	}
+
+	tl::log_info(ostrFitParamMsg.str());
 
 	if(ostrZeroErr.str() != "")
 	{
