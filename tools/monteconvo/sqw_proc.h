@@ -46,7 +46,7 @@ protected:
 public:
 	SqwProc();
 	SqwProc(const char* pcCfg, SqwProcStartMode mode=SqwProcStartMode::START_PARENT_FORK_CHILD,
-			const char* pcProcMemName = nullptr, const char* pcProcExecName = nullptr);
+		const char* pcProcMemName = nullptr, const char* pcProcExecName = nullptr);
 	explicit SqwProc(const std::string& strCfg);
 	virtual ~SqwProc();
 

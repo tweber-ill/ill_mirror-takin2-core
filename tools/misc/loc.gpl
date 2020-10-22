@@ -5,21 +5,22 @@
 #
 
 $loc << ENDDATA
-# date     takin    tlibs    core2    tlibs2
-03/2014     5745        0        0         0
-06/2014    11654        0        0         0
-12/2014    16667        0        0         0
-06/2015    19187    19087        0         0
-12/2015    27591    21277        0         0
-06/2016    37412    25035        0         0
-12/2016    45798    27943        0         0
-06/2017    50979    30712        0         0
-12/2017    55798    31155        0         0
-06/2018    57547    31394        0         0
-12/2018    60558    31810        0         0
-06/2019    58871    31627    12541     15634
-12/2019    59515    31644    14310     15842
-06/2020    61400    31965    14769     17019
+# date     takin    tlibs    core2    tlibs2   plugins
+03/2014     5745        0        0         0         0
+06/2014    11654        0        0         0         0
+12/2014    16667        0        0         0         0
+06/2015    19187    19087        0         0         0
+12/2015    27591    21277        0         0         0
+06/2016    37412    25035        0         0         0
+12/2016    45798    27943        0         0         0
+06/2017    50979    30712        0         0         0
+12/2017    55798    31155        0         0         0
+06/2018    57547    31394        0         0         0
+12/2018    60558    31810        0         0         0
+06/2019    58871    31627    12541     15634         0
+12/2019    59515    31644    14310     15842         0
+06/2020    61400    31965    14769     17019         0
+10/2020    61762    32067    15163     24068      3736
 ENDDATA
 
 
@@ -27,6 +28,7 @@ col_tak = "#550000ff"
 col_tak2 = "#550000aa"
 col_tl = "#55ff0000"
 col_tl2 = "#55aa0000"
+col_plug = "#5500aa00"
 col_total = "#00000000"
 
 ymax = 150000
@@ -40,8 +42,13 @@ set ylabel "Lines of code"
 set xrange [ "03/2014" : "12/2020" ]
 set yrange [0 : ymax]
 
+# Version 1
 set arrow 1 from "6/2016", 0 to "6/2016", ymax dt 2 lw 2 nohead front
+set label 1 at "4/2016", 120000 "Version 1.0" rotate by 90
+
+# Version 1.5
 set arrow 2 from "6/2017", 0 to "6/2017", ymax dt 2 lw 2 nohead front
+set label 2 at "4/2017", 120000 "Version 1.5" rotate by 90
 
 set key top left
 
@@ -50,5 +57,6 @@ plot \
     "$loc" u 1:($2) w filledcurve y1=0 fc rgb col_tak title "takin", \
     "$loc" u 1:($2+$4):($2) w filledcurve fc rgb col_tak2 title "takin-mag", \
     "$loc" u 1:($2+$4 + $3):($2 + $4) w filledcurve lw 2 fc rgb col_tl title "tlibs", \
-    "$loc" u 1:($2+$4 + $3+$5):($2+$4 + $3) w filledcurve lw 2 fc rgb col_tl2 title "tlibs-2", \
-    "$loc" u 1:($2+$4 + $3+$5) w lines lw 2 lc rgb col_total notitle
+    "$loc" u 1:($2+$4 + $3+$5):($2+$4 + $3) w filledcurve lw 2 fc rgb col_tl2 title "tlibs2", \
+    "$loc" u 1:($2+$4 + $3+$5 +$6):($2+$4 + $3+$5) w filledcurve lw 2 fc rgb col_plug title "plugins", \
+    "$loc" u 1:($2+$4 + $3+$5 +$6) w lines lw 2 lc rgb col_total notitle
