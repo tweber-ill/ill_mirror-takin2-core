@@ -146,6 +146,16 @@ bool TazDlg::Load(const char* pcFile)
 		return false;
 	}
 
+	if(!xml.PathExists(strXmlRoot))
+	{
+		QMessageBox::critical(this, "Error", "The selected file is not in the Takin format.");
+		return false;
+	}
+
+	if(!xml.PathExists(strXmlRoot + "sample"))
+		QMessageBox::warning(this, "Warning", "This file does not have a sample definition, attempting to load anyway.");
+
+
 	m_settings.setValue("main/last_dir", QString(strDir.c_str()));
 
 
@@ -555,6 +565,7 @@ bool TazDlg::Save()
 	mapConf[strXmlRoot + "meta/timestamp"] = tl::var_to_str<t_real>(tl::epoch<t_real>());
 	mapConf[strXmlRoot + "meta/version"] = TAKIN_VER;
 	mapConf[strXmlRoot + "meta/info"] = "Created with Takin.";
+	mapConf[strXmlRoot + "meta/module"] = "takin";
 	mapConf[strXmlRoot + "meta/user"] = pcUser;
 
 

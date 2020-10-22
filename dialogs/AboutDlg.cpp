@@ -128,6 +128,9 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrLibs << "<dt>Uses Tango icons.</dt>";
 	ostrLibs << "<dd><a href=\"http://tango.freedesktop.org\">http://tango.freedesktop.org</a><br></dd>";
 
+	ostrLibs << "<dt>Uses DejaVu fonts.</dt>";
+	ostrLibs << "<dd><a href=\"https://dejavu-fonts.github.io/\">https://dejavu-fonts.github.io</a><br></dd>";
+
 	ostrLibs << "</dl>";
 	//ostrLibs << "<p>See the LICENSES file in the Takin root directory.</p>";
 	ostrLibs << "</body></html>";

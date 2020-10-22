@@ -318,12 +318,19 @@ void ResoDlg::Save(std::map<std::string, std::string>& mapConf, const std::strin
 	mapConf[strXmlRoot + "meta/timestamp"] = tl::var_to_str<t_real_reso>(tl::epoch<t_real_reso>());
 	mapConf[strXmlRoot + "meta/version"] = TAKIN_VER;
 	mapConf[strXmlRoot + "meta/info"] = "Created with Takin/Reso.";
+	mapConf[strXmlRoot + "meta/module"] = "takin/res";
 	mapConf[strXmlRoot + "meta/user"] = pcUser;
 }
 
 
 void ResoDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 {
+	if(!xml.PathExists(strXmlRoot + "reso"))
+	{
+		QMessageBox::critical(this, "Error", "Cannot load the selected file as is does not seem to be a Takin/Resolution file.");
+		return;
+	}
+
 	bool bOldDontCalc = m_bDontCalc;
 	m_bDontCalc = 1;
 

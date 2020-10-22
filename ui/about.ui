@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>562</height>
+    <width>564</width>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,7 +56,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="labelVersion">
          <property name="text">
-          <string>Version 1</string>
+          <string>Version 2</string>
          </property>
         </widget>
        </item>
@@ -129,7 +129,7 @@
        <item row="7" column="0">
         <widget class="QLabel" name="labelYears">
          <property name="text">
-          <string>2014 - 2017</string>
+          <string>2014 - 2020</string>
          </property>
         </widget>
        </item>
