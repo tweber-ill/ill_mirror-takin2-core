@@ -11,14 +11,14 @@ FILE=res/icons/takin.svg
 
 
 echo "svg -> png (512)"
-convert -resize 512x512 -background none -alpha on -transparent-color white $FILE ${FILE%\.svg}.png
+convert -resize 512x512 -antialias -channel rgba -background "#ffffff00" -alpha background -transparent "#ffffffff" $FILE ${FILE%\.svg}.png
 
 echo "png -> icns"
 makeicns -in ${FILE%\.svg}.png -out ${FILE%\.svg}.icns
 
 
 echo "svg -> png (128)"
-convert -resize 128x128 -background none -alpha on -transparent-color white $FILE ${FILE%\.svg}.png
+convert -resize 128x128 -antialias -channel rgba -background "#ffffff00" -alpha background -transparent "#ffffffff" $FILE ${FILE%\.svg}.png
 
 echo "png -> ico"
 convert ${FILE%\.svg}.png ${FILE%\.svg}.ico
