@@ -74,6 +74,12 @@ bool TASReso::LoadLattice(const char* pcXmlFile)
 		return false;
 	}
 
+	if(!xml.PathExists(strXmlRoot + "sample") || !xml.PathExists(strXmlRoot + "plane"))
+	{
+		tl::log_err("File \"", pcXmlFile, "\" does not contain any sample or scattering plane information.");
+		return false;
+	}
+
 	t_real a = xml.Query<t_real>((strXmlRoot + "sample/a").c_str(), 0.);
 	t_real b = xml.Query<t_real>((strXmlRoot + "sample/b").c_str(), 0.);
 	t_real c = xml.Query<t_real>((strXmlRoot + "sample/c").c_str(), 0.);
@@ -113,6 +119,13 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 		tl::log_err("Cannot load resolution file \"", pcXmlFile, "\".");
 		return false;
 	}
+
+	if(!xml.PathExists(strXmlRoot + "reso"))
+	{
+		tl::log_err("File \"", pcXmlFile, "\" does not contain any instrument or resolution information.");
+		return false;
+	}
+
 
 	// CN
 	m_reso.mono_d = xml.Query<t_real>((strXmlRoot + "reso/mono_d").c_str(), 0.) * angs;
