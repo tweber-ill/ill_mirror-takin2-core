@@ -17,7 +17,27 @@
 		free parameters in an S(q,E) model using a Monte-Carlo convolution approach.
 		The S(q,E) model is fitted to one or more given measurement data files.</p>
 
-		<p>The fitter is called on the command-line by: "convofit my_fit.job"
+		<p>The convolution fitter can be used either directly form the GUI or alternatively
+		from the command line.</p>
+
+
+	<h3>GUI Version</h3>
+		<p>If a simulation has already been set up <a href="convo.html">in the "Convolution" dialog</a>,
+		a resolution convolution fit can simply be performed by designating S(q,E) model variables as
+		open fit parameters:<p>
+		
+		<p>(1) Click on the "Parameters..." button next to the "Model Source" selection
+		and tick the "Fit" checkbox for each parameter you want to use in the fit.</p>
+
+		<p>(2) The value of the parameter will be used as initial guess, additionally a non-zero 
+		error has to be assigned to each fit parameter to serve as fitting uncertainty.
+		Optionally, the range of the fitting region can be limited in the "Limits" column.</p>
+
+		<p>(3) Once the parameters are set up, click on "Start Fit".</p>
+
+
+	<h3>Command Line Version</h3>
+		<p>The fitter is called on the command line by: "takin --convofit my_fit.job".
 		The input job file "my_fit.job" in this example has the following structure:</p>
 
 		<p>Calling "convofit" without command-line arguments shows its global options.</p>
