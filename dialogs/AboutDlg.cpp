@@ -231,7 +231,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 
 
 
-	std::string strLicensesFile = find_resource("LICENSES");
+	std::string strLicensesFile = find_resource("LICENSES.txt");
 	std::ifstream ifstrLicenses(strLicensesFile);
 	std::string strLicenses;
 	while(ifstrLicenses)
@@ -244,7 +244,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 
 
 
-	std::string strLitFile = find_resource("LITERATURE");
+	std::string strLitFile = find_resource("LITERATURE.txt");
 	std::ifstream ifstrLit(strLitFile);
 	std::string strLit;
 	while(ifstrLit)

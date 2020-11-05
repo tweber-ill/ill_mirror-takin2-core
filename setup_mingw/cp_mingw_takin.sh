@@ -19,10 +19,7 @@ mkdir -p ${INSTDIR}
 
 # main programs
 cp -v bin/*.exe		${INSTDIR}/
-cp -v COPYING		${INSTDIR}/
-cp -v LICENSES		${INSTDIR}/
-cp -v LITERATURE	${INSTDIR}/
-cp -v AUTHORS		${INSTDIR}/
+cp -v *.txt		${INSTDIR}/
 
 
 # examples

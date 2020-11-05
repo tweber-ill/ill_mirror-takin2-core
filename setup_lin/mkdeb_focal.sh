@@ -41,10 +41,7 @@ cp -v bin/takinmod_jl		${INSTDIR}/usr/local/bin
 
 cp -rv res/*			${INSTDIR}/usr/local/share/takin/res/
 cp -rv doc/* 			${INSTDIR}/usr/local/share/takin/res/doc/
-cp -v COPYING			${INSTDIR}/usr/local/share/takin
-cp -v LICENSES			${INSTDIR}/usr/local/share/takin
-cp -v LITERATURE		${INSTDIR}/usr/local/share/takin
-cp -v AUTHORS			${INSTDIR}/usr/local/share/takin
+cp -v *.txt			${INSTDIR}/usr/local/share/takin
 cp -v setup_lin/takin.desktop	${INSTDIR}/usr/share/applications
 cp -v /usr/local/lib/libMinuit2.so ${INSTDIR}/usr/local/lib
 

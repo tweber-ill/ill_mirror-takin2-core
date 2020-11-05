@@ -113,10 +113,7 @@ cp -v setup_mac/Info.plist "${PRG}/Contents/"
 cp -rv data/res "${PRG}/Contents/"
 cp -rv doc/* "${PRG}/Contents/res/doc/"
 cp -v data/res/icons/takin.icns "${PRG}/Contents/Resources/"
-cp -v AUTHORS "${PRG}/Contents/Resources/"
-cp -v LICENSE "${PRG}/Contents/Resources/"
-cp -v LICENSES "${PRG}/Contents/Resources/"
-cp -v LITERATURE "${PRG}/Contents/Resources/"
+cp -v *.txt "${PRG}/Contents/Resources/"
 # -----------------------------------------------------------------------------
 
 
