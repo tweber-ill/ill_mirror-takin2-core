@@ -308,7 +308,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	decltype(scan.vecCts) vecCtsNew, vecMonNew, vecCtsErrNew, vecMonErrNew;
 	decltype(scan.vechklE) vechklENew;
 
-	for(std::size_t i=0; i<scan.vecX.size(); ++i)
+	for(std::size_t i=0; i<iNumPts; ++i)
 	{
 		// below lower limit?
 		if(filter.dLower && scan.vecX[i] <= *filter.dLower)
@@ -323,12 +323,25 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 			const std::string& colName = filter.colEquals->first;
 			const std::string& rowVal = filter.colEquals->second;
 
-			rex::regex rx(strRegex, rex::regex::ECMAScript | rex::regex_constants::icase);
+			rex::regex rxCol(colName, rex::regex::ECMAScript | rex::regex_constants::icase);
+			rex::regex rxVal(rowVal, rex::regex::ECMAScript | rex::regex_constants::icase);
+
 			rex::smatch matchCol, matchVal;
-			if(rex::regex_match(colName, matchCol, rx)
+
+			const tl::FileInstrBase<t_real_sc>::t_vecColNames& colNames
+				= pInstr->GetColNames();
+			for(std::size_t col=0; col<colNames.size(); ++col)
 			{
-				if(!rex::regex_match(rowVal, m, rx))
-					continue;
+				// get matching column
+				if(rex::regex_match(colNames[col], matchCol, rxCol))
+				{
+					const std::vector<t_real_sc>& filterCol = pInstr->GetCol(colNames[col]);
+
+					if(!rex::regex_match(tl::var_to_str(filterCol[i]), matchVal, rxVal))
+						continue;
+
+					break;
+				}
 			}
 		}
 
