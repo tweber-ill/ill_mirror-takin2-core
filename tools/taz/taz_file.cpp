@@ -835,16 +835,21 @@ bool TazDlg::ImportCIFFile(const QString& strFile)
 }
 
 
-static inline std::string get_ciftool_version()
+static inline std::pair<std::string, std::string> get_ciftool_version()
 {
-	tl::PipeProc<char> proc((g_strCifTool + " 2>/dev/null").c_str(), false);
+	std::string cifbin = find_program_binary("takin_cif2xml");
+	if(cifbin == "")
+		return std::make_pair("", cifbin);
+
+	tl::PipeProc<char> proc((cifbin + " 2>/dev/null").c_str(), false);
 	if(!proc.IsReady())
-		return "";
+		return std::make_pair("", cifbin);
 
 	std::string strVer;
 	std::getline(proc.GetIstr(), strVer);
 	tl::trim(strVer);
-	return strVer;
+
+	return std::make_pair(strVer, cifbin);
 }
 
 
@@ -863,7 +868,9 @@ bool TazDlg::ImportCIF(const char* pcFile)
 			"The external Cif2Xml tool is not correctly installed. "
 			"Please specify its path in the program settings.";
 
-		std::string strCifVer = get_ciftool_version();
+		std::string strCifVer;
+		std::string strCifBin;
+		std::tie(strCifVer, strCifBin) = get_ciftool_version();
 		if(strCifVer == "")
 		{
 			QMessageBox::critical(this, "Error", strToolNotFound.c_str());
@@ -873,7 +880,7 @@ bool TazDlg::ImportCIF(const char* pcFile)
 
 		// open pipe to external cif2xml tool
 		tl::log_info("Invoking ", strCifVer);
-		tl::PipeProc<char> proc((g_strCifTool + " 2>/dev/null \"" + strFile1 + "\"").c_str(), false);
+		tl::PipeProc<char> proc((strCifBin + " 2>/dev/null \"" + strFile1 + "\"").c_str(), false);
 		if(!proc.IsReady())
 		{
 			QMessageBox::critical(this, "Error", strToolNotFound.c_str());

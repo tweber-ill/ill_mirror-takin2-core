@@ -46,7 +46,6 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 	connect(btnGLFont, &QAbstractButton::clicked, this, &SettingsDlg::SelectGLFont);
 	connect(btnGfxFont, &QAbstractButton::clicked, this, &SettingsDlg::SelectGfxFont);
 	connect(btnGenFont, &QAbstractButton::clicked, this, &SettingsDlg::SelectGenFont);
-	connect(btnCif, &QAbstractButton::clicked, this, &SettingsDlg::SelectCifTool);
 	connect(btnGpl, &QAbstractButton::clicked, this, &SettingsDlg::SelectGplTool);
 
 	m_vecEdits =
@@ -115,7 +114,6 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 		t_tupEdit("main/font_gen", g_fontGen.toString().toStdString().c_str(), editGenFont),
 
 		// external tools
-		t_tupEdit("tools/cif2xml", "takin_cif2xml", editCif),
 		t_tupEdit("tools/gpl", "gnuplot", editGpl)
 	};
 
@@ -353,9 +351,6 @@ void SettingsDlg::SetGlobals() const
 
 
 	// external tools
-	if(editCif->text().length() != 0)
-		g_strCifTool = find_program_binary(editCif->text().toStdString());
-
 	if(editGpl->text().length() != 0)
 		g_strGplTool = find_program_binary(editGpl->text().toStdString());
 
@@ -435,22 +430,6 @@ void SettingsDlg::SelectGenFont()
 		g_fontGen = fontNew;
 		editGenFont->setText(fontNew.toString());
 	}
-}
-
-
-void SettingsDlg::SelectCifTool()
-{
-	QFileDialog::Option fileopt = QFileDialog::Option(0);
-	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
-		fileopt = QFileDialog::DontUseNativeDialog;
-
-	QString strFile = QFileDialog::getOpenFileName(this,
-		"Select Cif2Xml Tool...", "",
-		"Executable Files (* *.exe *.EXE)", nullptr, fileopt);
-	if(strFile == "")
-		return;
-
-	editCif->setText(strFile);
 }
 
 

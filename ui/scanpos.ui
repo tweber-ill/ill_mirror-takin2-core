@@ -18,10 +18,10 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="margin">
-    <number>6</number>
+    <number>4</number>
    </property>
    <property name="spacing">
-    <number>2</number>
+    <number>4</number>
    </property>
    <item row="1" column="1" colspan="2">
     <widget class="QLineEdit" name="editPlane">
@@ -32,6 +32,12 @@
    </item>
    <item row="4" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Scan Positions:</string>
      </property>
@@ -56,6 +62,12 @@
    </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Bragg Peak:</string>
      </property>
@@ -73,6 +85,12 @@
    </item>
    <item row="6" column="0" colspan="2">
     <widget class="QLabel" name="label_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Gnuplot Script:</string>
      </property>
@@ -95,6 +113,12 @@ Scan...</string>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Scattering Plane:</string>
      </property>

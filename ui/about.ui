@@ -122,7 +122,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="labelWritten">
          <property name="text">
-          <string>Written by Tobias Weber</string>
+          <string>Written by Tobias Weber &lt;tobias.weber@tum.de&gt;</string>
          </property>
         </widget>
        </item>

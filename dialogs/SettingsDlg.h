@@ -63,7 +63,6 @@ class SettingsDlg : public QDialog, Ui::SettingsDlg
 		void SelectGfxFont();
 		void SelectGenFont();
 
-		void SelectCifTool();
 		void SelectGplTool();
 };
 

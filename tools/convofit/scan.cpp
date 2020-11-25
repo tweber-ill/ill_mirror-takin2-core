@@ -337,7 +337,8 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 				{
 					const std::vector<t_real_sc>& filterCol = pInstr->GetCol(colNames[col]);
 
-					if(!rex::regex_match(tl::var_to_str(filterCol[i]), matchVal, rxVal))
+					std::string rowVal = tl::var_to_str(filterCol[i]);
+					if(!rex::regex_match(rowVal, matchVal, rxVal))
 						continue;
 
 					break;
