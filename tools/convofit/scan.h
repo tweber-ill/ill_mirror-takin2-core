@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/optional.hpp>
 
 #include "tlibs/math/math.h"
 #include "tlibs/phys/neutrons.h"
@@ -44,11 +45,9 @@ struct Plane
 
 struct Filter
 {
-	bool bLower = 0;
-	bool bUpper = 0;
-
-	t_real_sc dLower = 0.;
-	t_real_sc dUpper = 0.;
+	boost::optional<t_real_sc> dLower;
+	boost::optional<t_real_sc> dUpper;
+	boost::optional<std::pair<std::string, std::string>> colEquals;
 };
 
 

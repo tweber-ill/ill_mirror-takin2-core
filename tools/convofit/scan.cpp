@@ -11,6 +11,14 @@
 
 #include <fstream>
 
+#ifndef USE_BOOST_REX
+	#include <regex>
+	namespace rex = ::std;
+#else
+	#include <boost/tr1/regex.hpp>
+	namespace rex = ::boost;
+#endif
+
 
 /**
  * saving a scan file
@@ -68,7 +76,8 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	if(!vecFiles.size()) return 0;
 	tl::log_info("Loading \"", vecFiles[0], "\".");
 
-	std::unique_ptr<tl::FileInstrBase<t_real_sc>> pInstr(tl::FileInstrBase<t_real_sc>::LoadInstr(vecFiles[0].c_str()));
+	std::unique_ptr<tl::FileInstrBase<t_real_sc>>
+		pInstr(tl::FileInstrBase<t_real_sc>::LoadInstr(vecFiles[0].c_str()));
 	if(!pInstr)
 	{
 		tl::log_err("Cannot load \"", vecFiles[0], "\".");
@@ -78,7 +87,8 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	for(std::size_t iFile=1; iFile<vecFiles.size(); ++iFile)
 	{
 		tl::log_info("Loading \"", vecFiles[iFile], "\" for merging.");
-		std::unique_ptr<tl::FileInstrBase<t_real_sc>> pInstrM(tl::FileInstrBase<t_real_sc>::LoadInstr(vecFiles[iFile].c_str()));
+		std::unique_ptr<tl::FileInstrBase<t_real_sc>>
+			pInstrM(tl::FileInstrBase<t_real_sc>::LoadInstr(vecFiles[iFile].c_str()));
 		if(!pInstrM)
 		{
 			tl::log_err("Cannot load \"", vecFiles[iFile], "\".");
@@ -293,7 +303,6 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	}
 
 
-
 	// filter
 	decltype(scan.vecX) vecXNew;
 	decltype(scan.vecCts) vecCtsNew, vecMonNew, vecCtsErrNew, vecMonErrNew;
@@ -301,8 +310,27 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 
 	for(std::size_t i=0; i<scan.vecX.size(); ++i)
 	{
-		if(filter.bLower && scan.vecX[i] <= filter.dLower) continue;
-		if(filter.bUpper && scan.vecX[i] >= filter.dUpper) continue;
+		// below lower limit?
+		if(filter.dLower && scan.vecX[i] <= *filter.dLower)
+			continue;
+		// above upper limit?
+		if(filter.dUpper && scan.vecX[i] >= *filter.dUpper)
+			continue;
+
+		// keep row if the value in the column equals the given one
+		if(filter.colEquals)
+		{
+			const std::string& colName = filter.colEquals->first;
+			const std::string& rowVal = filter.colEquals->second;
+
+			rex::regex rx(strRegex, rex::regex::ECMAScript | rex::regex_constants::icase);
+			rex::smatch matchCol, matchVal;
+			if(rex::regex_match(colName, matchCol, rx)
+			{
+				if(!rex::regex_match(rowVal, m, rx))
+					continue;
+			}
+		}
 
 		vecXNew.push_back(scan.vecX[i]);
 		vecCtsNew.push_back(scan.vecCts[i]);
@@ -312,7 +340,6 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 
 		for(int ihklE=0; ihklE<4; ++ihklE)
 			vechklENew[ihklE].push_back(scan.vechklE[ihklE][i]);
-
 	}
 
 	scan.vecX = std::move(vecXNew);
@@ -323,7 +350,6 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 
 	for(int ihklE=0; ihklE<4; ++ihklE)
 		scan.vechklE[ihklE] = std::move(vechklENew[ihklE]);
-
 
 	return true;
 }

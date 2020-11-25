@@ -187,10 +187,10 @@ bool Convofit::run_job(const std::string& _strJob)
 	}
 
 	Filter filter;
-	filter.bLower = prop.Exists("input/filter_lower");
-	filter.bUpper = prop.Exists("input/filter_upper");
-	if(filter.bLower) filter.dLower = prop.QueryAndParse<t_real>("input/filter_lower", 0);
-	if(filter.bUpper) filter.dUpper = prop.QueryAndParse<t_real>("input/filter_upper", 0);
+	if(prop.Exists("input/filter_lower"))
+		filter.dLower = prop.QueryAndParse<t_real>("input/filter_lower", 0);
+	if(prop.Exists("input/filter_upper"))
+		filter.dUpper = prop.QueryAndParse<t_real>("input/filter_upper", 0);
 
 
 	// --------------------------------------------------------------------
