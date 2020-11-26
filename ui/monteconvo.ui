@@ -674,12 +674,15 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QComboBox" name="comboFilterCol">
+           <widget class="QLineEdit" name="editFilterCol">
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="editable">
-             <bool>true</bool>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
            </widget>
           </item>
@@ -1819,7 +1822,7 @@
   <tabstop>checkScan</tabstop>
   <tabstop>editScan</tabstop>
   <tabstop>btnBrowseScan</tabstop>
-  <tabstop>comboFilterCol</tabstop>
+  <tabstop>editFilterCol</tabstop>
   <tabstop>editFilterVal</tabstop>
   <tabstop>comboAlgo</tabstop>
   <tabstop>comboFixedK</tabstop>
@@ -2026,7 +2029,7 @@
   <connection>
    <sender>checkScan</sender>
    <signal>toggled(bool)</signal>
-   <receiver>comboFilterCol</receiver>
+   <receiver>editFilterCol</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

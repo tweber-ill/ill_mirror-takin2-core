@@ -54,14 +54,21 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	m_vecIntSpinBoxes = { spinNeutrons, spinSampleSteps, spinStepCnt,
 		spinStrategy, spinMaxCalls };
 	m_vecIntSpinNames = { "monteconvo/neutron_count", "monteconvo/sample_step_count", "monteconvo/step_count",
-	"convofit/strategy", "convofit/max_calls"
-	};
+		"convofit/strategy", "convofit/max_calls" };
 
-	m_vecEditBoxes = { editCrys, editRes, editSqw, editScan, editScale, editSlope, editOffs,
-		editCounter, editMonitor, editTemp, editField, editAutosave,
+	m_vecEditBoxes = {
+		editFilterCol, editFilterVal,
+		editCrys, editRes, editSqw, editScan,
+		editScale, editSlope, editOffs,
+		editCounter, editMonitor,
+		editTemp, editField,
+		editAutosave,
 	};
-	m_vecEditNames = { "monteconvo/crys", "monteconvo/instr", "monteconvo/sqw_conf",
-		"monteconvo/scanfile", "monteconvo/S_scale", "monteconvo/S_slope", "monteconvo/S_offs",
+	m_vecEditNames = {
+		"monteconvo/filter_col", "monteconvo/filter_val",
+		"monteconvo/crys", "monteconvo/instr",
+		"monteconvo/sqw_conf", "monteconvo/scanfile",
+		"monteconvo/S_scale", "monteconvo/S_slope", "monteconvo/S_offs",
 		"convofit/counter", "convofit/monitor",
 		"convofit/temp_override", "convofit/field_override",
 		"monteconvo/autosave",
@@ -330,6 +337,10 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	connect(comboSqw, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ConvoDlg::SqwModelChanged);
 	connect(editSqw, &QLineEdit::textChanged, this, &ConvoDlg::createSqwModel);
 	connect(editScan, &QLineEdit::textChanged, this, &ConvoDlg::scanFileChanged);
+	connect(editFilterCol, &QLineEdit::textChanged, this, [this]() -> void
+	{ scanFileChanged(editScan->text()); });
+	connect(editFilterVal, &QLineEdit::textChanged, this, [this]() -> void
+	{ scanFileChanged(editScan->text()); });
 
 	connect(editScale, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
 	connect(editSlope, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
@@ -348,7 +359,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	for(QDoubleSpinBox* pSpin : {spinStartH, spinStartK, spinStartL, spinStartE,
 		spinStopH, spinStopK, spinStopL, spinStopE})
 	{
-		connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), 
+		connect(pSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
 			this, &ConvoDlg::UpdateCurFavPos);
 	}
 
@@ -631,7 +642,15 @@ void ConvoDlg::scanFileChanged(const QString& qstrFile)
 	if(!checkScan->isChecked())
 		return;
 
-	if(!load_scan_file(qstrFile.toStdString(), m_scan, checkFlip->isChecked()))
+	Filter filter;
+	if(editFilterCol->text() != "")
+	{
+		filter.colEquals = std::make_pair(
+			editFilterCol->text().toStdString(),
+			editFilterVal->text().toStdString());
+	}
+
+	if(!load_scan_file(qstrFile.toStdString(), m_scan, checkFlip->isChecked(), filter))
 	{
 		tl::log_err("Cannot load scan(s).");
 		return;

@@ -28,7 +28,8 @@ ResoFocus get_reso_focus(int iFocMono, int iFocAna)
 
 
 
-bool load_scan_file(const std::string& _strFile, Scan& scan, bool bFlipAxis)
+bool load_scan_file(const std::string& _strFile, Scan& scan,
+	bool bFlipAxis, const Filter& filter)
 {
 	std::string strFile = _strFile;
 	tl::trim(strFile);
@@ -39,9 +40,7 @@ bool load_scan_file(const std::string& _strFile, Scan& scan, bool bFlipAxis)
 	tl::get_tokens<std::string, std::string>(strFile, ";", vecFiles);
 	std::for_each(vecFiles.begin(), vecFiles.end(), [](std::string& str){ tl::trim(str); });
 
-	Filter filter;
 	scan = Scan();
-
 	bool bLoaded = ::load_file(vecFiles, scan, 1, filter, bFlipAxis);
 
 	// if file was not found, alternatively look in global paths

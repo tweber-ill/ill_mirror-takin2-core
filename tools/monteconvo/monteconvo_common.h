@@ -23,9 +23,9 @@
  * determines the x axis of the scan
  */
 template<class t_real = double>
-std::tuple<bool, int, std::string, std::vector<std::vector<t_real>>> 
+std::tuple<bool, int, std::string, std::vector<std::vector<t_real>>>
 get_scan_axis(bool bIncludeE, int iScanAxis, std::size_t num_steps, t_real eps,
-    t_real startH, t_real endH, t_real startK, t_real endK, t_real startL, t_real endL, 
+    t_real startH, t_real endH, t_real startK, t_real endK, t_real startL, t_real endL,
     t_real startE, t_real endE)
 {
 	std::vector<t_real> vecH = tl::linspace<t_real,t_real>(startH, endH, num_steps);
@@ -74,7 +74,8 @@ get_scan_axis(bool bIncludeE, int iScanAxis, std::size_t num_steps, t_real eps,
 extern ResoFocus get_reso_focus(int iFocMono, int iFocAna);
 
 
-extern bool load_scan_file(const std::string& _strFile, Scan& scan, bool bFlipAxis=false);
+extern bool load_scan_file(const std::string& _strFile, Scan& scan,
+	bool bFlipAxis=false, const Filter& filter=Filter());
 
 
 #endif

@@ -304,6 +304,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 
 
 	// filter
+	decltype(scan.vecPoints) vecPointsNew;
 	decltype(scan.vecX) vecXNew;
 	decltype(scan.vecCts) vecCtsNew, vecMonNew, vecCtsErrNew, vecMonErrNew;
 	decltype(scan.vechklE) vechklENew;
@@ -318,34 +319,39 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 			continue;
 
 		// keep row if the value in the column equals the given one
-		if(filter.colEquals)
+		if(filter.colEquals && filter.colEquals->first!="" && filter.colEquals->second!="")
 		{
+			bool skip_pt = 0;
+
 			const std::string& colName = filter.colEquals->first;
-			const std::string& rowVal = filter.colEquals->second;
-
 			rex::regex rxCol(colName, rex::regex::ECMAScript | rex::regex_constants::icase);
-			rex::regex rxVal(rowVal, rex::regex::ECMAScript | rex::regex_constants::icase);
-
-			rex::smatch matchCol, matchVal;
+			rex::smatch matchCol;
 
 			const tl::FileInstrBase<t_real_sc>::t_vecColNames& colNames
 				= pInstr->GetColNames();
 			for(std::size_t col=0; col<colNames.size(); ++col)
 			{
-				// get matching column
+				// get first matching column
 				if(rex::regex_match(colNames[col], matchCol, rxCol))
 				{
 					const std::vector<t_real_sc>& filterCol = pInstr->GetCol(colNames[col]);
 
-					std::string rowVal = tl::var_to_str(filterCol[i]);
-					if(!rex::regex_match(rowVal, matchVal, rxVal))
-						continue;
+					const std::string& rowVal = filter.colEquals->second;
+					rex::regex rxVal(rowVal, rex::regex::ECMAScript | rex::regex_constants::icase);
+					rex::smatch matchVal;
+
+					std::string curRowVal = tl::var_to_str(filterCol[i]);
+					skip_pt = !rex::regex_match(curRowVal, matchVal, rxVal);
 
 					break;
 				}
 			}
+
+			if(skip_pt)
+				continue;
 		}
 
+		vecPointsNew.push_back(scan.vecPoints[i]);
 		vecXNew.push_back(scan.vecX[i]);
 		vecCtsNew.push_back(scan.vecCts[i]);
 		vecMonNew.push_back(scan.vecMon[i]);
@@ -356,6 +362,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 			vechklENew[ihklE].push_back(scan.vechklE[ihklE][i]);
 	}
 
+	scan.vecPoints = std::move(vecPointsNew);
 	scan.vecX = std::move(vecXNew);
 	scan.vecCts = std::move(vecCtsNew);
 	scan.vecMon = std::move(vecMonNew);
