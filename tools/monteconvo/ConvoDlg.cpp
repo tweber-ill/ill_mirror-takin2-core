@@ -51,10 +51,15 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 		"convofit/tolerance"
 	};
 
-	m_vecIntSpinBoxes = { spinNeutrons, spinSampleSteps, spinStepCnt,
-		spinStrategy, spinMaxCalls };
-	m_vecIntSpinNames = { "monteconvo/neutron_count", "monteconvo/sample_step_count", "monteconvo/step_count",
-		"convofit/strategy", "convofit/max_calls" };
+	m_vecIntSpinBoxes = { spinNeutrons, spinSampleSteps,
+		spinStepCnt,
+		spinStrategy, spinMaxCalls
+	};
+	m_vecIntSpinNames = {
+		"monteconvo/neutron_count", "monteconvo/sample_step_count",
+		"monteconvo/step_count",
+		"convofit/strategy", "convofit/max_calls"
+	};
 
 	m_vecEditBoxes = {
 		editFilterCol, editFilterVal,

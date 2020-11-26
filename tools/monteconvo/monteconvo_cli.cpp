@@ -78,6 +78,7 @@ struct ConvoConfig
 	std::string counter{}, monitor{};
 	std::string temp_override{}, field_override{};
 	std::string autosave{};
+	std::string filter_col{}, filter_val{};
 };
 
 
@@ -147,6 +148,8 @@ static ConvoConfig load_config(const tl::Prop<std::string>& xml)
 	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/field_override"); if(osVal) cfg.field_override = *osVal;
 	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/autosave"); if(osVal) cfg.autosave = *osVal;
 	//osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/sqw_params"); if(osVal) cfg.sqw_params = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/filter_col"); if(osVal) cfg.filter_col = *osVal;
+	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/filter_val"); if(osVal) cfg.filter_val = *osVal;
 
 	return cfg;
 }
@@ -196,11 +199,14 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	if(!load_sqw_params(pSqw.get(), xml, g_strXmlRoot+"monteconvo/"))
 		return false;
 
+	Filter filter;
+	if(cfg.filter_col != "")
+		filter.colEquals = std::make_pair(cfg.filter_col, cfg.filter_val);
 
 	Scan scan;
 	if(cfg.has_scanfile)
 	{
-		if(!load_scan_file(cfg.scanfile, scan, cfg.flip_coords))
+		if(!load_scan_file(cfg.scanfile, scan, cfg.flip_coords, filter))
 		{
 			tl::log_err("Cannot load scan(s) \"", cfg.scanfile, "\".");
 			return false;
