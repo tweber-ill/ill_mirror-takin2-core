@@ -44,6 +44,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Start the resolution convolution.</string>
+     </property>
      <property name="text">
       <string>Start Simulation</string>
      </property>
@@ -282,7 +285,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>MC steps for sample convolution (only for Eckold-Sobolev algorithm)</string>
+             <string>Monte-Carlo steps for sample convolution (only for Eckold-Sobolev algorithm)</string>
             </property>
             <property name="minimum">
              <number>1</number>
@@ -353,7 +356,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>MC steps for overall convolution</string>
+             <string>Monte-Carlo steps for overall convolution</string>
             </property>
             <property name="suffix">
              <string/>
@@ -387,6 +390,9 @@
           </item>
           <item row="3" column="1">
            <widget class="QComboBox" name="comboAxis">
+            <property name="toolTip">
+             <string>Automatic or manual selection of scan axis.</string>
+            </property>
             <item>
              <property name="text">
               <string>Automatic</string>
@@ -429,6 +435,9 @@
           </item>
           <item row="3" column="4" colspan="2">
            <widget class="QComboBox" name="comboAxis2">
+            <property name="toolTip">
+             <string>Automatic or manual selection of second scan axis for 2D maps.</string>
+            </property>
             <item>
              <property name="text">
               <string>Automatic</string>
@@ -576,8 +585,21 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QLineEdit" name="editCrys"/>
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelFilter">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Filter Scan:</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="3">
            <widget class="QToolButton" name="btnBrowseCrys">
@@ -609,7 +631,14 @@
            </widget>
           </item>
           <item row="1" column="1" colspan="2">
-           <widget class="QLineEdit" name="editRes"/>
+           <widget class="QLineEdit" name="editRes">
+            <property name="toolTip">
+             <string>Enter an instrument file saved from the Takin &quot;Resolution Parameters&quot; dialog.</string>
+            </property>
+            <property name="placeholderText">
+             <string>Takin Instrument File</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="3">
            <widget class="QToolButton" name="btnBrowseRes">
@@ -639,6 +668,12 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="toolTip">
+             <string>Enter a TAS scan data file.</string>
+            </property>
+            <property name="placeholderText">
+             <string>Scan Data File</string>
+            </property>
            </widget>
           </item>
           <item row="2" column="3">
@@ -657,22 +692,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="labelFilter">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Filter Scan:</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="1">
            <widget class="QLineEdit" name="editFilterCol">
             <property name="enabled">
@@ -683,6 +702,15 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Enter a column name to filter, e.g. &quot;PAL&quot;.</string>
+            </property>
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>Column</string>
             </property>
            </widget>
           </item>
@@ -696,6 +724,22 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Enter the value at the chosen column to keep, e.g. &quot;2&quot;.</string>
+            </property>
+            <property name="placeholderText">
+             <string>Value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2">
+           <widget class="QLineEdit" name="editCrys">
+            <property name="toolTip">
+             <string>Enter a crystal file saved from the Takin main window.</string>
+            </property>
+            <property name="placeholderText">
+             <string>Takin Crystal File</string>
             </property>
            </widget>
           </item>
@@ -1788,6 +1832,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Stop any running jobs.</string>
+     </property>
      <property name="text">
       <string>Stop</string>
      </property>
@@ -1797,6 +1844,9 @@
     <widget class="QPushButton" name="btnStartFit">
      <property name="enabled">
       <bool>true</bool>
+     </property>
+     <property name="toolTip">
+      <string>Start the resolution convolution fit.</string>
      </property>
      <property name="text">
       <string>Start Fit</string>
