@@ -13,7 +13,6 @@
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
 
-//#include <boost/filesystem.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/python/stl_iterator.hpp>
 
