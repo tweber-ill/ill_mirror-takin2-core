@@ -13,6 +13,8 @@
 #include "tlibs/log/log.h"
 #include "tlibs/file/file.h"
 
+//#include <boost/filesystem.hpp>
+#include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/python/stl_iterator.hpp>
 
 using t_real = t_real_reso;
@@ -60,6 +62,11 @@ SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 		py::list path = py::extract<py::list>(sysdict["path"]);
 		path.append(strDir.c_str());
 		path.append(".");
+		std::string strSitePackages = // one directory above the takinmod_py binary
+			(boost::dll::program_location().parent_path().parent_path() 
+				/ "site-packages").string();
+		path.append(strSitePackages.c_str());
+		tl::log_debug("Using site-packages path: ", strSitePackages);
 
 		if(bSetScriptCWD)
 		{

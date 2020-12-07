@@ -13,9 +13,11 @@ clean_frameworks=0
 
 PRG="takin.app"
 
-PLUGIN_DIR="/usr/local/opt/qt5/plugins/"
+BIN_DIR="${PRG}/Contents/MacOS/"
 DST_DIR="${PRG}/Contents/Frameworks/"
 DST_PLUGIN_DIR="${PRG}/Contents/PlugIns/"
+DST_SITEPACKAGES_DIR="${PRG}/Contents/site-packages"
+PLUGIN_DIR="/usr/local/opt/qt5/plugins/"
 
 
 # -----------------------------------------------------------------------------
@@ -31,6 +33,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/qt5/lib/QtPrintSupport.framework"
 	"/usr/local/opt/qt5/lib/QtDBus.framework"
 	"/usr/local/opt/qwt/lib/qwt.framework"
+	"/usr/local/opt/python/Frameworks/Python.framework"
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
 	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
@@ -42,6 +45,11 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgfortran.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libquadmath.0.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgomp.1.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgcc_s.1.dylib"
+	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
 )
 
 
@@ -60,17 +68,19 @@ declare -a SRC_PLUGINS=(
 # -----------------------------------------------------------------------------
 
 
+
 # -----------------------------------------------------------------------------
 # create dirs
-mkdir -pv ${DST_DIR}
+mkdir -pv "${DST_DIR}"
 mkdir -pv "${DST_PLUGIN_DIR}/printsupport"
 mkdir -pv "${DST_PLUGIN_DIR}/imageformats"
 mkdir -pv "${DST_PLUGIN_DIR}/iconengines"
 mkdir -pv "${DST_PLUGIN_DIR}/platforms"
 mkdir -pv "${DST_PLUGIN_DIR}/platformthemes"
 mkdir -pv "${DST_PLUGIN_DIR}/styles"
-mkdir -pv "${PRG}/Contents/MacOS"
+mkdir -pv "${BIN_DIR}"
 mkdir -pv "${PRG}/Contents/Resources"
+mkdir -pv "${DST_SITEPACKAGES_DIR}"
 # -----------------------------------------------------------------------------
 
 
@@ -79,7 +89,7 @@ mkdir -pv "${PRG}/Contents/Resources"
 # copy libs
 for srclib in ${SRC_LIBS[@]}; do
 	echo -e "Copying library \"${srclib}\"..."
-	cp -rv ${srclib} ${DST_DIR}
+	cp -Lrv ${srclib} "${DST_DIR}"
 done
 
 
@@ -92,21 +102,21 @@ done
 
 
 # copy binaries
-cp -v bin/takin "${PRG}/Contents/MacOS/"
-cp -v bin/takin_cif2xml "${PRG}/Contents/MacOS/"
-cp -v bin/takin_findsg "${PRG}/Contents/MacOS/"
-cp -v bin/takin_pol "${PRG}/Contents/MacOS/"
-cp -v bin/takinmod_py "${PRG}/Contents/MacOS/"
-cp -v bin/takinmod_jl "${PRG}/Contents/MacOS/"
-cp -v bin/takin_structfact "${PRG}/Contents/MacOS/"
-cp -v bin/takin_magstructfact "${PRG}/Contents/MacOS/"
-cp -v bin/takin_scanbrowser "${PRG}/Contents/MacOS/"
-cp -v bin/takin_magsgbrowser "${PRG}/Contents/MacOS/"
-cp -v bin/takin_moldyn "${PRG}/Contents/MacOS/"
+cp -v bin/takin "${BIN_DIR}"
+cp -v bin/takin_cif2xml "${BIN_DIR}"
+cp -v bin/takin_findsg "${BIN_DIR}"
+cp -v bin/takin_pol "${BIN_DIR}"
+cp -v bin/takinmod_py "${BIN_DIR}"
+cp -v bin/takinmod_jl "${BIN_DIR}"
+cp -v bin/takin_structfact "${BIN_DIR}"
+cp -v bin/takin_magstructfact "${BIN_DIR}"
+cp -v bin/takin_scanbrowser "${BIN_DIR}"
+cp -v bin/takin_magsgbrowser "${BIN_DIR}"
+cp -v bin/takin_moldyn "${BIN_DIR}"
 
-cp -v bin/takin_convofit "${PRG}/Contents/MacOS/"
-cp -v bin/takin_convoseries "${PRG}/Contents/MacOS/"
-cp -v bin/takin_polextract "${PRG}/Contents/MacOS/"
+cp -v bin/takin_convofit "${BIN_DIR}"
+cp -v bin/takin_convoseries "${BIN_DIR}"
+cp -v bin/takin_polextract "${BIN_DIR}"
 
 
 # data files
@@ -115,6 +125,12 @@ cp -rv data/res "${PRG}/Contents/"
 cp -rv doc/* "${PRG}/Contents/res/doc/"
 cp -v data/res/icons/takin.icns "${PRG}/Contents/Resources/"
 cp -v *.txt "${PRG}/Contents/Resources/"
+
+
+# python site-packages
+cp -rv /usr/local/opt/numpy/lib/python3.9/site-packages/numpy "${DST_SITEPACKAGES_DIR}"
+cp -rv /usr/local/opt/scipy/lib/python3.9/site-packages/scipy "${DST_SITEPACKAGES_DIR}"
+#ln -sf "../site-packages" "${BIN_DIR}/site-packages"
 # -----------------------------------------------------------------------------
 
 
@@ -124,8 +140,8 @@ cp -v *.txt "${PRG}/Contents/Resources/"
 chmod -R u+rw,a+r "${DST_DIR}"
 chmod -R u+rw,a+r "${DST_PLUGIN_DIR}"
 
-find {DST_DIR} -type d -print0 | xargs -0 chmod a+x
-find {DST_PLUGIN_DIR} -type d -print0 | xargs -0 chmod a+x
+find "${DST_DIR}" -type d -print0 | xargs -0 chmod a+x
+find "${DST_PLUGIN_DIR}" -type d -print0 | xargs -0 chmod a+x
 # -----------------------------------------------------------------------------
 
 

@@ -11,9 +11,12 @@ PRG="takin.app"
 
 TOOL=install_name_tool
 STRIP=strip
+
 QT_VER=$(ls /usr/local/Cellar/qt)
+PY_VER=3.9
 
 echo -e "Qt version: ${QT_VER}"
+echo -e "Py version: ${PY_VER}"
 
 
 # files whose linkage is to be changed
@@ -28,25 +31,7 @@ declare -a filestochange=(
 	"${PRG}/Contents/Frameworks/QtSvg.framework/Versions/5/QtSvg"
 	"${PRG}/Contents/Frameworks/QtXml.framework/Versions/5/QtXml"
 	"${PRG}/Contents/Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"${PRG}/Contents/PlugIns/printsupport/libcocoaprintersupport.dylib"
-	"${PRG}/Contents/PlugIns/imageformats/libqsvg.dylib"
-	"${PRG}/Contents/PlugIns/imageformats/libqicns.dylib"
-	"${PRG}/Contents/PlugIns/imageformats/libqjpeg.dylib"
-	"${PRG}/Contents/PlugIns/iconengines/libqsvgicon.dylib"
-	"${PRG}/Contents/PlugIns/styles/libqmacstyle.dylib"
-	"${PRG}/Contents/PlugIns/platforms/libqcocoa.dylib"
-	"${PRG}/Contents/PlugIns/platforms/libqminimal.dylib"
 	"${PRG}/Contents/Frameworks/qwt.framework/Versions/6/qwt"
-	"${PRG}/Contents/Frameworks/libfreetype.6.dylib"
-	"${PRG}/Contents/Frameworks/libpng16.16.dylib"
-	"${PRG}/Contents/Frameworks/libjpeg.9.dylib"
-	"${PRG}/Contents/Frameworks/libtiff.5.dylib"
-	"${PRG}/Contents/Frameworks/libboost_iostreams-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_filesystem-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_python39-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_regex-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_system-mt.dylib"
-	"${PRG}/Contents/Frameworks/libboost_program_options-mt.dylib"
 	"${PRG}/Contents/MacOS/takin"
 	"${PRG}/Contents/MacOS/takin_cif2xml"
 	"${PRG}/Contents/MacOS/takin_findsg"
@@ -120,6 +105,14 @@ declare -a changefrom=(
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/jpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
+	"/usr/local/opt/python@${PY_VER}/Frameworks/Python.framework/Versions/${PY_VER}/Python"
+	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgfortran.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgomp.1.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libquadmath.0.dylib"
+	"/usr/local/Cellar/gcc/10.2.0/lib/gcc/10/libquadmath.0.dylib"
+	"/usr/local/opt/gcc/lib/gcc/10/libgcc_s.1.dylib"
+	"/usr/local/lib/gcc/10/libgcc_s.1.dylib"
 )
 
 
@@ -178,13 +171,29 @@ declare -a changeto=(
 	"@executable_path/../Frameworks/libjpeg.9.dylib"
 	"@executable_path/../Frameworks/libjpeg.9.dylib"
 	"@executable_path/../Frameworks/libtiff.5.dylib"
+	"@executable_path/../Frameworks/Python.framework/Versions/${PY_VER}/Python"
+	"@executable_path/../Frameworks/libopenblas.0.dylib"
+	"@executable_path/../Frameworks/libgfortran.5.dylib"
+	"@executable_path/../Frameworks/libgomp.1.dylib"
+	"@executable_path/../Frameworks/libquadmath.0.dylib"
+	"@executable_path/../Frameworks/libquadmath.0.dylib"
+	"@executable_path/../Frameworks/libgcc_s.1.dylib"
+	"@executable_path/../Frameworks/libgcc_s.1.dylib"
 )
 
 
 CNT=$(expr ${#changefrom[*]} - 1)
 
 
-for cfile in ${filestochange[@]}; do
+function fix_name()
+{
+	cfile=$1
+
+	if [ ! -e ${cfile} ]; then
+		echo -e "Warning: ${cfile} does not exist."
+		return
+	fi
+
 	echo -e "Processing binary \"${cfile}\"..."
 	chmod a+rx ${cfile}
 
@@ -199,4 +208,17 @@ for cfile in ${filestochange[@]}; do
 
 	${STRIP} ${cfile}
 	echo -e ""
+}
+
+
+# fix names for given files
+for cfile in ${filestochange[@]}; do
+	fix_name $cfile
+done
+
+
+# fix names for libraries
+find ${PRG}/Contents/ \( -name "*.dylib" -o -name "*.so" \) -print0 \
+	| while read -d $'\0' dylib; do
+	fix_name $dylib
 done
