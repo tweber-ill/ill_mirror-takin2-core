@@ -9,6 +9,7 @@
 # pack with: hdiutil create takin.dmg -verbose -srcfolder takin.app -fs UDF -format "UDBZ" -volname "takin"
 #
 
+clean_frameworks=0
 
 PRG="takin.app"
 
@@ -120,8 +121,8 @@ cp -v *.txt "${PRG}/Contents/Resources/"
 
 # -----------------------------------------------------------------------------
 # attributes
-chmod -R -u+rwa+r ${DST_DIR}
-chmod -R -u+rwa+r ${DST_PLUGIN_DIR}
+chmod -R u+rw,a+r "${DST_DIR}"
+chmod -R u+rw,a+r "${DST_PLUGIN_DIR}"
 
 find {DST_DIR} -type d -print0 | xargs -0 chmod a+x
 find {DST_PLUGIN_DIR} -type d -print0 | xargs -0 chmod a+x
@@ -131,14 +132,16 @@ find {DST_PLUGIN_DIR} -type d -print0 | xargs -0 chmod a+x
 
 # -----------------------------------------------------------------------------
 # delete unnecessary files
-find "${DST_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
-find "${DST_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
+if [ $clean_frameworks -ne 0 ]; then
+	find "${DST_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
+	find "${DST_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
 
-declare -a QT_FW_LIBS=("QtCore" "QtGui" "QtWidgets" "QtConcurrent" "QtOpenGL"
-	"QtSvg" "QtXml" "QtDBus" "QtPrintSupport" "qwt")
+	declare -a QT_FW_LIBS=("QtCore" "QtGui" "QtWidgets" "QtConcurrent" "QtOpenGL"
+		"QtSvg" "QtXml" "QtDBus" "QtPrintSupport" "qwt")
 
-for qlib in ${QT_FW_LIBS[@]}; do
-	rm -rfv ${DST_DIR}/${qlib}.framework/Resources
-	rm -rfv ${DST_DIR}/${qlib}.framework/${qlib}*
-done
+	for qlib in ${QT_FW_LIBS[@]}; do
+		rm -rfv ${DST_DIR}/${qlib}.framework/Resources
+		rm -rfv ${DST_DIR}/${qlib}.framework/${qlib}*
+	done
+fi
 # -----------------------------------------------------------------------------

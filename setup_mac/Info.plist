@@ -31,8 +31,8 @@
 			<key>CFBundleTypeIconFile</key>	<string>takin.icns</string>
 			<key>CFBundleTypeName</key>	<string>Takin File</string>
 			<key>CFBundleTypeRole</key>	<string>Editor</string>
+			<key>LSHandlerRank</key>	<string>Owner</string>
 		</dict>
 	</array>
 </dict>
 </plist>
-
