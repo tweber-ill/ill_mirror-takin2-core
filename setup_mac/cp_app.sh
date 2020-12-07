@@ -125,6 +125,7 @@ cp -rv data/res "${PRG}/Contents/"
 cp -rv doc/* "${PRG}/Contents/res/doc/"
 cp -v data/res/icons/takin.icns "${PRG}/Contents/Resources/"
 cp -v *.txt "${PRG}/Contents/Resources/"
+rm -v "${PRG}/Contents/Resources/CMakeLists.txt"
 
 
 # python site-packages
