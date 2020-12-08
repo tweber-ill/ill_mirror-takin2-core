@@ -34,11 +34,15 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/qt5/lib/QtDBus.framework"
 	"/usr/local/opt/qwt/lib/qwt.framework"
 	"/usr/local/opt/python/Frameworks/Python.framework"
+)
+
+
+# libs which need to have their symbolic link resolved
+declare -a SRC_LIBS_L=(
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
 	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
-	"/usr/local/opt/boost/lib/libboost_regex-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
 	"/usr/local/opt/boost-python3/lib/libboost_python39-mt.dylib"
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
@@ -53,7 +57,6 @@ declare -a SRC_LIBS=(
 )
 
 
-
 # qt plugins
 declare -a SRC_PLUGINS=(
 	"printsupport/libcocoaprintersupport.dylib"
@@ -65,6 +68,16 @@ declare -a SRC_PLUGINS=(
 	"platforms/libqcocoa.dylib"
 	"platforms/libqminimal.dylib"
 )
+# -----------------------------------------------------------------------------
+
+
+
+# -----------------------------------------------------------------------------
+# clean old files
+rm -rfv ${BIN_DIR}
+rm -rfv ${DST_DIR}
+rm -rfv ${DST_PLUGIN_DIR}
+rm -rfv ${DST_SITEPACKAGES_DIR}
 # -----------------------------------------------------------------------------
 
 
@@ -88,6 +101,13 @@ mkdir -pv "${DST_SITEPACKAGES_DIR}"
 # -----------------------------------------------------------------------------
 # copy libs
 for srclib in ${SRC_LIBS[@]}; do
+	echo -e "Copying library \"${srclib}\"..."
+	cp -rv ${srclib} "${DST_DIR}"
+done
+
+
+# copy libs, following links
+for srclib in ${SRC_LIBS_L[@]}; do
 	echo -e "Copying library \"${srclib}\"..."
 	cp -Lrv ${srclib} "${DST_DIR}"
 done
@@ -132,6 +152,7 @@ rm -v "${PRG}/Contents/Resources/CMakeLists.txt"
 cp -rv /usr/local/opt/numpy/lib/python3.9/site-packages/numpy "${DST_SITEPACKAGES_DIR}"
 cp -rv /usr/local/opt/scipy/lib/python3.9/site-packages/scipy "${DST_SITEPACKAGES_DIR}"
 #ln -sf "../site-packages" "${BIN_DIR}/site-packages"
+#ln -sf ./Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages ${DST_SITEPACKAGES_DIR}
 # -----------------------------------------------------------------------------
 
 
@@ -150,6 +171,20 @@ find "${DST_PLUGIN_DIR}" -type d -print0 | xargs -0 chmod a+x
 # -----------------------------------------------------------------------------
 # delete unnecessary files
 if [ $clean_frameworks -ne 0 ]; then
+	# clean site-packages
+	rm -rfv ${DST_SITEPACKAGES_DIR}/PyQt5*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/wheel*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/setuptools*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/pip*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/distutils*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/_distutils*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/__pycache*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/pkg_*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/sip*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/site*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/easy_*
+
+	# clean non-needed files from frameworks
 	find "${DST_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
 	find "${DST_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
 
