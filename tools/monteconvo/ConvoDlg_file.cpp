@@ -37,7 +37,15 @@ void ConvoDlg::New()
 {
 	clear_global_paths();
 	m_strLastFile = "";
-	editAutosave->setText("");
+
+	for(QLineEdit* edit : { editCrys, editRes, editSqw, editScan,
+		editCounter, editMonitor, editTemp, editField, editAutosave })
+		edit->setText("");
+
+	editScale->setText("1");
+	editSlope->setText("0");
+	editOffs->setText("0");
+
 	setWindowTitle(s_strTitle.c_str());
 }
 
@@ -70,9 +78,11 @@ void ConvoDlg::Load(const QString& _strFile)
 	if(!tl::file_exists(strFile.c_str()))
 		return;
 
+	// clear previous states
+	New();
+
 	// add the location of the convo file as a possible global path
 	std::string strGlobDir = tl::get_dir(strFile);
-	clear_global_paths();
 	if(strGlobDir != "")
 		add_global_path(strGlobDir);
 
