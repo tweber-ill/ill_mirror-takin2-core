@@ -290,7 +290,7 @@ bool gen_spacegroups()
 
 	propOut.Add("sgroups.num_groups", iGroup);
 
-	propOut.Add("sgroups.source", "Space groups obtained from the "
+	propOut.Add("sgroups.source", "Space group data obtained from the "
 		"<a href=\"http://dx.doi.org/10.1021/ci050400b\">Blue Obelisk Data Repository</a>.");
 	propOut.Add("sgroups.source_url", "https://github.com/egonw/bodr/blob/master/bodr/crystal/space-groups.xml");
 
