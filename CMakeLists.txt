@@ -465,7 +465,7 @@ add_executable(takinmod_py
 target_link_libraries(takinmod_py
 	Boost::iostreams Boost::system Boost::filesystem
 	${_BOOST_PY_TARGET} ${Python3_LIBRARIES}
-	Threads::Threads ${Rt_LIBRARIES}
+	Threads::Threads ${Rt_LIBRARIES} ${Dl_LIBRARIES}
 )
 
 

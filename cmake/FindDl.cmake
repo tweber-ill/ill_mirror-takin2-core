@@ -1,6 +1,6 @@
 find_library(Dl_LIBRARIES
-	NAMES libdl.so
-	HINTS /usr/local/lib64 /usr/local/lib /usr/lib64 /usr/lib /opt/local/lib /usr/lib32 /usr/local/lib32
+	NAMES libdl.so libdl.so.2
+	HINTS /usr/local/lib64 /usr/local/lib /usr/lib64 /usr/lib /opt/local/lib /lib/x86_64-linux-gnu #/usr/lib32 /usr/local/lib32
 	DOC "DL library"
 )
 
