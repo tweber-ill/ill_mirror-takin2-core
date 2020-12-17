@@ -374,9 +374,10 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	LoadSettings();
 
 
-#ifdef BOOST_OS_MACOS
+#if defined(BOOST_OS_MACOS)
 	// check if system python is available
-	if(!tl::dir_exists("/Library/Frameworks/Python.framework"))
+	if(!tl::dir_exists("/Library/Frameworks/Python.framework")
+		&& find_resource_dirs("Frameworks/Python.framework", false).size()==0)
 	{
 		QMessageBox::information(this, "Python Module",
 			"The <i>Python</i> S(q,w) plugin module requires having the "
