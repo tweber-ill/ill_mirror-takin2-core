@@ -9,10 +9,13 @@
 #include "tlibs/string/string.h"
 #include "tlibs/math/math.h"
 #include "tlibs/math/rand.h"
+#include "tlibs/file/file.h"
 
 #include "libs/globals.h"
 #include "libs/globals_qt.h"
 #include "libs/qt/recent.h"
+
+#include <boost/predef.h>
 
 #include <iostream>
 #include <fstream>
@@ -369,6 +372,19 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	}
 
 	LoadSettings();
+
+
+#ifdef BOOST_OS_MACOS
+	// check if system python is available
+	if(!tl::dir_exists("/Library/Frameworks/Python.framework"))
+	{
+		QMessageBox::information(this, "Python Module",
+			"The <i>Python</i> S(q,w) plugin module requires having the "
+			"<a href=\"https://www.python.org/downloads/mac-osx/\">Python framework</a> installed.<br><br>"
+			"Please also install the <i>numpy</i> and <i>scipy</i> packages using the following command:<br><br>"
+			"<code>/Library/Frameworks/Python.framework/Versions/Current/bin/pip3 install numpy scipy</code>");
+	}
+#endif
 }
 
 
