@@ -14,7 +14,8 @@ clean_frameworks=0
 PRG="takin.app"
 
 BIN_DIR="${PRG}/Contents/MacOS/"
-DST_DIR="${PRG}/Contents/Frameworks/"
+DST_FRAMEWORK_DIR="${PRG}/Contents/Frameworks/"
+DST_LIB_DIR="${PRG}/Contents/Libraries/"
 DST_PLUGIN_DIR="${PRG}/Contents/PlugIns/"
 DST_SITEPACKAGES_DIR="${PRG}/Contents/site-packages"
 PLUGIN_DIR="/usr/local/opt/qt5/plugins/"
@@ -22,7 +23,7 @@ PLUGIN_DIR="/usr/local/opt/qt5/plugins/"
 
 # -----------------------------------------------------------------------------
 # frameworks
-declare -a SRC_LIBS=(
+declare -a SRC_FRAMEWORKS=(
 	"/usr/local/opt/qt5/lib/QtCore.framework"
 	"/usr/local/opt/qt5/lib/QtGui.framework"
 	"/usr/local/opt/qt5/lib/QtWidgets.framework"
@@ -38,7 +39,7 @@ declare -a SRC_LIBS=(
 
 
 # libs which need to have their symbolic link resolved
-declare -a SRC_LIBS_L=(
+declare -a SRC_LIBS=(
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
 	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
@@ -75,7 +76,8 @@ declare -a SRC_PLUGINS=(
 # -----------------------------------------------------------------------------
 # clean old files
 rm -rfv ${BIN_DIR}
-rm -rfv ${DST_DIR}
+rm -rfv ${DST_FRAMEWORK_DIR}
+rm -rfv ${DST_LIB_DIR}
 rm -rfv ${DST_PLUGIN_DIR}
 rm -rfv ${DST_SITEPACKAGES_DIR}
 # -----------------------------------------------------------------------------
@@ -84,7 +86,8 @@ rm -rfv ${DST_SITEPACKAGES_DIR}
 
 # -----------------------------------------------------------------------------
 # create dirs
-mkdir -pv "${DST_DIR}"
+mkdir -pv "${DST_FRAMEWORK_DIR}"
+mkdir -pv "${DST_LIB_DIR}"
 mkdir -pv "${DST_PLUGIN_DIR}/printsupport"
 mkdir -pv "${DST_PLUGIN_DIR}/imageformats"
 mkdir -pv "${DST_PLUGIN_DIR}/iconengines"
@@ -99,17 +102,17 @@ mkdir -pv "${DST_SITEPACKAGES_DIR}"
 
 
 # -----------------------------------------------------------------------------
-# copy libs
-for srclib in ${SRC_LIBS[@]}; do
-	echo -e "Copying library \"${srclib}\"..."
-	cp -rv ${srclib} "${DST_DIR}"
+# copy frameworks
+for srclib in ${SRC_FRAMEWORKS[@]}; do
+	echo -e "Copying framework \"${srclib}\"..."
+	cp -rv ${srclib} "${DST_FRAMEWORK_DIR}"
 done
 
 
 # copy libs, following links
-for srclib in ${SRC_LIBS_L[@]}; do
+for srclib in ${SRC_LIBS[@]}; do
 	echo -e "Copying library \"${srclib}\"..."
-	cp -Lrv ${srclib} "${DST_DIR}"
+	cp -Lrv ${srclib} "${DST_LIB_DIR}"
 done
 
 
@@ -159,10 +162,12 @@ cp -rv /usr/local/opt/scipy/lib/python3.9/site-packages/scipy "${DST_SITEPACKAGE
 
 # -----------------------------------------------------------------------------
 # attributes
-chmod -R u+rw,a+r "${DST_DIR}"
+chmod -R u+rw,a+r "${DST_FRAMEWORK_DIR}"
+chmod -R u+rw,a+r "${DST_LIB_DIR}"
 chmod -R u+rw,a+r "${DST_PLUGIN_DIR}"
 
-find "${DST_DIR}" -type d -print0 | xargs -0 chmod a+x
+find "${DST_FRAMEWORK_DIR}" -type d -print0 | xargs -0 chmod a+x
+find "${DST_LIB_DIR}" -type d -print0 | xargs -0 chmod a+x
 find "${DST_PLUGIN_DIR}" -type d -print0 | xargs -0 chmod a+x
 # -----------------------------------------------------------------------------
 
@@ -185,15 +190,15 @@ if [ $clean_frameworks -ne 0 ]; then
 	rm -rfv ${DST_SITEPACKAGES_DIR}/easy_*
 
 	# clean non-needed files from frameworks
-	find "${DST_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
-	find "${DST_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
+	find "${DST_FRAMEWORK_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
+	find "${DST_FRAMEWORK_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
 
 	declare -a QT_FW_LIBS=("QtCore" "QtGui" "QtWidgets" "QtConcurrent" "QtOpenGL"
 		"QtSvg" "QtXml" "QtDBus" "QtPrintSupport" "qwt")
 
 	for qlib in ${QT_FW_LIBS[@]}; do
-		rm -rfv ${DST_DIR}/${qlib}.framework/Resources
-		rm -rfv ${DST_DIR}/${qlib}.framework/${qlib}*
+		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/Resources
+		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/${qlib}*
 	done
 fi
 # -----------------------------------------------------------------------------
