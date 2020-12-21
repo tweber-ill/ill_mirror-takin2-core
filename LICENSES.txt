@@ -107,6 +107,30 @@ License: PSF License Agreement
 
 
 
+-------------------------------------------------------------------------------- 
+NumPy
+URL: https://numpy.org
+License URL: https://github.com/numpy/numpy/blob/master/LICENSE.txt
+
+Copyright (C) 2005-2020 NumPy Developers
+
+License: NumPy license (similar to BSD license)
+--------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------- 
+SciPy
+URL: https://www.scipy.org
+License URL: https://github.com/scipy/scipy/blob/master/LICENSE.txt
+
+Copyright (C) 2003-2020 SciPy Developers
+
+License: SciPy license (similar to BSD license)
+--------------------------------------------------------------------------------
+
+
+
 --------------------------------------------------------------------------------
 FreeType
 URL: http://freetype.org
