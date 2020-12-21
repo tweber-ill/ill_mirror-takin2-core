@@ -175,7 +175,7 @@ endif()
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL)
 find_package(Freetype)
-find_package(X11)
+#find_package(X11)
 
 
 if("${QT_MOC_EXECUTABLE}" STREQUAL "")
@@ -279,11 +279,11 @@ endif()
 
 
 
-if(X11_FOUND)
-	include_directories(${X11_X11_INCLUDE_PATH})
-else()
-	set(X11_X11_LIB "")
-endif()
+#if(X11_FOUND)
+#	include_directories(${X11_X11_INCLUDE_PATH})
+#else()
+#	set(X11_X11_LIB "")
+#endif()
 
 
 
@@ -309,7 +309,7 @@ if(OPENGL_FOUND AND FREETYPE_FOUND)
 	set(LIBS_3D
 		${FREETYPE_LIBRARY}
 		Qt5::OpenGL ${OPENGL_LIBRARIES}
-		${X11_X11_LIB}
+		#${X11_X11_LIB}
 	)
 else()
 	message("Disabling 3D support: OGL: ${OPENGL_FOUND}, FT: ${FREETYPE_FOUND}")
