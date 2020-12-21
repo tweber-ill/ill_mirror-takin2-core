@@ -95,6 +95,18 @@ License: Qwt License Version 1.0 (modified GNU LGPL version 2.1)
 
 
 
+-------------------------------------------------------------------------------- 
+Python
+URL: https://www.python.org
+License URL: https://docs.python.org/3/license.html
+
+Copyright (C) 2001-2020 Python Software Foundation
+
+License: PSF License Agreement
+--------------------------------------------------------------------------------
+
+
+
 --------------------------------------------------------------------------------
 FreeType
 URL: http://freetype.org
