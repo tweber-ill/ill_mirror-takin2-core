@@ -166,6 +166,10 @@ chmod -R u+rw,a+r "${DST_FRAMEWORK_DIR}"
 chmod -R u+rw,a+r "${DST_LIB_DIR}"
 chmod -R u+rw,a+r "${DST_PLUGIN_DIR}"
 
+# only the binaries in BIN_DIR should have the executable flag
+find "${PRG}" -type f -print0 | xargs -0 chmod a-x
+chmod a+x "${BIN_DIR}/*"
+
 find "${DST_FRAMEWORK_DIR}" -type d -print0 | xargs -0 chmod a+x
 find "${DST_LIB_DIR}" -type d -print0 | xargs -0 chmod a+x
 find "${DST_PLUGIN_DIR}" -type d -print0 | xargs -0 chmod a+x
