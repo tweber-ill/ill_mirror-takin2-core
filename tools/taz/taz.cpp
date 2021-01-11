@@ -325,7 +325,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	pMenuFile->addSeparator();
 
-	QAction *pExit = new QAction("Exit", this);
+	QAction *pExit = new QAction("Quit", this);
 	pExit->setMenuRole(QAction::QuitRole);
 	pExit->setIcon(load_icon("res/icons/system-log-out.svg"));
 	pMenuFile->addAction(pExit);
