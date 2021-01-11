@@ -229,7 +229,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 	pMenuFile->addSeparator();
 
-	QAction *pExit = new QAction("Exit", this);
+	QAction *pExit = new QAction("Quit Convo", this);
 	pExit->setIcon(load_icon("res/icons/system-log-out.svg"));
 	pMenuFile->addAction(pExit);
 
