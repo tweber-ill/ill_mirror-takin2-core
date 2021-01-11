@@ -120,7 +120,7 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 	m_vecChecks =
 	{
 		t_tupCheck("main/dlg_previews", 1, checkPreview),
-		t_tupCheck("main/native_dialogs", 0, checkNativeDlg),
+		t_tupCheck("main/native_dialogs", 1, checkNativeDlg),
 		t_tupCheck("net/flip_orient2", 1, checkFlipOrient2),
 		t_tupCheck("net/sth_stt_corr", 0, checkSthSttCorr),
 		t_tupCheck("main/ignore_xtal_restrictions", 0, checkIgnoreXtalRestrictions),
