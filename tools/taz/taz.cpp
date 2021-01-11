@@ -318,7 +318,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	pMenuFile->addSeparator();
 
-	QAction *pSettings = new QAction("Settings...", this);
+	QAction *pSettings = new QAction("Preferences...", this);
 	pSettings->setMenuRole(QAction::PreferencesRole);
 	pSettings->setIcon(load_icon("res/icons/preferences-system.svg"));
 	pMenuFile->addAction(pSettings);
