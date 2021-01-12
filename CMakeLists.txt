@@ -55,8 +55,8 @@ endif()
 
 
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-set(CMAKE_CXX_STANDARD 11)
-add_compile_options(-std=c++11 -D_GLIBCXX_USE_CXX11_ABI)
+set(CMAKE_CXX_STANDARD 14)
+add_compile_options(-std=c++14 -D_GLIBCXX_USE_CXX11_ABI)
 #add_compile_options(-fPIC)
 
 # for application plugins
@@ -319,9 +319,10 @@ endif()
 
 
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC OFF)
+set_property(SOURCE 3rdparty/Faddeeva.hh PROPERTY SKIP_AUTOGEN TRUE)
+set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_AUTOUIC TRUE)
+set(CMAKE_AUTORCC FALSE)
 
 
 

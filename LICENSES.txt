@@ -1,14 +1,17 @@
-Licenses for third-party software used in this software
-=======================================================
+================================================================================
+License overview for third-party software used in this software.
+The original license files are reproduced in the 3rdparty_licenses directory.
+================================================================================
 
 
--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------
 Boost
 URL: http://www.boost.org
 License URL: http://www.boost.org/LICENSE_1_0.txt
 
-Copyright Beman Dawes, David Abrahams, 1998-2005.
-Copyright Rene Rivera 2004-2007.
+Copyright 1998-2005 by Beman Dawes, David Abrahams.
+Copyright 2004-2007 by Rene Rivera.
 
 License:
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -38,93 +41,92 @@ DEALINGS IN THE SOFTWARE.
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Rescal
 URL: https://www.ill.eu/instruments-support/computing-for-science/cs-software/all-software/matlab-ill/#c4703 
-
-Copyright (C) 1998 Zinkin, McMorrow, Tennant, Farhi, and Wildes.
-
 License: GNU GPL version 2 (see below)
+
+Copyright (C) 1998 by Zinkin, McMorrow, Tennant, Farhi, and Wildes.
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 McStas
 URL: http://www.mcstas.org
 License URL: http://www.mcstas.org/about/conditions/COPYING
 
-Copyright (C) Riso National Laboratory.
+Copyright (C) by Riso National Laboratory.
 Authors: P. K. Willendrup, E. Knudsen, K. Lefmann, E. Farhi, U. Filges,
-	K. Nielsen, P. Astrand, K. Lieutenant, and P. Christiansen
+         K. Nielsen, P. Astrand, K. Lieutenant, and P. Christiansen
 
 License: GNU GPL version 2 (see below)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Qt
 URL: http://www.qt.io, http://code.qt.io/cgit/
 License URL: http://doc.qt.io/qt-5.6/licensing.html
 
-Copyright (C) 2015, 2016 The Qt Company Ltd. and other contributors.
-Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+Copyright (C) 2015, 2016 by The Qt Company Ltd. and other contributors.
+Copyright (C) 2014 by Digia Plc and/or its subsidiary(-ies).
 
 License, Qt4: GNU LGPL version 2.1 (see below)
+License, Qt5: GNU LGPL version 3
 
-(License, Qt5: GNU LGPL version 3
 Warning: After Qt 5.6, the /general/ Qt license options changed!
-Check remaining GPLv2 compatibility of /individual/ Qt modules here:
-https://doc.qt.io/qt-5/qtmodules.html
-before linking to them!)
+         Check remaining GPLv2 compatibility of /individual/ Qt modules here:
+         https://doc.qt.io/qt-5/qtmodules.html
+         before linking to them!)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Qwt
 URL: http://qwt.sourceforge.net
 License URL: http://qwt.sourceforge.net/qwtlicense.html
 
-Copyright (C) 1997 Josef Wilgen
-Copyright (C) 2002 Uwe Rathmann
+Copyright (C) 1997 by Josef Wilgen.
+Copyright (C) 2002 by Uwe Rathmann.
 
 License: Qwt License Version 1.0 (modified GNU LGPL version 2.1)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Python
 URL: https://www.python.org
 License URL: https://docs.python.org/3/license.html
 
-Copyright (C) 2001-2020 Python Software Foundation
+Copyright (C) 2001-2020 by Python Software Foundation.
 
 License: PSF License Agreement
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 NumPy
 URL: https://numpy.org
 License URL: https://github.com/numpy/numpy/blob/master/LICENSE.txt
 
-Copyright (C) 2005-2020 NumPy Developers
+Copyright (C) 2005-2020 by NumPy Developers
 
 License: NumPy license (similar to BSD license)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 SciPy
 URL: https://www.scipy.org
 License URL: https://github.com/scipy/scipy/blob/master/LICENSE.txt
 
-Copyright (C) 2003-2020 SciPy Developers
+Copyright (C) 2003-2020 by SciPy Developers.
 
 License: SciPy license (similar to BSD license)
 --------------------------------------------------------------------------------
@@ -136,25 +138,25 @@ FreeType
 URL: http://freetype.org
 License URL: https://www.freetype.org/license.html
 
-Copyright (C) 1996-2002, 2006 by
-David Turner, Robert Wilhelm, and Werner Lemberg
+Copyright (C) 1996-2002, 2006 by David Turner, Robert Wilhelm, 
+                                 and Werner Lemberg.
 
 License: GNU GPL version 2 (see below) or FreeType License
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Lapack & Lapacke
 URL: http://www.netlib.org/lapack
 License URL: http://www.netlib.org/lapack/LICENSE.txt
 
-Copyright (c) 1992-2013 The University of Tennessee and The University
-                        of Tennessee Research Foundation.  All rights
+Copyright (c) 1992-2013 by The University of Tennessee and The University
+                        of Tennessee Research Foundation. All rights
                         reserved.
-Copyright (c) 2000-2013 The University of California Berkeley. All
+Copyright (c) 2000-2013 by The University of California Berkeley. All
                         rights reserved.
-Copyright (c) 2006-2013 The University of Colorado Denver.  All rights
+Copyright (c) 2006-2013 by The University of Colorado Denver. All rights
                         reserved.
 
 License:
@@ -196,47 +198,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 ROOT (Minuit2, etc.)
 URL: https://root.cern.ch
 URL: http://seal.web.cern.ch/seal/snapshot/work-packages/mathlibs/minuit/release/download.html
 
-Copyright (c) 1995-2015 The ROOT Team
+Copyright (c) 1995-2015 by The ROOT Team.
 
 License: GNU LGPL version 2.1 (see below)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Clipper
 URL: http://www.ysbl.york.ac.uk/~cowtan/clipper/
 
-Copyright (c) 2000-2006 by Kevin Cowtan
+Copyright (c) 2000-2006 by Kevin Cowtan.
 
 License: GNU LGPL version 2.1 (see below)
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Qhull
 URL: http://www.qhull.org/
 URL: https://github.com/qhull/qhull
 
-Copyright (c) 1993-2019 by C.B. Barber
+Copyright (c) 1993-2019 by C. B. Barber.
 
 License URL: https://github.com/qhull/qhull/blob/master/COPYING.txt
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 NICOS
 URL: https://forge.frm2.tum.de/cgit/cgit.cgi/frm2/nicos/nicos.git/
 URL: http://forge.frm2.tum.de/cgit/cgit.cgi/frm2/nicos/nicos-core.git/
 
-Copyright (c) 2009-2020 by the NICOS contributors
+Copyright (c) 2009-2020 by the NICOS contributors.
 
 License: GNU GPL version 2 (see below)
 --------------------------------------------------------------------------------
@@ -244,12 +246,12 @@ License: GNU GPL version 2 (see below)
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 NeutronPy
 URL: https://github.com/neutronpy/neutronpy
 License URL: https://github.com/neutronpy/neutronpy/blob/master/LICENSE.txt
 
-Copyright (c) 2014-2017 by David M. Fobes
+Copyright (c) 2014-2017 by David M. Fobes.
 
 License:
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -274,13 +276,14 @@ SOFTWARE.
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Blue Obelisk Data Repository
 URL: http://dx.doi.org/10.1021/ci050400b, https://github.com/egonw/bodr
 License URL: https://github.com/egonw/bodr/blob/master/bodr/COPYING
 
 Copyright (c) 2006 by G. Hutchinson, C. Niehaus, E. Willighagen, J. Buchwald,
-	M. Pfeiffer, D. Leidert, J. Brefort, B. de Jong, and A. Vaitkus
+                      M. Pfeiffer, D. Leidert, J. Brefort, B. de Jong, 
+                      and A. Vaitkus.
 
 License: CC0 1.0
 --------------------------------------------------------------------------------
@@ -288,13 +291,13 @@ License: CC0 1.0
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Gnuplot
 URL: http://www.gnuplot.info
 License URL: http://gnuplot.cvs.sourceforge.net/gnuplot/gnuplot/Copyright?view=markup
 
-Copyright (C) 1986-1993, 1998, 2004, 2007-2014
-Thomas Williams, Colin Kelley and many others
+Copyright (C) 1986-1993, 1998, 2004, 2007-2014 by Thomas Williams, Colin Kelley 
+                                                  and many others.
 
 License:
 Permission to use, copy, and distribute this software and its
@@ -330,7 +333,7 @@ to the extent permitted by applicable law.
 Faddeeva Package
 URL: http://ab-initio.mit.edu/wiki/index.php/Faddeeva_Package
 
-Copyright (C) 2012 Massachusetts Institute of Technology.
+Copyright (C) 2012 by Massachusetts Institute of Technology.
 
 License:
 Permission is hereby granted, free of charge, to any person
@@ -354,20 +357,143 @@ SOFTWARE.
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 Tango Icons
 URL: http://tango.freedesktop.org/Tango_Icon_Library
-
 License: Public Domain
 --------------------------------------------------------------------------------
 
 
 
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 DejaVu Fonts
 URL: https://dejavu-fonts.github.io/
 License URL: https://dejavu-fonts.github.io/License.html
 --------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+libjpeg
+URL: https://www.ijg.org
+License URL: https://github.com/freedesktop/libjpeg
+
+Copyright (C) 1991-2020 by Thomas G. Lane and Guido Vollbeding.
+
+This software is based in part on the work of the Independent JPEG Group.
+
+License:
+The authors make NO WARRANTY or representation, either express or implied,
+with respect to this software, its quality, accuracy, merchantability, or
+fitness for a particular purpose.  This software is provided "AS IS", and you,
+its user, assume the entire risk as to its quality and accuracy.
+
+This software is copyright (C) 1991-2020, Thomas G. Lane, Guido Vollbeding.
+All Rights Reserved except as specified below.
+
+Permission is hereby granted to use, copy, modify, and distribute this
+software (or portions thereof) for any purpose, without fee, subject to these
+conditions:
+(1) If any part of the source code for this software is distributed, then this
+README file must be included, with this copyright and no-warranty notice
+unaltered; and any additions, deletions, or changes to the original files
+must be clearly indicated in accompanying documentation.
+(2) If only executable code is distributed, then the accompanying
+documentation must state that "this software is based in part on the work of
+the Independent JPEG Group".
+(3) Permission for use of this software is granted only if the user accepts
+full responsibility for any undesirable consequences; the authors accept
+NO LIABILITY for damages of any kind.
+
+These conditions apply to any software derived from or based on the IJG code,
+not just to the unmodified library.  If you use our work, you ought to
+acknowledge us.
+
+Permission is NOT granted for the use of any IJG author's name or company name
+in advertising or publicity relating to this software or products derived from
+it.  This software may be referred to only as "the Independent JPEG Group's
+software".
+
+We specifically permit and encourage the use of this software as the basis of
+commercial products, provided that all warranty or liability claims are
+assumed by the product vendor.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+libtiff
+URL: http://www.libtiff.org
+License URL: http://www.libtiff.org/misc.html
+
+Copyright (c) 1988-1997 by Sam Leffler.
+Copyright (c) 1991-1997 by Silicon Graphics, Inc.
+
+License:
+Permission to use, copy, modify, distribute, and sell this software and
+its documentation for any purpose is hereby granted without fee, provided
+that (i) the above copyright notices and this permission notice appear in
+all copies of the software and related documentation, and (ii) the names of
+Sam Leffler and Silicon Graphics may not be used in any advertising or
+publicity relating to the software without the specific, prior written
+permission of Sam Leffler and Silicon Graphics.
+
+THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+IN NO EVENT SHALL SAM LEFFLER OR SILICON GRAPHICS BE LIABLE FOR
+ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
+LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+OF THIS SOFTWARE.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+libpng
+URL: http://www.libpng.org/pub/png/libpng.html
+License URL: http://www.libpng.org/pub/png/src/libpng-LICENSE.txt
+
+Copyright (c) 1995-2019 by The PNG Reference Library Authors.
+Copyright (c) 2018-2019 by Cosmin Truta.
+Copyright (c) 2000-2002, 2004, 2006-2018 by Glenn Randers-Pehrson.
+Copyright (c) 1996-1997 by Andreas Dilger.
+Copyright (c) 1995-1996 by Guy Eric Schalnat, Group 42, Inc.
+
+License:
+The software is supplied "as is", without warranty of any kind,
+express or implied, including, without limitation, the warranties
+of merchantability, fitness for a particular purpose, title, and
+non-infringement.  In no event shall the Copyright owners, or
+anyone distributing the software, be liable for any damages or
+other liability, whether in contract, tort or otherwise, arising
+from, out of, or in connection with the software, or the use or
+other dealings in the software, even if advised of the possibility
+of such damage.
+
+Permission is hereby granted to use, copy, modify, and distribute
+this software, or portions hereof, for any purpose, without fee,
+subject to the following restrictions:
+
+ 1. The origin of this software must not be misrepresented; you
+    must not claim that you wrote the original software.  If you
+    use this software in a product, an acknowledgment in the product
+    documentation would be appreciated, but is not required.
+
+ 2. Altered source versions must be plainly marked as such, and must
+    not be misrepresented as being the original software.
+
+ 3. This Copyright notice may not be removed or altered from any
+    source or altered source distribution.
+--------------------------------------------------------------------------------
+
+
+
+
+================================================================================
 
 
 

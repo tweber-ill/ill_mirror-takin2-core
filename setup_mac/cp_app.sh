@@ -148,6 +148,7 @@ cp -rv data/res "${PRG}/Contents/"
 cp -rv doc/* "${PRG}/Contents/res/doc/"
 cp -v data/res/icons/takin.icns "${PRG}/Contents/Resources/"
 cp -v *.txt "${PRG}/Contents/Resources/"
+cp -rv 3rdparty_licenses "${PRG}/Contents/Resources/"
 rm -v "${PRG}/Contents/Resources/CMakeLists.txt"
 
 
@@ -168,7 +169,7 @@ chmod -R u+rw,a+r "${DST_PLUGIN_DIR}"
 
 # only the binaries in BIN_DIR should have the executable flag
 find "${PRG}" -type f -print0 | xargs -0 chmod a-x
-chmod a+x "${BIN_DIR}/*"
+chmod a+x ${BIN_DIR}*
 
 find "${DST_FRAMEWORK_DIR}" -type d -print0 | xargs -0 chmod a+x
 find "${DST_LIB_DIR}" -type d -print0 | xargs -0 chmod a+x
