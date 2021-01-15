@@ -48,7 +48,7 @@
       <string>Start the resolution convolution.</string>
      </property>
      <property name="text">
-      <string>Start Simulation</string>
+      <string>Start Sim.</string>
      </property>
     </widget>
    </item>

@@ -374,7 +374,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	LoadSettings();
 
 
-#if defined(BOOST_OS_MACOS)
+#if BOOST_OS_MACOS
 	// check if system python is available
 	if(!tl::dir_exists("/Library/Frameworks/Python.framework")
 		&& find_resource_dirs("Frameworks/Python.framework", false).size()==0)

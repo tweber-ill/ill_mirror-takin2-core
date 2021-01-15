@@ -204,7 +204,7 @@ void ConvoDlg::StartFit()
 	{
 		std::string msg = "The error of the following parameters is zero:\n\n"
 			+ ostrZeroErr.str() + "\n\nno fitting will be done for them."
-			" Please set the errors to non-zero in the model parameters dialog (\"...\" button).";
+			" Please set the errors to non-zero in the model parameters dialog (\"Parameters...\" button).";
 
 		QMessageBox::warning(this, "Warning", msg.c_str());
 	}
