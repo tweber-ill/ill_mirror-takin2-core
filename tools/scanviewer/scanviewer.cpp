@@ -1,7 +1,7 @@
 /**
  * Scan viewer
  * @author Tobias Weber <tweber@ill.fr>
- * @date mar-2015 - 2020
+ * @date mar-2015 - 2021
  * @license GPLv2
  */
 
@@ -192,7 +192,7 @@ void ScanViewerDlg::SetAbout()
 {
 	labelVersion->setText("Version " TAKIN_VER ".");
 	labelWritten->setText("Written by Tobias Weber <tweber@ill.fr>.");
-	labelYears->setText("Years: 2015 - 2020.");
+	labelYears->setText("Years: 2015 - 2021.");
 
 	std::string strCC = "Built";
 #ifdef BOOST_PLATFORM

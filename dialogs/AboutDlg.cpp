@@ -45,7 +45,7 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	labelVersion->setText("Version " TAKIN_VER ".");
 	labelWritten->setText("Written by Tobias Weber <tweber@ill.fr>.");
 	labelYears->setText("2014 - 2017 for Technische Universität München (TUM), Garching, Germany"
-		";\n2017 - 2020 for Institut Laue-Langevin (ILL), Grenoble, France.");
+		";\n2017 - 2021 for Institut Laue-Langevin (ILL), Grenoble, France.");
 
 	// old takin 1 repos:
 	//labelRepo->setText("Source repo: <a href=\"https://github.com/t-weber/takin\">https://github.com/t-weber/takin</a>.");
