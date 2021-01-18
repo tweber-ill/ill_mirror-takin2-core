@@ -21,6 +21,7 @@ $loc << ENDDATA
 12/2019    59515    31644    14310     15842         0
 06/2020    61400    31965    14769     17019         0
 10/2020    61762    32067    15163     24068      3736
+01/2021    62330    32104    15299     25159      3736
 ENDDATA
 
 
@@ -39,7 +40,7 @@ set xdata time
 set xlabel "Date"
 set ylabel "Lines of code"
 
-set xrange [ "03/2014" : "12/2020" ]
+set xrange [ "03/2014" : "03/2021" ]
 set yrange [0 : ymax]
 
 # Version 1
@@ -49,6 +50,10 @@ set label 1 at "4/2016", 120000 "Version 1.0" rotate by 90
 # Version 1.5
 set arrow 2 from "6/2017", 0 to "6/2017", ymax dt 2 lw 2 nohead front
 set label 2 at "4/2017", 120000 "Version 1.5" rotate by 90
+
+# Version 2.0
+set arrow 3 from "1/2021", 0 to "1/2021", ymax dt 2 lw 2 nohead front
+set label 3 at "11/2020", 120000 "Version 2.0" rotate by 90
 
 set key top left
 
