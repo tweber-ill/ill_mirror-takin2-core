@@ -84,3 +84,13 @@ fi
 if ! wget https://raw.githubusercontent.com/gnuplot/gnuplot/master/Copyright -O ${LICDIR}/gnuplot_license.txt; then
 	echo -e "Error: Cannot download Gnuplot license.";
 fi
+
+# gemmi
+if ! wget https://raw.githubusercontent.com/project-gemmi/gemmi/master/LICENSE.txt -O ${LICDIR}/gemmi_license.txt; then
+	echo -e "Error: Cannot download Gemmi license.";
+fi
+
+# qcustomplot
+if ! wget https://gitlab.com/DerManu/QCustomPlot/-/raw/master/GPL.txt -O ${LICDIR}/qcustomplot_license.txt; then
+	echo -e "Error: Cannot download QCustomPlot license.";
+fi
