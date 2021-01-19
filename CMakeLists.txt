@@ -12,7 +12,6 @@ message("System name: ${CMAKE_SYSTEM_NAME}.")
 
 
 option(DEBUG "debug build" FALSE)
-option(BUILD_FOR_MINGW "build a mingw version" FALSE)
 option(USE_PLUGINS "use the plugin system" TRUE)
 option(USE_STRIP "strip debug info from release binaries" TRUE)
 option(USE_GENTAB "build setup utilities" TRUE)
@@ -65,7 +64,7 @@ add_definitions(-DBUILD_APPLI)
 
 set(SOCK2 "")
 
-if(BUILD_FOR_MINGW)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	message("Setting MinGW options.")
 
 	# stuff needed by mingw
@@ -102,7 +101,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS "${PROJECT_SOURCE_DIR}/ui")
 
 set(Boost_FIND_QUIETLY FALSE)
 
-if(BUILD_FOR_MINGW)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	set(BOOST_SUFFIX -x64)
 else()
 	set(BOOST_SUFFIX)
@@ -162,7 +161,7 @@ else()
 	set(Mp_LIBRARIES "")
 endif()
 
-if(USE_PLUGINS AND USE_Dl AND NOT BUILD_FOR_MINGW)
+if(USE_PLUGINS AND USE_Dl AND NOT (CMAKE_SYSTEM_NAME STREQUAL "Windows"))
 	find_package(Dl REQUIRED)
 else()
 	set(Dl_LIBRARIES "")
@@ -224,11 +223,14 @@ if(USE_TR1_FUNCS)
 	add_definitions(-DUSE_BOOST_REX)
 endif()
 
-if(BUILD_FOR_MINGW)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	add_definitions(-DNO_HELP_ASSISTANT)
 	add_definitions(-DNO_TERM_CMDS)
 	add_definitions(-DUSE_WIDE_STR)
 	#add_definitions(-DNO_IOSTR)
+
+	# pass linker --subsystem option
+	add_compile_options(-Wl,--subsystem,windows)
 endif()
 
 # hack to prevent math_fwd.h inclusion
