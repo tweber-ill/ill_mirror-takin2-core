@@ -132,8 +132,8 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 	m_vecPosEditBoxes = {editE, editQ, editKi, editKf};
 	m_vecPosEditNames = {"reso/E", "reso/Q", "reso/ki", "reso/kf"};
 
-	m_vecCheckBoxes = {checkUseR0, checkUseGeneralR0, checkUseKi3, checkUseKf3, checkUseKfKi};
-	m_vecCheckNames = {"reso/use_R0", "reso/use_general_R0", "reso/use_ki3", "reso/use_kf3", "reso/use_kfki"};
+	m_vecCheckBoxes = {checkUseR0, checkUseGeneralR0, checkUseKi3, checkUseKf3, checkUseKfKi, checkKfVert};
+	m_vecCheckNames = {"reso/use_R0", "reso/use_general_R0", "reso/use_ki3", "reso/use_kf3", "reso/use_kfki", "reso/scatter_kf_vert"};
 
 
 	m_vecRadioPlus = {radioMonoScatterPlus, radioAnaScatterPlus,
@@ -452,6 +452,7 @@ void ResoDlg::Calc()
 		cn.pos_x = t_real_reso(spinSamplePosX->value()) * cm;
 		cn.pos_y = t_real_reso(spinSamplePosY->value()) * cm;
 		cn.pos_z = t_real_reso(spinSamplePosZ->value()) * cm;
+		cn.bKfVertical = checkKfVert->isChecked();
 
 		// TODO
 		cn.mono_numtiles_h = 1;
