@@ -296,7 +296,7 @@ ResoResults calc_eck(const EckParams& eck)
 	if(eck.bKfVertical)
 	{
 		pos_z2 = -pos_y2;
-		pos_y2 = pos_z2;
+		pos_y2 = eck.pos_z;
 	}
 
 	std::future<std::tuple<t_mat, t_vec, t_real, t_real, t_real>> futAna

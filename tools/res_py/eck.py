@@ -329,7 +329,7 @@ def calc_eck(param):
     # vertical scattering in kf axis, formula from [eck20]
     if param["kf_vert"]:
         pos_z2 = -pos_y2
-        pos_y2 = pos_z2
+        pos_y2 = param["pos_z"]
 
     [E, F, G, H, dReflA] = get_mono_vals(
         param["det_w"], param["det_h"],
