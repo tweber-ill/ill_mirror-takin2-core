@@ -5,8 +5,9 @@
 # @date feb-2015, oct-2019
 # @license GPLv2
 #
-# @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014)
+# @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014), doi: 10.1016/j.nima.2014.03.019
 # @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
+# @desc for vertical scattering modification: [eck20] G. Eckold, personal communication, 2020.
 #
 
 # requires numpy version >= 1.10
@@ -87,11 +88,11 @@ def focal_len(lenBefore, lenAfter):
 
 
 #
-# optimal mono/ana curvature, 
-# see e.g. 
-# 	- (Shirane 2002) p. 66
-# 	- or nicos/nicos-core.git/tree/nicos/devices/tas/mono.py in nicos
-#  - or Monochromator_curved.comp in McStas
+# optimal mono/ana curvature,
+# see e.g.
+#    - (Shirane 2002) p. 66
+#    - or nicos/nicos-core.git/tree/nicos/devices/tas/mono.py in nicos
+#    - or Monochromator_curved.comp in McStas
 #
 def foc_curv(lenBefore, lenAfter, tt, bVert):
     f = focal_len(lenBefore, lenAfter)
@@ -194,7 +195,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
 
-
     # C scalar: formula 28 in [eck14]
     C = 0.5*reso.sig2fwhm**2. * pos_y**2. * \
 	    ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
@@ -259,11 +259,11 @@ def calc_eck(param):
 
     if param["mono_is_curved_h"]:
         inv_mono_curvh = 1./mono_curvh
-    if param["mono_is_curved_v"]: 
+    if param["mono_is_curved_v"]:
         inv_mono_curvv = 1./mono_curvv
-    if param["ana_is_curved_h"]: 
+    if param["ana_is_curved_h"]:
         inv_ana_curvh = 1./ana_curvh
-    if param["ana_is_curved_v"]: 
+    if param["ana_is_curved_v"]:
         inv_ana_curvv = 1./ana_curvv
     # --------------------------------------------------------------------
 
@@ -324,6 +324,12 @@ def calc_eck(param):
     # ana part
     # equ 43 in [eck14]
     pos_y2 = - param["pos_x"]*np.sin(twotheta) + param["pos_y"]*np.cos(twotheta)
+    pos_z2 = param["pos_z"]
+
+    # vertical scattering in kf axis, formula from [eck20]
+    if param["kf_vert"]:
+        pos_z2 = -pos_y2
+        pos_y2 = pos_z2
 
     [E, F, G, H, dReflA] = get_mono_vals(
         param["det_w"], param["det_h"],
@@ -334,8 +340,18 @@ def calc_eck(param):
         param["coll_v_post_ana"], param["coll_v_post_sample"],
         param["ana_mosaic"], param["ana_mosaic_v"],
         inv_ana_curvh, inv_ana_curvv,
-        param["pos_x"], pos_y2, param["pos_z"],
+        param["pos_x"], pos_y2, pos_z2,
         dana_effic)
+
+    # vertical scattering in kf axis, formula from [eck20]
+    if param["kf_vert"]:
+        T_vert = np.array(
+            [[ 1.,  0., 0. ],
+             [ 0.,  0., 1. ],
+             [ 0., -1., 0. ]])
+
+        E = np.dot(np.dot(np.transpose(T_vert), E), T_vert)
+        F = np.dot(T_vert, F)
     #--------------------------------------------------------------------------
 
 
@@ -536,6 +552,8 @@ if __name__ == "__main__":
         "pos_x" : 0. * cm2A,
         "pos_y" : 0. * cm2A,
         "pos_z" : 0. * cm2A,
+
+        "kf_vert" : False,
     }
 
 
@@ -546,8 +564,8 @@ if __name__ == "__main__":
         exit(-1)
 
     if verbose:
-        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" % 
-            (params["twotheta"]*rad2deg, params["thetam"]*rad2deg, params["thetaa"]*rad2deg, 
+        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" %
+            (params["twotheta"]*rad2deg, params["thetam"]*rad2deg, params["thetaa"]*rad2deg,
             params["angle_ki_Q"]*rad2deg, params["angle_kf_Q"]*rad2deg))
         print("R0 = %g, Vol = %g" % (res["r0"], res["res_vol"]))
         print("Resolution matrix:\n%s" % res["reso"])
@@ -558,4 +576,3 @@ if __name__ == "__main__":
     # describe and plot ellipses
     ellipses = reso.calc_ellipses(res["reso"], verbose)
     reso.plot_ellipses(ellipses, verbose)
-

@@ -5,8 +5,9 @@
  * @date feb-2015
  * @license GPLv2
  *
- * @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014)
+ * @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014), doi: 10.1016/j.nima.2014.03.019
  * @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
+ * @desc for vertical scattering modification: [eck20] G. Eckold, personal communication, 2020.
  */
 
 #include "eck.h"
@@ -289,6 +290,15 @@ ResoResults calc_eck(const EckParams& eck)
 	// equ 43 in [eck14]
 	length pos_y2 = - eck.pos_x*units::sin(twotheta)
 		+ eck.pos_y*units::cos(twotheta);
+	length pos_z2 = eck.pos_z;
+
+	// vertical scattering in kf axis, formula from [eck20]
+	if(eck.bKfVertical)
+	{
+		pos_z2 = -pos_y2;
+		pos_y2 = pos_z2;
+	}
+
 	std::future<std::tuple<t_mat, t_vec, t_real, t_real, t_real>> futAna
 		= std::async(lpol, get_mono_vals,
 			eck.det_w, eck.det_h,
@@ -299,7 +309,7 @@ ResoResults calc_eck(const EckParams& eck)
 			eck.coll_v_post_ana, eck.coll_v_post_sample,
 			eck.ana_mosaic, eck.ana_mosaic_v,
 			inv_ana_curvh, inv_ana_curvv,
-			eck.pos_x, pos_y2, eck.pos_z,
+			eck.pos_x, pos_y2, pos_z2,
 			dana_effic);
 
 	//--------------------------------------------------------------------------
@@ -313,11 +323,23 @@ ResoResults calc_eck(const EckParams& eck)
 	const t_real& dReflM = std::get<4>(tupMono);
 
 	std::tuple<t_mat, t_vec, t_real, t_real, t_real> tupAna = futAna.get();
-	const t_mat& E = std::get<0>(tupAna);
-	const t_vec& F = std::get<1>(tupAna);
+	t_mat& E = std::get<0>(tupAna);
+	t_vec& F = std::get<1>(tupAna);
 	const t_real& G = std::get<2>(tupAna);
 	const t_real& H = std::get<3>(tupAna);
 	const t_real& dReflA = std::get<4>(tupAna);
+
+	// vertical scattering in kf axis, formula from [eck20]
+	if(eck.bKfVertical)
+	{
+		t_mat matTvert = ublas::zero_matrix<t_real>(3,3);
+		matTvert(0,0) = 1.;
+		matTvert(1,2) = 1.;
+		matTvert(2,1) = -1.;
+
+		E = tl::transform(E, matTvert, 1);
+		F = ublas::prod(matTvert, F);
+	}
 	//--------------------------------------------------------------------------
 
 

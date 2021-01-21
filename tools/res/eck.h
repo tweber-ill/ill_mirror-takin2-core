@@ -5,7 +5,7 @@
  * @date feb-2015
  * @license GPLv2
  *
- * @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014)
+ * @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014), doi: 10.1016/j.nima.2014.03.019
  */
 
 #ifndef __TAKIN_ECK_H__
@@ -22,6 +22,9 @@ struct EckParams : public PopParams
 	tl::t_angle_si<t_real_reso> ana_mosaic_v;
 
 	tl::t_length_si<t_real_reso> pos_x, pos_y, pos_z;
+
+	// vertical scattering in k_f
+	bool bKfVertical = false;
 };
 
 
