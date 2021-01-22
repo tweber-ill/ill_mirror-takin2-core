@@ -5,6 +5,13 @@
  * @license GPLv2
  */
 
+// mingw hack
+#if defined(__MINGW32__) || defined(__MINGW64__)
+	#if !defined(__kernel_entry)
+		#define __kernel_entry
+	#endif
+#endif
+
 #include "taz.h"
 
 #include <iostream>
