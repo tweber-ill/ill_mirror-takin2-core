@@ -586,9 +586,10 @@ endif()
 # -----------------------------------------------------------------------------
 install(TARGETS takin DESTINATION bin COMPONENT apptakin)
 
-if(USE_PLUGINS)
-	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
-endif()
+# remnants of old plugin system
+#if(USE_PLUGINS)
+#	install(DIRECTORY ${PROJECT_SOURCE_DIR}/plugins DESTINATION share/takin COMPONENT takinplugins)
+#endif()
 
 if(Py_FOUND)
 	install(TARGETS takinmod_py DESTINATION bin COMPONENT apptakinmod_py)
@@ -601,7 +602,7 @@ endif()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/doc
 	DESTINATION share/takin COMPONENT takindata1)
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/res/data ${PROJECT_SOURCE_DIR}/res/doc ${PROJECT_SOURCE_DIR}/res/icons ${PROJECT_SOURCE_DIR}/res/fonts ${PROJECT_SOURCE_DIR}/res/conf
 	DESTINATION share/takin/res COMPONENT takindata2)
 install(FILES ${PROJECT_SOURCE_DIR}/COPYING ${PROJECT_SOURCE_DIR}/AUTHORS
 	${PROJECT_SOURCE_DIR}/LICENSES ${PROJECT_SOURCE_DIR}/LITERATURE
