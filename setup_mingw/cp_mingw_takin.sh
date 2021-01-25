@@ -51,6 +51,7 @@ cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libharfbuzz-0.dll	${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libglib-2.0-0.dll	${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libintl-8.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libpcre-1.dll		${INSTDIR}/
+cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssp-0.dll		${INSTDIR}/
 #cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libMinuit2.dll	${INSTDIR}/
 
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_regex-x64.dll			${INSTDIR}/
@@ -58,6 +59,9 @@ cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_system-x64.dll		${INST
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_iostreams-x64.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_filesystem-x64.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_program_options-x64.dll	${INSTDIR}/
+
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_python39.dll			${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libpython3.9.dll			${INSTDIR}/
 
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/Qt5Core.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/Qt5Gui.dll		${INSTDIR}/
