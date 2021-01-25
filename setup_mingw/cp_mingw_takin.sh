@@ -64,8 +64,10 @@ cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_iostreams-x64.dll		${I
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_filesystem-x64.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_program_options-x64.dll	${INSTDIR}/
 
-#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_python39.dll			${INSTDIR}/
-#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libpython3.9.dll			${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_python39.dll	${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libpython3.9.dll	${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libcrypto-1_1-x64.dll	${INSTDIR}/
+#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-6.dll		${INSTDIR}/
 
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/Qt5Core.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/Qt5Gui.dll		${INSTDIR}/
