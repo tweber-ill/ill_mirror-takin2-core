@@ -466,6 +466,14 @@ add_executable(takinmod_py
 	tlibs/math/rand.cpp
 )
 
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	target_link_options(takinmod_py
+		# create an __info_plist section in the binary
+		PRIVATE LINKER:-sectcreate,__TEXT,__info_plist,${PROJECT_SOURCE_DIR}/setup_mac/InfoBundle.plist
+	)
+endif()
+
 target_link_libraries(takinmod_py
 	Boost::iostreams Boost::system Boost::filesystem
 	${_BOOST_PY_TARGET} ${Python3_LIBRARIES}
