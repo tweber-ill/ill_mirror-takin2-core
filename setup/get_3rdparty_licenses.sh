@@ -30,6 +30,11 @@ if ! wget https://raw.githubusercontent.com/scipy/scipy/master/LICENSE.txt -O ${
 	echo -e "Error: Cannot download Scipy license.";
 fi
 
+# ROOT
+if ! wget https://raw.githubusercontent.com/root-project/root/master/LICENSE -O ${LICDIR}/ROOT_license.txt; then
+	echo -e "Error: Cannot download ROOT license.";
+fi
+
 # qwt
 if ! wget https://raw.githubusercontent.com/qwtplot/qwt/trunk/COPYING -O ${LICDIR}/qwt_license.txt; then
 	echo -e "Error: Cannot download Qwt license.";

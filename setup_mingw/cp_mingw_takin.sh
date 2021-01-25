@@ -19,7 +19,11 @@ mkdir -p ${INSTDIR}
 
 # main programs
 cp -v bin/*.exe		${INSTDIR}/
-cp -v *.txt		${INSTDIR}/
+
+
+# info files
+cp -v *.txt			${INSTDIR}/
+cp -rv 3rdparty_licenses/	${INSTDIR}/
 
 
 # examples
