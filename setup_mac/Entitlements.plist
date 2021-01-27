@@ -7,4 +7,7 @@
 </dict>
 </plist>
 
-<!-- see: https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/EnablingAppSandbox.html -->
+<!--
+	These entitlements are needed for the external tools to be launchable from the main GUI.
+	See: https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/EnablingAppSandbox.html
+-->
