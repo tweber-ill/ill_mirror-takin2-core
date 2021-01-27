@@ -6,6 +6,7 @@
  */
 
 #include "sqwbase.h"
+#include "tlibs/log/log.h"
 
 
 /**
