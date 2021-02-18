@@ -9,9 +9,11 @@
 
 PRG="takin.app"
 
-# remove cached files
+# remove cache, object and hidden files
 find ${PRG}/Contents/Frameworks/Python.framework -type d -name "__pycache__" -exec rm -rfv {} \;
 find ${PRG}/Contents/Frameworks/Python.framework -type f -name "*.pyc" -exec rm -fv {} \;
+find ${PRG}/Contents/Frameworks/Python.framework -type f -name "*.o" -exec rm -fv {} \;
+find ${PRG}/Contents/Frameworks/Python.framework -type f -name ".*" -exec rm -fv {} \;
 
 
 # remove tcl/tk
