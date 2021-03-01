@@ -280,25 +280,29 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	QAction *pNew = new QAction("New", this);
 	pNew->setIcon(load_icon("res/icons/document-new.svg"));
+	pNew->setShortcut(QKeySequence::New);
 	pMenuFile->addAction(pNew);
 
 	pMenuFile->addSeparator();
 
-	QAction *pLoad = new QAction("Load...", this);
+	QAction *pLoad = new QAction("Open...", this);
 	pLoad->setIcon(load_icon("res/icons/document-open.svg"));
+	pLoad->setShortcut(QKeySequence::Open);
 	pMenuFile->addAction(pLoad);
 
-	m_pMenuRecent = new QMenu("Recently Loaded", this);
+	m_pMenuRecent = new QMenu("Recently Opened", this);
 	RecentFiles recent(&m_settings, "main/recent");
 	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ LoadFile(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecent);
 
 	QAction *pSave = new QAction("Save", this);
 	pSave->setIcon(load_icon("res/icons/document-save.svg"));
+	pSave->setShortcut(QKeySequence::Save);
 	pMenuFile->addAction(pSave);
 
 	QAction *pSaveAs = new QAction("Save as...", this);
 	pSaveAs->setIcon(load_icon("res/icons/document-save-as.svg"));
+	pSaveAs->setShortcut(QKeySequence::SaveAs);
 	pMenuFile->addAction(pSaveAs);
 
 	pMenuFile->addSeparator();
@@ -335,6 +339,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QAction *pExit = new QAction("Quit Takin", this);
 	pExit->setMenuRole(QAction::QuitRole);
 	pExit->setIcon(load_icon("res/icons/system-log-out.svg"));
+	pExit->setShortcut(QKeySequence::Quit);
 	pMenuFile->addAction(pExit);
 
 
@@ -737,6 +742,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	QAction *pHelp = new QAction("Show Help...", this);
 	pHelp->setIcon(load_icon("res/icons/help-browser.svg"));
+	pHelp->setShortcut(QKeySequence::HelpContents);
 	pMenuHelp->addAction(pHelp);
 
 	QAction *pDevelDoc = new QAction("Show Developer Help...", this);
