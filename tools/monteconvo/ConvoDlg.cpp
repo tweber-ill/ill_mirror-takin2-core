@@ -200,25 +200,29 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 	QAction *pNew = new QAction("New", this);
 	pNew->setIcon(load_icon("res/icons/document-new.svg"));
+	pNew->setShortcut(QKeySequence::New);
 	pMenuFile->addAction(pNew);
 
 	pMenuFile->addSeparator();
 
-	QAction *pLoad = new QAction("Load...", this);
+	QAction *pLoad = new QAction("Open...", this);
 	pLoad->setIcon(load_icon("res/icons/document-open.svg"));
+	pLoad->setShortcut(QKeySequence::Open);
 	pMenuFile->addAction(pLoad);
 
-	m_pMenuRecent = new QMenu("Recently Loaded", this);
+	m_pMenuRecent = new QMenu("Recently Opened", this);
 	RecentFiles recent(m_pSett, "monteconvo/recent");
 	recent.FillMenu(m_pMenuRecent, [this](const std::string& str){ Load(str.c_str()); });
 	pMenuFile->addMenu(m_pMenuRecent);
 
 	QAction *pSave = new QAction("Save", this);
 	pSave->setIcon(load_icon("res/icons/document-save.svg"));
+	pSave->setShortcut(QKeySequence::Save);
 	pMenuFile->addAction(pSave);
 
 	QAction *pSaveAs = new QAction("Save As...", this);
 	pSaveAs->setIcon(load_icon("res/icons/document-save-as.svg"));
+	pSaveAs->setShortcut(QKeySequence::SaveAs);
 	pMenuFile->addAction(pSaveAs);
 
 	pMenuFile->addSeparator();
@@ -230,7 +234,9 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	pMenuFile->addSeparator();
 
 	QAction *pExit = new QAction("Quit Convo", this);
+	pExit->setMenuRole(QAction::QuitRole);
 	pExit->setIcon(load_icon("res/icons/system-log-out.svg"));
+	pExit->setShortcut(QKeySequence::Quit);
 	pMenuFile->addAction(pExit);
 
 
@@ -295,6 +301,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	QMenu *pMenuHelp = new QMenu("Help", this);
 
 	QAction *pAbout = new QAction("About...", this);
+	pAbout->setMenuRole(QAction::AboutRole);
 	pAbout->setIcon(load_icon("res/icons/dialog-information.svg"));
 	pMenuHelp->addAction(pAbout);
 
