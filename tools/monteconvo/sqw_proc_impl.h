@@ -24,6 +24,7 @@
 
 #define MSG_QUEUE_SIZE 512
 #define PARAM_MEM 1024*1024
+#define WAIT_END_PROCESSES 250
 
 
 namespace ipr = boost::interprocess;
@@ -348,15 +349,10 @@ SqwProc<t_sqw>::SqwProc()
  */
 template<class t_sqw>
 SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
-	const char* pcProcMemName, const char* pcProcExecName,
-	unsigned int iNumChildProcesses)
-		: m_iNumChildProcesses(iNumChildProcesses), m_strProcBaseName(tl::rand_name<std::string>(8))
+	const char* pcProcMemName, const char* pcProcExecName, unsigned int iNumChildProcesses)
+	: m_iNumChildProcesses(iNumChildProcesses), m_strProcBaseName(tl::rand_name<std::string>(8))
 {
 	++m_iRefCnt;
-
-	// only support one child process when forking
-	if(mode == SqwProcStartMode::START_PARENT_FORK_CHILD)
-		m_iNumChildProcesses = 1;
 
 	// if a process name is given (e.g. for the child process), use it
 	if(pcProcMemName)
@@ -407,27 +403,36 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 					}
 				}
 
+#ifndef __MINGW32__
 				// fork a child process from the parent process
-	#ifndef __MINGW32__
 				else if(mode == SqwProcStartMode::START_PARENT_FORK_CHILD)
 				{
-					m_pidChild.push_back(fork());
-					if(m_pidChild[iChild] < 0)
+					pid_t pidChild = fork();
+
+					if(pidChild < 0)
 					{
-						tl::log_err("Cannot fork process.");
+						tl::log_err("Cannot fork child process.");
 						return;
 					}
-					else if(m_pidChild[iChild] == 0)
+					else if(pidChild == 0)
 					{
+						// start of child process
 						m_iNumChildProcesses = 1;
+						m_pidChild.resize(1);
 						m_pidChild[0] = 0;
 
 						child_proc<t_sqw>(*m_pmsgIn[iChild], *m_pmsgOut[iChild], pcCfg, m_pSharedPars[iChild]);
+
 						exit(0);
+						// end of child process
+
 						return;
 					}
+
+					// in control process
+					m_pidChild.push_back(pidChild);
 				}
-	#endif
+#endif
 
 				tl::log_debug("Waiting for child process ", iChild, " to become ready...");
 
@@ -454,6 +459,9 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 		{
 			// for the child process, the vectors have only one element
 			m_iNumChildProcesses = 1;
+			m_pidChild.resize(1);
+			m_pidChild[0] = 0;
+
 			const std::string& strProcName = m_strProcBaseName;
 
 			m_pMem.push_back(std::make_shared<ipr::managed_shared_memory>(ipr::open_only,
@@ -466,7 +474,6 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 			m_pmsgOut.push_back(std::make_shared<ipr::message_queue>(ipr::open_only,
 				("takin_sqw_proc_out_" + strProcName).c_str()));
 
-			m_pidChild.push_back(0);
 			child_proc<t_sqw>(*m_pmsgIn[0], *m_pmsgOut[0], pcCfg, m_pSharedPars[0]);
 		}
 	}
@@ -529,7 +536,7 @@ SqwProc<t_sqw>::~SqwProc()
 		if(--m_iRefCnt == 0)
 		{
 			// give clients time to end before removing the shared memory
-			std::this_thread::sleep_for(std::chrono::milliseconds{200});
+			std::this_thread::sleep_for(std::chrono::milliseconds{WAIT_END_PROCESSES});
 
 			for(unsigned int iChild=0; iChild<m_iNumChildProcesses; ++iChild)
 			{
