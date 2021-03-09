@@ -23,6 +23,7 @@ extern t_real_glob g_dEps;
 extern t_real_glob g_dEpsGfx;
 
 extern unsigned int g_iMaxThreads;
+extern unsigned int g_iMaxProcesses;
 
 extern std::size_t GFX_NUM_POINTS;
 extern std::size_t g_iMaxNN;
@@ -54,6 +55,7 @@ extern std::string find_file_in_global_paths(const std::string& strFile, bool bA
 extern std::string find_program_binary(const std::string& strExe, bool log_messages=true);
 
 extern unsigned int get_max_threads();
+extern unsigned int get_max_processes();
 
 extern std::string get_gpltool_version();
 

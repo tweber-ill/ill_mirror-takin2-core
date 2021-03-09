@@ -44,11 +44,18 @@ t_real_glob g_dFontSize = 10.;
 // -----------------------------------------------------------------------------
 
 unsigned int g_iMaxThreads = std::thread::hardware_concurrency();
+unsigned int g_iMaxProcesses = std::thread::hardware_concurrency();
 
 unsigned int get_max_threads()
 {
 	unsigned int iMaxThreads = std::thread::hardware_concurrency();
 	return std::min(iMaxThreads, g_iMaxThreads);
+}
+
+unsigned int get_max_processes()
+{
+	unsigned int iMaxProcesses = std::thread::hardware_concurrency();
+	return std::min(iMaxProcesses, g_iMaxProcesses);
 }
 
 // -----------------------------------------------------------------------------

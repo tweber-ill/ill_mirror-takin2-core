@@ -134,6 +134,7 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 		t_tupSpin("main/max_neighbours", g_iMaxNN, spinMaxNN),
 		t_tupSpin("main/max_peaks", 10, spinBragg),
 		t_tupSpin("main/max_threads", g_iMaxThreads, spinThreads),
+		t_tupSpin("main/max_processes", g_iMaxProcesses, spinProcesses),
 		t_tupSpin("gl/font_size", 24, spinGLFont),
 		t_tupSpin("net/poll", 750, spinNetPoll),
 	};
@@ -148,6 +149,7 @@ SettingsDlg::SettingsDlg(QWidget* pParent, QSettings* pSett)
 	spinPrecGen->setMaximum(std::numeric_limits<t_real>::max_digits10);
 	spinPrecGfx->setMaximum(std::numeric_limits<t_real>::max_digits10);
 	spinThreads->setMaximum(std::thread::hardware_concurrency());
+	spinProcesses->setMaximum(std::thread::hardware_concurrency());
 
 	SetDefaults(0);
 
@@ -309,6 +311,7 @@ void SettingsDlg::SetGlobals() const
 	g_iPrecGfx = spinPrecGfx->value();
 
 	g_iMaxThreads = spinThreads->value();
+	g_iMaxProcesses = spinProcesses->value();
 
 	g_dEps = std::pow(10., -t_real(g_iPrec));
 	g_dEpsGfx = std::pow(10., -t_real(g_iPrecGfx));
