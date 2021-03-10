@@ -227,6 +227,7 @@ static void msg_send(ipr::message_queue& msgqueue, const ProcMsg& msg)
 static ProcMsg msg_recv(ipr::message_queue& msgqueue)
 {
 	ProcMsg msg;
+
 	try
 	{
 		std::size_t iSize = 0;
@@ -240,6 +241,7 @@ static ProcMsg msg_recv(ipr::message_queue& msgqueue)
 	{
 		tl::log_err(ex.what());
 	}
+
 	return msg;
 }
 
@@ -444,7 +446,7 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 				if(!m_bOk)
 				{
 					tl::log_err("Child process ", m_pidChild[iChild], " reports failure.");
-					m_iNumChildProcesses = iChild;
+					m_iNumChildProcesses = iChild+1;
 					break;
 				}
 				else
