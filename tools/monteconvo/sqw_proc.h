@@ -8,6 +8,21 @@
 #ifndef __SQW_PROC_H__
 #define __SQW_PROC_H__
 
+#ifdef __USE_SQW_INTERPROC_EMUL__
+	#include <boost/interprocess/detail/workaround.hpp>
+
+	// try to avoid certain shared memory syscalls
+	#undef BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
+	#undef BOOST_INTERPROCESS_POSIX_SHARED_MEMORY_OBJECTS
+	#undef BOOST_INTERPROCESS_FILESYSTEM_BASED_POSIX_SHARED_MEMORY
+	#undef BOOST_INTERPROCESS_RUNTIME_FILESYSTEM_BASED_POSIX_SHARED_MEMORY
+
+	// force using emulation mode instead:
+	//   https://www.boost.org/doc/libs/1_75_0/doc/html/interprocess/sharedmemorybetweenprocesses.html#interprocess.sharedmemorybetweenprocesses.sharedmemory.emulation
+	#define BOOST_INTERPROCESS_FORCE_GENERIC_EMULATION
+	//#define BOOST_INTERPROCESS_SHARED_DIR_PATH "/tmp/shared_mem"
+#endif
+
 #include "sqw.h"
 #include <mutex>
 #include <memory>

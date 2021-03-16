@@ -19,6 +19,7 @@ option(USE_RtMp "use auxilliary libraries" TRUE)
 option(USE_Dl "use dl libraries" TRUE)
 option(USE_Py "search for python" TRUE)
 option(USE_CUSTOM_THREADPOOL "use custom threadpool implementation" FALSE)
+option(USE_INTERPROC_EMUL "force shared memory emulation mode" FALSE)
 
 set(USE_TR1_FUNCS FALSE)
 set(BUILD_EXT_TOOLS FALSE)
@@ -89,6 +90,12 @@ endif()
 if(USE_CUSTOM_THREADPOOL)
 	message("Using custom threadpool implementation.")
 	add_definitions(-DUSE_OWN_THREADPOOL)
+endif()
+
+
+if(USE_INTERPROC_EMUL)
+	message("Using interprocess shared memory emulation mode.")
+	add_definitions(-D__USE_SQW_INTERPROC_EMUL__)
 endif()
 
 
