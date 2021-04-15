@@ -452,6 +452,9 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pBZ3DExport->setIcon(load_icon("res/icons/image-x-generic.svg"));
 	m_pMenuViewRecip->addAction(pBZ3DExport);
 
+	QAction *pBZCutExport = new QAction("Export Brillouin Zone Cut...", this);
+	pBZCutExport->setIcon(load_icon("res/icons/image-x-generic.svg"));
+	m_pMenuViewRecip->addAction(pBZCutExport);
 
 
 	// --------------------------------------------------------------------------------
@@ -830,6 +833,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 
 	QObject::connect(pRecipExport, &QAction::triggered, this, &TazDlg::ExportRecip);
 	QObject::connect(pBZ3DExport, &QAction::triggered, this, &TazDlg::ExportBZ3DModel);
+	QObject::connect(pBZCutExport, &QAction::triggered, this, &TazDlg::ExportBZCut);
 	QObject::connect(pProjExport, &QAction::triggered, this, &TazDlg::ExportProj);
 	QObject::connect(pRealExport, &QAction::triggered, this, &TazDlg::ExportReal);
 	QObject::connect(pTofExport, &QAction::triggered, this, &TazDlg::ExportTof);

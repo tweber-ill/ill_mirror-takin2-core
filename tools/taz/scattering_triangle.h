@@ -197,7 +197,8 @@ class ScatteringTriangle : public QGraphicsItem
 		const tl::Kd<t_real_glob>& GetKdLattice() const { return m_kdLattice; }
 
 		const tl::Brillouin3D<t_real_glob>& GetBZ3D() const { return m_bz3; }
-		const std::vector<ublas::vector<t_real_glob>>& GetBZ3DPlaneVerts() const { return m_vecBZ3VertsUnproj; }
+		const std::vector<ublas::vector<t_real_glob>>& GetBZ3DPlaneVerts(bool planeproj=0) const
+		{ return planeproj ? m_vecBZ3Verts : m_vecBZ3VertsUnproj; }
 		const std::vector<ublas::vector<t_real_glob>>& GetBZ3DSymmVerts() const { return m_vecBZ3SymmPts; }
 
 	public:

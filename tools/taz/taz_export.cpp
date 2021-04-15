@@ -34,6 +34,7 @@ void TazDlg::ExportReal()
 	pTas->SetZoom(dZoom);
 }
 
+
 void TazDlg::ExportTof()
 {
 	TofLayout *pTof = m_sceneTof.GetTofLayout();
@@ -44,6 +45,7 @@ void TazDlg::ExportTof()
 	ExportSceneSVG(m_sceneTof);
 	pTof->SetZoom(dZoom);
 }
+
 
 void TazDlg::ExportRealLattice()
 {
@@ -56,6 +58,7 @@ void TazDlg::ExportRealLattice()
 	pLatt->SetZoom(dZoom);
 }
 
+
 void TazDlg::ExportRecip()
 {
 	ScatteringTriangle *pTri = m_sceneRecip.GetTriangle();
@@ -67,6 +70,7 @@ void TazDlg::ExportRecip()
 	pTri->SetZoom(dZoom);
 }
 
+
 void TazDlg::ExportProj()
 {
 	ProjLattice *pLatt = m_sceneProjRecip.GetLattice();
@@ -77,6 +81,7 @@ void TazDlg::ExportProj()
 	ExportSceneSVG(m_sceneProjRecip);
 	pLatt->SetZoom(dZoom);
 }
+
 
 void TazDlg::ExportSceneSVG(QGraphicsScene& scene)
 {
@@ -112,6 +117,62 @@ void TazDlg::ExportSceneSVG(QGraphicsScene& scene)
 
 
 /**
+ * export the current cut of the brillouin zone with the scattering plane
+ */
+void TazDlg::ExportBZCut()
+{
+	QFileDialog::Option fileopt = QFileDialog::Option(0);
+	if(!m_settings.value("main/native_dialogs", 1).toBool())
+		fileopt = QFileDialog::DontUseNativeDialog;
+
+	QString strDirLast = m_settings.value("main/last_dir_export", ".").toString();
+	QString strFile = QFileDialog::getSaveFileName(this,
+		"Export Data", strDirLast, "Data files (*.dat *.DAT)", nullptr, fileopt);
+	if(strFile == "")
+		return;
+	if(!strFile.endsWith(".dat", Qt::CaseInsensitive))
+		strFile += ".dat";
+
+
+	const ScatteringTriangle *pTri = m_sceneRecip.GetTriangle();
+	if(!pTri) return;
+
+	const auto& bz = pTri->GetBZ3D();
+	if(!bz.IsValid())
+	{
+		QMessageBox::critical(this, "Error", "3D Brillouin zone calculation is disabled or results are invalid.");
+		return;
+	}
+
+	std::ofstream ofstr(strFile.toStdString());
+	ofstr.precision(g_iPrec);
+	ofstr << "# Brillouin zone cut vertices.\n";
+	ofstr << "# Created with Takin " + std::string(TAKIN_VER) + ".\n";
+	ofstr << "\n";
+
+	const std::vector<ublas::vector<t_real>>& verts = pTri->GetBZ3DPlaneVerts();
+	for(ublas::vector<t_real> vert : verts)
+	{
+		if(vert.size() < 2)
+		{
+			tl::log_err("Invalid vertex in Brillouin zone cut.");
+			continue;
+		}
+
+		tl::set_eps_0(vert, g_dEps);
+		for(int coordidx=0; coordidx<2; ++coordidx)
+			ofstr << std::setw(g_iPrec*2.5) << std::left << vert[coordidx] << " ";
+		ofstr << "\n";
+	}
+	ofstr.flush();
+
+
+	std::string strDir = tl::get_dir(strFile.toStdString());
+	m_settings.setValue("main/last_dir_export", QString(strDir.c_str()));
+}
+
+
+/**
  * export the 3d BZ as 3D model
  */
 void TazDlg::ExportBZ3DModel()
@@ -129,7 +190,7 @@ void TazDlg::ExportBZ3DModel()
 		strFile += ".x3d";
 
 
-	ScatteringTriangle *pTri = m_sceneRecip.GetTriangle();
+	const ScatteringTriangle *pTri = m_sceneRecip.GetTriangle();
 	if(!pTri) return;
 
 	const auto& bz = pTri->GetBZ3D();
@@ -205,7 +266,6 @@ void TazDlg::ExportBZ3DModel()
 		m_settings.setValue("main/last_dir_export", QString(strDir.c_str()));
 	}
 }
-
 
 
 
