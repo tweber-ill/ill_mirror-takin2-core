@@ -673,9 +673,9 @@ void PowderDlg::SavePowder()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSettings)
-		m_pSettings->value("powder/last_dir", ".").toString();
+		m_pSettings->value("powder/last_dir", "~").toString();
 	QString qstrFile = QFileDialog::getSaveFileName(this,
 		"Save Powder Configuration", strDirLast,
 		"TAZ files (*.taz *.TAZ)", nullptr,
@@ -752,9 +752,9 @@ void PowderDlg::LoadPowder()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSettings)
-		strDirLast = m_pSettings->value("powder/last_dir", ".").toString();
+		strDirLast = m_pSettings->value("powder/last_dir", "~").toString();
 	QString qstrFile = QFileDialog::getOpenFileName(this,
 		"Open Powder Configuration", strDirLast,
 		"TAZ files (*.taz *.TAZ)", nullptr,
@@ -874,7 +874,7 @@ void PowderDlg::SaveTable()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_pSettings ? m_pSettings->value("powder/last_dir_table", ".").toString() : ".";
+	QString strDirLast = m_pSettings ? m_pSettings->value("powder/last_dir_table", "~").toString() : "~";
 	QString _strFile = QFileDialog::getSaveFileName(this,
 		"Save Table", strDirLast, "Data files (*.dat *.DAT)", nullptr, fileopt);
 

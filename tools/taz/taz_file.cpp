@@ -92,7 +92,7 @@ bool TazDlg::Load()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open TAS Configuration...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -599,7 +599,7 @@ bool TazDlg::SaveAs()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Save TAS Configuration", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -639,7 +639,7 @@ bool TazDlg::Import()
 		fileopt = QFileDialog::DontUseNativeDialog;
 
 	const bool bShowPreview = m_settings.value("main/dlg_previews", true).toBool();
-	QString strDirLast = m_settings.value("main/last_import_dir", ".").toString();
+	QString strDirLast = m_settings.value("main/last_import_dir", "~").toString();
 
 	std::unique_ptr<QFileDialog> pdlg;
 	if(bShowPreview)
@@ -802,7 +802,7 @@ bool TazDlg::ImportCIF()
 		fileopt = QFileDialog::DontUseNativeDialog;
 
 	const bool bShowPreview = m_settings.value("main/dlg_previews", true).toBool();
-	QString strDirLast = m_settings.value("main/last_import_cif_dir", ".").toString();
+	QString strDirLast = m_settings.value("main/last_import_cif_dir", "~").toString();
 
 	std::unique_ptr<QFileDialog> pdlg{new QFileDialog(this, "Import CIF...")};
 

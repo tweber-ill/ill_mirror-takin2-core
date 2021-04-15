@@ -58,7 +58,7 @@ void ConvoDlg::Load()
 
 	QString strDirLast = "";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir", "~").toString();
 	QString _strFile = QFileDialog::getOpenFileName(this,
 		"Open Convolution Configuration...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -122,7 +122,7 @@ void ConvoDlg::SaveAs()
 
 	QString strDirLast = "";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir", "~").toString();
 	QString _strFile = QFileDialog::getSaveFileName(this,
 		"Save Convolution Configuration", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -303,7 +303,7 @@ void ConvoDlg::SaveConvofit()
 
 	QString strDirLast = "";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_convofit", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_convofit", "~").toString();
 	QString _strFile = QFileDialog::getSaveFileName(this,
 		"Export to Convofit", strDirLast, "Convofit files (*.job *.JOB)",
 		nullptr, fileopt);
@@ -343,9 +343,9 @@ void ConvoDlg::SaveResult()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_result", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_result", "~").toString();
 
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Save Scan", strDirLast, "Data Files (*.dat *.DAT)", nullptr, fileopt);
@@ -470,9 +470,9 @@ void ConvoDlg::browseCrysFiles()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_crys", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_crys", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open Crystal File...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -493,9 +493,9 @@ void ConvoDlg::browseResoFiles()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_reso", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_reso", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open Resolution File...", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
@@ -516,9 +516,9 @@ void ConvoDlg::browseSqwFiles()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_sqw", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_sqw", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open S(q,w) File...", strDirLast, "All S(q,w) files (*.dat *.DAT *.py *.PY *.jl *.JL)",
 		nullptr, fileopt);
@@ -539,9 +539,9 @@ void ConvoDlg::browseScanFiles()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_scan", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_scan", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
 		"Open S(q,w) File...", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN);;All files (*.* *)",
 		nullptr, fileopt);
@@ -562,9 +562,9 @@ void ConvoDlg::browseAutosaveFile()
 	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_autosave", ".").toString();
+		strDirLast = m_pSett->value("monteconvo/last_dir_autosave", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Open S(q,w) File...", strDirLast, "Data files (*.dat *.txt);;All files (*.*)",
 		nullptr, fileopt);

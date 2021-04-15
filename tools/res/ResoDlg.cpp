@@ -259,7 +259,7 @@ std::shared_ptr<ReflCurve<t_real_reso>> ResoDlg::load_cache_refl(const std::stri
 	if(strFile == "")
 		return pRefl;
 
-	std::vector<std::string> vecRelDirs = { m_strCurDir, "." };
+	std::vector<std::string> vecRelDirs = { m_strCurDir, "~", "." };
 	const std::vector<std::string>& vecGlobalPaths = get_global_paths();
 	for(const std::string& strGlobalPath : vecGlobalPaths)
 		vecRelDirs.push_back(strGlobalPath);
@@ -990,7 +990,7 @@ void ResoDlg::MCGenerate()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strLastDir = m_pSettings ? m_pSettings->value("reso/mc_dir", ".").toString() : ".";
+	QString strLastDir = m_pSettings ? m_pSettings->value("reso/mc_dir", "~").toString() : "~";
 	QString _strFile = QFileDialog::getSaveFileName(this, "Save MC neutron data...",
 		strLastDir, "Data files (*.dat *.DAT);;All files (*.*)", nullptr, fileopt);
 	if(_strFile == "")

@@ -89,7 +89,7 @@ void TazDlg::ExportSceneSVG(QGraphicsScene& scene)
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir_export", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir_export", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Export SVG", strDirLast, "SVG files (*.svg *.SVG)", nullptr, fileopt);
 	if(strFile == "")
@@ -125,7 +125,7 @@ void TazDlg::ExportBZCut()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir_export", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir_export", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Export Data", strDirLast, "Data files (*.dat *.DAT)", nullptr, fileopt);
 	if(strFile == "")
@@ -181,7 +181,7 @@ void TazDlg::ExportBZ3DModel()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir_export", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir_export", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Export X3D", strDirLast, "X3D files (*.x3d *.X3D)", nullptr, fileopt);
 	if(strFile == "")
@@ -345,7 +345,7 @@ void TazDlg::ExportUCModel()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = m_settings.value("main/last_dir_export", ".").toString();
+	QString strDirLast = m_settings.value("main/last_dir_export", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
 		"Export X3D", strDirLast, "X3D files (*.x3d *.X3D)", nullptr, fileopt);
 	if(strFile == "")

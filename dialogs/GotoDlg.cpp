@@ -595,9 +595,9 @@ void GotoDlg::LoadList()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSettings)
-		strDirLast = m_pSettings->value("goto_pos/last_dir", ".").toString();
+		strDirLast = m_pSettings->value("goto_pos/last_dir", "~").toString();
 	QString qstrFile = QFileDialog::getOpenFileName(this,
 		"Load Positions", strDirLast,
 		"TAZ files (*.taz *.TAZ)", nullptr,
@@ -629,9 +629,9 @@ void GotoDlg::SaveList()
 	if(m_pSettings && !m_pSettings->value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strDirLast = ".";
+	QString strDirLast = "~";
 	if(m_pSettings)
-		m_pSettings->value("goto_pos/last_dir", ".").toString();
+		m_pSettings->value("goto_pos/last_dir", "~").toString();
 	QString qstrFile = QFileDialog::getSaveFileName(this,
 		"Save Positions", strDirLast,
 		"TAZ files (*.taz *.TAZ)", nullptr,

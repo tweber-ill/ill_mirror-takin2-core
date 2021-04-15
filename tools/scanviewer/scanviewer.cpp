@@ -328,7 +328,7 @@ void ScanViewerDlg::SelectDir()
 	if(!m_settings.value("main/native_dialogs", 1).toBool())
 		fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strCurDir = (m_strCurDir==""?".":m_strCurDir.c_str());
+	QString strCurDir = (m_strCurDir==""?"~":m_strCurDir.c_str());
 	QString strDir = QFileDialog::getExistingDirectory(this, "Select directory",
 		strCurDir, QFileDialog::ShowDirsOnly | fileopt);
 	if(strDir != "")
