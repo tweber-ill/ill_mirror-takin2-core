@@ -87,14 +87,17 @@ void DeadAnglesDlg::AddAngle()
 	int iRow = tableAngles->rowCount();
 	tableAngles->insertRow(iRow);
 
-	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::START_ANGLE), new QTableWidgetItem("0"));
-	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::STOP_ANGLE), new QTableWidgetItem("0"));
-	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::OFFSET_ANGLE), new QTableWidgetItem("0"));
+	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::START_ANGLE),
+		new QTableWidgetItem("0"));
+	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::STOP_ANGLE),
+		new QTableWidgetItem("0"));
+	tableAngles->setItem(iRow, static_cast<int>(AngleInfo::OFFSET_ANGLE),
+		new QTableWidgetItem("0"));
 
 	QComboBox *pComboCentreOn = new QComboBox(tableAngles);
-	pComboCentreOn->addItem("Mono.");
+	pComboCentreOn->addItem("Monochromator");
 	pComboCentreOn->addItem("Sample");
-	pComboCentreOn->addItem("Ana.");
+	pComboCentreOn->addItem("Analyser");
 	pComboCentreOn->setCurrentIndex(1);
 	tableAngles->setCellWidget(iRow, static_cast<int>(AngleInfo::CENTRE), pComboCentreOn);
 
@@ -161,13 +164,13 @@ void DeadAnglesDlg::SendApplyDeadAngles()
 	{
 		DeadAngle<t_real> angle;
 		angle.dAngleStart = 
-			tl::str_to_var<t_real>(tableAngles->item(
+			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::START_ANGLE))->text().toStdString());
 		angle.dAngleEnd = 
-			tl::str_to_var<t_real>(tableAngles->item(
+			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::STOP_ANGLE))->text().toStdString());
 		angle.dAngleOffs = 
-			tl::str_to_var<t_real>(tableAngles->item(
+			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::OFFSET_ANGLE))->text().toStdString());
 
 		QComboBox* pComboCentreOn = (QComboBox*)tableAngles->
