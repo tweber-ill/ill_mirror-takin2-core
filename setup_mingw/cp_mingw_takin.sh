@@ -56,7 +56,8 @@ cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libglib-2.0-0.dll	${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libintl-8.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libpcre-1.dll		${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssp-0.dll		${INSTDIR}/
-#cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libMinuit2.dll	${INSTDIR}/
+cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libMinuit2.dll		${INSTDIR}/
+cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libMinuit2Math.dll	${INSTDIR}/
 
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_regex-x64.dll			${INSTDIR}/
 cp -v /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libboost_system-x64.dll		${INSTDIR}/
