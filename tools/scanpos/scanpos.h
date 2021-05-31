@@ -79,7 +79,8 @@ bool make_plot(std::ostream& ostr,
 	(*pOstr) << "#!/usr/bin/gnuplot -p\n";
 	(*pOstr) << "#\n";
 	(*pOstr) << "# Created with Takin version " << TAKIN_VER
-		<< " and tlibs version " << TLIBS_VERSION << ".\n";
+		<< " and tlibs version " << TLIBS_VERSION
+		<< " (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	(*pOstr) << "# Date: " << tl::epoch_to_str<t_real>(tl::epoch<t_real>(),
 		"%b %d, %Y at %H:%M:%S (%Z).") << "\n";
 	(*pOstr) << "#\n\n";

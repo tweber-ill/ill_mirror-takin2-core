@@ -316,7 +316,7 @@ void QwtPlotWrapper::SavePlot() const
 
 	ofstrDat.precision(g_iPrec);
 	ofstrDat << "#\n";
-	ofstrDat << "# comment: Created with Takin.\n";
+	ofstrDat << "# comment: Created with Takin (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	ofstrDat << "# timestamp: " << tl::var_to_str<t_real_qwt>(dEpoch)
 		<< " (" << tl::epoch_to_str<t_real_qwt>(dEpoch) << ").\n";
 	ofstrDat << "# title: " << m_pPlot->title().text().toStdString() << "\n";
@@ -415,7 +415,7 @@ void QwtPlotWrapper::ExportGpl() const
 
 	ofstrDat.precision(g_iPrec);
 	ofstrDat << "#\n";
-	ofstrDat << "# comment: Created with Takin.\n";
+	ofstrDat << "# comment: Created with Takin (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	ofstrDat << "# timestamp: " << tl::var_to_str<t_real_qwt>(dEpoch)
 		<< " (" << tl::epoch_to_str<t_real_qwt>(dEpoch) << ").\n";
 	ofstrDat << "#\n";

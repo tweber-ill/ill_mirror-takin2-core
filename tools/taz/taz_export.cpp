@@ -104,7 +104,7 @@ void TazDlg::ExportSceneSVG(QGraphicsScene& scene)
 	svg.setSize(QSize(rect.width(), rect.height()));
 	//svg.setResolution(300);
 	svg.setViewBox(QRectF(0, 0, rect.width(), rect.height()));
-	svg.setDescription("Created with Takin");
+	svg.setDescription("Created with Takin (https://dx.doi.org/10.5281/zenodo.4117437)");
 
 	QPainter painter;
 	painter.begin(&svg);
@@ -147,7 +147,7 @@ void TazDlg::ExportBZCut()
 	std::ofstream ofstr(strFile.toStdString());
 	ofstr.precision(g_iPrec);
 	ofstr << "# Brillouin zone cut vertices.\n";
-	ofstr << "# Created with Takin " + std::string(TAKIN_VER) + ".\n";
+	ofstr << "# Created with Takin " + std::string(TAKIN_VER) + " (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	ofstr << "\n";
 
 	const std::vector<ublas::vector<t_real>>& verts = pTri->GetBZ3DPlaneVerts();
@@ -250,7 +250,7 @@ void TazDlg::ExportBZ3DModel()
 	ostrComment << bz.GetVertices().size() << " vertices, ";
 	ostrComment << pTri->GetBZ3DSymmVerts().size() << " symmetry points.\n";
 
-	std::string strTakin = "\nCreated with Takin " + std::string(TAKIN_VER) + ".\n";
+	std::string strTakin = "\nCreated with Takin " + std::string(TAKIN_VER) + " (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	strTakin += "Timestamp: " + tl::epoch_to_str<t_real>(tl::epoch<t_real>()) + "\n\n";
 	x3d.SetComment(strTakin + ostrComment.str());
 
@@ -417,7 +417,7 @@ void TazDlg::ExportUCModel()
 	ostrComment << "Super cell contains " << m_latticecommon.vecIdxSC.size() << " atoms.\n";
 
 	tl::log_info(ostrComment.str());
-	std::string strTakin = "\nCreated with Takin " + std::string(TAKIN_VER) + ".\n";
+	std::string strTakin = "\nCreated with Takin " + std::string(TAKIN_VER) + " (https://dx.doi.org/10.5281/zenodo.4117437).\n";
 	strTakin += "Timestamp: " + tl::epoch_to_str<t_real>(tl::epoch<t_real>()) + "\n\n";
 	x3d.SetComment(strTakin + ostrComment.str());
 
