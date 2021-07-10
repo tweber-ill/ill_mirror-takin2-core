@@ -498,7 +498,7 @@ bool gen_magformfacts_npy()
 
 	if(!propIn.Load("tmp/magnetic_form_factors.json", tl::PropType::JSON))
 	{
-		tl::log_err("Cannot load scattering length table \"tmp/magnetic_form_factors.json\".");
+		tl::log_err("Cannot load magnetic formfactor table \"tmp/magnetic_form_factors.json\".");
 		return false;
 	}
 
