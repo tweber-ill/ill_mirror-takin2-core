@@ -177,10 +177,17 @@ t_real SqwKdTree::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 {
 	// meV and rlu units will have equal scaling in the kd tree!
 	std::vector<t_real> vechklE = {dh, dk, dl, dE};
+	
+	// Warning: Will return 0 when bounding box has one of the four dimensions is 0
 	if(!m_kd->IsPointInGrid(vechklE))
+	{
+		//std::cout << "not in grid: (" << dh << " " << dk << " " << dl << " " << dE << ")" << std::endl;
 		return 0.;
+	}
 
 	std::vector<t_real> vec = m_kd->GetNearestNode(vechklE);
+	//std::cout << "querying (" << dh << " " << dk << " " << dl << " " << dE << "), result: " 
+	//	<< vec[0] << " " << vec[1] << " " << vec[2] << " " << vec[3] << std::endl;
 
 	return vec[4];
 }
