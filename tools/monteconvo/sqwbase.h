@@ -32,7 +32,7 @@ public:
 
 protected:
 	bool m_bOk = false;
-	std::vector<t_var_fit> m_vecFit;
+	std::vector<t_var_fit> m_vecFit{};
 
 
 public:
