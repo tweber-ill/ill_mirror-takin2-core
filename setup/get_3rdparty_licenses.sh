@@ -66,7 +66,8 @@ if ! wget https://raw.githubusercontent.com/egonw/bodr/master/bodr/COPYING -O ${
 fi
 
 # dejavu
-if ! wget https://dejavu-fonts.github.io/License.html -O ${LICDIR}/dejavu_license.htm; then
+#if ! wget https://dejavu-fonts.github.io/License.html -O ${LICDIR}/dejavu_license.htm; then
+if ! wget https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/LICENSE -O ${LICDIR}/dejavu_license.txt; then
 	echo -e "Error: Cannot download DejaVu license.";
 fi
 
@@ -76,7 +77,8 @@ if ! wget https://raw.githubusercontent.com/freedesktop/libjpeg/master/README -O
 fi
 
 # libtiff
-if ! wget http://www.libtiff.org/misc.html -O ${LICDIR}/libtiff_license.htm; then
+#if ! wget http://www.libtiff.org/misc.html -O ${LICDIR}/libtiff_license.htm; then
+if ! wget https://raw.githubusercontent.com/vadz/libtiff/master/COPYRIGHT -O ${LICDIR}/libtiff_license.txt; then
 	echo -e "Error: Cannot download libtiff license.";
 fi
 
