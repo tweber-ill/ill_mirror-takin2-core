@@ -8,6 +8,27 @@
  *		rescal5 package by Zinkin, McMorrow, Tennant, Farhi, and Wildes (ca. 1995-2007):
  *		http://www.ill.eu/en/instruments-support/computing-for-science/cs-software/all-software/matlab-ill/rescal-for-matlab/
  * @desc see: [pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
+ *
+ * ----------------------------------------------------------------------------
+ * Takin (inelastic neutron scattering software package)
+ * Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+ *                          Grenoble, France).
+ * Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
+ *                          (TUM), Garching, Germany).
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * ----------------------------------------------------------------------------
  */
 
 #ifndef __TAKIN_POP_H__
