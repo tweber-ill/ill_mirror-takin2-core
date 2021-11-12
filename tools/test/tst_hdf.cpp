@@ -3,8 +3,8 @@
  * @author Tobias Weber <tobias.weber@tum.de>
  * @date 9-apr-17
  * @license GPLv2
- * 
- * gcc -lstdc++ -o tst_hdf tst_hdf.cpp -lstdc++ -lhdf5
+ *
+ * gcc -o tst_hdf tst_hdf.cpp -lstdc++ -lhdf5
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -76,7 +76,7 @@ int main()
 
 
 	hid_t file2 = ::H5Fopen("tst.hdf", H5F_ACC_RDONLY, H5P_DEFAULT);
-	if(file1 < 0)
+	if(file2 < 0)
 	{
 		std::cerr << "Cannot open file." << std::endl;
 		return -1;
