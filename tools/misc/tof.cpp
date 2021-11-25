@@ -54,6 +54,9 @@ bool convert_tof(const fs::path& tof_file, const fs::path& out_file)
 {
 	using t_data = std::uint32_t;
 
+	gil::gray16_image_t total_png(PSD_WIDTH, PSD_HEIGHT);
+	auto total_view = gil::view(total_png);
+
 	for(unsigned t=0; t<TOF_COUNT; ++t)
 	{
 		std::ostringstream ostr_file;
@@ -76,14 +79,16 @@ bool convert_tof(const fs::path& tof_file, const fs::path& out_file)
 		for(unsigned y=0; y<PSD_HEIGHT; ++y)
 		{
 			auto row = view.row_begin(y);
+			auto total_row = total_view.row_begin(y);
 
 			for(unsigned x=0; x<PSD_WIDTH; ++x)
 			{
 				t_data cnt = data[y*PSD_WIDTH + x];
 
 				*(row + x) = cnt;
-				counts += cnt;
+				*(total_row + x) = *(total_row + x) + cnt;
 
+				counts += cnt;
 				//std::cout << std::hex << cnt << " ";
 			}
 			//std::cout << std::endl;
@@ -98,6 +103,8 @@ bool convert_tof(const fs::path& tof_file, const fs::path& out_file)
 		}
 	}
 
+	std::string total_png_file = out_file.string() + ".png";
+	gil::write_view(total_png_file, total_view, gil::png_tag());
 	return true;
 }
 
