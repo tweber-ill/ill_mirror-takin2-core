@@ -86,7 +86,11 @@ bool convert_tof(const fs::path& tof_file, const fs::path& out_file)
 				t_data cnt = data[y*PSD_WIDTH + x];
 
 				*(row + x) = cnt;
-				*(total_row + x) = *(total_row + x) + cnt;
+
+				if(t == 0)
+					*(total_row + x) = cnt;
+				else
+					*(total_row + x) = *(total_row + x) + cnt;
 
 				counts += cnt;
 				//std::cout << std::hex << cnt << " ";
