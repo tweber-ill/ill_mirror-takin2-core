@@ -43,11 +43,13 @@
 #include <qwt_picker_machine.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_renderer.h>
-#include <qwt_curve_fitter.h>
-#include <qwt_spline_curve_fitter.h>
 #include <qwt_scale_map.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_engine.h>
+#include <qwt_curve_fitter.h>
+#if QWT_VERSION >= 0x060200
+	#include <qwt_spline_curve_fitter.h>
+#endif
 
 #include <QFileDialog>
 #include <QMessageBox>

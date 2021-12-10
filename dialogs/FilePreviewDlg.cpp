@@ -107,10 +107,10 @@ void FilePreviewDlg::FileSelected(const QString& qstrFile)
 
 	std::unique_ptr<tl::FileInstrBase<t_real>> _ptrInstr(pInstr);
 
-	std::vector<std::string> vecScanVars = pInstr->GetScannedVars();
+	std::vector<std::string> vecScanVars = _ptrInstr->GetScannedVars();
 	if(vecScanVars.size() == 0) return;
-	m_vecCts = pInstr->GetCol(pInstr->GetCountVar());
-	m_vecScn = pInstr->GetCol(vecScanVars[0]);
+	m_vecCts = _ptrInstr->GetCol(_ptrInstr->GetCountVar());
+	m_vecScn = _ptrInstr->GetCol(vecScanVars[0]);
 
 	//std::copy(m_vecScn.begin(), m_vecScn.end(), std::ostream_iterator<t_real>(std::cout, " "));
 	//std::cout << std::endl;

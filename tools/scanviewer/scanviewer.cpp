@@ -1147,7 +1147,8 @@ void ScanViewerDlg::ChangedPath()
 	{
 		m_strCurDir = tl::wstr_to_str(dir.native());
 		tl::trim(m_strCurDir);
-		if(*(m_strCurDir.begin()+m_strCurDir.length()-1) != fs::path::preferred_separator)
+		std::size_t len = m_strCurDir.length();
+		if(len > 0 && *(m_strCurDir.begin()+len-1) != fs::path::preferred_separator)
 			m_strCurDir += fs::path::preferred_separator;
 		UpdateFileList();
 

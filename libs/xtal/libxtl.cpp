@@ -49,6 +49,8 @@ int xtl_init()
 
 	g_pSGs = new xtl::SpaceGroups<t_real>("libxtl.xml", "xtl");
 	g_pSLs = new xtl::ScatlenList<t_real>("libxtl.xml", "xtl");
+
+	return 0;
 }
 
 

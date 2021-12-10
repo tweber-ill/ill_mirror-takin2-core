@@ -328,7 +328,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	decltype(scan.vecPoints) vecPointsNew;
 	decltype(scan.vecX) vecXNew;
 	decltype(scan.vecCts) vecCtsNew, vecMonNew, vecCtsErrNew, vecMonErrNew;
-	decltype(scan.vechklE) vechklENew;
+	decltype(scan.vechklE) vechklENew{};
 
 	for(std::size_t i=0; i<iNumPts; ++i)
 	{
