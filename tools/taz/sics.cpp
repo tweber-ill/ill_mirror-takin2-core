@@ -33,6 +33,7 @@
 #include "tlibs/time/chrono.h"
 #include "libs/globals.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/bind/bind.hpp>
 
 using t_real = t_real_glob;
 

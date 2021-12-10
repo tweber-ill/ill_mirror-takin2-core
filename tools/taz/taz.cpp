@@ -1663,7 +1663,7 @@ void TazDlg::ShowHelp()
 			std::string{"assistant"}
 		}};
 
-		for(const std::string strHelpProg : vecHelpProg)
+		for(const std::string& strHelpProg : vecHelpProg)
 		{
 			fs::path pathAssistant = proc::search_path(strHelpProg);
 			if(fs::exists(pathAssistant) && pathAssistant!="")

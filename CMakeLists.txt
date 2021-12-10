@@ -54,8 +54,8 @@ if(DEBUG)
 	set(CMAKE_BUILD_TYPE Debug)
 
 	set(Boost_DEBUG TRUE)
-	set(Boost_USE_DEBUG_LIBS TRUE)
-	set(Boost_USE_RELEASE_LIBS FALSE)
+	#set(Boost_USE_DEBUG_LIBS TRUE)
+	#set(Boost_USE_RELEASE_LIBS FALSE)
 
 	add_definitions(-DDEBUG)
 	add_compile_options(-ggdb -rdynamic)

@@ -32,6 +32,8 @@
 #include "tlibs/helper/py.h"
 #include "libs/globals.h"
 
+#include <boost/bind/bind.hpp>
+
 using t_real = t_real_glob;
 
 

@@ -44,6 +44,8 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_renderer.h>
 #include <qwt_curve_fitter.h>
+#include <qwt_spline_curve_fitter.h>
+#include <qwt_scale_map.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_engine.h>
 
@@ -186,8 +188,10 @@ QwtPlotWrapper::QwtPlotWrapper(QwtPlot *pPlot,
 			if(bUseSpline)
 			{
 				pCurve->setCurveFitter(new QwtSplineCurveFitter());
+#if QWT_VERSION < 0x060200
 				((QwtSplineCurveFitter*)pCurve->curveFitter())->setFitMode(
-					QwtSplineCurveFitter::/*Parametric*/Spline);
+					QwtSplineCurveFitter::Spline);
+#endif
 				pCurve->setCurveAttribute(QwtPlotCurve::Fitted);
 			}
 
@@ -623,7 +627,9 @@ void MyQwtRasterData::SetXRange(t_real_qwt dMin, t_real_qwt dMax)
 	dMin -= dOffs; dMax -= dOffs;
 
 	m_dXRange[0] = dMin; m_dXRange[1] = dMax;
+#if QWT_VERSION < 0x060200
 	setInterval(Qt::XAxis, QwtInterval(dMin, dMax, QwtInterval::ExcludeMaximum));
+#endif
 }
 
 void MyQwtRasterData::SetYRange(t_real_qwt dMin, t_real_qwt dMax)
@@ -632,13 +638,17 @@ void MyQwtRasterData::SetYRange(t_real_qwt dMin, t_real_qwt dMax)
 	dMin -= dOffs; dMax -= dOffs;
 
 	m_dYRange[0] = dMin; m_dYRange[1] = dMax;
+#if QWT_VERSION < 0x060200
 	setInterval(Qt::YAxis, QwtInterval(dMin, dMax, QwtInterval::ExcludeMaximum));
+#endif
 }
 
 void MyQwtRasterData::SetZRange(t_real_qwt dMin, t_real_qwt dMax)
 {
 	m_dZRange[0] = dMin; m_dZRange[1] = dMax;
+#if QWT_VERSION < 0x060200
 	setInterval(Qt::ZAxis, QwtInterval(dMin, dMax));
+#endif
 }
 
 void MyQwtRasterData::SetZRange()	// automatically determined range
@@ -647,7 +657,9 @@ void MyQwtRasterData::SetZRange()	// automatically determined range
 
 	auto minmax = std::minmax_element(m_pData.get(), m_pData.get()+m_iW*m_iH);
 	m_dZRange[0] = *minmax.first; m_dZRange[1] = *minmax.second;
+#if QWT_VERSION < 0x060200
 	setInterval(Qt::ZAxis, QwtInterval(m_dZRange[0], m_dZRange[1]));
+#endif
 }
 
 
@@ -670,7 +682,8 @@ t_real_qwt MyQwtRasterData::value(t_real_qwt dx, t_real_qwt dy) const
 MyQwtRasterData::~MyQwtRasterData()
 {}
 
-MyQwtRasterData::MyQwtRasterData(const MyQwtRasterData& dat) : QwtRasterData()
+MyQwtRasterData::MyQwtRasterData(const MyQwtRasterData& dat)
+	: QwtRasterData()
 {
 	this->operator=(dat);
 }
@@ -718,6 +731,20 @@ QwtInterval MyQwtRasterData::range() const
 {
 	return QwtInterval(GetZMin(), GetZMax());
 }
+
+#if QWT_VERSION >= 0x060200
+QwtInterval MyQwtRasterData::interval(Qt::Axis ax) const
+{
+	if(ax == Qt::XAxis)
+		return QwtInterval(GetXMin(), GetXMax(), QwtInterval::ExcludeMaximum);
+	if(ax == Qt::XAxis)
+		return QwtInterval(GetYMin(), GetYMax(), QwtInterval::ExcludeMaximum);
+	else if(ax == Qt::ZAxis)
+		return range();
+
+	return QwtInterval(0, 0);
+}
+#endif
 
 
 

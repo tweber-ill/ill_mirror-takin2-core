@@ -72,7 +72,7 @@ namespace fs = boost::filesystem;
 ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	: QDialog(pParent, Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowMinMaxButtonsHint),
 		m_settings("takin", "scanviewer"),
-		m_vecExts({	".dat", ".DAT", ".scn", ".SCN", ".ng0", ".NG0", ".log", ".LOG", "" }),
+		m_vecExts({ ".dat", ".DAT", ".scn", ".SCN", ".ng0", ".NG0", ".log", ".LOG", "" }),
 		m_pFitParamDlg(new FitParamDlg(this, &m_settings))
 {
 	this->setupUi(this);
@@ -93,6 +93,7 @@ ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	plot->setCanvasBackground(colorBck);
 
 	m_plotwrap.reset(new QwtPlotWrapper(plot, 2, true));
+
 
 	QPen penCurve;
 	penCurve.setColor(QColor(0,0,0x99));

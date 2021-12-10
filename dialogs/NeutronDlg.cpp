@@ -833,11 +833,11 @@ void NeutronDlg::CalcBraggRecip()
 			lam = tl::bragg_recip_lam(Q, tt, t_real(iOrder));
 			t_real dK = tl::lam2k(lam) * angs;
 
-			std::string strLam = tl::var_to_str(t_real(lam/angs), g_iPrec);
-			std::string strK = tl::var_to_str(dK, g_iPrec);
+			std::string strLamNew = tl::var_to_str(t_real(lam/angs), g_iPrec);
+			std::string strKNew = tl::var_to_str(dK, g_iPrec);
 
-			editBraggReciLam->setText(strLam.c_str());
-			editBraggReciK->setText(strK.c_str());
+			editBraggReciLam->setText(strLamNew.c_str());
+			editBraggReciK->setText(strKNew.c_str());
 		}
 		catch(const std::exception& ex)
 		{
@@ -852,11 +852,11 @@ void NeutronDlg::CalcBraggRecip()
 			Q = tl::bragg_recip_Q(lam, tt, t_real(iOrder));
 			t_real dD = tl::G2d(Q) / angs;
 
-			std::string strQ = tl::var_to_str(t_real(Q*angs), g_iPrec);
-			std::string strD = tl::var_to_str(dD, g_iPrec);
+			std::string strQNew = tl::var_to_str(t_real(Q*angs), g_iPrec);
+			std::string strDNew = tl::var_to_str(dD, g_iPrec);
 
-			editBraggReciQ->setText(strQ.c_str());
-			editBraggRecid->setText(strD.c_str());
+			editBraggReciQ->setText(strQNew.c_str());
+			editBraggRecid->setText(strDNew.c_str());
 		}
 		catch(const std::exception& ex)
 		{
@@ -870,11 +870,11 @@ void NeutronDlg::CalcBraggRecip()
 		{
 			tt = tl::bragg_recip_twotheta(Q, lam, t_real(iOrder));
 
-			std::string strTT = tl::var_to_str<t_real>(tl::r2d(tt/rads), g_iPrec);
-			std::string strT = tl::var_to_str<t_real>(tl::r2d(t_real(0.5)*tt/rads), g_iPrec);
+			std::string strTTNew = tl::var_to_str<t_real>(tl::r2d(tt/rads), g_iPrec);
+			std::string strTNew = tl::var_to_str<t_real>(tl::r2d(t_real(0.5)*tt/rads), g_iPrec);
 
-			editBraggReciTT->setText(strTT.c_str());
-			editBraggReciT->setText(strT.c_str());
+			editBraggReciTT->setText(strTTNew.c_str());
+			editBraggReciT->setText(strTNew.c_str());
 		}
 		catch(const std::exception& ex)
 		{

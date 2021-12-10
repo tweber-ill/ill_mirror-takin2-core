@@ -397,7 +397,7 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 
 				m_pMem.push_back(std::make_shared<ipr::managed_shared_memory>(ipr::create_only,
 					("takin_sqw_proc_mem_" + strProcName).c_str(), PARAM_MEM));
-				m_pSharedPars.push_back(static_cast<void*>(m_pMem[iChild]->construct<t_sh_str>
+				m_pSharedPars.push_back(static_cast<void*>(m_pMem[iChild]->template construct<t_sh_str>
 					(("takin_sqw_proc_params_" + strProcName).c_str())
 					(t_sh_str_alloc(m_pMem[iChild]->get_segment_manager()))));
 
@@ -489,7 +489,7 @@ SqwProc<t_sqw>::SqwProc(const char* pcCfg, SqwProcStartMode mode,
 
 			m_pMem.push_back(std::make_shared<ipr::managed_shared_memory>(ipr::open_only,
 				("takin_sqw_proc_mem_" + strProcName).c_str()));
-			m_pSharedPars.push_back(static_cast<void*>(m_pMem[0]->find<t_sh_str>
+			m_pSharedPars.push_back(static_cast<void*>(m_pMem[0]->template find<t_sh_str>
 				(("takin_sqw_proc_params_" + strProcName).c_str()).first));
 
 			m_pmsgIn.push_back(std::make_shared<ipr::message_queue>(ipr::open_only,
@@ -568,7 +568,7 @@ SqwProc<t_sqw>::~SqwProc()
 				ipr::message_queue::remove(("takin_sqw_proc_in_" + strProcName).c_str());
 				ipr::message_queue::remove(("takin_sqw_proc_out_" + strProcName).c_str());
 
-				m_pMem[iChild]->destroy<t_sh_str>(("takin_sqw_proc_params_" + strProcName).c_str());
+				m_pMem[iChild]->template destroy<t_sh_str>(("takin_sqw_proc_params_" + strProcName).c_str());
 				ipr::shared_memory_object::remove(("takin_sqw_proc_mem_" + strProcName).c_str());
 
 				tl::log_debug("Removed process memory \"", "takin_sqw_proc_*_",

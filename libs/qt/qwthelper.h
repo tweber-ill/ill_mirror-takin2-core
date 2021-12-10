@@ -38,6 +38,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_spectrogram.h>
 #include <qwt_raster_data.h>
+//#include <qwt_matrix_raster_data.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_picker.h>
@@ -113,6 +114,10 @@ public:
 	virtual QwtRasterData* clone() const;
 	virtual QwtRasterData* copy() const /*override only for qwt5*/;
 	virtual QwtInterval range() const /*override only for qwt5*/;
+
+#if QWT_VERSION >= 0x060200
+	virtual QwtInterval interval(Qt::Axis ax) const override;
+#endif
 };
 
 

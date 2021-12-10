@@ -29,6 +29,7 @@
 #include "FilePreviewDlg.h"
 #include <QGridLayout>
 #include <QLabel>
+#include <QPen>
 #include "tlibs/file/loadinstr.h"
 #include <iostream>
 #include <memory>
