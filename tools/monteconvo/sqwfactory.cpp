@@ -369,7 +369,7 @@ void load_sqw_plugins()
 					std::shared_ptr<so::shared_library> pmod =
 						std::make_shared<so::shared_library>(strPlugin,
 							so::load_mode::rtld_lazy | so::load_mode::rtld_local);
-					if(!pmod)
+					if(!pmod || !*pmod)
 						continue;
 
 					// import info function
