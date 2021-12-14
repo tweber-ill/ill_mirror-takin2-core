@@ -71,7 +71,7 @@ function find_bindings()
 
 	echo -e "--------------------------------------------------------------------------------"
 	echo -e "\"${cfile}\":"
-	otool -L ${cfile} | grep --color /usr/local
+	otool -L ${cfile} | grep --color "/usr/local\|/Library/Frameworks/Python.framework"
 	echo -e "--------------------------------------------------------------------------------\n"
 }
 

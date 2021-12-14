@@ -687,7 +687,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 						// run exernal tool process
 						tl::log_debug("Running process \"", toolbin, "\"...");
 
-						tl::PipeProc<char> proc(toolbin.c_str(), false);
+						tl::PipeProc<char> proc((toolbin + "&").c_str(), false);
 						if(!proc.IsReady())
 							tl::log_err("Process \"", toolbin, "\" could not be created.");
 					});
@@ -780,6 +780,8 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	pMenuHelp->addAction(pLog);
 
 	pMenuHelp->addSeparator();
+	QAction *pWebsite = new QAction("Show Takin Website...", this);
+	pMenuHelp->addAction(pWebsite);
 	QAction *pBugReport = new QAction("Report Bug...", this);
 	pMenuHelp->addAction(pBugReport);
 
@@ -889,6 +891,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 	QObject::connect(pHelp, &QAction::triggered, this, &TazDlg::ShowHelp);
 	QObject::connect(pDevelDoc, &QAction::triggered, this, &TazDlg::ShowDevelDoc);
 	QObject::connect(pLog, &QAction::triggered, this, &TazDlg::ShowLog);
+	QObject::connect(pWebsite, &QAction::triggered, this, &TazDlg::ShowWebsite);
 	QObject::connect(pBugReport, &QAction::triggered, this, &TazDlg::ReportBug);
 	QObject::connect(pAbout, &QAction::triggered, this, &TazDlg::ShowAbout);
 	QObject::connect(pAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -1637,9 +1640,16 @@ void TazDlg::ShowAbout()
 }
 
 
+void TazDlg::ShowWebsite()
+{
+	QDesktopServices::openUrl(QUrl("http://www.ill.eu/takin"));
+}
+
+
 void TazDlg::ReportBug()
 {
-	QDesktopServices::openUrl(QUrl("https://code.ill.fr/scientific-software/takin/core/-/issues"));
+	QDesktopServices::openUrl(QUrl(
+		"https://code.ill.fr/scientific-software/takin/core/-/issues"));
 }
 
 

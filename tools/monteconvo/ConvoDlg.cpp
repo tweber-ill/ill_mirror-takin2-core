@@ -254,10 +254,10 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 
 	pMenuFile->addSeparator();
 
-	QAction *pExit = new QAction("Quit Convo", this);
-	pExit->setMenuRole(QAction::QuitRole);
+	QAction *pExit = new QAction("Close Convo", this);
+	//pExit->setMenuRole(QAction::QuitRole);
 	pExit->setIcon(load_icon("res/icons/system-log-out.svg"));
-	pExit->setShortcut(QKeySequence::Quit);
+	pExit->setShortcut(QKeySequence::Close);
 	pMenuFile->addAction(pExit);
 
 

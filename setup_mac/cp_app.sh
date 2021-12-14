@@ -30,7 +30,7 @@
 # ----------------------------------------------------------------------------
 #
 
-clean_frameworks=0
+clean_frameworks=1
 
 PRG="takin.app"
 
@@ -54,9 +54,10 @@ declare -a SRC_FRAMEWORKS=(
 	"/usr/local/opt/qt5/lib/QtSvg.framework"
 	"/usr/local/opt/qt5/lib/QtPrintSupport.framework"
 	"/usr/local/opt/qt5/lib/QtDBus.framework"
-	"/usr/local/opt/qwt/lib/qwt.framework"
-	"/usr/local/opt/python/Frameworks/Python.framework"
+	"/usr/local/opt/qwt-qt5/lib/qwt.framework"
+	"/Library/Frameworks/Python.framework"
 )
+#	"/usr/local/opt/python/Frameworks/Python.framework"
 
 
 # libs which need to have their symbolic link resolved
@@ -71,12 +72,13 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
-	"/usr/local/opt/gcc/lib/gcc/10/libgfortran.5.dylib"
-	"/usr/local/opt/gcc/lib/gcc/10/libquadmath.0.dylib"
-	"/usr/local/opt/gcc/lib/gcc/10/libgomp.1.dylib"
-	"/usr/local/opt/gcc/lib/gcc/10/libgcc_s.1.dylib"
-	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
 )
+
+#	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
+#	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
+#	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
+#	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
+#	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
 
 
 # qt plugins
@@ -174,10 +176,10 @@ rm -v "${PRG}/Contents/Resources/CMakeLists.txt"
 
 
 # python site-packages
-cp -rv /usr/local/opt/numpy/lib/python3.9/site-packages/numpy "${DST_SITEPACKAGES_DIR}"
-cp -rv /usr/local/opt/scipy/lib/python3.9/site-packages/scipy "${DST_SITEPACKAGES_DIR}"
-#ln -sf "../site-packages" "${BIN_DIR}/site-packages"
-#ln -sf ./Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages ${DST_SITEPACKAGES_DIR}
+#cp -rv /usr/local/opt/numpy/lib/python3.9/site-packages/numpy "${DST_SITEPACKAGES_DIR}"
+#cp -rv /usr/local/opt/scipy/lib/python3.9/site-packages/scipy "${DST_SITEPACKAGES_DIR}"
+##ln -sf "../site-packages" "${BIN_DIR}/site-packages"
+##ln -sf ./Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages ${DST_SITEPACKAGES_DIR}
 # -----------------------------------------------------------------------------
 
 
@@ -210,6 +212,7 @@ if [ $clean_frameworks -ne 0 ]; then
 	rm -rfv ${DST_SITEPACKAGES_DIR}/distutils*
 	rm -rfv ${DST_SITEPACKAGES_DIR}/_distutils*
 	rm -rfv ${DST_SITEPACKAGES_DIR}/__pycache*
+	rm -rfv ${DST_SITEPACKAGES_DIR}/__pycache__*
 	rm -rfv ${DST_SITEPACKAGES_DIR}/pkg_*
 	rm -rfv ${DST_SITEPACKAGES_DIR}/sip*
 	rm -rfv ${DST_SITEPACKAGES_DIR}/site*
@@ -218,6 +221,7 @@ if [ $clean_frameworks -ne 0 ]; then
 	# clean non-needed files from frameworks
 	find "${DST_FRAMEWORK_DIR}" -type d -name "Headers" -print0 | xargs -0 rm -rfv
 	find "${DST_FRAMEWORK_DIR}" -type d -name "Current" -print0 | xargs -0 rm -rfv
+	find "${DST_FRAMEWORK_DIR}" -name "*.pyc" -print0 | xargs -0 rm -rfv
 
 	declare -a QT_FW_LIBS=("QtCore" "QtGui" "QtWidgets" "QtConcurrent" "QtOpenGL"
 		"QtSvg" "QtXml" "QtDBus" "QtPrintSupport" "qwt")
