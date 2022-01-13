@@ -243,7 +243,10 @@ int main(int argc, char** argv)
 
 
 		// only for non-standalone minuit
-		SetErrorHandler([](int, bool, const char*, const char* pcMsg) { tl::log_err(pcMsg); });
+		SetErrorHandler([](int, bool, const char*, const char* pcMsg)
+		{
+			tl::log_err(pcMsg);
+		});
 
 
 
@@ -290,6 +293,8 @@ int main(int argc, char** argv)
 		opts::basic_command_line_parser<char> clparser(argc, argv);
 		clparser.options(args);
 		clparser.positional(args_pos);
+		// allow unregistered args, because these may need to be passed on to one of the sub-programs
+		clparser.allow_unregistered();
 		opts::basic_parsed_options<char> parsedopts = clparser.run();
 
 		opts::variables_map opts_map;
@@ -571,8 +576,14 @@ int main(int argc, char** argv)
 
 		return iRet;
 	}
-	catch(const std::system_error& err) { sys_err(err); }
-	catch(const boost::system::system_error& err) { sys_err(err); }
+	catch(const std::system_error& err)
+	{
+		sys_err(err);
+	}
+	catch(const boost::system::system_error& err)
+	{
+		sys_err(err);
+	}
 	catch(const std::exception& ex)
 	{
 		tl::log_crit("Exception: ", ex.what());
