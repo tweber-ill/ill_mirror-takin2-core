@@ -11,6 +11,7 @@
 #include "tools/monteconvo/sqwbase.h"
 #include "tlibs/math/linalg.h"
 
+
 class SqwMod : public SqwBase
 {
 	public:

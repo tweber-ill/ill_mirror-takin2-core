@@ -97,7 +97,7 @@ public:
 // ----------------------------------------------------------------------------
 
 
-template<class t_vec>
+template<class t_vec = std::vector<double>>
 std::string vec_to_str(const t_vec& vec)
 {
 	std::ostringstream ostr;
@@ -107,12 +107,12 @@ std::string vec_to_str(const t_vec& vec)
 }
 
 
-template<class t_vec>
+template<class t_vec = std::vector<double>>
 t_vec str_to_vec(const std::string& str)
 {
 	typedef typename t_vec::value_type T;
 
-	std::vector<T> vec0;
+	t_vec vec0;
 	tl::get_tokens<T, std::string, std::vector<T>>(str, " \t", vec0);
 
 	t_vec vec(vec0.size());
