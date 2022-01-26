@@ -222,6 +222,7 @@ void unload_sqw_ext_plugins()
 {
 	g_mapSqwExt.clear();
 	g_vecExtMods.clear();
+
 	tl::log_debug("Unloaded all external plugins.");
 }
 
@@ -313,6 +314,9 @@ void unload_sqw_plugins()
 {
 	for(auto& pMod : g_vecMods)
 	{
+		if(!pMod)
+			continue;
+
 		std::function<t_fkt_info> fktInfo =
 #ifndef __MINGW32__
 			pMod->get<t_pfkt_info>("takin_sqw_info");

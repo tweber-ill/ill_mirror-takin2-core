@@ -112,7 +112,7 @@ t_vec str_to_vec(const std::string& str)
 {
 	typedef typename t_vec::value_type T;
 
-	t_vec vec0;
+	std::vector<T> vec0;
 	tl::get_tokens<T, std::string, std::vector<T>>(str, " \t", vec0);
 
 	t_vec vec(vec0.size());
