@@ -72,8 +72,8 @@ class RecentFiles
 	public:
 		RecentFiles(QSettings *pSett, const char* pcKey)
 			: m_pSettings(pSett), m_strKey(pcKey)
-		{			
-			LoadList();	
+		{
+			LoadList();
 		}
 
 		virtual ~RecentFiles() = default;
