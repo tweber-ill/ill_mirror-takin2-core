@@ -158,6 +158,7 @@ cp -v bin/takin_structfact "${BIN_DIR}"
 cp -v bin/takin_magstructfact "${BIN_DIR}"
 cp -v bin/takin_scanbrowser "${BIN_DIR}"
 cp -v bin/takin_magsgbrowser "${BIN_DIR}"
+cp -v bin/takin_magdyn "${BIN_DIR}"
 cp -v bin/takin_moldyn "${BIN_DIR}"
 
 cp -v bin/takin_convofit "${BIN_DIR}"

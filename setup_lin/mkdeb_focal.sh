@@ -83,6 +83,7 @@ cp -v bin/takin_structfact	${INSTDIR}/usr/local/bin
 cp -v bin/takin_magstructfact	${INSTDIR}/usr/local/bin
 cp -v bin/takin_scanbrowser	${INSTDIR}/usr/local/bin
 cp -v bin/takin_magsgbrowser	${INSTDIR}/usr/local/bin
+cp -v bin/takin_magdyn		${INSTDIR}/usr/local/bin
 cp -v bin/takin_moldyn		${INSTDIR}/usr/local/bin
 
 

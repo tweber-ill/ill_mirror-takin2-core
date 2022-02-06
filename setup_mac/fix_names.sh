@@ -62,6 +62,7 @@ declare -a filestochange=(
 	"${PRG}/Contents/MacOS/takin_magstructfact"
 	"${PRG}/Contents/MacOS/takin_scanbrowser"
 	"${PRG}/Contents/MacOS/takin_magsgbrowser"
+	"${PRG}/Contents/MacOS/takin_magdyn"
 	"${PRG}/Contents/MacOS/takin_moldyn"
 	"${PRG}/Contents/MacOS/takinmod_py"
 	"${PRG}/Contents/MacOS/takinmod_jl"
