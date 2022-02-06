@@ -164,7 +164,7 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPS} OPTIONAL_COMPONENTS ${BOOST_OPT_COMPS})
 find_package(Threads REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui OpenGL Svg)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Svg) #OpenGL)
 find_package(Qwt REQUIRED)
 find_package(Minuit2 REQUIRED)
 find_package(PNG REQUIRED)
@@ -346,7 +346,7 @@ if(OPENGL_FOUND AND FREETYPE_FOUND)
 
 	set(LIBS_3D
 		${FREETYPE_LIBRARY}
-		Qt5::OpenGL ${OPENGL_LIBRARIES}
+		${OPENGL_LIBRARIES}  # Qt5::OpenGL
 		#${X11_X11_LIB}
 	)
 else()
