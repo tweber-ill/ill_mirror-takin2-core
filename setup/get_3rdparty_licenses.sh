@@ -57,7 +57,7 @@ if ! wget https://raw.githubusercontent.com/root-project/root/master/LICENSE -O 
 fi
 
 # qwt
-if ! wget https://raw.githubusercontent.com/qwtplot/qwt/trunk/COPYING -O ${LICDIR}/qwt_license.txt; then
+if ! wget https://sourceforge.net/p/qwt/git/ci/develop/tree/COPYING?format=raw -O ${LICDIR}/qwt_license.txt; then
 	echo -e "Error: Cannot download Qwt license.";
 fi
 
