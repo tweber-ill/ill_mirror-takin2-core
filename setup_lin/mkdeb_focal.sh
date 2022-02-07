@@ -69,9 +69,11 @@ cp -v setup_lin/takin.desktop	${INSTDIR}/usr/share/applications
 cp -v /usr/local/lib/libMinuit2.so ${INSTDIR}/usr/local/lib
 
 pushd ${INSTDIR}/usr/local/lib
-ln -sf libMinuit2.so libMinuit2.so.0
-ln -sf libMinuit2.so libMinuit2.so.0.0
-ln -sf libMinuit2.so libMinuit2.so.0.0.0
+if [ -e libMinuit2.so ]; then
+	ln -sf libMinuit2.so libMinuit2.so.0
+	ln -sf libMinuit2.so libMinuit2.so.0.0
+	ln -sf libMinuit2.so libMinuit2.so.0.0.0
+fi
 popd
 
 
