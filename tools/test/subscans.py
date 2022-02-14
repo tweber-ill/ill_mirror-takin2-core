@@ -87,13 +87,13 @@ if __name__ == "__main__":
 	I2 = dat2[:, I_col] / bose2
 	I2_err = dat2[:, Ierr_col] / bose2
 
+	if I1.size != I2.size:
+		print("Error: Unequal array sizes.")
+		exit(-1)
+
 	E_diff = np.abs(E1 - E2)
 	if np.any(E_diff > 0.025):
 		print("Error: Cannot subtract non-matching energies.")
-		exit(-1)
-
-	if I1.size != I2.size:
-		print("Error: Unequal array sizes.")
 		exit(-1)
 
 	I_sub = I1 - I2 + offs
