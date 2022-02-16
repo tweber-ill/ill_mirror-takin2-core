@@ -544,14 +544,23 @@ bool Convofit::run_job(const std::string& _strJob)
 	std::vector<t_real> vecModTmpX, vecModTmpY;
 	// slots
 	mod.AddFuncResultSlot(
-	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate](t_real h, t_real k, t_real l, t_real E, t_real S)
+	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate, iScanAxis](t_real h, t_real k, t_real l, t_real E, t_real S)
 	{
 		if(g_bVerbose)
 			tl::log_info("Q = (", h, ", ", k, ", ", l, ") rlu, E = ", E, " meV -> S = ", S);
 
 		if(bPlotIntermediate)
 		{
-			vecModTmpX.push_back(E);	// TODO: use scan direction
+			t_real x = 0.;
+			switch(iScanAxis)
+			{
+				case 0: x = h; break;
+				case 1: x = k; break;
+				case 2: x = l; break;
+				case 3: x = E; break;
+			}
+
+			vecModTmpX.push_back(x);
 			vecModTmpY.push_back(S);
 
 			tl::PlotObj<t_real> pltMod;
