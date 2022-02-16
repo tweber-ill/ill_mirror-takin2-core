@@ -554,10 +554,11 @@ bool Convofit::run_job(const std::string& _strJob)
 			t_real x = 0.;
 			switch(iScanAxis)
 			{
-				case 0: x = h; break;
-				case 1: x = k; break;
-				case 2: x = l; break;
-				case 3: x = E; break;
+				case 1: x = h; break;
+				case 2: x = k; break;
+				case 3: x = l; break;
+				case 4: x = E; break;
+				default: x = E; break;
 			}
 
 			vecModTmpX.push_back(x);
