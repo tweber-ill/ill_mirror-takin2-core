@@ -133,7 +133,7 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 		dYVal = 0.;
 
 	if(m_psigFuncResult)
-		(*m_psigFuncResult)(vecScanPos[0], vecScanPos[1], vecScanPos[2], vecScanPos[3], dYVal);
+		(*m_psigFuncResult)(vecScanPos[0], vecScanPos[1], vecScanPos[2], vecScanPos[3], dYVal, m_iCurParamSet);
 	return tl::t_real_min(dYVal);
 }
 

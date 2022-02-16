@@ -86,7 +86,7 @@ protected:
 	// -------------------------------------------------------------------------
 	// signals
 	public: using t_sigFuncResult = sig::signal<void(t_real_mod h, t_real_mod k, t_real_mod l,
-		t_real_mod E, t_real_mod S)>;
+		t_real_mod E, t_real_mod S, std::size_t scan_group)>;
 	protected: std::shared_ptr<t_sigFuncResult> m_psigFuncResult;
 	public: void AddFuncResultSlot(const t_sigFuncResult::slot_type& slot)
 	{

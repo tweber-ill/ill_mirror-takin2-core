@@ -459,14 +459,23 @@ bool Convofit::run_job(const std::string& _strJob)
 
 	tl::log_info("Number of scan groups: ", vecSc.size(), ".");
 
-	// scan plot object
-	tl::PlotObj<t_real> pltMeas;
+	// scan plot objects
+	std::vector<tl::PlotObj<t_real>> pltMeas;
 	if(bPlot || bPlotIntermediate)
 	{
-		pltMeas.vecX = vecSc[0].vecX;
-		pltMeas.vecY = vecSc[0].vecCts;
-		pltMeas.vecErrY = vecSc[0].vecCtsErr;
-		pltMeas.linestyle = tl::STYLE_POINTS;
+		pltMeas.reserve(vecSc.size());
+
+		for(std::size_t scan_group=0; scan_group<vecSc.size(); ++scan_group)
+		{
+			tl::PlotObj<t_real> thescan;
+
+			thescan.vecX = vecSc[scan_group].vecX;
+			thescan.vecY = vecSc[scan_group].vecCts;
+			thescan.vecErrY = vecSc[scan_group].vecCtsErr;
+			thescan.linestyle = tl::STYLE_POINTS;
+
+			pltMeas.emplace_back(std::move(thescan));
+		}
 	}
 	// --------------------------------------------------------------------
 
@@ -544,7 +553,8 @@ bool Convofit::run_job(const std::string& _strJob)
 	std::vector<t_real> vecModTmpX, vecModTmpY;
 	// slots
 	mod.AddFuncResultSlot(
-	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate, iScanAxis](t_real h, t_real k, t_real l, t_real E, t_real S)
+	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate, iScanAxis]
+		(t_real h, t_real k, t_real l, t_real E, t_real S, std::size_t scan_group)
 	{
 		if(g_bVerbose)
 			tl::log_info("Q = (", h, ", ", k, ", ", l, ") rlu, E = ", E, " meV -> S = ", S);
@@ -570,7 +580,8 @@ bool Convofit::run_job(const std::string& _strJob)
 			pltMod.linestyle = tl::STYLE_LINES_SOLID;
 			pltMod.odSize = 1.5;
 
-			m_sigPlot(this->m_pPlt, "", "Intensity", pltMeas, pltMod, 0);
+			if(scan_group < pltMeas.size())
+				m_sigPlot(this->m_pPlt, "", "Intensity", pltMeas[scan_group], pltMod, 0);
 		}
 	});
 	mod.AddParamsChangedSlot(
@@ -763,7 +774,8 @@ bool Convofit::run_job(const std::string& _strJob)
 			pltMod.linestyle = tl::STYLE_LINES_SOLID;
 			pltMod.odSize = 1.5;
 
-			m_sigPlot(m_pPlt, "", "Intensity", pltMeas, pltMod, 1);
+			if(pltMeas.size())
+				m_sigPlot(m_pPlt, "", "Intensity", pltMeas[0], pltMod, 1);
 		}
 		else
 		{
