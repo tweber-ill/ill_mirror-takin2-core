@@ -34,7 +34,7 @@ TOOL=install_name_tool
 STRIP=strip
 
 QT_VER=$(ls /usr/local/Cellar/qt)
-QT_VER=5.15.2_1
+QT_VER=5.15.2_2
 PY_VER=3.10
 QT_NAME=qt@5
 
@@ -131,6 +131,7 @@ declare -a changefrom=(
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
 	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_atomic-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
 	"/usr/local/opt/boost-python3/lib/libboost_python39-mt.dylib"
@@ -139,15 +140,20 @@ declare -a changefrom=(
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/jpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
+	"/usr/local/Cellar/gcc/11.2.0_3/lib/gcc/11/libquadmath.0.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
+	"/usr/local/lib/gcc/11/libgcc_s.1.dylib"
+	"/usr/local/opt/lapack/lib/liblapacke.3.dylib"
+	"/usr/local/opt/lapack/lib/liblapack.3.dylib"
+	"@rpath/liblapack.3.dylib"
+	"/usr/local/opt/lapack/lib/libblas.3.dylib"
+	"@rpath/libblas.3.dylib"
 )
 
 #	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
-#	"/usr/local/Cellar/gcc/11.2.0_3/lib/gcc/11/libquadmath.0.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
-#	"/usr/local/lib/gcc/11/libgcc_s.1.dylib"
 
 
 
@@ -209,6 +215,7 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libMinuit2.0.dylib"
 	"@executable_path/../Libraries/libboost_system-mt.dylib"
 	"@executable_path/../Libraries/libboost_filesystem-mt.dylib"
+	"@executable_path/../Libraries/libboost_atomic-mt.dylib"
 	"@executable_path/../Libraries/libboost_iostreams-mt.dylib"
 	"@executable_path/../Libraries/libboost_program_options-mt.dylib"
 	"@executable_path/../Libraries/libboost_python39-mt.dylib"
@@ -217,15 +224,20 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libjpeg.9.dylib"
 	"@executable_path/../Libraries/libjpeg.9.dylib"
 	"@executable_path/../Libraries/libtiff.5.dylib"
+	"@executable_path/../Libraries/libgfortran.5.dylib"
+	"@executable_path/../Libraries/libgomp.1.dylib"
+	"@executable_path/../Libraries/libquadmath.0.dylib"
+	"@executable_path/../Libraries/libquadmath.0.dylib"
+	"@executable_path/../Libraries/libgcc_s.1.dylib"
+	"@executable_path/../Libraries/libgcc_s.1.dylib"
+	"@executable_path/../Libraries/liblapacke.3.dylib"
+	"@executable_path/../Libraries/liblapack.3.dylib"
+	"@executable_path/../Libraries/liblapack.3.dylib"
+	"@executable_path/../Libraries/libblas.3.dylib"
+	"@executable_path/../Libraries/libblas.3.dylib"
 )
 
 #	"@executable_path/../Libraries/libopenblas.0.dylib"
-#	"@executable_path/../Libraries/libgfortran.5.dylib"
-#	"@executable_path/../Libraries/libgomp.1.dylib"
-#	"@executable_path/../Libraries/libquadmath.0.dylib"
-#	"@executable_path/../Libraries/libquadmath.0.dylib"
-#	"@executable_path/../Libraries/libgcc_s.1.dylib"
-#	"@executable_path/../Libraries/libgcc_s.1.dylib"
 
 
 

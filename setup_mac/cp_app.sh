@@ -65,6 +65,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
 	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
+	"/usr/local/opt/boost/lib/libboost_atomic-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
 	"/usr/local/opt/boost-python3/lib/libboost_python39-mt.dylib"
@@ -72,12 +73,15 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
 	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
+	"/usr/local/opt/lapack/lib/liblapacke.3.dylib"
+	"/usr/local/opt/lapack/lib/liblapack.3.dylib"
+	"/usr/local/opt/lapack/lib/libblas.3.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
+	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
 )
 
-#	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
-#	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
 #	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
 
 
@@ -231,5 +235,8 @@ if [ $clean_frameworks -ne 0 ]; then
 		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/Resources
 		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/${qlib}*
 	done
+
+	# remove old signatures
+	codesign --remove-signature ${DST_FRAMEWORK_DIR}/Python.framework/Versions/Current/Python
 fi
 # -----------------------------------------------------------------------------
