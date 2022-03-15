@@ -124,7 +124,7 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 		"reso/mono_refl", "reso/ana_effic",
 
 		"reso/pop_mono_w", "reso/pop_mono_h", "reso/pop_mono_thick", "reso/pop_mono_curvh", "reso/pop_mono_curvv",
-		"reso/pop_sample_wq", "reso/pop_sampe_wperpq", "reso/pop_sample_h",
+		"reso/pop_sample_wq", "reso/pop_sample_wperpq", "reso/pop_sample_h",
 		"reso/pop_ana_w", "reso/pop_ana_h", "reso/pop_ana_thick", "reso/pop_ana_curvh", "reso/pop_ana_curvv",
 		"reso/pop_src_w", "reso/pop_src_h",
 		"reso/pop_guide_divh", "reso/pop_guide_divv",
