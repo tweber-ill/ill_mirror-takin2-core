@@ -59,44 +59,47 @@ static const auto meV = tl::get_one_meV<t_real>();
 static const auto cm = tl::get_one_centimeter<t_real>();
 static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
 
-#define POP_NUM_POS   13
-#define POP_SRC_Y     0   // w
-#define POP_SRC_Z     1   // h
-#define POP_MONO_X    2   // d
-#define POP_MONO_Y    3   // w
-#define POP_MONO_Z    4   // h
-#define POP_SAMPLE_X  5   // perp Q
-#define POP_SAMPLE_Y  6   // para Q
-#define POP_SAMPLE_Z  7   //h
-#define POP_ANA_X     8   // d
-#define POP_ANA_Y     9   // w
-#define POP_ANA_Z     10  // h
-#define POP_DET_Y     11  // w
-#define POP_DET_Z     12  // h
+enum PopPosIdx : std::size_t
+{
+	// w, h
+	POP_SRC_Y = 0, POP_SRC_Z,
+	// d, w, h
+	POP_MONO_X, POP_MONO_Y, POP_MONO_Z,
+	// perp Q, para Q, h
+	POP_SAMPLE_X, POP_SAMPLE_Y, POP_SAMPLE_Z,
+	// d, w, h
+	POP_ANA_X, POP_ANA_Y, POP_ANA_Z,
+	// w, h
+	POP_DET_Y, POP_DET_Z,
 
-#define POP_NUM_MOSAIC     4
-#define POP_MONO_MOSAIC_Y  0
-#define POP_MONO_MOSAIC_Z  1
-#define POP_ANA_MOSAIC_Y   2
-#define POP_ANA_MOSAIC_Z   3
+	POP_NUM_POS
+};
 
-#define POP_NUM_DIV           8
-#define POP_DIV_PREMONO_H     0
-#define POP_DIV_PRESAMPLE_H   1
-#define POP_DIV_PREMONO_V     2
-#define POP_DIV_PRESAMPLE_V   3
-#define POP_DIV_POSTSAMPLE_H  4
-#define POP_DIV_POSTANA_H     5
-#define POP_DIV_POSTSAMPLE_V  6
-#define POP_DIV_POSTANA_V     7
+enum PopMosaicIdx : std::size_t
+{
+	POP_MONO_MOSAIC_Y = 0, POP_MONO_MOSAIC_Z,
+	POP_ANA_MOSAIC_Y, POP_ANA_MOSAIC_Z,
 
-#define POP_NUM_KIKF  6
-#define POP_KI_X      0
-#define POP_KI_Y      1
-#define POP_KI_Z      2
-#define POP_KF_X      3
-#define POP_KF_Y      4
-#define POP_KF_Z      5
+	POP_NUM_MOSAIC
+};
+
+enum PopDivIdx : std::size_t
+{
+	POP_DIV_PREMONO_H = 0, POP_DIV_PRESAMPLE_H,
+	POP_DIV_PREMONO_V, POP_DIV_PRESAMPLE_V,
+	POP_DIV_POSTSAMPLE_H, POP_DIV_POSTANA_H,
+	POP_DIV_POSTSAMPLE_V, POP_DIV_POSTANA_V,
+
+	POP_NUM_DIV
+};
+
+enum PopKiKfIdx
+{
+	POP_KI_X = 0, POP_KI_Y, POP_KI_Z,
+	POP_KF_X, POP_KF_Y, POP_KF_Z,
+
+	POP_NUM_KIKF
+};
 
 
 ResoResults calc_pop(const PopParams& pop)
