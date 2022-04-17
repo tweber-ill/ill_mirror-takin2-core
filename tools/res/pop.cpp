@@ -61,16 +61,11 @@ static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
 
 enum PopPosIdx : std::size_t
 {
-	// w, h
-	POP_SRC_Y = 0, POP_SRC_Z,
-	// d, w, h
-	POP_MONO_X, POP_MONO_Y, POP_MONO_Z,
-	// perp Q, para Q, h
-	POP_SAMPLE_X, POP_SAMPLE_Y, POP_SAMPLE_Z,
-	// d, w, h
-	POP_ANA_X, POP_ANA_Y, POP_ANA_Z,
-	// w, h
-	POP_DET_Y, POP_DET_Z,
+	POP_SRC_Y = 0, POP_SRC_Z,                 // w, h
+	POP_MONO_X, POP_MONO_Y, POP_MONO_Z,       // d, w, h
+	POP_SAMPLE_X, POP_SAMPLE_Y, POP_SAMPLE_Z, // perp Q, para Q, h
+	POP_ANA_X, POP_ANA_Y, POP_ANA_Z,          // d, w, h
+	POP_DET_Y, POP_DET_Z,                     // w, h
 
 	POP_NUM_POS
 };
@@ -93,7 +88,7 @@ enum PopDivIdx : std::size_t
 	POP_NUM_DIV
 };
 
-enum PopKiKfIdx
+enum PopKiKfIdx : std::size_t
 {
 	POP_KI_X = 0, POP_KI_Y, POP_KI_Z,
 	POP_KF_X, POP_KF_Y, POP_KF_Z,
@@ -204,15 +199,19 @@ ResoResults calc_pop(const PopParams& pop)
 	t_mat SI = tl::zero_matrix(POP_NUM_POS, POP_NUM_POS);
 	SI(POP_SRC_Y, POP_SRC_Y) = dMultSrc * pop.src_w*pop.src_w /cm/cm;
 	SI(POP_SRC_Z, POP_SRC_Z) = dMultSrc * pop.src_h*pop.src_h /cm/cm;
+
 	SI(POP_MONO_X, POP_MONO_X) = t_real(1./12.) * pop.mono_thick*pop.mono_thick /cm/cm;
 	SI(POP_MONO_Y, POP_MONO_Y) = t_real(1./12.) * pop.mono_w*pop.mono_w /cm/cm;
 	SI(POP_MONO_Z, POP_MONO_Z) = t_real(1./12.) * pop.mono_h*pop.mono_h /cm/cm;
+
 	SI(POP_SAMPLE_X, POP_SAMPLE_X) = dMultSample * pop.sample_w_perpq*pop.sample_w_perpq /cm/cm;
 	SI(POP_SAMPLE_Y, POP_SAMPLE_Y) = dMultSample * pop.sample_w_q*pop.sample_w_q /cm/cm;
 	SI(POP_SAMPLE_Z, POP_SAMPLE_Z) = t_real(1./12.) * pop.sample_h*pop.sample_h /cm/cm;
+
 	SI(POP_ANA_X, POP_ANA_X) = t_real(1./12.) * pop.ana_thick*pop.ana_thick /cm/cm;
 	SI(POP_ANA_Y, POP_ANA_Y) = t_real(1./12.) * pop.ana_w*pop.ana_w /cm/cm;
 	SI(POP_ANA_Z, POP_ANA_Z) = t_real(1./12.) * pop.ana_h*pop.ana_h /cm/cm;
+
 	SI(POP_DET_Y, POP_DET_Y) = dMultDet * pop.det_w*pop.det_w /cm/cm;
 	SI(POP_DET_Z, POP_DET_Z) = dMultDet * pop.det_h*pop.det_h /cm/cm;
 
@@ -232,10 +231,14 @@ ResoResults calc_pop(const PopParams& pop)
 	length mono_curvh = pop.mono_curvh, mono_curvv = pop.mono_curvv;
 	length ana_curvh = pop.ana_curvh, ana_curvv = pop.ana_curvv;
 
-	if(pop.bMonoIsOptimallyCurvedH) mono_curvh = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), false);
-	if(pop.bMonoIsOptimallyCurvedV) mono_curvv = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), true);
-	if(pop.bAnaIsOptimallyCurvedH) ana_curvh = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), false);
-	if(pop.bAnaIsOptimallyCurvedV) ana_curvv = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), true);
+	if(pop.bMonoIsOptimallyCurvedH)
+		mono_curvh = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), false);
+	if(pop.bMonoIsOptimallyCurvedV)
+		mono_curvv = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), true);
+	if(pop.bAnaIsOptimallyCurvedH)
+		ana_curvh = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), false);
+	if(pop.bAnaIsOptimallyCurvedV)
+		ana_curvv = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), true);
 
 	mono_curvh *= pop.dmono_sense; mono_curvv *= pop.dmono_sense;
 	ana_curvh *= pop.dana_sense; ana_curvv *= pop.dana_sense;
