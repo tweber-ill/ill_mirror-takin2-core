@@ -102,18 +102,30 @@ t_real R0_P(angle theta, angle coll, angle mosaic)
 		t_real(1)/(coll*coll) + t_real(1)/(t_real(4)*mosaic*mosaic*tS*tS)));
 }
 
+
+/**
+ * R0 factor from formula (2) in [ch73]
+ */
 t_real R0_N(angle theta, angle mosaic, t_real refl)
 {
 	t_real tS = units::sin(theta);
 	return (refl / (t_real(2)*mosaic * tS)) / std::sqrt(t_real(2)*pi) * rads;
 }
 
+
+/**
+ * R0 factor from formula (2) in [ch73]
+ */
 t_real R0_J(wavenumber ki, wavenumber kf, angle twotheta)
 {
 	t_real tS = units::sin(twotheta);
 	return mn/hbar / (ki*ki * kf*kf*kf * tS) / angs/angs/angs/sec;
 }
 
+
+/**
+ * R0 factor from formula (2) in [ch73]
+ */
 t_real chess_R0(wavenumber ki, wavenumber kf,
 	angle theta_m, angle theta_a, angle twotheta_s,
 	angle mos_m, angle mos_a, angle coll_pre_mono_v, angle coll_post_ana_v,
@@ -123,5 +135,4 @@ t_real chess_R0(wavenumber ki, wavenumber kf,
 		R0_P(theta_m, coll_pre_mono_v, mos_m) * R0_P(theta_a, coll_post_ana_v, mos_a) *
 		R0_N(theta_m, mos_m, refl_m) * R0_N(theta_a, mos_a, refl_a);
 }
-
 // -----------------------------------------------------------------------------
