@@ -76,38 +76,41 @@ get_mono_vals(const length& src_w, const length& src_h,
 	const length& pos_x , const length& pos_y, const length& pos_z,
 	t_real dRefl)
 {
+	const t_real s_th_m = units::abs(units::sin(thetam));
+	const t_real t_th_m = units::tan(thetam);
+
 	// A matrix: formula 26 in [eck14]
 	t_mat A = ublas::identity_matrix<t_real>(3);
 	{
 		const auto A_t0 = t_real(1) / mono_mosaic;
-		const auto A_tx = inv_mono_curvh*dist_mono_sample / units::abs(units::sin(thetam));
+		const auto A_tx = inv_mono_curvh*dist_mono_sample / s_th_m;
 		const auto A_t1 = A_t0*A_tx;
 
 		A(0,0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
-			units::tan(thetam)*units::tan(thetam) *
+			t_th_m*t_th_m *
 		(
 /*a*/			+ units::pow<2>(t_real(2)/coll_h_pre_mono) *rads*rads
 /*b*/			+ units::pow<2>(t_real(2)*dist_src_mono/src_w)
-/*c*/			+ A_t0*A_t0 *rads*rads
+/*c*/			+ A_t0*A_t0 * rads*rads
 		);
 		A(0,1) = A(1,0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs)
-			* units::tan(thetam) *
+			* t_th_m *
 		(
 /*w*/			+ t_real(2)*tl::my_units_pow2(t_real(1)/coll_h_pre_mono) *rads*rads
 /*x*/			+ t_real(2)*dist_src_mono*(dist_src_mono-dist_mono_sample)/(src_w*src_w)
 /*y*/			+ A_t0*A_t0 * rads*rads
-/*z*/			- A_t0*A_t1 *rads*rads
+/*z*/			- A_t0*A_t1 * rads*rads
 		);
 		A(1,1) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
 		(
 /*1*/			+ units::pow<2>(t_real(1)/coll_h_pre_mono) *rads*rads
 /*2*/			+ units::pow<2>(t_real(1)/coll_h_pre_sample) *rads*rads
 /*3*/			+ units::pow<2>((dist_src_mono-dist_mono_sample)/src_w)
-/*4*/			+ units::pow<2>(dist_mono_sample/(mono_w*units::abs(units::sin(thetam))))
+/*4*/			+ units::pow<2>(dist_mono_sample/(mono_w*s_th_m))
 
-/*5*/			+ A_t0*A_t0 *rads*rads
-/*6*/			- t_real(2)*A_t0*A_t1 *rads*rads
-/*7*/			+ A_t1*A_t1 *rads*rads
+/*5*/			+ A_t0*A_t0 * rads*rads
+/*6*/			- t_real(2)*A_t0*A_t1 * rads*rads
+/*7*/			+ A_t1*A_t1 * rads*rads
 		);
 	}
 
@@ -117,7 +120,7 @@ get_mono_vals(const length& src_w, const length& src_h,
 	// corresponding pre-mono terms commented out in Av, as they are not considered there
 	t_mat Av(2,2);
 	{
-		const auto Av_t0 = t_real(0.5) / (mono_mosaic_v*units::abs(units::sin(thetam)));
+		const auto Av_t0 = t_real(0.5) / (mono_mosaic_v*s_th_m);
 		const auto Av_t1 = inv_mono_curvv*dist_mono_sample / mono_mosaic_v;
 
 		Av(0,0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
@@ -149,19 +152,18 @@ get_mono_vals(const length& src_w, const length& src_h,
 	// B vector: formula 27 in [eck14]
 	t_vec B(3);
 	{
-		const auto B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*units::abs(units::sin(thetam)));
+		const auto B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*s_th_m);
 
-		B(0) = sig2fwhm*sig2fwhm * pos_y / (ki*angs) * units::tan(thetam) *
+		B(0) = sig2fwhm*sig2fwhm * pos_y / (ki*angs) * t_th_m *
 		(
 /*i*/			+ t_real(2)*dist_src_mono / (src_w*src_w)
 /*j*/			+ B_t0 *rads*rads
 		);
 		B(1) = sig2fwhm*sig2fwhm * pos_y / (ki*angs) *
 		(
-/*r*/			- dist_mono_sample / (units::pow<2>(mono_w*units::abs(units::sin(thetam))))
+/*r*/			- dist_mono_sample / (units::pow<2>(mono_w*s_th_m))
 /*s*/			+ B_t0 * rads*rads
-/*t*/			- B_t0 * rads*rads * inv_mono_curvh*dist_mono_sample /
-					(units::abs(units::sin(thetam)))
+/*t*/			- B_t0 * rads*rads * inv_mono_curvh*dist_mono_sample / s_th_m
 /*u*/			+ (dist_src_mono-dist_mono_sample) / (src_w*src_w)
 		);
 	}
@@ -174,14 +176,14 @@ get_mono_vals(const length& src_w, const length& src_h,
 		Bv(0) = sig2fwhm*sig2fwhm * pos_z / (ki*angs) * t_real(-1.) *
 		(
 /*r*/			+ dist_mono_sample / (mono_h*mono_h)	// typo in paper?
-/*~s*/			- t_real(0.5)*Bv_t0 *rads*rads / units::abs(units::sin(thetam))
+/*~s*/			- t_real(0.5)*Bv_t0 *rads*rads / s_th_m
 /*~t*/			+ Bv_t0 * rads*rads * inv_mono_curvv*dist_mono_sample
 /*~u*/			+ dist_mono_sample / (src_h*src_h)		// typo in paper?
 		);
 		Bv(1) = sig2fwhm*sig2fwhm * pos_z / (ki*angs) * t_real(-1.) *
 		(
 /*i*/			+ dist_src_mono / (src_h*src_h)			// typo in paper?
-/*j*/			+ t_real(0.5)*Bv_t0/units::abs(units::sin(thetam)) * rads*rads
+/*j*/			+ t_real(0.5)*Bv_t0/s_th_m * rads*rads
 		);
 	}
 
@@ -190,8 +192,8 @@ get_mono_vals(const length& src_w, const length& src_h,
 	t_real C = t_real(0.5)*sig2fwhm*sig2fwhm * pos_y*pos_y *
 	(
 		t_real(1)/(src_w*src_w) +
-		units::pow<2>(t_real(1)/(mono_w*units::abs(units::sin(thetam)))) +
-		units::pow<2>(inv_mono_curvh/(mono_mosaic * units::abs(units::sin(thetam)))) *rads*rads
+		units::pow<2>(t_real(1)/(mono_w*s_th_m)) +
+		units::pow<2>(inv_mono_curvh/(mono_mosaic * s_th_m)) * rads*rads
 	);
 
 	// Cv scalar: formula 40 in [eck14]
@@ -199,7 +201,7 @@ get_mono_vals(const length& src_w, const length& src_h,
 	(
 		t_real(1)/(src_h*src_h) +
 		t_real(1)/(mono_h*mono_h) +
-		units::pow<2>(inv_mono_curvv/mono_mosaic_v) *rads*rads
+		units::pow<2>(inv_mono_curvv/mono_mosaic_v) * rads*rads
 	);
 
 
@@ -309,8 +311,8 @@ ResoResults calc_eck(const EckParams& eck)
 	// ana part
 
 	// equ 43 in [eck14]
-	length pos_y2 = - eck.pos_x*units::sin(twotheta)
-		+ eck.pos_y*units::cos(twotheta);
+	length pos_y2 = - eck.pos_x * units::sin(twotheta)
+		+ eck.pos_y * units::cos(twotheta);
 	length pos_z2 = eck.pos_z;
 
 	// vertical scattering in kf axis, formula from [eck20]

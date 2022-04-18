@@ -75,9 +75,6 @@ static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
  * ( 2ki*c      0      0 -2kf*c      0      0 )   ( dkf_x )   ( dE    )
  * (     1      0      0      0      0      0 )   ( dkf_y )   ( dki_x )
  * (     0      0      1      0      0      0 )   ( dkf_z )   ( dki_z )
- *
- * e.g. E ~ ki^2 - kf^2
- * dE ~ 2ki*dki - 2kf*dkf
  */
 t_mat get_trafo_dkidkf_dQdE(const angle& ki_Q, const angle& kf_Q,
 	const wavenumber& ki, const wavenumber& kf)
@@ -85,13 +82,22 @@ t_mat get_trafo_dkidkf_dQdE(const angle& ki_Q, const angle& kf_Q,
 	t_mat Ti = tl::rotation_matrix_2d(ki_Q/rads);
 	t_mat Tf = -tl::rotation_matrix_2d(kf_Q/rads);
 
-	t_mat U = ublas::zero_matrix<t_real>(6,6);
+	t_mat U = ublas::zero_matrix<t_real>(6, 6);
 	tl::submatrix_copy(U, Ti, 0, 0);
 	tl::submatrix_copy(U, Tf, 0, 3);
-	U(2,2) = 1.; U(2,5) = -1.;
-	U(3,0) = +t_real(2)*ki * tl::get_KSQ2E<t_real>() * angs;
-	U(3,3) = -t_real(2)*kf * tl::get_KSQ2E<t_real>() * angs;
-	U(4,0) = 1.; U(5,2) = 1.;
+
+	// dQ = dki - dkf
+	U(2 /*dQ_z*/, 2 /*dki_z*/) = 1.;
+	U(2 /*dQ_z*/, 5 /*dkf_z*/) = -1.;
+
+	//  E ~ ki^2 - kf^2
+	// dE ~ 2ki*dki - 2kf*dkf
+	U(3 /*dE*/, 0 /*dki_x*/) = +t_real(2)*ki * tl::get_KSQ2E<t_real>() * angs;
+	U(3 /*dE*/, 3 /*dkf_x*/) = -t_real(2)*kf * tl::get_KSQ2E<t_real>() * angs;
+
+	// simply copy the same variables
+	U(4 /*dki_x*/, 0 /*dki_x*/) = 1.;
+	U(5 /*dki_z*/, 2 /*dki_z*/) = 1.;
 
 	return U;
 }
