@@ -121,8 +121,8 @@ ResoResults calc_pop(const PopParams& pop)
 	kf_Q *= pop.dsample_sense;
 
 	// B matrix, [pop75], Appendix 1 -> U matrix in CN
-	t_mat B = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, pop.ki, pop.kf);
-	B.resize(4, POP_NUM_KIKF, true);
+	t_mat B_trafo_QE = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, pop.ki, pop.kf);
+	B_trafo_QE.resize(4, POP_NUM_KIKF, true);
 
 	angle coll_h_pre_mono = pop.coll_h_pre_mono;
 	angle coll_v_pre_mono = pop.coll_v_pre_mono;
@@ -135,26 +135,26 @@ ResoResults calc_pop(const PopParams& pop)
 
 
 	// collimator covariance matrix G, [pop75], Appendix 1
-	t_mat G = tl::zero_matrix(POP_NUM_DIV, POP_NUM_DIV);
+	t_mat G_collis = tl::zero_matrix(POP_NUM_DIV, POP_NUM_DIV);
 
-	G(POP_DIV_PREMONO_H, POP_DIV_PREMONO_H) = 
+	G_collis(POP_DIV_PREMONO_H, POP_DIV_PREMONO_H) = 
 		t_real(1) / (coll_h_pre_mono*coll_h_pre_mono /rads/rads);
-	G(POP_DIV_PRESAMPLE_H, POP_DIV_PRESAMPLE_H) = 
+	G_collis(POP_DIV_PRESAMPLE_H, POP_DIV_PRESAMPLE_H) = 
 		t_real(1) / (pop.coll_h_pre_sample*pop.coll_h_pre_sample /rads/rads);
 
-	G(POP_DIV_PREMONO_V, POP_DIV_PREMONO_V) = 
-		t_real(1) / (coll_v_pre_mono*coll_v_pre_mono /rads/rads);
-	G(POP_DIV_PRESAMPLE_V, POP_DIV_PRESAMPLE_V) = 
-		t_real(1) / (pop.coll_v_pre_sample*pop.coll_v_pre_sample /rads/rads);
-
-	G(POP_DIV_POSTSAMPLE_H, POP_DIV_POSTSAMPLE_H) = 
+	G_collis(POP_DIV_POSTSAMPLE_H, POP_DIV_POSTSAMPLE_H) = 
 		t_real(1) / (pop.coll_h_post_sample*pop.coll_h_post_sample /rads/rads);
-	G(POP_DIV_POSTANA_H, POP_DIV_POSTANA_H) = 
+	G_collis(POP_DIV_POSTANA_H, POP_DIV_POSTANA_H) = 
 		t_real(1) / (pop.coll_h_post_ana*pop.coll_h_post_ana /rads/rads);
 
-	G(POP_DIV_POSTSAMPLE_V, POP_DIV_POSTSAMPLE_V) = 
+	G_collis(POP_DIV_PREMONO_V, POP_DIV_PREMONO_V) = 
+		t_real(1) / (coll_v_pre_mono*coll_v_pre_mono /rads/rads);
+	G_collis(POP_DIV_PRESAMPLE_V, POP_DIV_PRESAMPLE_V) = 
+		t_real(1) / (pop.coll_v_pre_sample*pop.coll_v_pre_sample /rads/rads);
+
+	G_collis(POP_DIV_POSTSAMPLE_V, POP_DIV_POSTSAMPLE_V) = 
 		t_real(1) / (pop.coll_v_post_sample*pop.coll_v_post_sample /rads/rads);
-	G(POP_DIV_POSTANA_V, POP_DIV_POSTANA_V) = 
+	G_collis(POP_DIV_POSTANA_V, POP_DIV_POSTANA_V) = 
 		t_real(1) / (pop.coll_v_post_ana*pop.coll_v_post_ana /rads/rads);
 
 
@@ -163,32 +163,32 @@ ResoResults calc_pop(const PopParams& pop)
 	const angle sample_mosaic_z = pop.sample_mosaic;
 
 	// crystal mosaic covariance matrix F, [pop75], Appendix 1
-	t_mat F = tl::zero_matrix(POP_NUM_MOSAIC, POP_NUM_MOSAIC);
-	F(POP_MONO_MOSAIC_Y, POP_MONO_MOSAIC_Y) =
+	t_mat F_mosaics = tl::zero_matrix(POP_NUM_MOSAIC, POP_NUM_MOSAIC);
+	F_mosaics(POP_MONO_MOSAIC_Y, POP_MONO_MOSAIC_Y) =
 		t_real(1)/(pop.mono_mosaic*pop.mono_mosaic /rads/rads);
-	F(POP_MONO_MOSAIC_Z, POP_MONO_MOSAIC_Z) =
+	F_mosaics(POP_MONO_MOSAIC_Z, POP_MONO_MOSAIC_Z) =
 		t_real(1)/(mono_mosaic_z*mono_mosaic_z /rads/rads);
-	F(POP_ANA_MOSAIC_Y, POP_ANA_MOSAIC_Y) =
+	F_mosaics(POP_ANA_MOSAIC_Y, POP_ANA_MOSAIC_Y) =
 		t_real(1)/(pop.ana_mosaic*pop.ana_mosaic /rads/rads);
-	F(POP_ANA_MOSAIC_Z, POP_ANA_MOSAIC_Z) =
+	F_mosaics(POP_ANA_MOSAIC_Z, POP_ANA_MOSAIC_Z) =
 		t_real(1)/(ana_mosaic_z*ana_mosaic_z /rads/rads);
 
 
 	// A matrix, [pop75], Appendix 1
-	t_mat A = ublas::zero_matrix<t_real>(POP_NUM_KIKF, POP_NUM_DIV);
-	A(POP_KI_X, POP_DIV_PREMONO_H) = t_real(0.5) * pop.ki*angs * 
+	t_mat A_div_kikf_trafo = ublas::zero_matrix<t_real>(POP_NUM_KIKF, POP_NUM_DIV);
+	A_div_kikf_trafo(POP_KI_X, POP_DIV_PREMONO_H) = t_real(0.5) * pop.ki*angs * 
 		units::cos(thetam)/units::sin(thetam);
-	A(POP_KI_X, POP_DIV_PRESAMPLE_H) = t_real(-0.5) * pop.ki*angs * 
+	A_div_kikf_trafo(POP_KI_X, POP_DIV_PRESAMPLE_H) = t_real(-0.5) * pop.ki*angs * 
 		units::cos(thetam)/units::sin(thetam);
-	A(POP_KI_Y, POP_DIV_PRESAMPLE_H) = pop.ki * angs;
-	A(POP_KI_Z, POP_DIV_PRESAMPLE_V) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_Y, POP_DIV_PRESAMPLE_H) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_Z, POP_DIV_PRESAMPLE_V) = pop.ki * angs;
 
-	A(POP_KF_X, POP_DIV_POSTSAMPLE_H) = t_real(0.5) * pop.kf*angs * 
+	A_div_kikf_trafo(POP_KF_X, POP_DIV_POSTSAMPLE_H) = t_real(0.5) * pop.kf*angs * 
 		units::cos(thetaa)/units::sin(thetaa);
-	A(POP_KF_X, POP_DIV_POSTANA_H) = t_real(-0.5) * pop.kf*angs * 
+	A_div_kikf_trafo(POP_KF_X, POP_DIV_POSTANA_H) = t_real(-0.5) * pop.kf*angs * 
 		units::cos(thetaa)/units::sin(thetaa);
-	A(POP_KF_Y, POP_DIV_POSTSAMPLE_H) = pop.kf * angs;
-	A(POP_KF_Z, POP_DIV_POSTSAMPLE_V) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_Y, POP_DIV_POSTSAMPLE_H) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_Z, POP_DIV_POSTSAMPLE_V) = pop.kf * angs;
 
 
 	// covariance matrix of component geometries, S, [pop75], Appendices 2 and 3
@@ -196,29 +196,29 @@ ResoResults calc_pop(const PopParams& pop)
 	t_real dMultSample = pop.bSampleCub ? 1./12. : 1./16.;
 	t_real dMultDet = pop.bDetRect ? 1./12. : 1./16.;
 
-	t_mat SI = tl::zero_matrix(POP_NUM_POS, POP_NUM_POS);
-	SI(POP_SRC_Y, POP_SRC_Y) = dMultSrc * pop.src_w*pop.src_w /cm/cm;
-	SI(POP_SRC_Z, POP_SRC_Z) = dMultSrc * pop.src_h*pop.src_h /cm/cm;
+	t_mat SI_geo = tl::zero_matrix(POP_NUM_POS, POP_NUM_POS);
+	SI_geo(POP_SRC_Y, POP_SRC_Y) = dMultSrc * pop.src_w*pop.src_w /cm/cm;
+	SI_geo(POP_SRC_Z, POP_SRC_Z) = dMultSrc * pop.src_h*pop.src_h /cm/cm;
 
-	SI(POP_MONO_X, POP_MONO_X) = t_real(1./12.) * pop.mono_thick*pop.mono_thick /cm/cm;
-	SI(POP_MONO_Y, POP_MONO_Y) = t_real(1./12.) * pop.mono_w*pop.mono_w /cm/cm;
-	SI(POP_MONO_Z, POP_MONO_Z) = t_real(1./12.) * pop.mono_h*pop.mono_h /cm/cm;
+	SI_geo(POP_MONO_X, POP_MONO_X) = t_real(1./12.) * pop.mono_thick*pop.mono_thick /cm/cm;
+	SI_geo(POP_MONO_Y, POP_MONO_Y) = t_real(1./12.) * pop.mono_w*pop.mono_w /cm/cm;
+	SI_geo(POP_MONO_Z, POP_MONO_Z) = t_real(1./12.) * pop.mono_h*pop.mono_h /cm/cm;
 
-	SI(POP_SAMPLE_X, POP_SAMPLE_X) = dMultSample * pop.sample_w_perpq*pop.sample_w_perpq /cm/cm;
-	SI(POP_SAMPLE_Y, POP_SAMPLE_Y) = dMultSample * pop.sample_w_q*pop.sample_w_q /cm/cm;
-	SI(POP_SAMPLE_Z, POP_SAMPLE_Z) = t_real(1./12.) * pop.sample_h*pop.sample_h /cm/cm;
+	SI_geo(POP_SAMPLE_X, POP_SAMPLE_X) = dMultSample * pop.sample_w_perpq*pop.sample_w_perpq /cm/cm;
+	SI_geo(POP_SAMPLE_Y, POP_SAMPLE_Y) = dMultSample * pop.sample_w_q*pop.sample_w_q /cm/cm;
+	SI_geo(POP_SAMPLE_Z, POP_SAMPLE_Z) = t_real(1./12.) * pop.sample_h*pop.sample_h /cm/cm;
 
-	SI(POP_ANA_X, POP_ANA_X) = t_real(1./12.) * pop.ana_thick*pop.ana_thick /cm/cm;
-	SI(POP_ANA_Y, POP_ANA_Y) = t_real(1./12.) * pop.ana_w*pop.ana_w /cm/cm;
-	SI(POP_ANA_Z, POP_ANA_Z) = t_real(1./12.) * pop.ana_h*pop.ana_h /cm/cm;
+	SI_geo(POP_ANA_X, POP_ANA_X) = t_real(1./12.) * pop.ana_thick*pop.ana_thick /cm/cm;
+	SI_geo(POP_ANA_Y, POP_ANA_Y) = t_real(1./12.) * pop.ana_w*pop.ana_w /cm/cm;
+	SI_geo(POP_ANA_Z, POP_ANA_Z) = t_real(1./12.) * pop.ana_h*pop.ana_h /cm/cm;
 
-	SI(POP_DET_Y, POP_DET_Y) = dMultDet * pop.det_w*pop.det_w /cm/cm;
-	SI(POP_DET_Z, POP_DET_Z) = dMultDet * pop.det_h*pop.det_h /cm/cm;
+	SI_geo(POP_DET_Y, POP_DET_Y) = dMultDet * pop.det_w*pop.det_w /cm/cm;
+	SI_geo(POP_DET_Z, POP_DET_Z) = dMultDet * pop.det_h*pop.det_h /cm/cm;
 
-	SI *= sig2fwhm*sig2fwhm;
+	SI_geo *= sig2fwhm*sig2fwhm;
 
-	t_mat S;
-	if(!tl::inverse(SI, S))
+	t_mat S_geo;
+	if(!tl::inverse(SI_geo, S_geo))
 	{
 		res.bOk = false;
 		res.strErr = "S matrix cannot be inverted.";
@@ -233,24 +233,22 @@ ResoResults calc_pop(const PopParams& pop)
 
 	if(pop.bMonoIsOptimallyCurvedH)
 		mono_curvh = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), false);
-	if(pop.bMonoIsOptimallyCurvedV)
-		mono_curvv = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), true);
 	if(pop.bAnaIsOptimallyCurvedH)
 		ana_curvh = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), false);
+	if(pop.bMonoIsOptimallyCurvedV)
+		mono_curvv = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), true);
 	if(pop.bAnaIsOptimallyCurvedV)
 		ana_curvv = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), true);
 
-	mono_curvh *= pop.dmono_sense; mono_curvv *= pop.dmono_sense;
-	ana_curvh *= pop.dana_sense; ana_curvv *= pop.dana_sense;
+	mono_curvh *= pop.dmono_sense;
+	ana_curvh *= pop.dana_sense;
+	mono_curvv *= pop.dmono_sense;
+	ana_curvv *= pop.dana_sense;
 
-	inv_length inv_mono_curvh = t_real(0)/cm, inv_mono_curvv = t_real(0)/cm;
-	inv_length inv_ana_curvh = t_real(0)/cm, inv_ana_curvv = t_real(0)/cm;
-
-	if(pop.bMonoIsCurvedH) inv_mono_curvh = t_real(1)/mono_curvh;
-	if(pop.bMonoIsCurvedV) inv_mono_curvv = t_real(1)/mono_curvv;
-	if(pop.bAnaIsCurvedH) inv_ana_curvh = t_real(1)/ana_curvh;
-	if(pop.bAnaIsCurvedV) inv_ana_curvv = t_real(1)/ana_curvv;
-
+	inv_length inv_mono_curvh = pop.bMonoIsCurvedH ? t_real(1)/mono_curvh : t_real(0)/cm;
+	inv_length inv_ana_curvh = pop.bAnaIsCurvedH ? t_real(1)/ana_curvh : t_real(0)/cm;
+	inv_length inv_mono_curvv = pop.bMonoIsCurvedV ? t_real(1)/mono_curvv : t_real(0)/cm;
+	inv_length inv_ana_curvv = pop.bAnaIsCurvedV ? t_real(1)/ana_curvv : t_real(0)/cm;
 
 	const auto tupScFact = get_scatter_factors(pop.flags, pop.thetam, pop.ki, pop.thetaa, pop.kf);
 
@@ -263,88 +261,88 @@ ResoResults calc_pop(const PopParams& pop)
 
 
 	// T matrix to transform the mosaic cov. matrix, [pop75], Appendix 2
-	t_mat T = ublas::zero_matrix<t_real>(POP_NUM_MOSAIC, POP_NUM_POS);
-	T(POP_MONO_MOSAIC_Y, POP_SRC_Y) = t_real(-0.5) / (pop.dist_src_mono / cm);
-	T(POP_MONO_MOSAIC_Y, POP_MONO_X) = t_real(0.5) * units::cos(thetam) * (
+	t_mat T_mosaic_trafo = ublas::zero_matrix<t_real>(POP_NUM_MOSAIC, POP_NUM_POS);
+	T_mosaic_trafo(POP_MONO_MOSAIC_Y, POP_SRC_Y) = t_real(-0.5) / (pop.dist_src_mono / cm);
+	T_mosaic_trafo(POP_MONO_MOSAIC_Y, POP_MONO_X) = t_real(0.5) * units::cos(thetam) * (
 		t_real(1)/(pop.dist_mono_sample/cm) -
 		t_real(1)/(pop.dist_src_mono/cm));
-	T(POP_MONO_MOSAIC_Y, POP_MONO_Y) = t_real(0.5) * units::sin(thetam) * (
-		t_real(1)/(pop.dist_src_mono/cm) + 
+	T_mosaic_trafo(POP_MONO_MOSAIC_Y, POP_MONO_Y) = t_real(0.5) * units::sin(thetam) * (
+		t_real(1)/(pop.dist_src_mono/cm) +
 		t_real(1)/(pop.dist_mono_sample/cm) -
-		t_real(2)*inv_mono_curvh*cm/units::sin(thetam));
-	T(POP_MONO_MOSAIC_Y, POP_SAMPLE_X) = t_real(0.5) * units::sin(t_real(0.5)*twotheta)
-		/ (pop.dist_mono_sample/cm);
-	T(POP_MONO_MOSAIC_Y, POP_SAMPLE_Y) = t_real(0.5) * units::cos(t_real(0.5)*twotheta)
-		/ (pop.dist_mono_sample/cm);
+		t_real(2)*inv_mono_curvh*cm / units::sin(thetam));
+	T_mosaic_trafo(POP_MONO_MOSAIC_Y, POP_SAMPLE_X) = t_real(0.5) *
+		units::sin(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
+	T_mosaic_trafo(POP_MONO_MOSAIC_Y, POP_SAMPLE_Y) = t_real(0.5) *
+		units::cos(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
 
-	T(POP_MONO_MOSAIC_Z, POP_SRC_Z) = t_real(-0.5) / (
+	T_mosaic_trafo(POP_ANA_MOSAIC_Y, POP_DET_Y) = t_real(0.5) / (pop.dist_ana_det / cm);
+	T_mosaic_trafo(POP_ANA_MOSAIC_Y, POP_ANA_X) = t_real(-0.5) * units::cos(thetaa) * (
+		t_real(1)/(pop.dist_sample_ana/cm) -
+		t_real(1)/(pop.dist_ana_det/cm));
+	T_mosaic_trafo(POP_ANA_MOSAIC_Y, POP_ANA_Y) = t_real(0.5) * units::sin(thetaa) * (
+		t_real(1)/(pop.dist_ana_det/cm) +
+		t_real(1)/(pop.dist_sample_ana/cm) -
+		t_real(2)*inv_ana_curvh*cm / units::sin(thetaa));
+	T_mosaic_trafo(POP_ANA_MOSAIC_Y, POP_SAMPLE_X) = t_real(0.5) *
+		units::sin(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
+	T_mosaic_trafo(POP_ANA_MOSAIC_Y, POP_SAMPLE_Y) = t_real(-0.5) *
+		units::cos(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
+
+	T_mosaic_trafo(POP_MONO_MOSAIC_Z, POP_SRC_Z) = t_real(-0.5) / (
 		pop.dist_src_mono/cm * units::sin(thetam));
-	T(POP_MONO_MOSAIC_Z, POP_MONO_Z) = t_real(0.5) * (
+	T_mosaic_trafo(POP_MONO_MOSAIC_Z, POP_MONO_Z) = t_real(0.5) * (
 		t_real(1)/(pop.dist_src_mono/cm * units::sin(thetam)) +
 		t_real(1)/(pop.dist_mono_sample/cm * units::sin(thetam)) -
 		t_real(2)*inv_mono_curvv*cm);
-	T(POP_MONO_MOSAIC_Z, POP_SAMPLE_Z) = t_real(-0.5) / (
+	T_mosaic_trafo(POP_MONO_MOSAIC_Z, POP_SAMPLE_Z) = t_real(-0.5) / (
 		pop.dist_mono_sample/cm * units::sin(thetam));
 
-	T(POP_ANA_MOSAIC_Y, POP_SAMPLE_X) = t_real(0.5) * units::sin(t_real(0.5)*twotheta)
-		/ (pop.dist_sample_ana/cm);
-	T(POP_ANA_MOSAIC_Y, POP_SAMPLE_Y) = t_real(-0.5) * units::cos(t_real(0.5)*twotheta)
-		/ (pop.dist_sample_ana/cm);
-	T(POP_ANA_MOSAIC_Y, POP_ANA_X) = t_real(0.5) * units::cos(thetaa) * (
-		t_real(1)/(pop.dist_ana_det/cm) -
-		t_real(1)/(pop.dist_sample_ana/cm));
-	T(POP_ANA_MOSAIC_Y, POP_ANA_Y) = t_real(0.5) * units::sin(thetaa) * (
-		t_real(1)/(pop.dist_sample_ana/cm) +
-		t_real(1)/(pop.dist_ana_det/cm) -
-		t_real(2)*inv_ana_curvh*cm / units::sin(thetaa));
-	T(POP_ANA_MOSAIC_Y, POP_DET_Y) = t_real(0.5)/(pop.dist_ana_det/cm);
-
-	T(POP_ANA_MOSAIC_Z, POP_SAMPLE_Z) = t_real(-0.5) / (
-		pop.dist_sample_ana/cm*units::sin(thetaa));
-	T(POP_ANA_MOSAIC_Z, POP_ANA_Z) = t_real(0.5) * (
-		t_real(1)/(pop.dist_sample_ana/cm * units::sin(thetaa)) +
-		t_real(1)/(pop.dist_ana_det/cm * units::sin(thetaa)) -
+	T_mosaic_trafo(POP_ANA_MOSAIC_Z, POP_DET_Z) = t_real(-0.5) / (
+		pop.dist_ana_det/cm * units::sin(thetaa));
+	T_mosaic_trafo(POP_ANA_MOSAIC_Z, POP_ANA_Z) = t_real(0.5) * (
+		t_real(1)/(pop.dist_ana_det/cm * units::sin(thetaa)) +
+		t_real(1)/(pop.dist_sample_ana/cm * units::sin(thetaa)) -
 		t_real(2)*inv_ana_curvv*cm);
-	T(POP_ANA_MOSAIC_Z, POP_DET_Z) = t_real(-0.5) / (
-		pop.dist_ana_det/cm*units::sin(thetaa));
+	T_mosaic_trafo(POP_ANA_MOSAIC_Z, POP_SAMPLE_Z) = t_real(-0.5) / (
+		pop.dist_sample_ana/cm * units::sin(thetaa));
 
 
-	// D matrix to transform spatial to angular variables, [pop75], Appendix 2
-	t_mat D = ublas::zero_matrix<t_real>(POP_NUM_DIV, POP_NUM_POS);
-	D(POP_DIV_PREMONO_H, POP_SRC_Y) = t_real(-1) / (pop.dist_src_mono/cm);
-	D(POP_DIV_PREMONO_H, POP_MONO_X) = -cos(thetam) / (pop.dist_src_mono/cm);
-	D(POP_DIV_PREMONO_H, POP_MONO_Y) = sin(thetam) / (pop.dist_src_mono/cm);
+	// D matrix to transform spatial to divergence variables, [pop75], Appendix 2
+	t_mat D_geo_div_trafo = ublas::zero_matrix<t_real>(POP_NUM_DIV, POP_NUM_POS);
+	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_SRC_Y) = t_real(-1) / (pop.dist_src_mono/cm);
+	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_MONO_X) = -cos(thetam) / (pop.dist_src_mono/cm);
+	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_MONO_Y) = sin(thetam) / (pop.dist_src_mono/cm);
 
-	D(POP_DIV_PRESAMPLE_H, POP_MONO_X) = cos(thetam) / (pop.dist_mono_sample/cm);
-	D(POP_DIV_PRESAMPLE_H, POP_MONO_Y) = sin(thetam) / (pop.dist_mono_sample/cm);
-	D(POP_DIV_PRESAMPLE_H, POP_SAMPLE_X) = sin(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
-	D(POP_DIV_PRESAMPLE_H, POP_SAMPLE_Y) = cos(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_DET_Y) = t_real(1) / (pop.dist_ana_det/cm);
+	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_ANA_X) = cos(thetaa) / (pop.dist_ana_det/cm);
+	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_ANA_Y) = sin(thetaa) / (pop.dist_ana_det/cm);
 
-	D(POP_DIV_PREMONO_V, POP_SRC_Z) = t_real(-1) / (pop.dist_src_mono/cm);
-	D(POP_DIV_PREMONO_V, POP_MONO_Z) = t_real(1) / (pop.dist_src_mono/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_MONO_X) = cos(thetam) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_MONO_Y) = sin(thetam) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_SAMPLE_X) = sin(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_SAMPLE_Y) = cos(t_real(0.5)*twotheta) / (pop.dist_mono_sample/cm);
 
-	D(POP_DIV_PRESAMPLE_V, POP_MONO_Z) = t_real(-1) / (pop.dist_mono_sample/cm);
-	D(POP_DIV_PRESAMPLE_V, POP_SAMPLE_Z) = t_real(1) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_ANA_X) = -cos(thetaa) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_ANA_Y) = sin(thetaa) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_X) = sin(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_Y) = -cos(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
 
-	D(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_X) = sin(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
-	D(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_Y) = -cos(t_real(0.5)*twotheta) / (pop.dist_sample_ana/cm);
-	D(POP_DIV_POSTSAMPLE_H, POP_ANA_X) = -cos(thetaa) / (pop.dist_sample_ana/cm);
-	D(POP_DIV_POSTSAMPLE_H, POP_ANA_Y) = sin(thetaa) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_PREMONO_V, POP_SRC_Z) = t_real(-1) / (pop.dist_src_mono/cm);
+	D_geo_div_trafo(POP_DIV_PREMONO_V, POP_MONO_Z) = t_real(1) / (pop.dist_src_mono/cm);
 
-	D(POP_DIV_POSTANA_H, POP_ANA_X) = cos(thetaa) / (pop.dist_ana_det/cm);
-	D(POP_DIV_POSTANA_H, POP_ANA_Y) = sin(thetaa) / (pop.dist_ana_det/cm);
-	D(POP_DIV_POSTANA_H, POP_DET_Y) = t_real(1) / (pop.dist_ana_det/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_V, POP_MONO_Z) = t_real(-1) / (pop.dist_mono_sample/cm);
+	D_geo_div_trafo(POP_DIV_PRESAMPLE_V, POP_SAMPLE_Z) = t_real(1) / (pop.dist_mono_sample/cm);
 
-	D(POP_DIV_POSTSAMPLE_V, POP_SAMPLE_Z) = t_real(-1) / (pop.dist_sample_ana/cm);
-	D(POP_DIV_POSTSAMPLE_V, POP_ANA_Z) = t_real(1) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_SAMPLE_Z) = t_real(-1) / (pop.dist_sample_ana/cm);
+	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_ANA_Z) = t_real(1) / (pop.dist_sample_ana/cm);
 
-	D(POP_DIV_POSTANA_V, POP_ANA_Z) = t_real(-1) / (pop.dist_ana_det/cm);
-	D(POP_DIV_POSTANA_V, POP_DET_Z) = t_real(1) / (pop.dist_ana_det/cm);
+	D_geo_div_trafo(POP_DIV_POSTANA_V, POP_ANA_Z) = t_real(-1) / (pop.dist_ana_det/cm);
+	D_geo_div_trafo(POP_DIV_POSTANA_V, POP_DET_Z) = t_real(1) / (pop.dist_ana_det/cm);
 
 
 	// [pop75], equ. 20
 	// [T] = 1/cm, [F] = 1/rad^2, [pop75], equ. 15
-	t_mat K = S + tl::transform(F, T, true);
+	t_mat K = S_geo + tl::transform(F_mosaics, T_mosaic_trafo, true);
 	t_mat Ki;
 	if(!tl::inverse(K, Ki))
 	{
@@ -354,7 +352,7 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 	// [pop75], equ. 17
-	t_mat Hi = tl::transform_inv(Ki, D, true);
+	t_mat Hi = tl::transform_inv(Ki, D_geo_div_trafo, true);
 	t_mat H;
 	if(!tl::inverse(Hi, H))
 	{
@@ -364,7 +362,7 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 	// [pop75], equ. 18
-	t_mat H_G = H + G;
+	t_mat H_G = H + G_collis;
 	t_mat H_Gi;
 	if(!tl::inverse(H_G, H_Gi))
 	{
@@ -374,7 +372,7 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 	// [pop75], equ. 20
-	t_mat BA = ublas::prod(B, A);
+	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_Gi, BA, true);
 	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
 	cov(2,2) += pop.Q*pop.Q*angs*angs * sample_mosaic_z*sample_mosaic_z /rads/rads;
@@ -405,12 +403,13 @@ ResoResults calc_pop(const PopParams& pop)
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = 0.;
-	const t_real pi = tl::get_pi<t_real>();
 	if(pop.flags & CALC_R0)
 	{
+		const t_real pi = tl::get_pi<t_real>();
+
 		// resolution volume, [pop75], equ. 13a & 16
 		// [D] = 1/cm, [SI] = cm^2
-		t_mat DSiDt = tl::transform_inv(SI, D, true);
+		t_mat DSiDt = tl::transform_inv(SI_geo, D_geo_div_trafo, true);
 		t_mat DSiDti;
 		if(!tl::inverse(DSiDt, DSiDti))
 		{
@@ -418,10 +417,10 @@ ResoResults calc_pop(const PopParams& pop)
 			res.strErr = "R0 factor cannot be calculated.";
 			return res;
 		}
-		DSiDti += G;
+		DSiDti += G_collis;
 
-		t_real dDetS = tl::determinant(S);
-		t_real dDetF = tl::determinant(F);
+		t_real dDetS = tl::determinant(S_geo);
+		t_real dDetF = tl::determinant(F_mosaics);
 		t_real dDetK = tl::determinant(K);
 		t_real dDetDSiDti = tl::determinant(DSiDti);
 
