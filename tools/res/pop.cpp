@@ -133,6 +133,9 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 
+	// --------------------------------------------------------------------
+	// instrument property matrices
+	// --------------------------------------------------------------------
 	// collimator covariance matrix G, [pop75], Appendix 1
 	t_mat G_collis = tl::zero_matrix(POP_NUM_DIV, POP_NUM_DIV);
 
@@ -237,10 +240,12 @@ ResoResults calc_pop(const PopParams& pop)
 		res.strErr = "S matrix cannot be inverted.";
 		return res;
 	}
+	// --------------------------------------------------------------------
 
 
 	// --------------------------------------------------------------------
 	// mono/ana focus
+	// --------------------------------------------------------------------
 	length mono_curvh = pop.mono_curvh, mono_curvv = pop.mono_curvv;
 	length ana_curvh = pop.ana_curvh, ana_curvv = pop.ana_curvv;
 
@@ -273,6 +278,9 @@ ResoResults calc_pop(const PopParams& pop)
 	// --------------------------------------------------------------------
 
 
+	// --------------------------------------------------------------------
+	// trafo matrices
+	// --------------------------------------------------------------------
 	// T matrix to transform the mosaic cov. matrix, [pop75], Appendix 2
 	auto get_mosaic_trafo = [](t_real dist_src_mono, t_real dist_mono_sample,
 		t_real s_th_m, t_real c_th_m, t_real s_th_s, t_real c_th_s,
@@ -391,13 +399,17 @@ ResoResults calc_pop(const PopParams& pop)
 	D_geo_div_trafo(POP_DIV_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
 	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
 	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_SAMPLE_Z) = -ana_geo_trafo[10];
+	// --------------------------------------------------------------------
 
 
+	// --------------------------------------------------------------------
+	// covariance matrix calculation
+	// --------------------------------------------------------------------
 	// [pop75], equ. 20
 	// [T] = 1/cm, [F] = 1/rad^2, [pop75], equ. 15
-	t_mat K = S_geo + tl::transform(F_mosaics, T_mosaic_trafo, true);
-	t_mat Ki;
-	if(!tl::inverse(K, Ki))
+	t_mat K_geo = S_geo + tl::transform(F_mosaics, T_mosaic_trafo, true);
+	t_mat Ki_geo;
+	if(!tl::inverse(K_geo, Ki_geo))
 	{
 		res.bOk = false;
 		res.strErr = "Matrix K cannot be inverted.";
@@ -405,9 +417,9 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 	// [pop75], equ. 17
-	t_mat Hi = tl::transform_inv(Ki, D_geo_div_trafo, true);
-	t_mat H;
-	if(!tl::inverse(Hi, H))
+	t_mat Hi_div = tl::transform_inv(Ki_geo, D_geo_div_trafo, true);
+	t_mat H_div;
+	if(!tl::inverse(Hi_div, H_div))
 	{
 		res.bOk = false;
 		res.strErr = "Matrix H^(-1) cannot be inverted.";
@@ -415,9 +427,9 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 
 	// [pop75], equ. 18
-	t_mat H_G = H + G_collis;
-	t_mat H_Gi;
-	if(!tl::inverse(H_G, H_Gi))
+	t_mat H_G_div = H_div + G_collis;
+	t_mat H_Gi_div;
+	if(!tl::inverse(H_G_div, H_Gi_div))
 	{
 		res.bOk = false;
 		res.strErr = "Matrix H+G cannot be inverted.";
@@ -426,7 +438,7 @@ ResoResults calc_pop(const PopParams& pop)
 
 	// [pop75], equ. 20
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
-	t_mat cov = tl::transform_inv(H_Gi, BA, true);
+	t_mat cov = tl::transform_inv(H_Gi_div, BA, true);
 	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
 	cov(2,2) += pop.Q*pop.Q*angs*angs * sample_mosaic_z*sample_mosaic_z /rads/rads;
 
@@ -436,11 +448,12 @@ ResoResults calc_pop(const PopParams& pop)
 		res.strErr = "Covariance matrix cannot be inverted.";
 		return res;
 	}
-
-
 	// -------------------------------------------------------------------------
 
 
+	// --------------------------------------------------------------------
+	// r0 intensity scaling factor and resolution volume calculation
+	// --------------------------------------------------------------------
 	res.reso *= sig2fwhm*sig2fwhm;
 	res.reso_v = ublas::zero_vector<t_real>(4);
 	res.reso_s = 0.;
@@ -452,7 +465,6 @@ ResoResults calc_pop(const PopParams& pop)
 		res.reso = tl::transform(res.reso, matMirror, true);
 		res.reso_v[1] = -res.reso_v[1];
 	}
-
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = 0.;
@@ -474,7 +486,7 @@ ResoResults calc_pop(const PopParams& pop)
 
 		t_real dDetS = tl::determinant(S_geo);
 		t_real dDetF = tl::determinant(F_mosaics);
-		t_real dDetK = tl::determinant(K);
+		t_real dDetK = tl::determinant(K_geo);
 		t_real dDetDSiDti = tl::determinant(DSiDti);
 
 		// [pop75], equs. 13a & 16
@@ -491,11 +503,11 @@ ResoResults calc_pop(const PopParams& pop)
 		// except for the (unimportant) prefactors this is the same as dividing by the resolution volume
 		//res.dR0 /= res.dResVol * pi * t_real(3.);
 	}
+	// --------------------------------------------------------------------
 
 	// Bragg widths
 	const std::vector<t_real> vecFwhms = calc_bragg_fwhms(res.reso);
 	std::copy(vecFwhms.begin(), vecFwhms.end(), res.dBraggFWHMs);
-
 
 	if(tl::is_nan_or_inf(res.dR0) || tl::is_nan_or_inf(res.reso))
 	{
