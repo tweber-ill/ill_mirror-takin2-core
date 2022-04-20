@@ -368,22 +368,22 @@ ResoResults calc_pop(const PopParams& pop)
 		std::array<t_real, 11> arr;
 
 		// POP_PREMONO_H
-		arr[0] = t_real(-1) / dist_src_mono;  // POP_SRC_Y
-		arr[1] = -c_th_m / dist_src_mono;    // POP_MONO_X
-		arr[2] = s_th_m / dist_src_mono;     // POP_MONO_Y
+		arr[0] = t_real(-1) / dist_src_mono;    // POP_SRC_Y
+		arr[1] = -c_th_m / dist_src_mono;       // POP_MONO_X
+		arr[2] = s_th_m / dist_src_mono;        // POP_MONO_Y
 
 		// POP_PRESAMPLE_H
-		arr[3] = c_th_m / dist_mono_sample;  // POP_MONO_X
-		arr[4] = s_th_m / dist_mono_sample;  // POP_MONO_Y
-		arr[5] = s_th_s / dist_mono_sample; // POP_SAMPLE_X
-		arr[6] = c_th_s / dist_mono_sample; // POP_SAMPLE_Y
+		arr[3] = c_th_m / dist_mono_sample;     // POP_MONO_X
+		arr[4] = s_th_m / dist_mono_sample;     // POP_MONO_Y
+		arr[5] = s_th_s / dist_mono_sample;     // POP_SAMPLE_X
+		arr[6] = c_th_s / dist_mono_sample;     // POP_SAMPLE_Y
 
 		// POP_PREMONO_V
-		arr[7] = t_real(-1) / dist_src_mono;  // POP_SRC_Z
-		arr[8] = t_real(1) / dist_src_mono;  // POP_MONO_Z
+		arr[7] = t_real(-1) / dist_src_mono;    // POP_SRC_Z
+		arr[8] = t_real(1) / dist_src_mono;     // POP_MONO_Z
 
 		// POP_PRESAMPLE_V
-		arr[9] = t_real(-1) / dist_mono_sample;  // POP_MONO_Z
+		arr[9] = t_real(-1) / dist_mono_sample; // POP_MONO_Z
 		arr[10] = t_real(1) / dist_mono_sample; // POP_SAMPLE_Z
 
 		return arr;
