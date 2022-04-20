@@ -311,7 +311,7 @@ ResoResults calc_pop(const PopParams& pop)
 		std::array<t_real, 8> arr;
 
 		// horizontal
-		arr[POP_SRC_Y] = t_real(-0.5) / dist_src_mono;  // sign typo in paper
+		arr[POP_SRC_Y] = t_real(-0.5) / dist_src_mono;
 		arr[POP_MONO_X] = c_th_m * (t_real(0.5) / dist_mono_sample
 			- t_real(0.5) / dist_src_mono),
 		arr[POP_MONO_Y] = s_th_m * (t_real(0.5) / dist_src_mono
@@ -336,7 +336,7 @@ ResoResults calc_pop(const PopParams& pop)
 		pop.dist_src_mono/cm, pop.dist_mono_sample/cm,
 		s_th_m, c_th_m, s_th_s, c_th_s,
 		inv_mono_curvh*cm, inv_mono_curvv*cm);
-	T_mosaic_trafo(POP_MONO_H, POP_SRC_Y) = mono_mosaic_trafo[POP_SRC_Y];
+	T_mosaic_trafo(POP_MONO_H, POP_SRC_Y) = mono_mosaic_trafo[POP_SRC_Y]; // sign forgotten in paper
 	T_mosaic_trafo(POP_MONO_H, POP_MONO_X) = mono_mosaic_trafo[POP_MONO_X];
 	T_mosaic_trafo(POP_MONO_H, POP_MONO_Y) = mono_mosaic_trafo[POP_MONO_Y];
 	T_mosaic_trafo(POP_MONO_H, POP_SAMPLE_X) = mono_mosaic_trafo[POP_SAMPLE_X];
@@ -415,7 +415,7 @@ ResoResults calc_pop(const PopParams& pop)
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_ANA_X) = ana_geo_trafo[3];
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_ANA_Y) = ana_geo_trafo[4];
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_X) = ana_geo_trafo[5];
-	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_Y) = ana_geo_trafo[6];
+	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_Y) = ana_geo_trafo[6]; // forgotten in paper
 	D_geo_div_trafo(POP_POSTANA_V, POP_DET_Z) = -ana_geo_trafo[7];
 	D_geo_div_trafo(POP_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
 	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
