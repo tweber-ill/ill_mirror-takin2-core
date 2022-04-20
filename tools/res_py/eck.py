@@ -6,7 +6,7 @@
 # @license GPLv2
 #
 # @desc for algorithm: [eck14] G. Eckold and O. Sobolev, NIM A 752, pp. 54-64 (2014), doi: 10.1016/j.nima.2014.03.019
-# @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
+# @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
 # @desc for vertical scattering modification: [eck20] G. Eckold, personal communication, 2020.
 #
 # ----------------------------------------------------------------------------
@@ -35,99 +35,7 @@
 import numpy as np
 import numpy.linalg as la
 import reso
-
-np.set_printoptions(floatmode = "fixed",  precision = 4)
-
-
-#--------------------------------------------------------------------------
-# scattering triangle
-# see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/tascalc.py
-
-ksq2E = 2.072124836832
-
-
-def k2lam(k):
-    return 2.*np.pi / k
-
-
-def get_E(ki, kf):
-        return ksq2E * (ki**2. - kf**2.)
-
-
-def get_scattering_angle(ki, kf, Q):
-    c = (ki**2. + kf**2. - Q**2.) / (2.*ki*kf)
-    return np.arccos(c)
-
-
-def get_angle_ki_Q(ki, kf, Q):
-    c = (ki**2. + Q**2. - kf**2.) / (2.*ki*Q)
-    return np.arccos(c)
-
-
-def get_angle_kf_Q(ki, kf, Q):
-    c = (ki**2. - Q**2. - kf**2.) / (2.*kf*Q)
-    return np.arccos(c)
-
-
-def get_mono_angle(k, d):
-    s = np.pi/(d*k)
-    angle = np.arcsin(s)
-    return angle
-#--------------------------------------------------------------------------
-
-
-
-#--------------------------------------------------------------------------
-# helpers
-
-#
-# z rotation matrix
-#
-def rotation_matrix_3d_z(angle):
-    s = np.sin(angle)
-    c = np.cos(angle)
-
-    return np.array([
-        [c, -s, 0],
-        [s,  c, 0],
-        [0,  0, 1]])
-
-
-def mirror_matrix(iSize, iComp):
-    mat = np.identity(iSize)
-    mat[iComp, iComp] = -1.
-
-    return mat;
-
-
-#
-# thin lens equation: 1/f = 1/lenB + 1/lenA
-#
-def focal_len(lenBefore, lenAfter):
-    f_inv = 1./lenBefore + 1./lenAfter
-    return 1. / f_inv
-
-
-#
-# optimal mono/ana curvature,
-# see e.g.
-#    - (Shirane 2002) p. 66
-#    - or nicos/nicos-core.git/tree/nicos/devices/tas/mono.py in nicos
-#    - or Monochromator_curved.comp in McStas
-#
-def foc_curv(lenBefore, lenAfter, tt, bVert):
-    f = focal_len(lenBefore, lenAfter)
-    s = np.abs(np.sin(0.5*tt))
-
-    if bVert:
-        curv = 2. * f*s
-    else:
-        curv = 2. * f/s
-
-    return curv
-#--------------------------------------------------------------------------
-
-
+import helpers
 
 
 #
@@ -140,7 +48,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 	coll_v_pre_mono, coll_v_pre_sample,
 	mono_mosaic, mono_mosaic_v,
 	inv_mono_curvh, inv_mono_curvv,
-	pos_x , pos_y, pos_z,
+	pos_x, pos_y, pos_z,
 	refl):
 
     # A matrix: formula 26 in [eck14]
@@ -158,10 +66,10 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
             A_t0**2. - A_t0*A_t1)
 
     A[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
-    ( (1./coll_h_pre_mono)**2. + (1./coll_h_pre_sample)**2. \
-        + ((dist_src_mono-dist_mono_sample)/src_w)**2. \
-        + (dist_mono_sample/(mono_w*np.abs(np.sin(thetam))))**2. \
-        + A_t0*A_t0 - 2.*A_t0*A_t1 + A_t1*A_t1)
+        ( (1./coll_h_pre_mono)**2. + (1./coll_h_pre_sample)**2. \
+            + ((dist_src_mono-dist_mono_sample)/src_w)**2. \
+            + (dist_mono_sample/(mono_w*np.abs(np.sin(thetam))))**2. \
+            + A_t0*A_t0 - 2.*A_t0*A_t1 + A_t1*A_t1 )
 
 
 
@@ -265,13 +173,17 @@ def calc_eck(param):
     ana_curvv = param["ana_curvv"]
 
     if param["mono_is_optimally_curved_h"]:
-        mono_curvh = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), False)
+        mono_curvh = foc_curv(param["dist_src_mono"], \
+		param["dist_mono_sample"], np.abs(2.*thetam), False)
     if param["mono_is_optimally_curved_v"]: 
-        mono_curvv = foc_curv(param["dist_src_mono"], param["dist_mono_sample"], np.abs(2.*thetam), True)
+        mono_curvv = foc_curv(param["dist_src_mono"], \
+		param["dist_mono_sample"], np.abs(2.*thetam), True)
     if param["ana_is_optimally_curved_h"]: 
-        ana_curvh = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), False)
+        ana_curvh = foc_curv(param["dist_sample_ana"], \
+		param["dist_ana_det"], np.abs(2.*thetaa), False)
     if param["ana_is_optimally_curved_v"]: 
-        ana_curvv = foc_curv(param["dist_sample_ana"], param["dist_ana_det"], np.abs(2.*thetaa), True)
+        ana_curvv = foc_curv(param["dist_sample_ana"], \
+		param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.
     inv_mono_curvv = 0.
@@ -289,7 +201,7 @@ def calc_eck(param):
     # --------------------------------------------------------------------
 
 
-    lam = k2lam(ki)
+    lam = helpers.k2lam(ki)
 
     coll_h_pre_mono = param["coll_h_pre_mono"]
     coll_v_pre_mono = param["coll_v_pre_mono"]
@@ -389,10 +301,10 @@ def calc_eck(param):
     # trafo, equ 52 in [eck14]
     T = np.identity(6)
     T[0,3] = T[1,4] = T[2,5] = -1.
-    T[3,0] = 2.*ksq2E * kipara
-    T[3,3] = 2.*ksq2E * kfpara
-    T[3,1] = 2.*ksq2E * kperp
-    T[3,4] = -2.*ksq2E * kperp
+    T[3,0] = 2.*helpers.ksq2E * kipara
+    T[3,3] = 2.*helpers.ksq2E * kfpara
+    T[3,1] = 2.*helpers.ksq2E * kperp
+    T[3,4] = -2.*helpers.ksq2E * kperp
     T[4,1] = T[5,2] = (0.5 - dE)
     T[4,4] = T[5,5] = (0.5 + dE)
 
@@ -400,8 +312,8 @@ def calc_eck(param):
 
 
     # equ 54 in [eck14]
-    Dalph_i = rotation_matrix_3d_z(-ki_Q)
-    Dalph_f = rotation_matrix_3d_z(-kf_Q)
+    Dalph_i = helpers.rotation_matrix_3d_z(-ki_Q)
+    Dalph_f = helpers.rotation_matrix_3d_z(-kf_Q)
     Arot = np.dot(np.dot(np.transpose(Dalph_i), A), Dalph_i)
     Erot = np.dot(np.dot(np.transpose(Dalph_f), E), Dalph_f)
 
@@ -449,7 +361,7 @@ def calc_eck(param):
 
     if param["sample_sense"] < 0.:
         # mirror Q_perp
-        matMirror = mirror_matrix(len(res["reso"]), 1)
+        matMirror = helpers.mirror_matrix(len(res["reso"]), 1)
         res["reso"] = np.dot(np.dot(np.transpose(matMirror), res["reso"]), matMirror)
         res["reso_v"][1] = -res["reso_v"][1]
 
@@ -465,7 +377,7 @@ def calc_eck(param):
     res["r0"] *= np.exp(-W)
     res["r0"] *= dxsec
 
-	# Bragg widths
+    # Bragg widths
     res["coherent_fwhms"] = reso.calc_coh_fwhms(res["reso"])
     res["ok"] = True
 
@@ -473,127 +385,3 @@ def calc_eck(param):
         res["ok"] = False
 
     return res
-
-
-
-#
-# test calculation
-#
-if __name__ == "__main__":
-    verbose = True
-
-    cm2A = 1e8
-    min2rad = 1./ 60. / 180.*np.pi
-    rad2deg = 180. / np.pi
-
-    d_mono = 3.355
-    d_ana = 3.355
-
-    ki = 1.4
-    kf = 1.5
-    Q = 1.5
-    E = get_E(ki, kf)
-
-    sc_senses = [ 1., -1., 1.]
-
-    params = {
-        # scattering triangle
-        "ki" : ki, "kf" : kf, "E" : E, "Q" : Q,
-
-        # angles
-        "twotheta" : get_scattering_angle(ki, kf, Q),
-        "thetam" : get_mono_angle(ki, d_mono),
-        "thetaa" : get_mono_angle(kf, d_ana),
-        "angle_ki_Q" : get_angle_ki_Q(ki, kf, Q),
-        "angle_kf_Q" : get_angle_kf_Q(ki, kf, Q),
-
-        # scattering senses
-        "mono_sense" : sc_senses[0],
-        "sample_sense" : sc_senses[1],
-        "ana_sense" : sc_senses[2],
-
-        # distances
-        "dist_src_mono" : 100. * cm2A,
-        "dist_mono_sample" : 100. * cm2A,
-        "dist_sample_ana" : 100. * cm2A,
-        "dist_ana_det" : 100. * cm2A,
-
-        # component sizes
-        "src_w" : 10. * cm2A,
-        "src_h" : 10. * cm2A,
-        "mono_w" : 10. * cm2A,
-        "mono_h" : 10. * cm2A,
-        "det_w" : 10. * cm2A,
-        "det_h" : 10. * cm2A,
-        "ana_w" : 10. * cm2A,
-        "ana_h" : 10. * cm2A,
-
-        # focusing
-        "mono_curvh" : 0.,
-        "mono_curvv" : 0.,
-        "ana_curvh" : 0.,
-        "ana_curvv" : 0.,
-        "mono_is_optimally_curved_h" : False,
-        "mono_is_optimally_curved_v" : False,
-        "ana_is_optimally_curved_h" : False,
-        "ana_is_optimally_curved_v" : False,
-        "mono_is_curved_h" : False,
-        "mono_is_curved_v" : False,
-        "ana_is_curved_h" : False,
-        "ana_is_curved_v" : False,
-
-        # collimation
-        "coll_h_pre_mono" : 9999. *min2rad,
-        "coll_v_pre_mono" : 9999. *min2rad,
-        "coll_h_pre_sample" : 30. *min2rad,
-        "coll_v_pre_sample" : 9999. *min2rad,
-        "coll_h_post_sample" : 30. *min2rad,
-        "coll_v_post_sample" : 9999. *min2rad,
-        "coll_h_post_ana" : 9999. *min2rad,
-        "coll_v_post_ana" : 9999. *min2rad,
-
-        # guide
-        "use_guide" : False,
-        "guide_div_h" : 9999. *min2rad,
-        "guide_div_v" : 9999. *min2rad,
-
-        # mosaics
-        "mono_mosaic" : 60. *min2rad,
-        "mono_mosaic_v" : 60. *min2rad,
-        "ana_mosaic" : 60. *min2rad,
-        "ana_mosaic_v" : 60. *min2rad,
-
-        # crystal reflectivities
-        # TODO, so far always 1
-        "dmono_refl" : 1.,
-        "dana_effic" : 1.,
-
-        # off-center scattering
-        # WARNING: while this is calculated, it is not yet considered in the ellipse plots
-        "pos_x" : 0. * cm2A,
-        "pos_y" : 0. * cm2A,
-        "pos_z" : 0. * cm2A,
-
-        "kf_vert" : False,
-    }
-
-
-    # calculate resolution ellipsoid
-    res = calc_eck(params)
-    if not res["ok"]:
-        print("RESOLUTION CALCULATION FAILED!")
-        exit(-1)
-
-    if verbose:
-        print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" %
-            (params["twotheta"]*rad2deg, params["thetam"]*rad2deg, params["thetaa"]*rad2deg,
-            params["angle_ki_Q"]*rad2deg, params["angle_kf_Q"]*rad2deg))
-        print("R0 = %g, Vol = %g" % (res["r0"], res["res_vol"]))
-        print("Resolution matrix:\n%s" % res["reso"])
-        print("Resolution vector: %s" % res["reso_v"])
-        print("Resolution scalar: %g" % res["reso_s"])
-
-
-    # describe and plot ellipses
-    ellipses = reso.calc_ellipses(res["reso"], verbose)
-    reso.plot_ellipses(ellipses, verbose)

@@ -59,6 +59,10 @@ static const auto meV = tl::get_one_meV<t_real>();
 static const auto cm = tl::get_one_centimeter<t_real>();
 static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
 
+
+/**
+ * position indices, see V vector definition in [pop75], p. 509
+ */
 enum PopPosIdx : std::size_t
 {
 	POP_SRC_Y = 0, POP_SRC_Z,                 // w, h
@@ -78,14 +82,14 @@ enum PopMosaicIdx : std::size_t
 	POP_NUM_MOSAIC
 };
 
-enum PopDivIdx : std::size_t
+enum PopCompIdx : std::size_t
 {
-	POP_DIV_PREMONO_H = 0, POP_DIV_PRESAMPLE_H,
-	POP_DIV_PREMONO_V, POP_DIV_PRESAMPLE_V,
-	POP_DIV_POSTSAMPLE_H, POP_DIV_POSTANA_H,
-	POP_DIV_POSTSAMPLE_V, POP_DIV_POSTANA_V,
+	POP_PREMONO_H = 0, POP_PRESAMPLE_H,
+	POP_PREMONO_V, POP_PRESAMPLE_V,
+	POP_POSTSAMPLE_H, POP_POSTANA_H,
+	POP_POSTSAMPLE_V, POP_POSTANA_V,
 
-	POP_NUM_DIV
+	POP_NUM_COMPS
 };
 
 enum PopKiKfIdx : std::size_t
@@ -137,26 +141,26 @@ ResoResults calc_pop(const PopParams& pop)
 	// instrument property matrices
 	// --------------------------------------------------------------------
 	// collimator covariance matrix G, [pop75], Appendix 1
-	t_mat G_collis = tl::zero_matrix(POP_NUM_DIV, POP_NUM_DIV);
+	t_mat G_collis = tl::zero_matrix(POP_NUM_COMPS, POP_NUM_COMPS);
 
-	G_collis(POP_DIV_PREMONO_H, POP_DIV_PREMONO_H) = 
+	G_collis(POP_PREMONO_H, POP_PREMONO_H) = 
 		t_real(1) / (coll_h_pre_mono*coll_h_pre_mono /rads/rads);
-	G_collis(POP_DIV_PRESAMPLE_H, POP_DIV_PRESAMPLE_H) = 
+	G_collis(POP_PRESAMPLE_H, POP_PRESAMPLE_H) = 
 		t_real(1) / (pop.coll_h_pre_sample*pop.coll_h_pre_sample /rads/rads);
 
-	G_collis(POP_DIV_POSTSAMPLE_H, POP_DIV_POSTSAMPLE_H) = 
+	G_collis(POP_POSTSAMPLE_H, POP_POSTSAMPLE_H) = 
 		t_real(1) / (pop.coll_h_post_sample*pop.coll_h_post_sample /rads/rads);
-	G_collis(POP_DIV_POSTANA_H, POP_DIV_POSTANA_H) = 
+	G_collis(POP_POSTANA_H, POP_POSTANA_H) = 
 		t_real(1) / (pop.coll_h_post_ana*pop.coll_h_post_ana /rads/rads);
 
-	G_collis(POP_DIV_PREMONO_V, POP_DIV_PREMONO_V) = 
+	G_collis(POP_PREMONO_V, POP_PREMONO_V) = 
 		t_real(1) / (coll_v_pre_mono*coll_v_pre_mono /rads/rads);
-	G_collis(POP_DIV_PRESAMPLE_V, POP_DIV_PRESAMPLE_V) = 
+	G_collis(POP_PRESAMPLE_V, POP_PRESAMPLE_V) = 
 		t_real(1) / (pop.coll_v_pre_sample*pop.coll_v_pre_sample /rads/rads);
 
-	G_collis(POP_DIV_POSTSAMPLE_V, POP_DIV_POSTSAMPLE_V) = 
+	G_collis(POP_POSTSAMPLE_V, POP_POSTSAMPLE_V) = 
 		t_real(1) / (pop.coll_v_post_sample*pop.coll_v_post_sample /rads/rads);
-	G_collis(POP_DIV_POSTANA_V, POP_DIV_POSTANA_V) = 
+	G_collis(POP_POSTANA_V, POP_POSTANA_V) = 
 		t_real(1) / (pop.coll_v_post_ana*pop.coll_v_post_ana /rads/rads);
 
 
@@ -192,19 +196,19 @@ ResoResults calc_pop(const PopParams& pop)
 		return std::make_tuple(div_mono, div_sample);
 	};
 
-	t_mat A_div_kikf_trafo = ublas::zero_matrix<t_real>(POP_NUM_KIKF, POP_NUM_DIV);
+	t_mat A_div_kikf_trafo = ublas::zero_matrix<t_real>(POP_NUM_KIKF, POP_NUM_COMPS);
 
 	auto div_ki = get_div_monosample(pop.ki*angs, cot_th_m);
-	A_div_kikf_trafo(POP_KI_X, POP_DIV_PREMONO_H) = std::get<0>(div_ki);
-	A_div_kikf_trafo(POP_KI_X, POP_DIV_PRESAMPLE_H) = std::get<1>(div_ki);
-	A_div_kikf_trafo(POP_KI_Y, POP_DIV_PRESAMPLE_H) = pop.ki * angs;
-	A_div_kikf_trafo(POP_KI_Z, POP_DIV_PRESAMPLE_V) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_X, POP_PREMONO_H) = std::get<0>(div_ki);
+	A_div_kikf_trafo(POP_KI_X, POP_PRESAMPLE_H) = std::get<1>(div_ki);
+	A_div_kikf_trafo(POP_KI_Y, POP_PRESAMPLE_H) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_Z, POP_PRESAMPLE_V) = pop.ki * angs;
 
 	auto div_kf = get_div_monosample(pop.kf*angs, -cot_th_a);
-	A_div_kikf_trafo(POP_KF_X, POP_DIV_POSTANA_H) = std::get<0>(div_kf);
-	A_div_kikf_trafo(POP_KF_X, POP_DIV_POSTSAMPLE_H) = std::get<1>(div_kf);
-	A_div_kikf_trafo(POP_KF_Y, POP_DIV_POSTSAMPLE_H) = pop.kf * angs;
-	A_div_kikf_trafo(POP_KF_Z, POP_DIV_POSTSAMPLE_V) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_X, POP_POSTANA_H) = std::get<0>(div_kf);
+	A_div_kikf_trafo(POP_KF_X, POP_POSTSAMPLE_H) = std::get<1>(div_kf);
+	A_div_kikf_trafo(POP_KF_Y, POP_POSTSAMPLE_H) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_Z, POP_POSTSAMPLE_V) = pop.kf * angs;
 
 
 	// covariance matrix of component geometries, S, [pop75], Appendices 2 and 3
@@ -290,23 +294,20 @@ ResoResults calc_pop(const PopParams& pop)
 		return std::array<t_real, 8>
 		{
 			// horizontal
-			t_real(-0.5) / dist_src_mono,              // POP_SRC_Y
-			t_real(0.5) * c_th_m * (                   // POP_MONO_X
-				t_real(1) / dist_mono_sample -
-				t_real(1) / dist_src_mono),
-			t_real(0.5) * s_th_m * (                   // POP_MONO_Y
-				t_real(1) / dist_src_mono +
-				t_real(1) / dist_mono_sample -
-				t_real(2) * inv_curvh / s_th_m),
+			t_real(-0.5) / dist_src_mono,              // POP_SRC_Y, sign typo in paper
+			c_th_m * (t_real(0.5) / dist_mono_sample   // POP_MONO_X
+				- t_real(0.5) / dist_src_mono),
+			s_th_m * (t_real(0.5) / dist_src_mono      // POP_MONO_Y
+				+ t_real(0.5) / dist_mono_sample)
+				- inv_curvh,
 			t_real(0.5) * s_th_s / dist_mono_sample,   // POP_SAMPLE_X
 			t_real(0.5) * c_th_s / dist_mono_sample,   // POP_SAMPLE_Y
 
 			// vertical
 			t_real(-0.5) / (dist_src_mono * s_th_m),   // POP_SRC_Z
-			t_real(0.5) / s_th_m * (                   // POP_MONO_Z
-				t_real(1) / dist_src_mono +
-				t_real(1) / dist_mono_sample -
-				t_real(2) * inv_curvv * s_th_m),
+			(	+ t_real(0.5) / dist_src_mono      // POP_MONO_Z
+				+ t_real(0.5) / dist_mono_sample) / s_th_m 
+				- inv_curvv,
 			t_real(-0.5) / (dist_mono_sample * s_th_m) // POP_SAMPLE_Z
 		};
 	};
@@ -347,58 +348,58 @@ ResoResults calc_pop(const PopParams& pop)
 	{
 		return std::array<t_real, 11>
 		{
-			// POP_DIV_PREMONO_H
+			// POP_PREMONO_H
 			t_real(-1) / dist_src_mono,    // POP_SRC_Y
 			-c_th_m / dist_src_mono,       // POP_MONO_X
 			s_th_m / dist_src_mono,        // POP_MONO_Y
 
-			// POP_DIV_PRESAMPLE_H
+			// POP_PRESAMPLE_H
 			c_th_m / dist_mono_sample,     // POP_MONO_X
 			s_th_m / dist_mono_sample,     // POP_MONO_Y
 			s_th_s / dist_mono_sample,     // POP_SAMPLE_X
 			c_th_s / dist_mono_sample,     // POP_SAMPLE_Y
 
-			// POP_DIV_PREMONO_V
+			// POP_PREMONO_V
 			t_real(-1) / dist_src_mono,    // POP_SRC_Z
 			t_real(1) / dist_src_mono,     // POP_MONO_Z
 
-			// POP_DIV_PRESAMPLE_V
+			// POP_PRESAMPLE_V
 			t_real(-1) / dist_mono_sample, // POP_MONO_Z
 			t_real(1) / dist_mono_sample   // POP_SAMPLE_Z
 		};
 	};
 
-	t_mat D_geo_div_trafo = ublas::zero_matrix<t_real>(POP_NUM_DIV, POP_NUM_POS);
+	t_mat D_geo_div_trafo = ublas::zero_matrix<t_real>(POP_NUM_COMPS, POP_NUM_POS);
 
 	auto mono_geo_trafo = get_geo_trafo(
 		pop.dist_src_mono/cm, pop.dist_mono_sample/cm,
 		s_th_m, c_th_m, s_th_s, c_th_s);
-	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_SRC_Y) = mono_geo_trafo[0];
-	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_MONO_X) = mono_geo_trafo[1];
-	D_geo_div_trafo(POP_DIV_PREMONO_H, POP_MONO_Y) = mono_geo_trafo[2];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_MONO_X) = mono_geo_trafo[3];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_MONO_Y) = mono_geo_trafo[4];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_SAMPLE_X) = mono_geo_trafo[5];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_H, POP_SAMPLE_Y) = mono_geo_trafo[6];
-	D_geo_div_trafo(POP_DIV_PREMONO_V, POP_SRC_Z) = mono_geo_trafo[7];
-	D_geo_div_trafo(POP_DIV_PREMONO_V, POP_MONO_Z) = mono_geo_trafo[8];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_V, POP_MONO_Z) = mono_geo_trafo[9];
-	D_geo_div_trafo(POP_DIV_PRESAMPLE_V, POP_SAMPLE_Z) = mono_geo_trafo[10];
+	D_geo_div_trafo(POP_PREMONO_H, POP_SRC_Y) = mono_geo_trafo[0];
+	D_geo_div_trafo(POP_PREMONO_H, POP_MONO_X) = mono_geo_trafo[1];
+	D_geo_div_trafo(POP_PREMONO_H, POP_MONO_Y) = mono_geo_trafo[2];
+	D_geo_div_trafo(POP_PRESAMPLE_H, POP_MONO_X) = mono_geo_trafo[3];
+	D_geo_div_trafo(POP_PRESAMPLE_H, POP_MONO_Y) = mono_geo_trafo[4];
+	D_geo_div_trafo(POP_PRESAMPLE_H, POP_SAMPLE_X) = mono_geo_trafo[5];
+	D_geo_div_trafo(POP_PRESAMPLE_H, POP_SAMPLE_Y) = mono_geo_trafo[6];
+	D_geo_div_trafo(POP_PREMONO_V, POP_SRC_Z) = mono_geo_trafo[7];
+	D_geo_div_trafo(POP_PREMONO_V, POP_MONO_Z) = mono_geo_trafo[8];
+	D_geo_div_trafo(POP_PRESAMPLE_V, POP_MONO_Z) = mono_geo_trafo[9];
+	D_geo_div_trafo(POP_PRESAMPLE_V, POP_SAMPLE_Z) = mono_geo_trafo[10];
 
 	auto ana_geo_trafo = get_geo_trafo(
 		pop.dist_ana_det/cm, pop.dist_sample_ana/cm,
 		s_th_a, -c_th_a, s_th_s, -c_th_s);
-	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_DET_Y) = -ana_geo_trafo[0];
-	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_ANA_X) = ana_geo_trafo[1];
-	D_geo_div_trafo(POP_DIV_POSTANA_H, POP_ANA_Y) = ana_geo_trafo[2];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_ANA_X) = ana_geo_trafo[3];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_ANA_Y) = ana_geo_trafo[4];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_X) = ana_geo_trafo[5];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_H, POP_SAMPLE_Y) = ana_geo_trafo[6];
-	D_geo_div_trafo(POP_DIV_POSTANA_V, POP_DET_Z) = -ana_geo_trafo[7];
-	D_geo_div_trafo(POP_DIV_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
-	D_geo_div_trafo(POP_DIV_POSTSAMPLE_V, POP_SAMPLE_Z) = -ana_geo_trafo[10];
+	D_geo_div_trafo(POP_POSTANA_H, POP_DET_Y) = -ana_geo_trafo[0];
+	D_geo_div_trafo(POP_POSTANA_H, POP_ANA_X) = ana_geo_trafo[1];
+	D_geo_div_trafo(POP_POSTANA_H, POP_ANA_Y) = ana_geo_trafo[2];
+	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_ANA_X) = ana_geo_trafo[3];
+	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_ANA_Y) = ana_geo_trafo[4];
+	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_X) = ana_geo_trafo[5];
+	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_Y) = ana_geo_trafo[6];
+	D_geo_div_trafo(POP_POSTANA_V, POP_DET_Z) = -ana_geo_trafo[7];
+	D_geo_div_trafo(POP_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
+	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
+	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_SAMPLE_Z) = -ana_geo_trafo[10];
 	// --------------------------------------------------------------------
 
 

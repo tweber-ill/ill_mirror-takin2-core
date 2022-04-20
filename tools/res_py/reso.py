@@ -36,8 +36,6 @@
 import numpy as np
 import numpy.linalg as la
 
-np.set_printoptions(floatmode = "fixed",  precision = 4)
-
 
 sig2fwhm = 2.*np.sqrt(2.*np.log(2.))
 
