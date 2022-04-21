@@ -37,17 +37,29 @@ import reso
 import helpers
 
 
+IDX_SRC_Y    = 0
+IDX_SRC_Z    = 1
+IDX_MONO_X   = 2
+IDX_MONO_Y   = 3
+IDX_MONO_Z   = 4
+IDX_SAMPLE_X = 5
+IDX_SAMPLE_Y = 6
+IDX_SAMPLE_Z = 7
+
+IDX_HORI     = 0
+IDX_VERT     = 1
+
+IDX_MONO_H   = 0
+IDX_MONO_V   = 1
+IDX_SAMPLE_H = 2
+IDX_SAMPLE_V = 3
+
+
 #
 # get matrices for ki axis 
 #
-def get_mono_vals(src_w, src_h, mono_w, mono_h,
-	dist_src_mono, dist_mono_sample,
-	ki, thetam, thetas,
-	coll_h_pre_mono, coll_h_pre_sample,
-	coll_v_pre_mono, coll_v_pre_sample,
-	mono_mosaic, mono_mosaic_v,
-	inv_mono_curvh, inv_mono_curvv,
-	refl):
+def get_mono_trafos(dist_src_mono, dist_mono_sample,
+	thetam, thetas, inv_curvh, inv_curvv):
 
     s_th_m = np.sin(thetam)
     c_th_m = np.cos(thetam)
@@ -55,53 +67,69 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     c_th_s = np.cos(thetas)
 
 
-    IDX_SRC_Y    = 0
-    IDX_MONO_X   = 1
-    IDX_MONO_Y   = 2
-    IDX_SAMPLE_X = 3
-    IDX_SAMPLE_Y = 4
-    IDX_SRC_Z    = 5
-    IDX_MONO_Z   = 6
-    IDX_SAMPLE_Z = 7
-
-
     # D matrix, [pop75], Appendix 2
     D = np.zeros([4, 8])
 
-    # POP_DIV_PREMONO_H
-    D[0, IDX_SRC_Y] = -1. / dist_src_mono
-    D[0, IDX_MONO_X] = -c_th_m / dist_src_mono
-    D[0, IDX_MONO_Y] = s_th_m / dist_src_mono
+    D[IDX_MONO_H, IDX_SRC_Y] = -1. / dist_src_mono
+    D[IDX_MONO_H, IDX_MONO_X] = -c_th_m / dist_src_mono
+    D[IDX_MONO_H, IDX_MONO_Y] = s_th_m / dist_src_mono
 
-    # POP_DIV_PRESAMPLE_H
-    D[1, IDX_MONO_X] = c_th_m / dist_mono_sample
-    D[1, IDX_MONO_Y] = s_th_m / dist_mono_sample
-    D[1, IDX_SAMPLE_X] = s_th_s / dist_mono_sample
-    D[1, IDX_SAMPLE_Y] = c_th_s / dist_mono_sample
+    D[IDX_MONO_V, IDX_SRC_Z] = -1. / dist_src_mono
+    D[IDX_MONO_V, IDX_MONO_Z] = 1. / dist_src_mono
 
-    # POP_DIV_PREMONO_V
-    D[2, IDX_SRC_Z] = -1. / dist_src_mono
-    D[2, IDX_MONO_Z] = 1. / dist_src_mono
+    D[IDX_SAMPLE_H, IDX_MONO_X] = c_th_m / dist_mono_sample
+    D[IDX_SAMPLE_H, IDX_MONO_Y] = s_th_m / dist_mono_sample
+    D[IDX_SAMPLE_H, IDX_SAMPLE_X] = s_th_s / dist_mono_sample
+    D[IDX_SAMPLE_H, IDX_SAMPLE_Y] = c_th_s / dist_mono_sample
 
-    # POP_DIV_PRESAMPLE_V
-    D[3, IDX_MONO_Z] = -1. / dist_mono_sample
-    D[3, IDX_SAMPLE_Z] = 1. / dist_mono_sample
+    D[IDX_SAMPLE_V, IDX_MONO_Z] = -1. / dist_mono_sample
+    D[IDX_SAMPLE_V, IDX_SAMPLE_Z] = 1. / dist_mono_sample
 
 
     # T matrix, [pop75], Appendix 2
     T = np.zeros([2, 8])
 
-    # horizontal
-    T[0, IDX_SRC_Y] = 0.5 * D[0, IDX_SRC_Y]
-    T[0, IDX_MONO_X] = 0.5 * (D[0, IDX_MONO_X] + D[1, IDX_MONO_X])
-    T[0, IDX_MONO_Y] = 0.5 * (D[0, IDX_MONO_Y] + D[1, IDX_MONO_Y]) - inv_mono_curvh
-    T[0, IDX_SAMPLE_X] = 0.5 * D[1, IDX_SAMPLE_X]
-    T[0, IDX_SAMPLE_Y] = 0.5 * D[1, IDX_SAMPLE_Y]
+    T[IDX_HORI, IDX_SRC_Y] = 0.5 * D[IDX_MONO_H, IDX_SRC_Y]
+    T[IDX_HORI, IDX_MONO_X] = 0.5 * (D[IDX_MONO_H, IDX_MONO_X] + D[1, IDX_MONO_X])
+    T[IDX_HORI, IDX_MONO_Y] = 0.5 * (D[IDX_MONO_H, IDX_MONO_Y] + D[1, IDX_MONO_Y]) - inv_curvh
+    T[IDX_HORI, IDX_SAMPLE_X] = 0.5 * D[IDX_SAMPLE_H, IDX_SAMPLE_X]
+    T[IDX_HORI, IDX_SAMPLE_Y] = 0.5 * D[IDX_SAMPLE_H, IDX_SAMPLE_Y]
 
-    # vertical
-    T[1, IDX_SRC_Z] = 0.5 * D[2, IDX_SRC_Z] / s_th_m
-    T[1, IDX_MONO_Z] = 0.5 * (D[2, IDX_MONO_Z] - D[3, IDX_MONO_Z]) / s_th_m - inv_mono_curvv
-    T[1, IDX_SAMPLE_Z] = -0.5 * D[3, IDX_SAMPLE_Z] / s_th_m
+    T[IDX_VERT, IDX_SRC_Z] = 0.5 * D[IDX_MONO_V, IDX_SRC_Z] / s_th_m
+    T[IDX_VERT, IDX_MONO_Z] = 0.5 * (D[IDX_MONO_V, IDX_MONO_Z] - D[3, IDX_MONO_Z]) / s_th_m - inv_curvv
+    T[IDX_VERT, IDX_SAMPLE_Z] = -0.5 * D[IDX_SAMPLE_V, IDX_SAMPLE_Z] / s_th_m
+
+
+    return [D, T]
+
+
+
+#
+# unite trafo matrices
+#
+def combine_mono_ana_trafos(Dm, Tm, Da, Ta):
+    N = Dm.shape[0]
+    M = Dm.shape[1]
+    D = np.zeros([2*N, 2*M - 3])
+
+    D[0:N, 0:M] = Dm
+    # add ana matrix (without sample columns) in lower right block
+    D[N:2*N, M:2*M-3] = Da[:, 0:IDX_SAMPLE_X]
+    # unite mono and ana sample columns
+    D[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Da[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
+
+
+    N = Tm.shape[0]
+    M = Tm.shape[1]
+    T = np.zeros([2*N, 2*M - 3])
+
+    T[0:N, 0:M] = Tm
+    # add ana matrix (without sample columns) in lower right block
+    T[N:2*N, M:2*M-3] = Ta[:, 0:IDX_SAMPLE_X]
+    # unite mono and ana sample columns
+    T[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Ta[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
+
+    return [D, T]
 
 
 
