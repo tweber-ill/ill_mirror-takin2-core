@@ -2,7 +2,7 @@
 # implementation of the popovici algo
 #
 # @author Tobias Weber <tweber@ill.fr>
-# @date feb-2015, oct-2019
+# @date feb-2015, oct-2019, apr-2022
 # @license GPLv2
 #
 # @desc for algorithm: [pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
@@ -90,13 +90,13 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     T = np.zeros([2, 8])
 
     T[IDX_HORI, IDX_SRC_Y] = 0.5 * D[IDX_MONO_H, IDX_SRC_Y]
-    T[IDX_HORI, IDX_MONO_X] = 0.5 * (D[IDX_MONO_H, IDX_MONO_X] + D[1, IDX_MONO_X])
-    T[IDX_HORI, IDX_MONO_Y] = 0.5 * (D[IDX_MONO_H, IDX_MONO_Y] + D[1, IDX_MONO_Y]) - inv_curvh
+    T[IDX_HORI, IDX_MONO_X] = 0.5 * (D[IDX_MONO_H, IDX_MONO_X] + D[IDX_MONO_H, IDX_MONO_X])
+    T[IDX_HORI, IDX_MONO_Y] = 0.5 * (D[IDX_MONO_H, IDX_MONO_Y] + D[IDX_MONO_H, IDX_MONO_Y]) - inv_curvh
     T[IDX_HORI, IDX_SAMPLE_X] = 0.5 * D[IDX_SAMPLE_H, IDX_SAMPLE_X]
     T[IDX_HORI, IDX_SAMPLE_Y] = 0.5 * D[IDX_SAMPLE_H, IDX_SAMPLE_Y]
 
     T[IDX_VERT, IDX_SRC_Z] = 0.5 * D[IDX_MONO_V, IDX_SRC_Z] / s_th_m
-    T[IDX_VERT, IDX_MONO_Z] = 0.5 * (D[IDX_MONO_V, IDX_MONO_Z] - D[3, IDX_MONO_Z]) / s_th_m - inv_curvv
+    T[IDX_VERT, IDX_MONO_Z] = 0.5 * (D[IDX_MONO_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - inv_curvv
     T[IDX_VERT, IDX_SAMPLE_Z] = -0.5 * D[IDX_SAMPLE_V, IDX_SAMPLE_Z] / s_th_m
 
 
