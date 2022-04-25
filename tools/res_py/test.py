@@ -78,10 +78,15 @@ params = {
     # component sizes
     "src_w" : 10. * cm2A,
     "src_h" : 10. * cm2A,
+    "mono_d" : 0.2 * cm2A,
     "mono_w" : 10. * cm2A,
     "mono_h" : 10. * cm2A,
+    "sample_d" : 1. * cm2A,
+    "sample_w" : 1. * cm2A,
+    "sample_h" : 1. * cm2A,
     "det_w" : 10. * cm2A,
     "det_h" : 10. * cm2A,
+    "ana_d" : 0.2 * cm2A,
     "ana_w" : 10. * cm2A,
     "ana_h" : 10. * cm2A,
 
@@ -117,6 +122,8 @@ params = {
     # mosaics
     "mono_mosaic" : 60. *min2rad,
     "mono_mosaic_v" : 60. *min2rad,
+    "sample_mosaic" : 5. *min2rad,
+    "sample_mosaic_v" : 5. *min2rad,
     "ana_mosaic" : 60. *min2rad,
     "ana_mosaic_v" : 60. *min2rad,
 

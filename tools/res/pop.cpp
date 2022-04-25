@@ -160,24 +160,24 @@ ResoResults calc_pop(const PopParams& pop)
 	// collimator covariance matrix G, [pop75], Appendix 1
 	t_mat G_collis = tl::zero_matrix(POP_NUM_COMPS, POP_NUM_COMPS);
 
-	G_collis(POP_PREMONO_H, POP_PREMONO_H) = 
+	G_collis(POP_PREMONO_H, POP_PREMONO_H) =
 		t_real(1) / (coll_h_pre_mono*coll_h_pre_mono /rads/rads);
-	G_collis(POP_PRESAMPLE_H, POP_PRESAMPLE_H) = 
+	G_collis(POP_PRESAMPLE_H, POP_PRESAMPLE_H) =
 		t_real(1) / (pop.coll_h_pre_sample*pop.coll_h_pre_sample /rads/rads);
 
-	G_collis(POP_POSTSAMPLE_H, POP_POSTSAMPLE_H) = 
+	G_collis(POP_POSTSAMPLE_H, POP_POSTSAMPLE_H) =
 		t_real(1) / (pop.coll_h_post_sample*pop.coll_h_post_sample /rads/rads);
-	G_collis(POP_POSTANA_H, POP_POSTANA_H) = 
+	G_collis(POP_POSTANA_H, POP_POSTANA_H) =
 		t_real(1) / (pop.coll_h_post_ana*pop.coll_h_post_ana /rads/rads);
 
-	G_collis(POP_PREMONO_V, POP_PREMONO_V) = 
+	G_collis(POP_PREMONO_V, POP_PREMONO_V) =
 		t_real(1) / (coll_v_pre_mono*coll_v_pre_mono /rads/rads);
-	G_collis(POP_PRESAMPLE_V, POP_PRESAMPLE_V) = 
+	G_collis(POP_PRESAMPLE_V, POP_PRESAMPLE_V) =
 		t_real(1) / (pop.coll_v_pre_sample*pop.coll_v_pre_sample /rads/rads);
 
-	G_collis(POP_POSTSAMPLE_V, POP_POSTSAMPLE_V) = 
+	G_collis(POP_POSTSAMPLE_V, POP_POSTSAMPLE_V) =
 		t_real(1) / (pop.coll_v_post_sample*pop.coll_v_post_sample /rads/rads);
-	G_collis(POP_POSTANA_V, POP_POSTANA_V) = 
+	G_collis(POP_POSTANA_V, POP_POSTANA_V) =
 		t_real(1) / (pop.coll_v_post_ana*pop.coll_v_post_ana /rads/rads);
 
 
@@ -255,7 +255,7 @@ ResoResults calc_pop(const PopParams& pop)
 	SI_geo *= sig2fwhm*sig2fwhm;
 
 	t_mat S_geo;
-	if(!tl::inverse(SI_geo, S_geo))
+	if(!tl::inverse_diag(SI_geo, S_geo))
 	{
 		res.bOk = false;
 		res.strErr = "S matrix cannot be inverted.";

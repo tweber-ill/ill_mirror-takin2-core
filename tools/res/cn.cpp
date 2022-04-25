@@ -82,11 +82,12 @@ t_mat get_trafo_dkidkf_dQdE(const angle& ki_Q, const angle& kf_Q,
 	t_mat Ti = tl::rotation_matrix_2d(ki_Q/rads);
 	t_mat Tf = -tl::rotation_matrix_2d(kf_Q/rads);
 
+	// dQ_{x,y} = dki_{x,y} - dkf_{x,y}
 	t_mat U = ublas::zero_matrix<t_real>(6, 6);
 	tl::submatrix_copy(U, Ti, 0, 0);
 	tl::submatrix_copy(U, Tf, 0, 3);
 
-	// dQ = dki - dkf
+	// dQ_z = dki_z - dkf_z
 	U(2 /*dQ_z*/, 2 /*dki_z*/) = 1.;
 	U(2 /*dQ_z*/, 5 /*dkf_z*/) = -1.;
 
