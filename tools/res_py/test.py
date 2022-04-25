@@ -7,7 +7,7 @@
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -31,6 +31,7 @@
 import numpy as np
 import reso
 import helpers
+import pop
 import eck
 
 np.set_printoptions(floatmode = "fixed",  precision = 4)
@@ -135,7 +136,9 @@ params = {
 
 
 # calculate resolution ellipsoid
-res = eck.calc_eck(params)
+#res = eck.calc(params)
+res = pop.calc(params)
+
 if not res["ok"]:
     print("RESOLUTION CALCULATION FAILED!")
     exit(-1)

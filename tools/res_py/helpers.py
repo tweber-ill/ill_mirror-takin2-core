@@ -11,7 +11,7 @@
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -87,6 +87,15 @@ def rotation_matrix_3d_z(angle):
         [c, -s, 0],
         [s,  c, 0],
         [0,  0, 1]])
+
+
+def rotation_matrix_2d(angle):
+    s = np.sin(angle)
+    c = np.cos(angle)
+
+    return np.array([
+        [c, -s],
+        [s,  c]])
 
 
 def mirror_matrix(iSize, iComp):

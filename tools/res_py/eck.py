@@ -11,7 +11,7 @@
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -152,7 +152,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 #
 # Eckold algorithm combining the mono and ana resolutions
 #
-def calc_eck(param):
+def calc(param):
     twotheta = param["twotheta"] * param["sample_sense"]
     thetam = param["thetam"] * param["mono_sense"]
     thetaa = param["thetaa"] * param["ana_sense"]
@@ -174,16 +174,16 @@ def calc_eck(param):
 
     if param["mono_is_optimally_curved_h"]:
         mono_curvh = foc_curv(param["dist_src_mono"], \
-		param["dist_mono_sample"], np.abs(2.*thetam), False)
-    if param["mono_is_optimally_curved_v"]: 
+            param["dist_mono_sample"], np.abs(2.*thetam), False)
+    if param["mono_is_optimally_curved_v"]:
         mono_curvv = foc_curv(param["dist_src_mono"], \
-		param["dist_mono_sample"], np.abs(2.*thetam), True)
-    if param["ana_is_optimally_curved_h"]: 
+            param["dist_mono_sample"], np.abs(2.*thetam), True)
+    if param["ana_is_optimally_curved_h"]:
         ana_curvh = foc_curv(param["dist_sample_ana"], \
-		param["dist_ana_det"], np.abs(2.*thetaa), False)
-    if param["ana_is_optimally_curved_v"]: 
+            param["dist_ana_det"], np.abs(2.*thetaa), False)
+    if param["ana_is_optimally_curved_v"]:
         ana_curvv = foc_curv(param["dist_sample_ana"], \
-		param["dist_ana_det"], np.abs(2.*thetaa), True)
+            param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.
     inv_mono_curvv = 0.
@@ -291,8 +291,8 @@ def calc_eck(param):
 
     # equ 4 & equ 53 in [eck14]
     dE = (ki**2. - kf**2.) / (2.*Q**2.)
-    kipara = Q*(0.5+dE)
-    kfpara = Q-kipara
+    kipara = Q*(0.5 + dE)
+    kfpara = Q - kipara
     kperp = np.sqrt(np.abs(kipara**2. - ki**2.))
     kperp *= param["sample_sense"]
 
