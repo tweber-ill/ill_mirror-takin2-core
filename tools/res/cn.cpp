@@ -10,6 +10,7 @@
  * @desc see: 	[cn67] M. J. Cooper and R. Nathans, Acta Cryst. 23, 357 (1967), doi: 10.1107/S0365110X67002816
  *		[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973), doi: 10.1107/S0567739473000422
  *		[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
+ *		[pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -67,14 +68,14 @@ static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
 
 
 /**
- * transformation matrix -> [mit84], equ. A.15
- *
- * (  Ti11   Ti12      0   Tf11   Tf12      0 )   ( dki_x )   ( dQ_x  )
- * (  Ti12   Ti22      0   Tf12   Tf22      0 )   ( dki_y )   ( dQ_y  )
- * (     0      0      1      0      0     -1 ) * ( dki_z ) = ( dQ_z  )
- * ( 2ki*c      0      0 -2kf*c      0      0 )   ( dkf_x )   ( dE    )
- * (     1      0      0      0      0      0 )   ( dkf_y )   ( dki_x )
- * (     0      0      1      0      0      0 )   ( dkf_z )   ( dki_z )
+ * transformation matrix -> [mit84], equ. A.15 and [pop75], Appendix 1
+ *        dki part                dkf part
+ * (  Ti11   Ti12      0  |   Tf11   Tf12      0 )   ( dki_x )   ( dQ_x  )
+ * (  Ti12   Ti22      0  |   Tf12   Tf22      0 )   ( dki_y )   ( dQ_y  )
+ * (     0      0      1  |      0      0     -1 ) * ( dki_z ) = ( dQ_z  )
+ * ( 2ki*c      0      0  | -2kf*c      0      0 )   ( dkf_x )   ( dE    )
+ * (     1      0      0  |      0      0      0 )   ( dkf_y )   ( dki_x )
+ * (     0      0      1  |      0      0      0 )   ( dkf_z )   ( dki_z )
  */
 t_mat get_trafo_dkidkf_dQdE(const angle& ki_Q, const angle& kf_Q,
 	const wavenumber& ki, const wavenumber& kf)

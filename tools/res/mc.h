@@ -84,8 +84,6 @@ void mc_neutrons(const Ellipsoid4d<typename t_vec::value_type>& ell4d,
 	//if(vecResult.size() != iNum)
 	//	vecResult.resize(iNum);
 
-	//tl::log_debug("rot: ", rot);
-	//tl::log_debug("Qvec0 = ", opts.dAngleQVec0/M_PI*180.);
 	t_mat matQVec0 = tl::rotation_matrix_2d(-opts.dAngleQVec0);
 	tl::resize_unity(matQVec0, 4);
 
@@ -97,9 +95,9 @@ void mc_neutrons(const Ellipsoid4d<typename t_vec::value_type>& ell4d,
 			tl::rand_norm_nd<t_real, std::vector>
 				({0.,0.,0.,0.},
 				{ ell4d.x_hwhm*tl::get_HWHM2SIGMA<t_real>(),
-				ell4d.y_hwhm*tl::get_HWHM2SIGMA<t_real>(),
-				ell4d.z_hwhm*tl::get_HWHM2SIGMA<t_real>(),
-				ell4d.w_hwhm*tl::get_HWHM2SIGMA<t_real>() }));
+				  ell4d.y_hwhm*tl::get_HWHM2SIGMA<t_real>(),
+				  ell4d.z_hwhm*tl::get_HWHM2SIGMA<t_real>(),
+				  ell4d.w_hwhm*tl::get_HWHM2SIGMA<t_real>() }));
 
 		vecMC = ublas::prod(rot, vecMC);
 		if(!opts.bCenter)

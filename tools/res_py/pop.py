@@ -37,47 +37,28 @@ import reso
 import helpers
 
 
-IDX_SRC_Y      = 0
-IDX_SRC_Z      = 1
-IDX_MONO_X     = 2
-IDX_MONO_Y     = 3
-IDX_MONO_Z     = 4
-IDX_SAMPLE_X   = 5
-IDX_SAMPLE_Y   = 6
-IDX_SAMPLE_Z   = 7
-IDX_ANA_X      = 8
-IDX_ANA_Y      = 9
-IDX_ANA_Z      = 10
-IDX_DET_Y      = 11
-IDX_DET_Z      = 12
-NUM_MONO_POS   = 8
-NUM_POS        = 13
+# --------------------------------------------------------------------
+# matrix element indices
+IDX_SRC_Y      = 0;  IDX_SRC_Z      = 1
+IDX_MONO_X     = 2;  IDX_MONO_Y     = 3;  IDX_MONO_Z     = 4;
+IDX_SAMPLE_X   = 5;  IDX_SAMPLE_Y   = 6;  IDX_SAMPLE_Z   = 7
+IDX_ANA_X      = 8;  IDX_ANA_Y      = 9;  IDX_ANA_Z      = 10
+IDX_DET_Y      = 11; IDX_DET_Z      = 12
+NUM_MONO_POS   = 8;  NUM_POS        = 13
 
-IDX_SRC_H      = 0
-IDX_SRC_V      = 1
-IDX_MONO_H     = 2
-IDX_MONO_V     = 3
-IDX_SAMPLE_H   = 4
-IDX_SAMPLE_V   = 5
-IDX_ANA_H      = 6
-IDX_ANA_V      = 7
-NUM_MONO_COMPS = 4
-NUM_COMPS      = NUM_MONO_COMPS*2
+IDX_SRC_H      = 0;  IDX_SRC_V      = 1
+IDX_MONO_H     = 2;  IDX_MONO_V     = 3
+IDX_SAMPLE_H   = 4;  IDX_SAMPLE_V   = 5
+IDX_ANA_H      = 6;  IDX_ANA_V      = 7
+NUM_MONO_COMPS = 4;  NUM_COMPS      = NUM_MONO_COMPS*2
 
-IDX_KI_H       = 0
-IDX_KI_V       = 1
-IDX_KF_H       = 2
-IDX_KF_V       = 3
-NUM_KI         = 2
-NUM_KIKF       = NUM_KI*2
+IDX_KI_H       = 0;  IDX_KI_V       = 1
+IDX_KF_H       = 2;  IDX_KF_V       = 3
+NUM_KI         = 2;  NUM_KIKF       = NUM_KI*2
 
-IDX_KI_X       = 0
-IDX_KI_Y       = 1
-IDX_KI_Z       = 2
-IDX_KF_X       = 3
-IDX_KF_Y       = 4
-IDX_KF_Z       = 5
+IDX_KI_X       = 0;  IDX_KI_Y       = 1;  IDX_KI_Z       = 2
 NUM_KI_COMPS   = 3
+# --------------------------------------------------------------------
 
 
 
@@ -85,7 +66,8 @@ NUM_KI_COMPS   = 3
 # get matrices for ki axis
 #
 def get_mono_trafos(dist_src_mono, dist_mono_sample,
-	thetam, thetas, inv_curvh, inv_curvv, ki, sense = 1.):
+	thetam, thetas, inv_curvh, inv_curvv,
+	ki, ki_Q, sense = 1.):
 
     s_th_m = np.sin(thetam)
     c_th_m = sense * np.cos(thetam)
@@ -123,6 +105,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     T[IDX_KI_H, IDX_SAMPLE_X] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_X]
     T[IDX_KI_H, IDX_SAMPLE_Y] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_Y]
 
+    # signs for kf
     T[IDX_KI_V, IDX_SRC_Z] = 0.5 * sense * D[IDX_SRC_V, IDX_SRC_Z] / s_th_m
     T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_SRC_V, IDX_MONO_Z]) / s_th_m - inv_curvv
     T[IDX_KI_V, IDX_SAMPLE_Z] = -0.5 * sense * D[IDX_MONO_V, IDX_SAMPLE_Z] / s_th_m
@@ -133,17 +116,23 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     A[IDX_KI_X, IDX_SRC_H] = 0.5 * ki * cot_th_m
     A[IDX_KI_X, IDX_MONO_H] = -0.5 * ki * cot_th_m
     A[IDX_KI_Y, IDX_MONO_H] = ki
-    A[IDX_KI_Z, IDX_MONO_V] = ki
+    A[IDX_KI_Z, IDX_MONO_V] = ki # sign
 
 
-    return [D, T, A]
+    # B matrix, [mit84], equ. A.15 and [pop75] Appendix 1
+    B = np.zeros([4, NUM_KI_COMPS])
+    B[0:2, IDX_KI_X:IDX_KI_X+2] = sense * helpers.rotation_matrix_2d(ki_Q)
+    B[2, IDX_KI_Z] = sense
+    B[3, IDX_KI_X] = 2. * sense * ki * helpers.ksq2E
+
+    return [D, T, A, B]
 
 
 
 #
 # unite trafo matrices
 #
-def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa):
+def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba):
     N = Dm.shape[0]
     M = Dm.shape[1]
     D = np.zeros([2*N, 2*M - 3])
@@ -175,32 +164,13 @@ def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa):
     A[N:2*N, IDX_SAMPLE_V] = Aa[:, IDX_MONO_V]
 
 
-    return [D, T, A]
+    N = Bm.shape[0]
+    M = Bm.shape[1]
+    B = np.zeros([N, 2*M])
+    B[0:N, 0:M] = Bm
+    B[0:N, M:2*M] = Ba
 
-
-
-#
-# trafo from the [dki_x, dki_y, dki_z, dkf_x, dkf_y, dkf_z]
-#       into the [dQ_x, dQ_y, dQ_z, dE] system
-# see [mit84], equ. A.15
-#
-def get_QE_trafo(ki, kf, ki_Q, kf_Q):
-    B = np.zeros([4, 6])
-
-    # dQ_{x,y} = dki_{x,y} - dkf_{x,y}
-    B[0:2, IDX_KI_X:IDX_KI_X+2] = +helpers.rotation_matrix_2d(ki_Q)
-    B[0:2, IDX_KF_X:IDX_KF_X+2] = -helpers.rotation_matrix_2d(kf_Q)
-
-    # dQ_z = dki_z - dkf_z
-    B[2, IDX_KI_Z] = +1.
-    B[2, IDX_KF_Z] = -1.
-
-    #  E ~ ki^2 - kf^2
-    # dE ~ 2ki*dki - 2kf*dkf
-    B[3, IDX_KI_X] = +2.*ki * helpers.ksq2E
-    B[3, IDX_KF_X] = -2.*kf * helpers.ksq2E
-
-    return B
+    return [D, T, A, B]
 
 
 
@@ -333,14 +303,12 @@ def calc(param):
 
     # -------------------------------------------------------------------------
     # ki and kf trafo matrices
-    [Dm, Tm, Am] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
-        thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, 1.)
-    [Da, Ta, Aa] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
-        thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, -1.)
+    [Dm, Tm, Am, Bm] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
+        thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, ki_Q, 1.)
+    [Da, Ta, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
+        thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, kf_Q, -1.)
 
-    [D, T, A] = combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa)
-
-    B = get_QE_trafo(ki, kf, ki_Q, kf_Q)
+    [D, T, A, B] = combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba)
     # -------------------------------------------------------------------------
 
 

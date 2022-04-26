@@ -51,7 +51,7 @@ kf = 1.5
 Q = 1.5
 E = helpers.get_E(ki, kf)
 
-sc_senses = [ 1., -1., 1.]
+sc_senses = [ -1., 1., -1.]
 
 params = {
     # scattering triangle
