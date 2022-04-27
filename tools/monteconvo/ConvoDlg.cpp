@@ -387,6 +387,7 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	connect(btnStop, &QPushButton::clicked, this, &ConvoDlg::Stop);
 
 	connect(checkScan, &QCheckBox::toggled, this, &ConvoDlg::scanCheckToggled);
+	connect(checkFlip, &QCheckBox::toggled, this, &ConvoDlg::coordFlipToggled);
 
 	connect(pHK, &QAction::triggered, this, &ConvoDlg::ChangeHK);
 	connect(pHL, &QAction::triggered, this, &ConvoDlg::ChangeHL);
@@ -686,6 +687,12 @@ void ConvoDlg::scanCheckToggled(bool bChecked)
 {
 	if(bChecked)
 		scanFileChanged(editScan->text());
+}
+
+
+void ConvoDlg::coordFlipToggled(bool bChecked)
+{
+	scanFileChanged(editScan->text());
 }
 
 

@@ -150,6 +150,7 @@ protected slots:
 
 	void scanFileChanged(const QString& qstrFile);
 	void scanCheckToggled(bool);
+	void coordFlipToggled(bool);
 	void scaleChanged();
 
 	void SaveResult();
