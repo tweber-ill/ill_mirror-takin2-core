@@ -70,8 +70,10 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
+	tabFitting->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
-	if(m_pSqwParamDlg) m_pSqwParamDlg->setEnabled(false);
+	if(m_pSqwParamDlg)
+		m_pSqwParamDlg->setEnabled(false);
 	editScale->setEnabled(false);
 	editSlope->setEnabled(false);
 	editOffs->setEnabled(false);
@@ -89,8 +91,10 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
-			if(m_pSqwParamDlg) QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
+			if(m_pSqwParamDlg)
+				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editScale, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editSlope, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editOffs, "setEnabled", Q_ARG(bool, true));
@@ -531,8 +535,10 @@ void ConvoDlg::Start2D()
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
+	tabFitting->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
-	if(m_pSqwParamDlg) m_pSqwParamDlg->setEnabled(false);
+	if(m_pSqwParamDlg)
+		m_pSqwParamDlg->setEnabled(false);
 	editScale->setEnabled(false);
 	editSlope->setEnabled(false);
 	editOffs->setEnabled(false);
@@ -550,8 +556,10 @@ void ConvoDlg::Start2D()
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
-			if(m_pSqwParamDlg) QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
+			if(m_pSqwParamDlg)
+				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editScale, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editSlope, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editOffs, "setEnabled", Q_ARG(bool, true));
@@ -938,8 +946,10 @@ void ConvoDlg::StartDisp()
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
+	tabFitting->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
-	if(m_pSqwParamDlg) m_pSqwParamDlg->setEnabled(false);
+	if(m_pSqwParamDlg)
+		m_pSqwParamDlg->setEnabled(false);
 	editScale->setEnabled(false);
 	editSlope->setEnabled(false);
 	editOffs->setEnabled(false);
@@ -957,8 +967,10 @@ void ConvoDlg::StartDisp()
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
-			if(m_pSqwParamDlg) QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
+			if(m_pSqwParamDlg)
+				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editScale, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editSlope, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(editOffs, "setEnabled", Q_ARG(bool, true));
