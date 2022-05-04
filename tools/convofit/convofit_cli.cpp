@@ -26,6 +26,7 @@
  * ----------------------------------------------------------------------------
  */
 
+#include <boost/make_shared.hpp>
 #include <boost/program_options.hpp>
 
 #include "convofit.h"
@@ -71,58 +72,46 @@ int convofit_main(int argc, char** argv)
 
 		// normal args
 		opts::options_description args("convofit options (overriding job file settings)");
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("job-file",
-			opts::value<decltype(vecJobs)>(&vecJobs),
-			"convolution fitting job file")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("verbose",
-			opts::bool_switch(&g_bVerbose),
-			"verbose logging")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("neutrons",
-			opts::value<decltype(g_iNumNeutrons)>(&g_iNumNeutrons),
-			"neutron count")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("skip-fit",
-			opts::bool_switch(&g_bSkipFit),
-			"skip the fitting step")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("keep-model",
-			opts::bool_switch(&g_bUseValuesFromModel),
-			"keep the initial values from the model file")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("model-params",
-			opts::value<decltype(g_strSetParams)>(&g_strSetParams),
-			"set S(q,w) model parameters")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("outfile-suffix",
-			opts::value<decltype(g_strOutFileSuffix)>(&g_strOutFileSuffix),
-			"suffix to append to output files")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("plot-points",
-			opts::value<decltype(g_iPlotPoints)>(&g_iPlotSkipBegin),
-			"number of plot points")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("plot-skip-begin",
-			opts::value<decltype(g_iPlotSkipBegin)>(&g_iPlotSkipBegin),
-			"skip plot points in the beginning of the range")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("plot-skip-end",
-			opts::value<decltype(g_iPlotSkipEnd)>(&g_iPlotSkipEnd),
-			"skip plot points in the end of the range")));
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("max-threads",
-			opts::value<decltype(g_iMaxThreads)>(&g_iMaxThreads),
-			"maximum number of threads")));
+		args.add(boost::make_shared<opts::option_description>(
+			"job-file", opts::value<decltype(vecJobs)>(&vecJobs),
+			"convolution fitting job file"));
+		args.add(boost::make_shared<opts::option_description>(
+			"verbose", opts::bool_switch(&g_bVerbose),
+			"verbose logging"));
+		args.add(boost::make_shared<opts::option_description>(
+			"neutrons", opts::value<decltype(g_iNumNeutrons)>(&g_iNumNeutrons),
+			"neutron count"));
+		args.add(boost::make_shared<opts::option_description>(
+			"skip-fit", opts::bool_switch(&g_bSkipFit),
+			"skip the fitting step"));
+		args.add(boost::make_shared<opts::option_description>(
+			"keep-model", opts::bool_switch(&g_bUseValuesFromModel),
+			"keep the initial values from the model file"));
+		args.add(boost::make_shared<opts::option_description>(
+			"model-params", opts::value<decltype(g_strSetParams)>(&g_strSetParams),
+			"set S(q,w) model parameters"));
+		args.add(boost::make_shared<opts::option_description>(
+			"outfile-suffix", opts::value<decltype(g_strOutFileSuffix)>(&g_strOutFileSuffix),
+			"suffix to append to output files"));
+		args.add(boost::make_shared<opts::option_description>(
+			"plot-points", opts::value<decltype(g_iPlotPoints)>(&g_iPlotSkipBegin),
+			"number of plot points"));
+		args.add(boost::make_shared<opts::option_description>(
+			"plot-skip-begin", opts::value<decltype(g_iPlotSkipBegin)>(&g_iPlotSkipBegin),
+			"skip plot points in the beginning of the range"));
+		args.add(boost::make_shared<opts::option_description>(
+			"plot-skip-end", opts::value<decltype(g_iPlotSkipEnd)>(&g_iPlotSkipEnd),
+			"skip plot points in the end of the range"));
+		args.add(boost::make_shared<opts::option_description>(
+			"max-threads", opts::value<decltype(g_iMaxThreads)>(&g_iMaxThreads),
+			"maximum number of threads"));
 
 		// dummy arg if launched from takin executable
 		bool bStartedFromTakin = 0;
 #ifndef CONVOFIT_STANDALONE
-		args.add(boost::shared_ptr<opts::option_description>(
-			new opts::option_description("convofit",
-			opts::bool_switch(&bStartedFromTakin),
-			"launch convofit from takin")));
+		args.add(boost::make_shared<opts::option_description>(
+			"convofit", opts::bool_switch(&bStartedFromTakin),
+			"launch convofit from takin"));
 #endif
 
 		// positional args
