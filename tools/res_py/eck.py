@@ -153,16 +153,17 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 # Eckold algorithm combining the mono and ana resolutions
 #
 def calc(param):
-    twotheta = param["twotheta"] * param["sample_sense"]
-    thetam = param["thetam"] * param["mono_sense"]
-    thetaa = param["thetaa"] * param["ana_sense"]
-    ki_Q = param["angle_ki_Q"] * param["sample_sense"]
-    kf_Q = param["angle_kf_Q"] * param["sample_sense"]
-
     ki = param["ki"]
     kf = param["kf"]
     E = param["E"]
     Q = param["Q"]
+
+    # angles
+    twotheta = helpers.get_scattering_angle(ki, kf, Q) * param["sample_sense"]
+    thetam = helpers.get_mono_angle(ki, param["mono_xtal_d"]) * param["mono_sense"]
+    thetaa = helpers.get_mono_angle(kf, param["ana_xtal_d"]) * param["ana_sense"]
+    ki_Q = helpers.get_angle_ki_Q(ki, kf, Q) * param["sample_sense"]
+    kf_Q = helpers.get_angle_kf_Q(ki, kf, Q) * param["sample_sense"]
 
 
     # --------------------------------------------------------------------

@@ -42,14 +42,14 @@ import helpers
 IDX_SRC_Y      = 0;  IDX_SRC_Z      = 1
 IDX_MONO_X     = 2;  IDX_MONO_Y     = 3;  IDX_MONO_Z     = 4;
 IDX_SAMPLE_X   = 5;  IDX_SAMPLE_Y   = 6;  IDX_SAMPLE_Z   = 7
-IDX_ANA_X      = 8;  IDX_ANA_Y      = 9;  IDX_ANA_Z      = 10
-IDX_DET_Y      = 11; IDX_DET_Z      = 12
+IDX_DET_Y      = 8;  IDX_DET_Z      = 9
+IDX_ANA_X      = 10; IDX_ANA_Y      = 11; IDX_ANA_Z      = 12
 NUM_MONO_POS   = 8;  NUM_POS        = 13
 
 IDX_SRC_H      = 0;  IDX_SRC_V      = 1
 IDX_MONO_H     = 2;  IDX_MONO_V     = 3
-IDX_SAMPLE_H   = 4;  IDX_SAMPLE_V   = 5
-IDX_ANA_H      = 6;  IDX_ANA_V      = 7
+IDX_ANA_H      = 4;  IDX_ANA_V      = 5
+IDX_SAMPLE_H   = 6;  IDX_SAMPLE_V   = 7
 NUM_MONO_COMPS = 4;  NUM_COMPS      = NUM_MONO_COMPS*2
 
 IDX_KI_H       = 0;  IDX_KI_V       = 1
@@ -100,14 +100,14 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     T = np.zeros([NUM_KI, NUM_MONO_POS])
 
     T[IDX_KI_H, IDX_SRC_Y] = 0.5 * D[IDX_SRC_H, IDX_SRC_Y]
-    T[IDX_KI_H, IDX_MONO_X] = 0.5 * (D[IDX_SRC_H, IDX_MONO_X] + D[IDX_SRC_H, IDX_MONO_X])
-    T[IDX_KI_H, IDX_MONO_Y] = 0.5 * (D[IDX_SRC_H, IDX_MONO_Y] + D[IDX_SRC_H, IDX_MONO_Y]) - inv_curvh
+    T[IDX_KI_H, IDX_MONO_X] = 0.5 * (D[IDX_SRC_H, IDX_MONO_X] + D[IDX_MONO_H, IDX_MONO_X])
+    T[IDX_KI_H, IDX_MONO_Y] = 0.5 * (D[IDX_SRC_H, IDX_MONO_Y] + D[IDX_MONO_H, IDX_MONO_Y]) - inv_curvh
     T[IDX_KI_H, IDX_SAMPLE_X] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_X]
     T[IDX_KI_H, IDX_SAMPLE_Y] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_Y]
 
     # signs for kf
     T[IDX_KI_V, IDX_SRC_Z] = 0.5 * sense * D[IDX_SRC_V, IDX_SRC_Z] / s_th_m
-    T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_SRC_V, IDX_MONO_Z]) / s_th_m - inv_curvv
+    T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - inv_curvv
     T[IDX_KI_V, IDX_SAMPLE_Z] = -0.5 * sense * D[IDX_MONO_V, IDX_SAMPLE_Z] / s_th_m
 
 
@@ -132,7 +132,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
 #
 # unite trafo matrices
 #
-def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba):
+def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba):
     N = Dm.shape[0]
     M = Dm.shape[1]
     D = np.zeros([2*N, 2*M - 3])
@@ -158,17 +158,18 @@ def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba):
     N = Am.shape[0]
     M = Am.shape[1]
     A = np.zeros([2*N, 2*M])
+
     A[0:N, 0:M] = Am
-    A[N:2*N, IDX_ANA_H] = Aa[:, IDX_SRC_H]      # after source -> before detector
-    A[N:2*N, IDX_SAMPLE_H] = Aa[:, IDX_MONO_H]  # after mono -> before ana
-    A[N:2*N, IDX_SAMPLE_V] = Aa[:, IDX_MONO_V]
+    A[N:2*N, M:2*M] = Aa
 
 
     N = Bm.shape[0]
     M = Bm.shape[1]
     B = np.zeros([N, 2*M])
+
     B[0:N, 0:M] = Bm
     B[0:N, M:2*M] = Ba
+
 
     return [D, T, A, B]
 
@@ -178,19 +179,25 @@ def combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba):
 # resolution algorithm
 #
 def calc(param):
-    twotheta = param["twotheta"] * param["sample_sense"]
-    thetas = twotheta * 0.5
-    thetam = param["thetam"] * param["mono_sense"]
-    thetaa = param["thetaa"] * param["ana_sense"]
-    ki_Q = param["angle_ki_Q"] * param["sample_sense"]
-    kf_Q = param["angle_kf_Q"] * param["sample_sense"]
-
+    # instrument position
     ki = param["ki"]
     kf = param["kf"]
     E = param["E"]
     Q = param["Q"]
 
     lam = helpers.k2lam(ki)
+
+    # angles
+    twotheta = helpers.get_scattering_angle(ki, kf, Q) * param["sample_sense"]
+    thetas = twotheta * 0.5
+    thetam = helpers.get_mono_angle(ki, param["mono_xtal_d"]) * param["mono_sense"]
+    thetaa = helpers.get_mono_angle(kf, param["ana_xtal_d"]) * param["ana_sense"]
+    ki_Q = helpers.get_angle_ki_Q(ki, kf, Q) * param["sample_sense"]
+    kf_Q = helpers.get_angle_kf_Q(ki, kf, Q) * param["sample_sense"]
+
+#    print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" %
+#        (twotheta*helpers.rad2deg, thetam*helpers.rad2deg, thetaa*helpers.rad2deg,
+#        ki_Q*helpers.rad2deg, kf_Q*helpers.rad2deg))
 
 
     # --------------------------------------------------------------------
@@ -219,13 +226,13 @@ def calc(param):
     inv_ana_curvv = 0.
 
     if param["mono_is_curved_h"]:
-        inv_mono_curvh = 1./mono_curvh
+        inv_mono_curvh = 1./mono_curvh * param["mono_sense"]
     if param["mono_is_curved_v"]:
-        inv_mono_curvv = 1./mono_curvv
+        inv_mono_curvv = 1./mono_curvv * param["mono_sense"]
     if param["ana_is_curved_h"]:
-        inv_ana_curvh = 1./ana_curvh
+        inv_ana_curvh = 1./ana_curvh * param["ana_sense"]
     if param["ana_is_curved_v"]:
-        inv_ana_curvv = 1./ana_curvv
+        inv_ana_curvv = 1./ana_curvv * param["ana_sense"]
     # --------------------------------------------------------------------
 
 
@@ -315,7 +322,7 @@ def calc(param):
     S[IDX_ANA_Z, IDX_ANA_Z] = 12. / param["ana_h"]**2.
     S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
     S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
-    S /= reso.sig2fwhm
+    S /= reso.sig2fwhm**2.
     Sinv = la.inv(S)
     # -------------------------------------------------------------------------
 
@@ -327,7 +334,7 @@ def calc(param):
     [Da, Ta, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
         thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, kf_Q, -1.)
 
-    [D, T, A, B] = combine_mono_ana_trafos(Dm, Tm, Da, Ta, Am, Aa, Bm, Ba)
+    [D, T, A, B] = combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba)
     # -------------------------------------------------------------------------
 
 

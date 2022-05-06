@@ -129,16 +129,11 @@ ResoResults calc_pop(const PopParams& pop)
 	res.Q_avg[3] = pop.E / meV;
 
 	length lam = tl::k2lam(pop.ki);
-	angle twotheta = pop.twotheta;
+	angle twotheta = pop.twotheta * pop.dsample_sense;
 	angle thetaa = pop.thetaa * pop.dana_sense;
 	angle thetam = pop.thetam * pop.dmono_sense;
-	angle ki_Q = pop.angle_ki_Q;
-	angle kf_Q = pop.angle_kf_Q;
-	//kf_Q = ki_Q + twotheta;
-
-	twotheta *= pop.dsample_sense;
-	ki_Q *= pop.dsample_sense;
-	kf_Q *= pop.dsample_sense;
+	angle ki_Q = pop.angle_ki_Q * pop.dsample_sense;
+	angle kf_Q = pop.angle_kf_Q * pop.dsample_sense;
 
 	// B matrix, [pop75], Appendix 1 -> U matrix in CN
 	t_mat B_trafo_QE = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, pop.ki, pop.kf);
@@ -322,7 +317,7 @@ ResoResults calc_pop(const PopParams& pop)
 
 		// vertical
 		arr[POP_SRC_Z] = t_real(-0.5) / (dist_src_mono * s_th_m);
-		arr[POP_MONO_Z] = (	+ t_real(0.5) / dist_src_mono
+		arr[POP_MONO_Z] = ( + t_real(0.5) / dist_src_mono
 			+ t_real(0.5) / dist_mono_sample) / s_th_m
 			- inv_curvv;
 		arr[POP_SAMPLE_Z] = t_real(-0.5) / (dist_mono_sample * s_th_m);
@@ -349,7 +344,6 @@ ResoResults calc_pop(const PopParams& pop)
 		pop.dist_ana_det/cm, pop.dist_sample_ana/cm,
 		s_th_a, -c_th_a, s_th_s, -c_th_s,
 		inv_ana_curvh*cm, inv_ana_curvv*cm);
-
 	T_mosaic_trafo(POP_ANA_H, POP_DET_Y) = -ana_mosaic_trafo[get_ki_pos(POP_DET_Y)];
 	T_mosaic_trafo(POP_ANA_H, POP_ANA_X) = ana_mosaic_trafo[get_ki_pos(POP_ANA_X)];
 	T_mosaic_trafo(POP_ANA_H, POP_ANA_Y) = ana_mosaic_trafo[get_ki_pos(POP_ANA_Y)];
