@@ -30,7 +30,6 @@
 # ----------------------------------------------------------------------------
 #
 
-# requires numpy version >= 1.10
 import numpy as np
 import numpy.linalg as la
 import reso
@@ -66,8 +65,8 @@ NUM_KI_COMPS   = 3
 # get matrices for ki axis
 #
 def get_mono_trafos(dist_src_mono, dist_mono_sample,
-	thetam, thetas, inv_curvh, inv_curvv,
-	ki, ki_Q, sense = 1.):
+    thetam, thetas, inv_curvh, inv_curvv,
+    ki, ki_Q, sense = 1.):
 
     s_th_m = np.sin(thetam)
     c_th_m = sense * np.cos(thetam)
@@ -322,8 +321,8 @@ def calc(param):
     S[IDX_ANA_Z, IDX_ANA_Z] = 12. / param["ana_h"]**2.
     S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
     S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
-    S /= reso.sig2fwhm**2.
-    Sinv = la.inv(S)
+    S /= helpers.sig2fwhm**2.
+    Sinv = 1./S
     # -------------------------------------------------------------------------
 
 
@@ -355,7 +354,7 @@ def calc(param):
     cov = np.dot(np.dot(BA, HGinv), np.transpose(BA))
     cov[1, 1] += Q**2. * param["sample_mosaic"]**2.
     cov[2, 2] += Q**2. * param["sample_mosaic_v"]**2.
-    R = la.inv(cov) * reso.sig2fwhm**2.
+    R = la.inv(cov) * helpers.sig2fwhm**2.
 
     if param["sample_sense"] < 0.:
         # mirror Q_perp
@@ -366,7 +365,7 @@ def calc(param):
     DS = np.dot(np.dot(D, Sinv), np.transpose(D))
     DSinv = la.inv(DS) + G
     R0 = dmono_refl*dana_effic * dxsec * (0.5*np.pi)**2. \
-		/ (np.sin(thetam) * np.sin(thetaa)) \
+        / (np.sin(thetam) * np.sin(thetaa)) \
         * np.sqrt(la.det(S)*la.det(F) / (la.det(K) * la.det(DSinv)))
 
     res["reso"] = R

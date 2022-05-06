@@ -31,7 +31,6 @@
 # ----------------------------------------------------------------------------
 #
 
-# requires numpy version >= 1.10
 import numpy as np
 import numpy.linalg as la
 import reso
@@ -58,14 +57,14 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     A_tx = inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam))
     A_t1 = A_t0*A_tx
 
-    A[0,0] = 0.5*reso.sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
+    A[0,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
         ( (2./coll_h_pre_mono)**2. + (2*dist_src_mono/src_w)**2. + A_t0*A_t0 )
 
-    A[0,1] = A[1,0] = 0.5*reso.sig2fwhm**2. / ki**2. * np.tan(thetam) * \
+    A[0,1] = A[1,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * np.tan(thetam) * \
         ( + 2.*(1./coll_h_pre_mono)**2. + 2.*dist_src_mono*(dist_src_mono-dist_mono_sample)/src_w**2. + \
             A_t0**2. - A_t0*A_t1)
 
-    A[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
+    A[1,1] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
         ( (1./coll_h_pre_mono)**2. + (1./coll_h_pre_sample)**2. \
             + ((dist_src_mono-dist_mono_sample)/src_w)**2. \
             + (dist_mono_sample/(mono_w*np.abs(np.sin(thetam))))**2. \
@@ -82,14 +81,14 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     Av_t0 = 0.5 / (mono_mosaic_v*np.abs(np.sin(thetam)))
     Av_t1 = inv_mono_curvv*dist_mono_sample / mono_mosaic_v
 
-    Av[0,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
+    Av[0,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
         ( (1./coll_v_pre_sample)**2. + (dist_mono_sample/src_h)**2. + (dist_mono_sample/mono_h)**2. + \
         Av_t0**2. - 2.*Av_t0*Av_t1 + Av_t1**2. )     # typo/missing in paper?
 
-    Av[0,1] = Av[1,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
+    Av[0,1] = Av[1,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
         ( dist_src_mono*dist_mono_sample/src_h**2. - Av_t0*Av_t0 + Av_t0*Av_t1 )
 
-    Av[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
+    Av[1,1] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
         ( (1./coll_v_pre_mono)**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
 
 
@@ -98,10 +97,10 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     B = np.array([0,0,0])
     B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*np.abs(np.sin(thetam)))
 
-    B[0] = reso.sig2fwhm**2. * pos_y / ki * np.tan(thetam) * \
+    B[0] = helpers.sig2fwhm**2. * pos_y / ki * np.tan(thetam) * \
         ( 2.*dist_src_mono / src_w**2. + B_t0 )
 
-    B[1] = reso.sig2fwhm**2. * pos_y / ki * \
+    B[1] = helpers.sig2fwhm**2. * pos_y / ki * \
     ( - dist_mono_sample / (mono_w*np.abs(np.sin(thetam)))**2. + \
         B_t0 - B_t0 * inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam)) + \
         (dist_src_mono-dist_mono_sample) / src_w**2. )
@@ -114,23 +113,23 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     Bv_t0 = inv_mono_curvv/mono_mosaic_v**2
 
     # typo in paper?
-    Bv[0] = (-1.) *  reso.sig2fwhm**2. * pos_z / ki * \
+    Bv[0] = (-1.) *  helpers.sig2fwhm**2. * pos_z / ki * \
         ( dist_mono_sample / mono_h**2. + dist_mono_sample / src_h**2. + \
             Bv_t0 * inv_mono_curvv*dist_mono_sample - 0.5*Bv_t0 / np.abs(np.sin(thetam)) )
 
     # typo in paper?
-    Bv[1] = (-1.) * reso.sig2fwhm**2. * pos_z / ki * \
+    Bv[1] = (-1.) * helpers.sig2fwhm**2. * pos_z / ki * \
         ( dist_src_mono / (src_h*src_h) + 0.5*Bv_t0/np.abs(np.sin(thetam)) )
 
 
 
     # C scalar: formula 28 in [eck14]
-    C = 0.5*reso.sig2fwhm**2. * pos_y**2. * \
+    C = 0.5*helpers.sig2fwhm**2. * pos_y**2. * \
         ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
             (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
     # Cv scalar: formula 40 in [eck14]
-    Cv = 0.5*reso.sig2fwhm**2. * pos_z**2. * \
+    Cv = 0.5*helpers.sig2fwhm**2. * pos_z**2. * \
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
 

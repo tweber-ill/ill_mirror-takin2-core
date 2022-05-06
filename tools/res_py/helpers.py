@@ -31,14 +31,15 @@
 # ----------------------------------------------------------------------------
 #
 
-# requires numpy version >= 1.10
 import numpy as np
+import helpers
 
 
 
 #--------------------------------------------------------------------------
 # constants
 #--------------------------------------------------------------------------
+sig2fwhm = 2.*np.sqrt(2.*np.log(2.))
 cm2A = 1e8
 min2rad = 1./ 60. / 180.*np.pi
 rad2deg = 180. / np.pi
@@ -60,7 +61,7 @@ def k2lam(k):
 
 
 def get_E(ki, kf):
-        return ksq2E * (ki**2. - kf**2.)
+    return ksq2E * (ki**2. - kf**2.)
 
 
 def get_scattering_angle(ki, kf, Q):

@@ -29,8 +29,8 @@
 
 # requires numpy version >= 1.10
 import numpy as np
-import reso
 import helpers
+import reso
 import pop
 import eck
 
