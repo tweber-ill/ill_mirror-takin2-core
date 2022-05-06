@@ -42,14 +42,14 @@ import helpers
 # mono (and ana) resolution calculation
 #
 def get_mono_vals(src_w, src_h, mono_w, mono_h,
-	dist_src_mono, dist_mono_sample,
-	ki, thetam,
-	coll_h_pre_mono, coll_h_pre_sample,
-	coll_v_pre_mono, coll_v_pre_sample,
-	mono_mosaic, mono_mosaic_v,
-	inv_mono_curvh, inv_mono_curvv,
-	pos_x, pos_y, pos_z,
-	refl):
+    dist_src_mono, dist_mono_sample,
+    ki, thetam,
+    coll_h_pre_mono, coll_h_pre_sample,
+    coll_v_pre_mono, coll_v_pre_sample,
+    mono_mosaic, mono_mosaic_v,
+    inv_mono_curvh, inv_mono_curvv,
+    pos_x, pos_y, pos_z,
+    refl):
 
     # A matrix: formula 26 in [eck14]
     A = np.identity(3)
@@ -84,13 +84,13 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
     Av[0,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
         ( (1./coll_v_pre_sample)**2. + (dist_mono_sample/src_h)**2. + (dist_mono_sample/mono_h)**2. + \
-    	Av_t0**2. - 2.*Av_t0*Av_t1 + Av_t1**2. ) 	# typo/missing in paper?
+        Av_t0**2. - 2.*Av_t0*Av_t1 + Av_t1**2. )     # typo/missing in paper?
 
     Av[0,1] = Av[1,0] = 0.5*reso.sig2fwhm**2. / ki**2. * \
         ( dist_src_mono*dist_mono_sample/src_h**2. - Av_t0*Av_t0 + Av_t0*Av_t1 )
 
     Av[1,1] = 0.5*reso.sig2fwhm**2. / ki**2. * \
-        ( (1./(coll_v_pre_mono))**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
+        ( (1./coll_v_pre_mono)**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
 
 
 
@@ -126,8 +126,8 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
     # C scalar: formula 28 in [eck14]
     C = 0.5*reso.sig2fwhm**2. * pos_y**2. * \
-	    ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
-		    (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
+        ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
+            (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
     # Cv scalar: formula 40 in [eck14]
     Cv = 0.5*reso.sig2fwhm**2. * pos_z**2. * \
@@ -136,7 +136,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
 
 
     # z components, [eck14], equ. 42
-    A[2,2] = Av[0,0] - Av[0,1]*Av[0,1]/Av[1,1]
+    A[2,2] = Av[0,0] - Av[0,1]**2./Av[1,1]
     B[2] = Bv[0] - Bv[1]*Av[0,1]/Av[1,1]
     D = Cv - 0.25*Bv[1]/Av[1,1]
 
@@ -173,16 +173,16 @@ def calc(param):
     ana_curvv = param["ana_curvv"]
 
     if param["mono_is_optimally_curved_h"]:
-        mono_curvh = foc_curv(param["dist_src_mono"], \
+        mono_curvh = helpers.foc_curv(param["dist_src_mono"], \
             param["dist_mono_sample"], np.abs(2.*thetam), False)
     if param["mono_is_optimally_curved_v"]:
-        mono_curvv = foc_curv(param["dist_src_mono"], \
+        mono_curvv = helpers.foc_curv(param["dist_src_mono"], \
             param["dist_mono_sample"], np.abs(2.*thetam), True)
     if param["ana_is_optimally_curved_h"]:
-        ana_curvh = foc_curv(param["dist_sample_ana"], \
+        ana_curvh = helpers.foc_curv(param["dist_sample_ana"], \
             param["dist_ana_det"], np.abs(2.*thetaa), False)
     if param["ana_is_optimally_curved_v"]:
-        ana_curvv = foc_curv(param["dist_sample_ana"], \
+        ana_curvv = helpers.foc_curv(param["dist_sample_ana"], \
             param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.

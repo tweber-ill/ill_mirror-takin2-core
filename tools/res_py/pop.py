@@ -201,16 +201,16 @@ def calc(param):
     ana_curvv = param["ana_curvv"]
 
     if param["mono_is_optimally_curved_h"]:
-        mono_curvh = foc_curv(param["dist_src_mono"], \
+        mono_curvh = helpers.foc_curv(param["dist_src_mono"], \
             param["dist_mono_sample"], np.abs(2.*thetam), False)
     if param["mono_is_optimally_curved_v"]:
-        mono_curvv = foc_curv(param["dist_src_mono"], \
+        mono_curvv = helpers.foc_curv(param["dist_src_mono"], \
             param["dist_mono_sample"], np.abs(2.*thetam), True)
     if param["ana_is_optimally_curved_h"]:
-        ana_curvh = foc_curv(param["dist_sample_ana"], \
+        ana_curvh = helpers.foc_curv(param["dist_sample_ana"], \
             param["dist_ana_det"], np.abs(2.*thetaa), False)
     if param["ana_is_optimally_curved_v"]:
-        ana_curvv = foc_curv(param["dist_sample_ana"], \
+        ana_curvv = helpers.foc_curv(param["dist_sample_ana"], \
             param["dist_ana_det"], np.abs(2.*thetaa), True)
 
     inv_mono_curvh = 0.

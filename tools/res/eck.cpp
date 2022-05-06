@@ -143,7 +143,7 @@ get_mono_vals(const length& src_w, const length& src_h,
 		);
 		Av(1,1) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
 		(
-/*a*/			+ units::pow<2>(t_real(1)/(coll_v_pre_mono)) *rads*rads
+/*a*/			+ units::pow<2>(t_real(1)/coll_v_pre_mono) *rads*rads
 /*b*/			+ units::pow<2>(dist_src_mono/src_h)
 /*c*/			+ Av_t0*Av_t0 *rads*rads
 		);
@@ -234,10 +234,14 @@ ResoResults calc_eck(const EckParams& eck)
 	length mono_curvh = eck.mono_curvh, mono_curvv = eck.mono_curvv;
 	length ana_curvh = eck.ana_curvh, ana_curvv = eck.ana_curvv;
 
-	if(eck.bMonoIsOptimallyCurvedH) mono_curvh = tl::foc_curv(eck.dist_src_mono, eck.dist_mono_sample, units::abs(t_real(2)*thetam), false);
-	if(eck.bMonoIsOptimallyCurvedV) mono_curvv = tl::foc_curv(eck.dist_src_mono, eck.dist_mono_sample, units::abs(t_real(2)*thetam), true);
-	if(eck.bAnaIsOptimallyCurvedH) ana_curvh = tl::foc_curv(eck.dist_sample_ana, eck.dist_ana_det, units::abs(t_real(2)*thetaa), false);
-	if(eck.bAnaIsOptimallyCurvedV) ana_curvv = tl::foc_curv(eck.dist_sample_ana, eck.dist_ana_det, units::abs(t_real(2)*thetaa), true);
+	if(eck.bMonoIsOptimallyCurvedH)
+		mono_curvh = tl::foc_curv(eck.dist_src_mono, eck.dist_mono_sample, units::abs(t_real(2)*thetam), false);
+	if(eck.bMonoIsOptimallyCurvedV)
+		mono_curvv = tl::foc_curv(eck.dist_src_mono, eck.dist_mono_sample, units::abs(t_real(2)*thetam), true);
+	if(eck.bAnaIsOptimallyCurvedH)
+		ana_curvh = tl::foc_curv(eck.dist_sample_ana, eck.dist_ana_det, units::abs(t_real(2)*thetaa), false);
+	if(eck.bAnaIsOptimallyCurvedV)
+		ana_curvv = tl::foc_curv(eck.dist_sample_ana, eck.dist_ana_det, units::abs(t_real(2)*thetaa), true);
 
 	//mono_curvh *= eck.dmono_sense; mono_curvv *= eck.dmono_sense;
 	//ana_curvh *= eck.dana_sense; ana_curvv *= eck.dana_sense;

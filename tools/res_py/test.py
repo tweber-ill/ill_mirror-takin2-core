@@ -45,8 +45,8 @@ rad2deg = 180. / np.pi
 
 # settings
 ki = 1.4
-kf = 1.5
-Q = 1.5
+kf = 1.4
+Q = 1.777
 
 d_mono = 3.355
 d_ana = 3.355
@@ -79,10 +79,10 @@ params = {
     "ana_sense" : -1.,
 
     # distances
-    "dist_src_mono" : 100. * cm2A,
-    "dist_mono_sample" : 100. * cm2A,
-    "dist_sample_ana" : 100. * cm2A,
-    "dist_ana_det" : 100. * cm2A,
+    "dist_src_mono" : 10. * cm2A,
+    "dist_mono_sample" : 200. * cm2A,
+    "dist_sample_ana" : 115. * cm2A,
+    "dist_ana_det" : 85. * cm2A,
 
     # shapes
     "src_shape" : "rectangular",     # "rectangular" or "circular"
@@ -90,56 +90,62 @@ params = {
     "det_shape" : "rectangular",     # "rectangular" or "circular"
 
     # component sizes
-    "src_w" : 10. * cm2A,
-    "src_h" : 10. * cm2A,
-    "mono_d" : 0.2 * cm2A,
-    "mono_w" : 10. * cm2A,
-    "mono_h" : 10. * cm2A,
+    "src_w" : 6. * cm2A,
+    "src_h" : 12. * cm2A,
+    "mono_d" : 0.15 * cm2A,
+    "mono_w" : 12. * cm2A,
+    "mono_h" : 8. * cm2A,
     "sample_d" : 1. * cm2A,
     "sample_w" : 1. * cm2A,
     "sample_h" : 1. * cm2A,
-    "det_w" : 10. * cm2A,
-    "det_h" : 10. * cm2A,
-    "ana_d" : 0.2 * cm2A,
-    "ana_w" : 10. * cm2A,
-    "ana_h" : 10. * cm2A,
+    "ana_d" : 0.3 * cm2A,
+    "ana_w" : 12. * cm2A,
+    "ana_h" : 8. * cm2A,
+    "det_w" : 1.5 * cm2A,
+    "det_h" : 5. * cm2A,
 
-    # collimation
-    "coll_h_pre_mono" : 9999. *min2rad,
-    "coll_v_pre_mono" : 9999. *min2rad,
+    # horizontal collimation
+    "coll_h_pre_mono" : 30. *min2rad,
     "coll_h_pre_sample" : 30. *min2rad,
-    "coll_v_pre_sample" : 9999. *min2rad,
     "coll_h_post_sample" : 30. *min2rad,
-    "coll_v_post_sample" : 9999. *min2rad,
     "coll_h_post_ana" : 9999. *min2rad,
+
+    # vertical collimation
+    "coll_v_pre_mono" : 9999. *min2rad,
+    "coll_v_pre_sample" : 9999. *min2rad,
+    "coll_v_post_sample" : 9999. *min2rad,
     "coll_v_post_ana" : 9999. *min2rad,
 
-    # focusing
+    # horizontal focusing
     "mono_curvh" : 0.,
-    "mono_curvv" : 0.,
     "ana_curvh" : 0.,
-    "ana_curvv" : 0.,
     "mono_is_curved_h" : False,
-    "mono_is_curved_v" : False,
     "ana_is_curved_h" : False,
-    "ana_is_curved_v" : False,
     "mono_is_optimally_curved_h" : False,
-    "mono_is_optimally_curved_v" : False,
     "ana_is_optimally_curved_h" : False,
+
+    # vertical focusing
+    "mono_curvv" : 0.,
+    "ana_curvv" : 0.,
+    "mono_is_curved_v" : True,
+    "ana_is_curved_v" : False,
+    "mono_is_optimally_curved_v" : True,
     "ana_is_optimally_curved_v" : False,
 
     # guide before monochromator
-    "use_guide" : False,
-    "guide_div_h" : 9999. *min2rad,
-    "guide_div_v" : 9999. *min2rad,
+    "use_guide" : True,
+    "guide_div_h" : 15. *min2rad,
+    "guide_div_v" : 15. *min2rad,
 
-    # mosaics
-    "mono_mosaic" : 60. *min2rad,
-    "mono_mosaic_v" : 60. *min2rad,
+    # horizontal mosaics
+    "mono_mosaic" : 45. *min2rad,
     "sample_mosaic" : 5. *min2rad,
+    "ana_mosaic" : 45. *min2rad,
+
+    # vertical mosaics
+    "mono_mosaic_v" : 45. *min2rad,
     "sample_mosaic_v" : 5. *min2rad,
-    "ana_mosaic" : 60. *min2rad,
-    "ana_mosaic_v" : 60. *min2rad,
+    "ana_mosaic_v" : 45. *min2rad,
 
     # crystal reflectivities
     # TODO, so far always 1
