@@ -7,6 +7,7 @@
 #
 # @desc for algorithm: [pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
 # @desc for alternate R0 normalisation: [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
+# @desc The initial version of this calculation was based on the "rescal5" software by Zinkin, McMorrow, Tennant, Farhi, and Wildes (ca. 1995-2007).
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)

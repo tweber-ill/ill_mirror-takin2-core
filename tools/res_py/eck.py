@@ -71,7 +71,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
             + A_t0*A_t0 - 2.*A_t0*A_t1 + A_t1*A_t1 )
 
 
-
     # Av matrix: formula 38 in [eck14]
     # some typos in paper leading to the (false) result of a better Qz resolution when focusing
     # => trying to match terms in Av with corresponding terms in A
@@ -92,7 +91,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
         ( (1./coll_v_pre_mono)**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
 
 
-
     # B vector: formula 27 in [eck14]
     B = np.array([0,0,0])
     B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*np.abs(np.sin(thetam)))
@@ -104,7 +102,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     ( - dist_mono_sample / (mono_w*np.abs(np.sin(thetam)))**2. + \
         B_t0 - B_t0 * inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam)) + \
         (dist_src_mono-dist_mono_sample) / src_w**2. )
-
 
 
     # Bv vector: formula 39 in [eck14]
@@ -133,7 +130,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
 
-
     # z components, [eck14], equ. 42
     A[2,2] = Av[0,0] - Av[0,1]**2./Av[1,1]
     B[2] = Bv[0] - Bv[1]*Av[0,1]/Av[1,1]
@@ -144,7 +140,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     therefl = refl * np.sqrt(np.pi / Av[1,1]) # typo in paper?
 
     return [ A, B, C, D, therefl ]
-
 
 
 
@@ -209,7 +204,6 @@ def calc(param):
     if param["use_guide"]:
         coll_h_pre_mono = lam*param["guide_div_h"]
         coll_v_pre_mono = lam*param["guide_div_v"]
-
 
 
     # dict with results
@@ -332,7 +326,6 @@ def calc(param):
     V1 = np.dot(vecBF, Tinv)
 
 
-
     # --------------------------------------------------------------------------
     # integrate last 2 vars -> equs 57 & 58 in [eck14]
 
@@ -348,7 +341,6 @@ def calc(param):
     if param["calc_R0"]:
         R0 = dReflM*dReflA * np.sqrt(np.pi/np.abs(U1[5,5]) * np.pi/np.abs(U2[4,4]))
     # --------------------------------------------------------------------------
-
 
 
     # quadratic part of quadric (matrix U)
