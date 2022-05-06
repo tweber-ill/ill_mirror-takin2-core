@@ -50,7 +50,9 @@ rad2deg = 180. / np.pi
 # scattering triangle
 # see: https://code.ill.fr/scientific-software/takin/mag-core/blob/master/tools/tascalc/tascalc.py
 #--------------------------------------------------------------------------
-ksq2E = 2.072124836832
+#import scipy.constants as co
+#ksq2E = (co.Planck/co.elementary_charge/2./np.pi)**2. * co.elementary_charge / 2. / co.neutron_mass * 1e23
+ksq2E = 2.072124855   # calculated with scipy.constants using the formula above
 
 
 def k2lam(k):
