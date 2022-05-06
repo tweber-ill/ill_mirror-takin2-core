@@ -247,7 +247,7 @@ def calc(param):
     # - if the instrument works in ki=const mode the kf^3 factor is needed.
 
     # TODO
-    #tupScFact = get_scatter_factors(param.flags, param.thetam, param.ki, param.thetaa, param.kf);
+    #tupScFact = get_scatter_factors(param.flags, param.thetam, param.ki, param.thetaa, param.kf)
     tupScFact = [1., 1., 1.]
 
     dmono_refl = param["dmono_refl"] * tupScFact[0]
@@ -322,7 +322,7 @@ def calc(param):
     S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
     S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
     S /= helpers.sig2fwhm**2.
-    Sinv = 1./S
+    Sinv = la.inv(S)
     # -------------------------------------------------------------------------
 
 
@@ -362,14 +362,16 @@ def calc(param):
         R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
 
     # [pop75], equ. 13a & 16
-    DS = np.dot(np.dot(D, Sinv), np.transpose(D))
-    DSinv = la.inv(DS) + G
-    R0 = dmono_refl*dana_effic * dxsec * (0.5*np.pi)**2. \
-        / (np.sin(thetam) * np.sin(thetaa)) \
-        * np.sqrt(la.det(S)*la.det(F) / (la.det(K) * la.det(DSinv)))
+    R0 = 0.
+    if param["calc_R0"]:
+        DS = np.dot(np.dot(D, Sinv), np.transpose(D))
+        DSinv = la.inv(DS) + G
+        R0 = dmono_refl*dana_effic * dxsec * (0.5*np.pi)**2. \
+            * np.sqrt(la.det(S)*la.det(F) / (la.det(K)*la.det(DSinv))) \
+            / (np.sin(thetam) * np.sin(thetaa))
 
     res["reso"] = R
-    res["reso_v"] = np.array([0., 0., 0., 0.]);
+    res["reso_v"] = np.array([0., 0., 0., 0.])
     res["reso_s"] = 0.
     res["r0"] = R0
     res["res_vol"] = reso.ellipsoid_volume(R)

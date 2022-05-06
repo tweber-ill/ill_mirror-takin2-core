@@ -224,7 +224,7 @@ def calc(param):
     # - if the instrument works in ki=const mode the kf^3 factor is needed.
 
     # TODO
-    #tupScFact = get_scatter_factors(param.flags, param.thetam, param.ki, param.thetaa, param.kf);
+    #tupScFact = get_scatter_factors(param.flags, param.thetam, param.ki, param.thetaa, param.kf)
     tupScFact = [1., 1., 1.]
 
     dmono_refl = param["dmono_refl"] * tupScFact[0]
@@ -288,14 +288,12 @@ def calc(param):
     #--------------------------------------------------------------------------
 
 
-
     # equ 4 & equ 53 in [eck14]
     dE = (ki**2. - kf**2.) / (2.*Q**2.)
     kipara = Q*(0.5 + dE)
     kfpara = Q - kipara
     kperp = np.sqrt(np.abs(kipara**2. - ki**2.))
     kperp *= param["sample_sense"]
-
 
 
     # trafo, equ 52 in [eck14]
@@ -338,44 +336,49 @@ def calc(param):
     # --------------------------------------------------------------------------
     # integrate last 2 vars -> equs 57 & 58 in [eck14]
 
-    U2 = reso.quadric_proj(U1, 5);
-    U = reso.quadric_proj(U2, 4);
+    U2 = reso.quadric_proj(U1, 5)
+    U = reso.quadric_proj(U2, 4)
 
-    V2 = reso.quadric_proj_vec(V1, U1, 5);
-    V = reso.quadric_proj_vec(V2, U2, 4);
+    V2 = reso.quadric_proj_vec(V1, U1, 5)
+    V = reso.quadric_proj_vec(V2, U2, 4)
 
     W = (C + D + G + H) - 0.25*V1[5]/U1[5,5] - 0.25*V2[4]/U2[4,4]
 
-    Z = dReflM*dReflA * np.sqrt(np.pi/np.abs(U1[5,5])) * np.sqrt(np.pi/np.abs(U2[4,4]))
+    R0 = 0.
+    if param["calc_R0"]:
+        R0 = dReflM*dReflA * np.sqrt(np.pi/np.abs(U1[5,5]) * np.pi/np.abs(U2[4,4]))
     # --------------------------------------------------------------------------
 
 
 
     # quadratic part of quadric (matrix U)
     # careful: factor -0.5*... missing in U matrix compared to normal gaussian!
-    res["reso"] = 2. * U;
+    R = 2. * U
     # linear (vector V) and constant (scalar W) part of quadric
-    res["reso_v"] = V;
-    res["reso_s"] = W;
+    res["reso_v"] = V
+    res["reso_s"] = W
 
 
     if param["sample_sense"] < 0.:
         # mirror Q_perp
         matMirror = helpers.mirror_matrix(len(res["reso"]), 1)
-        res["reso"] = np.dot(np.dot(np.transpose(matMirror), res["reso"]), matMirror)
+        R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
         res["reso_v"][1] = -res["reso_v"][1]
 
 
     # prefactor and volume
-    res["res_vol"] = reso.ellipsoid_volume(res["reso"])
+    res_vol = reso.ellipsoid_volume(R)
 
-    res["r0"] = Z
-    # missing volume prefactor to normalise gaussian,
-    # cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
-    res["r0"] *= res["res_vol"] * np.pi * 3.
+    if param["calc_R0"]:
+        # missing volume prefactor to normalise gaussian,
+        # cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
+        R0 *= res_vol * np.pi * 3.
+        R0 *= np.exp(-W)
+        R0 *= dxsec
 
-    res["r0"] *= np.exp(-W)
-    res["r0"] *= dxsec
+    res["reso"] = R
+    res["r0"] = R0
+    res["res_vol"] = res_vol
 
     # Bragg widths
     res["coherent_fwhms"] = reso.calc_coh_fwhms(res["reso"])

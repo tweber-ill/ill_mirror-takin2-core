@@ -506,7 +506,7 @@ ResoResults calc_pop(const PopParams& pop)
 
 		// [pop75], equs. 13a & 16
 		res.dR0 = dmono_refl*dana_effic * t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
-		res.dR0 *= std::sqrt(dDetS*dDetF/(dDetK * dDetDSiDti));
+		res.dR0 *= std::sqrt(dDetS*dDetF / (dDetK*dDetDSiDti));
 		res.dR0 /= t_real(8.*pi*8.*pi) * s_th_m*s_th_a;
 		res.dR0 *= dxsec;
 
