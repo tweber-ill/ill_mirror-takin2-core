@@ -368,5 +368,8 @@ def calc(param):
     res["r0"] = R0
     res["res_vol"] = reso.ellipsoid_volume(R)
 
+    if np.isnan(res["r0"]) or np.isinf(res["r0"]) or np.isnan(res["reso"].any()) or np.isinf(res["reso"].any()):
+        res["ok"] = False
+
     res["ok"] = True
     return res
