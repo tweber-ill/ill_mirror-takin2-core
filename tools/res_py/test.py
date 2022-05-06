@@ -37,25 +37,34 @@ import eck
 np.set_printoptions(floatmode = "fixed",  precision = 4)
 
 
-verbose = True
-
+# constants
 cm2A = 1e8
 min2rad = 1./ 60. / 180.*np.pi
 rad2deg = 180. / np.pi
 
-d_mono = 3.355
-d_ana = 3.355
 
+# settings
 ki = 1.4
 kf = 1.5
 Q = 1.5
-E = helpers.get_E(ki, kf)
 
-sc_senses = [ -1., 1., -1.]
+d_mono = 3.355
+d_ana = 3.355
 
+reso_method = "pop"    # "eck" or "pop"
+verbose = True
+
+
+#
+# resolution parameters
+# NOTE: not all parameters are used by all calculation backends
+#
 params = {
     # scattering triangle
-    "ki" : ki, "kf" : kf, "E" : E, "Q" : Q,
+    "ki" : ki,
+    "kf" : kf,
+    "E" : helpers.get_E(ki, kf),
+    "Q" : Q,
 
     # angles
     "twotheta" : helpers.get_scattering_angle(ki, kf, Q),
@@ -65,15 +74,20 @@ params = {
     "angle_kf_Q" : helpers.get_angle_kf_Q(ki, kf, Q),
 
      # scattering senses
-    "mono_sense" : sc_senses[0],
-    "sample_sense" : sc_senses[1],
-    "ana_sense" : sc_senses[2],
+    "mono_sense" : -1.,
+    "sample_sense" : 1.,
+    "ana_sense" : -1.,
 
     # distances
     "dist_src_mono" : 100. * cm2A,
     "dist_mono_sample" : 100. * cm2A,
     "dist_sample_ana" : 100. * cm2A,
     "dist_ana_det" : 100. * cm2A,
+
+    # shapes
+    "src_shape" : "rectangular",     # "rectangular" or "circular"
+    "sample_shape" : "cylindrical",  # "cuboid" or "cylindrical"
+    "det_shape" : "rectangular",     # "rectangular" or "circular"
 
     # component sizes
     "src_w" : 10. * cm2A,
@@ -90,20 +104,6 @@ params = {
     "ana_w" : 10. * cm2A,
     "ana_h" : 10. * cm2A,
 
-    # focusing
-    "mono_curvh" : 0.,
-    "mono_curvv" : 0.,
-    "ana_curvh" : 0.,
-    "ana_curvv" : 0.,
-    "mono_is_optimally_curved_h" : False,
-    "mono_is_optimally_curved_v" : False,
-    "ana_is_optimally_curved_h" : False,
-    "ana_is_optimally_curved_v" : False,
-    "mono_is_curved_h" : False,
-    "mono_is_curved_v" : False,
-    "ana_is_curved_h" : False,
-    "ana_is_curved_v" : False,
-
     # collimation
     "coll_h_pre_mono" : 9999. *min2rad,
     "coll_v_pre_mono" : 9999. *min2rad,
@@ -114,7 +114,21 @@ params = {
     "coll_h_post_ana" : 9999. *min2rad,
     "coll_v_post_ana" : 9999. *min2rad,
 
-    # guide
+    # focusing
+    "mono_curvh" : 0.,
+    "mono_curvv" : 0.,
+    "ana_curvh" : 0.,
+    "ana_curvv" : 0.,
+    "mono_is_curved_h" : False,
+    "mono_is_curved_v" : False,
+    "ana_is_curved_h" : False,
+    "ana_is_curved_v" : False,
+    "mono_is_optimally_curved_h" : False,
+    "mono_is_optimally_curved_v" : False,
+    "ana_is_optimally_curved_h" : False,
+    "ana_is_optimally_curved_v" : False,
+
+    # guide before monochromator
     "use_guide" : False,
     "guide_div_h" : 9999. *min2rad,
     "guide_div_v" : 9999. *min2rad,
@@ -138,13 +152,19 @@ params = {
     "pos_y" : 0. * cm2A,
     "pos_z" : 0. * cm2A,
 
+    # vertical scattering in kf, keep "False" for normal TAS
     "kf_vert" : False,
 }
 
 
-# calculate resolution ellipsoid
-#res = eck.calc(params)
-res = pop.calc(params)
+# calculate resolution ellipsoid using the given backend
+if reso_method == "eck":
+    res = eck.calc(params)
+elif reso_method == "pop":
+    res = pop.calc(params)
+else:
+    raise "ResPy: Invalid resolution calculation method selected."
+
 
 if not res["ok"]:
     print("RESOLUTION CALCULATION FAILED!")

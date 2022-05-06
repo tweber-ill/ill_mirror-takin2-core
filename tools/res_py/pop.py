@@ -283,19 +283,38 @@ def calc(param):
 
     # S matrix, [pop75], Appendices 2 and 3
     S = np.zeros([NUM_POS, NUM_POS])
-    S[IDX_SRC_Y, IDX_SRC_Y] = 12. / param["src_w"]**2.
-    S[IDX_SRC_Z, IDX_SRC_Z] = 12. / param["src_h"]**2.
+    if param["src_shape"] == "rectangular":
+        src_factor = 12.
+    elif param["src_shape"] == "circular":
+        src_factor = 16.
+    else:
+        raise "ResPy: No valid source shape given."
+    if param["sample_shape"] == "cuboid":
+        sample_factor = 12.
+    elif param["sample_shape"] == "cylindrical":
+        sample_factor = 16.
+    else:
+        raise "ResPy: No valid sample shape given."
+    if param["det_shape"] == "rectangular":
+        det_factor = 12.
+    elif param["det_shape"] == "circular":
+        det_factor = 16.
+    else:
+        raise "ResPy: No valid detector shape given."
+
+    S[IDX_SRC_Y, IDX_SRC_Y] = src_factor / param["src_w"]**2.
+    S[IDX_SRC_Z, IDX_SRC_Z] = src_factor / param["src_h"]**2.
     S[IDX_MONO_X, IDX_MONO_X] = 12. / param["mono_d"]**2.
     S[IDX_MONO_Y, IDX_MONO_Y] = 12. / param["mono_w"]**2.
     S[IDX_MONO_Z, IDX_MONO_Z] = 12. / param["mono_h"]**2.
-    S[IDX_SAMPLE_X, IDX_SAMPLE_X] = 12. / param["sample_d"]**2.
-    S[IDX_SAMPLE_Y, IDX_SAMPLE_Y] = 12. / param["sample_w"]**2.
+    S[IDX_SAMPLE_X, IDX_SAMPLE_X] = sample_factor / param["sample_d"]**2.
+    S[IDX_SAMPLE_Y, IDX_SAMPLE_Y] = sample_factor / param["sample_w"]**2.
     S[IDX_SAMPLE_Z, IDX_SAMPLE_Z] = 12. / param["sample_h"]**2.
     S[IDX_ANA_X, IDX_ANA_X] = 12. / param["ana_d"]**2.
     S[IDX_ANA_Y, IDX_ANA_Y] = 12. / param["ana_w"]**2.
     S[IDX_ANA_Z, IDX_ANA_Z] = 12. / param["ana_h"]**2.
-    S[IDX_DET_Y, IDX_DET_Y] = 12. / param["det_w"]**2.
-    S[IDX_DET_Z, IDX_DET_Z] = 12. / param["det_h"]**2.
+    S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
+    S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
     S /= reso.sig2fwhm
     Sinv = la.inv(S)
     # -------------------------------------------------------------------------
