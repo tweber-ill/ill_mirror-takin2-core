@@ -60,6 +60,7 @@ class NeutronDlg : public QDialog, Ui::NeutronDlg
 		void CalcNeutronOm();
 		void CalcNeutronF();
 		void CalcNeutronT();
+		void CalcNeutronTau();
 
 		void RecipThetaEdited();
 		void RecipTwoThetaEdited();

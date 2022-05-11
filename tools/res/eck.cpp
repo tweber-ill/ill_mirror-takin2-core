@@ -175,14 +175,14 @@ get_mono_vals(const length& src_w, const length& src_h,
 
 		Bv(0) = sig2fwhm*sig2fwhm * pos_z / (ki*angs) * t_real(-1.) *
 		(
-/*r*/			+ dist_mono_sample / (mono_h*mono_h)	// typo in paper?
+/*r*/			+ dist_mono_sample / (mono_h*mono_h)    // typo in paper?
 /*~s*/			- t_real(0.5)*Bv_t0 *rads*rads / s_th_m
 /*~t*/			+ Bv_t0 * rads*rads * inv_mono_curvv*dist_mono_sample
-/*~u*/			+ dist_mono_sample / (src_h*src_h)		// typo in paper?
+/*~u*/			+ dist_mono_sample / (src_h*src_h)      // typo in paper?
 		);
 		Bv(1) = sig2fwhm*sig2fwhm * pos_z / (ki*angs) * t_real(-1.) *
 		(
-/*i*/			+ dist_src_mono / (src_h*src_h)			// typo in paper?
+/*i*/			+ dist_src_mono / (src_h*src_h)         // typo in paper?
 /*j*/			+ t_real(0.5)*Bv_t0/s_th_m * rads*rads
 		);
 	}
@@ -208,7 +208,7 @@ get_mono_vals(const length& src_w, const length& src_h,
 	// z components, [eck14], equ. 42
 	A(2,2) = Av(0,0) - Av(0,1)*Av(0,1)/Av(1,1);
 	B[2] = Bv[0] - Bv[1]*Av(0,1)/Av(1,1);
-	t_real D = Cv - t_real(0.25)*Bv[1]/Av(1,1);
+	t_real D = Cv - t_real(0.25)*Bv[1]*Bv[1]/Av(1,1);  // typo in paper? (thanks to F. Bourdarot for pointing this out)
 
 
 	// [eck14], equ. 54
@@ -315,7 +315,8 @@ ResoResults calc_eck(const EckParams& eck)
 	// ana part
 
 	// equ 43 in [eck14]
-	length pos_y2 = - eck.pos_x * units::sin(twotheta)
+	length pos_y2 =
+		- eck.pos_x * units::sin(twotheta)
 		+ eck.pos_y * units::cos(twotheta);
 	length pos_z2 = eck.pos_z;
 

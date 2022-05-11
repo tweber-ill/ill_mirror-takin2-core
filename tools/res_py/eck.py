@@ -119,7 +119,6 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
         ( dist_src_mono / (src_h*src_h) + 0.5*Bv_t0/np.abs(np.sin(thetam)) )
 
 
-
     # C scalar: formula 28 in [eck14]
     C = 0.5*helpers.sig2fwhm**2. * pos_y**2. * \
         ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
@@ -133,11 +132,11 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     # z components, [eck14], equ. 42
     A[2,2] = Av[0,0] - Av[0,1]**2./Av[1,1]
     B[2] = Bv[0] - Bv[1]*Av[0,1]/Av[1,1]
-    D = Cv - 0.25*Bv[1]/Av[1,1]
+    D = Cv - (0.5*Bv[1])**2./Av[1,1]  # typo in paper? (thanks to F. Bourdarot for pointing this out)
 
 
     # [eck14], equ. 54
-    therefl = refl * np.sqrt(np.pi / Av[1,1]) # typo in paper?
+    therefl = refl * np.sqrt(np.pi / Av[1,1])  # typo in paper?
 
     return [ A, B, C, D, therefl ]
 
