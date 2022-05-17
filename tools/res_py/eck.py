@@ -47,84 +47,86 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     coll_v_pre_mono, coll_v_pre_sample,
     mono_mosaic, mono_mosaic_v,
     inv_mono_curvh, inv_mono_curvv,
-    pos_x, pos_y, pos_z,
-    refl):
+    pos_x, pos_y, pos_z, refl):
 
-    # A matrix: formula 26 in [eck14]
+    # A matrix: equ. 26 in [eck14]
     A = np.identity(3)
 
     A_t0 = 1. / mono_mosaic
     A_tx = inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam))
-    A_t1 = A_t0*A_tx
+    A_t1 = A_t0 * A_tx
 
     A[0,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
-        ( (2./coll_h_pre_mono)**2. + (2*dist_src_mono/src_w)**2. + A_t0*A_t0 )
+        ( (2./coll_h_pre_mono)**2. + (2*dist_src_mono/src_w)**2. + A_t0**2. )
 
     A[0,1] = A[1,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * np.tan(thetam) * \
-        ( + 2.*(1./coll_h_pre_mono)**2. + 2.*dist_src_mono*(dist_src_mono-dist_mono_sample)/src_w**2. + \
-            A_t0**2. - A_t0*A_t1)
+        ( + 2.*(1./coll_h_pre_mono)**2. + \
+            2.*dist_src_mono*(dist_src_mono-dist_mono_sample)/src_w**2. + \
+            A_t0**2. - A_t0*A_t1 )
 
     A[1,1] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
-        ( (1./coll_h_pre_mono)**2. + (1./coll_h_pre_sample)**2. \
+        ( 1./coll_h_pre_mono**2. + 1./coll_h_pre_sample**2. \
             + ((dist_src_mono-dist_mono_sample)/src_w)**2. \
             + (dist_mono_sample/(mono_w*np.abs(np.sin(thetam))))**2. \
-            + A_t0*A_t0 - 2.*A_t0*A_t1 + A_t1*A_t1 )
+            + (A_t0 - A_t1)**2. )
 
 
-    # Av matrix: formula 38 in [eck14]
+    # Av matrix: equ. 38 in [eck14]
     # some typos in paper leading to the (false) result of a better Qz resolution when focusing
     # => trying to match terms in Av with corresponding terms in A
     # corresponding pre-mono terms commented out in Av, as they are not considered there
     Av = np.identity(2)
 
-    Av_t0 = 0.5 / (mono_mosaic_v*np.abs(np.sin(thetam)))
-    Av_t1 = inv_mono_curvv*dist_mono_sample / mono_mosaic_v
+    Av_t0 = 0.5 / (mono_mosaic_v * np.abs(np.sin(thetam)))
+    Av_t1 = inv_mono_curvv * dist_mono_sample / mono_mosaic_v
 
     Av[0,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
-        ( (1./coll_v_pre_sample)**2. + (dist_mono_sample/src_h)**2. + (dist_mono_sample/mono_h)**2. + \
-        Av_t0**2. - 2.*Av_t0*Av_t1 + Av_t1**2. )     # typo/missing in paper?
+        ( 1./coll_v_pre_sample**2. + (dist_mono_sample/src_h)**2. + (dist_mono_sample/mono_h)**2. + \
+        (Av_t0 - Av_t1)**2. )     # typo/missing in paper?
 
     Av[0,1] = Av[1,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
-        ( dist_src_mono*dist_mono_sample/src_h**2. - Av_t0*Av_t0 + Av_t0*Av_t1 )
+        ( dist_src_mono*dist_mono_sample/src_h**2. - Av_t0**2. + Av_t0*Av_t1 )
 
     Av[1,1] = 0.5*helpers.sig2fwhm**2. / ki**2. * \
         ( (1./coll_v_pre_mono)**2. + (dist_src_mono/src_h)**2. + Av_t0**2. )
 
 
-    # B vector: formula 27 in [eck14]
+    # B vector: equ. 27 in [eck14]
     B = np.array([0,0,0])
-    B_t0 = inv_mono_curvh / (mono_mosaic*mono_mosaic*np.abs(np.sin(thetam)))
+    B_t0 = inv_mono_curvh / (mono_mosaic**2. * np.abs(np.sin(thetam)))
 
     B[0] = helpers.sig2fwhm**2. * pos_y / ki * np.tan(thetam) * \
         ( 2.*dist_src_mono / src_w**2. + B_t0 )
 
     B[1] = helpers.sig2fwhm**2. * pos_y / ki * \
-    ( - dist_mono_sample / (mono_w*np.abs(np.sin(thetam)))**2. + \
-        B_t0 - B_t0 * inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam)) + \
+        ( - dist_mono_sample / (mono_w*np.abs(np.sin(thetam)))**2. + \
+        B_t0 - B_t0 * A_tx + \
         (dist_src_mono-dist_mono_sample) / src_w**2. )
 
 
-    # Bv vector: formula 39 in [eck14]
+    # Bv vector: equ. 39 in [eck14]
     Bv = np.array([0,0])
 
-    Bv_t0 = inv_mono_curvv/mono_mosaic_v**2
+    Bv_t0 = inv_mono_curvv / mono_mosaic_v**2
 
     # typo in paper?
     Bv[0] = (-1.) *  helpers.sig2fwhm**2. * pos_z / ki * \
-        ( dist_mono_sample / mono_h**2. + dist_mono_sample / src_h**2. + \
-            Bv_t0 * inv_mono_curvv*dist_mono_sample - 0.5*Bv_t0 / np.abs(np.sin(thetam)) )
+        ( dist_mono_sample / mono_h**2. + \
+            dist_mono_sample / src_h**2. + \
+            Bv_t0 * inv_mono_curvv*dist_mono_sample - \
+            0.5*Bv_t0 / np.abs(np.sin(thetam)) )
 
     # typo in paper?
     Bv[1] = (-1.) * helpers.sig2fwhm**2. * pos_z / ki * \
         ( dist_src_mono / (src_h*src_h) + 0.5*Bv_t0/np.abs(np.sin(thetam)) )
 
 
-    # C scalar: formula 28 in [eck14]
+    # C scalar: equ. 28 in [eck14]
     C = 0.5*helpers.sig2fwhm**2. * pos_y**2. * \
         ( 1./src_w**2. + (1./(mono_w*np.abs(np.sin(thetam))))**2. + \
             (inv_mono_curvh/(mono_mosaic * np.abs(np.sin(thetam))))**2. )
 
-    # Cv scalar: formula 40 in [eck14]
+    # Cv scalar: equ. 40 in [eck14]
     Cv = 0.5*helpers.sig2fwhm**2. * pos_z**2. * \
         ( 1./src_h**2. + 1./mono_h**2. + (inv_mono_curvv/mono_mosaic_v)**2. )
 
@@ -248,7 +250,7 @@ def calc(param):
 
     #--------------------------------------------------------------------------
     # ana part
-    # equ 43 in [eck14]
+    # equ. 43 in [eck14]
     pos_y2 = - param["pos_x"]*np.sin(twotheta) + param["pos_y"]*np.cos(twotheta)
     pos_z2 = param["pos_z"]
 
@@ -281,7 +283,7 @@ def calc(param):
     #--------------------------------------------------------------------------
 
 
-    # equ 4 & equ 53 in [eck14]
+    # equ. 4 & equ. 53 in [eck14]
     dE = (ki**2. - kf**2.) / (2.*Q**2.)
     kipara = Q*(0.5 + dE)
     kfpara = Q - kipara
@@ -289,7 +291,7 @@ def calc(param):
     kperp *= param["sample_sense"]
 
 
-    # trafo, equ 52 in [eck14]
+    # trafo, equ. 52 in [eck14]
     T = np.identity(6)
     T[0,3] = T[1,4] = T[2,5] = -1.
     T[3,0] = 2.*helpers.ksq2E * kipara
@@ -302,7 +304,7 @@ def calc(param):
     Tinv = la.inv(T)
 
 
-    # equ 54 in [eck14]
+    # equ. 54 in [eck14]
     Dalph_i = helpers.rotation_matrix_3d_z(-ki_Q)
     Dalph_f = helpers.rotation_matrix_3d_z(-kf_Q)
     Arot = np.dot(np.dot(np.transpose(Dalph_i), A), Dalph_i)
@@ -313,7 +315,7 @@ def calc(param):
     matAE[3:6, 3:6] = Erot
 
     # U1 matrix
-    # typo in paper in quadric trafo in equ 54 (top)?
+    # typo in paper in quadric trafo in equ. 54 (top)?
     U1 = np.dot(np.dot(np.transpose(Tinv), matAE), Tinv)
 
     # V1 vector
