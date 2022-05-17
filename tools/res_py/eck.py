@@ -56,6 +56,7 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     A_tx = inv_mono_curvh*dist_mono_sample / np.abs(np.sin(thetam))
     A_t1 = A_t0 * A_tx
 
+    # typo in paper?
     A[0,0] = 0.5*helpers.sig2fwhm**2. / ki**2. * np.tan(thetam)**2. * \
         ( (2./coll_h_pre_mono)**2. + (2*dist_src_mono/src_w)**2. + A_t0**2. )
 
@@ -134,7 +135,8 @@ def get_mono_vals(src_w, src_h, mono_w, mono_h,
     # z components, [eck14], equ. 42
     A[2,2] = Av[0,0] - Av[0,1]**2./Av[1,1]
     B[2] = Bv[0] - Bv[1]*Av[0,1]/Av[1,1]
-    D = Cv - (0.5*Bv[1])**2./Av[1,1]  # typo in paper? (thanks to F. Bourdarot for pointing this out)
+    # typo in paper? (thanks to F. Bourdarot for pointing this out)
+    D = Cv - (0.5*Bv[1])**2./Av[1,1]
 
 
     # [eck14], equ. 54
