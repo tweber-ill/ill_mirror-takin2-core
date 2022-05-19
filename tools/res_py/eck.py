@@ -338,7 +338,10 @@ def calc(param):
     V2 = reso.quadric_proj_vec(V1, U1, 5)
     V = reso.quadric_proj_vec(V2, U2, 4)
 
-    W = (C + D + G + H) - 0.25*V1[5]/U1[5,5] - 0.25*V2[4]/U2[4,4]
+    W = (C + D + G + H)
+
+    # squares in Vs missing in paper? (thanks to F. Bourdarot for pointing this out)
+    W -= (0.5*V1[5]**2.)/U1[5,5] + (0.5*V2[4])**2./U2[4,4]
 
     R0 = 0.
     if param["calc_R0"]:
@@ -356,7 +359,7 @@ def calc(param):
 
     if param["sample_sense"] < 0.:
         # mirror Q_perp
-        matMirror = helpers.mirror_matrix(len(res["reso"]), 1)
+        matMirror = helpers.mirror_matrix(len(R), 1)
         R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
         res["reso_v"][1] = -res["reso_v"][1]
 

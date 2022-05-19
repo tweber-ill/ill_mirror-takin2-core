@@ -429,7 +429,9 @@ ResoResults calc_eck(const EckParams& eck)
 	t_vec V2 = quadric_proj(V1, U1, 5);
 	t_vec V = quadric_proj(V2, U2, 4);
 
-	t_real W = (C + D + G + H) - 0.25*V1[5]/U1(5,5) - 0.25*V2[4]/U2(4,4);
+	t_real W = (C + D + G + H);
+	// squares in Vs missing in paper? (thanks to F. Bourdarot for pointing this out)
+	W -= 0.25*V1[5]*V1[5]/U1(5,5) + 0.25*V2[4]*V2[4]/U2(4,4);
 
 	t_real Z = dReflM*dReflA
 		* std::sqrt(pi/std::abs(U1(5,5)))
