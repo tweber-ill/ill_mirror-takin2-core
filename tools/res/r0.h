@@ -50,11 +50,11 @@ extern t_real_reso chess_R0(
 
 
 /**
- * general R0 normalisation factor from from [mit84], equ. A.57
+ * general R0 normalisation factor from [mit84], equ. A.57
  */
 template<class t_real = double>
 t_real mitch_R0(t_real dmono_refl, t_real dana_effic,
-	t_real dKiVol, t_real dKfVol, t_real dResVol, 
+	t_real dKiVol, t_real dKfVol, t_real dResVol,
 	bool bNormToResVol=0)
 {
 	t_real dR0 = dmono_refl * dKiVol * dana_effic * dKfVol;

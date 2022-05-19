@@ -235,13 +235,13 @@ ResoResults calc_cn(const CNParams& cn)
 	res.reso_v = ublas::zero_vector<t_real>(4);
 	res.reso_s = 0.;
 
-	if(cn.dsample_sense < 0.)
+	/*if(cn.dsample_sense < 0.)
 	{
 		// mirror Q_perp
 		t_mat matMirror = tl::mirror_matrix<t_mat>(res.reso.size1(), 1);
 		res.reso = tl::transform(res.reso, matMirror, true);
 		res.reso_v[1] = -res.reso_v[1];
-	}
+	}*/
 
 	// -------------------------------------------------------------------------
 

@@ -36,11 +36,11 @@
 
 
 /**
- * transforms resolution ellipsoid from <Qpara Qperp Qup> 
+ * transforms resolution ellipsoid from <Qpara Qperp Qup>
  * to crystal hkl coordinate system
  */
 template<class t_mat, class t_vec, class t_real = typename t_mat::value_type>
-std::tuple<t_mat, t_vec, t_vec> 
+std::tuple<t_mat, t_vec, t_vec>
 conv_lab_to_rlu(t_real dAngleQVec0,
 	const t_mat& matUB, const t_mat& matUBinv,
 	const t_mat& reso, const t_vec& reso_v, const t_vec& Q_avg)
@@ -66,11 +66,11 @@ conv_lab_to_rlu(t_real dAngleQVec0,
 
 
 /**
- * transforms resolution ellipsoid from <Qpara Qperp Qup> 
+ * transforms resolution ellipsoid from <Qpara Qperp Qup>
  * to crystal orientation vector hkl system
  */
 template<class t_mat, class t_vec, class t_real = typename t_mat::value_type>
-std::tuple<t_mat, t_vec, t_vec> 
+std::tuple<t_mat, t_vec, t_vec>
 conv_lab_to_rlu_orient(t_real dAngleQVec0,
 	const t_mat& matUB, const t_mat& matUBinv,
 	const t_mat& matUrlu, const t_mat& matUinvrlu,

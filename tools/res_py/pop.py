@@ -357,10 +357,10 @@ def calc(param):
     cov[2, 2] += Q**2. * param["sample_mosaic_v"]**2.
     R = la.inv(cov) * helpers.sig2fwhm**2.
 
-    if param["sample_sense"] < 0.:
-        # mirror Q_perp
-        matMirror = helpers.mirror_matrix(len(R), 1)
-        R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
+    #if param["sample_sense"] < 0.:
+    #    # mirror Q_perp
+    #    matMirror = helpers.mirror_matrix(len(R), 1)
+    #    R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
 
     # [pop75], equ. 13a & 16
     R0 = 0.

@@ -446,13 +446,13 @@ ResoResults calc_eck(const EckParams& eck)
 	res.reso_v = V;
 	res.reso_s = W;
 
-	if(eck.dsample_sense < 0.)
+	/*if(eck.dsample_sense < 0.)
 	{
 		// mirror Q_perp
 		t_mat matMirror = tl::mirror_matrix<t_mat>(res.reso.size1(), 1);
 		res.reso = tl::transform(res.reso, matMirror, true);
 		res.reso_v[1] = -res.reso_v[1];
-	}
+	}*/
 
 	// prefactor and volume
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);

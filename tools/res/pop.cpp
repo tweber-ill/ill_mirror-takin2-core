@@ -473,13 +473,13 @@ ResoResults calc_pop(const PopParams& pop)
 	res.reso_v = ublas::zero_vector<t_real>(4);
 	res.reso_s = 0.;
 
-	if(pop.dsample_sense < 0.)
+	/*if(pop.dsample_sense < 0.)
 	{
 		// mirror Q_perp
 		t_mat matMirror = tl::mirror_matrix<t_mat>(res.reso.size1(), 1);
 		res.reso = tl::transform(res.reso, matMirror, true);
 		res.reso_v[1] = -res.reso_v[1];
-	}
+	}*/
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = 0.;
