@@ -65,6 +65,7 @@ params = {
     "mono_sense" : -1.,
     "sample_sense" : 1.,
     "ana_sense" : -1.,
+    "mirror_Qperp" : False,
 
     # distances
     "dist_src_mono" : 10. * helpers.cm2A,

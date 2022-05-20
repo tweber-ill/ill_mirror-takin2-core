@@ -357,11 +357,11 @@ def calc(param):
     res["reso_s"] = W
 
 
-    #if param["sample_sense"] < 0.:
-    #    # mirror Q_perp
-    #    matMirror = helpers.mirror_matrix(len(R), 1)
-    #    R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
-    #    res["reso_v"][1] = -res["reso_v"][1]
+    if param["mirror_Qperp"] and param["sample_sense"] < 0.:
+        # mirror Q_perp
+        matMirror = helpers.mirror_matrix(len(R), 1)
+        R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
+        res["reso_v"][1] = -res["reso_v"][1]
 
 
     # prefactor and volume
