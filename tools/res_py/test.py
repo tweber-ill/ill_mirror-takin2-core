@@ -51,6 +51,9 @@ verbose = True
 # NOTE: not all parameters are used by all calculation backends
 #
 params = {
+    # options
+    "verbose" : verbose,
+
     # scattering triangle
     "ki" : ki,
     "kf" : kf,

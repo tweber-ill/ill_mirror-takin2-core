@@ -67,7 +67,7 @@ NUM_KI_COMPS   = 3
 #
 def get_mono_trafos(dist_src_mono, dist_mono_sample,
     thetam, thetas, inv_curvh, inv_curvv,
-    ki, ki_Q, sense = 1.):
+    ki, Q_ki, sense = 1.):
 
     sign_z = -1.  # to compare with the calculations by F. Bourdarot
 
@@ -123,7 +123,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
 
     # B matrix, [mit84], equ. A.15 and [pop75] Appendix 1
     B = np.zeros([4, NUM_KI_COMPS])
-    B[0:2, IDX_KI_X:IDX_KI_X+2] = sense * helpers.rotation_matrix_2d(ki_Q)
+    B[0:2, IDX_KI_X:IDX_KI_X+2] = sense * helpers.rotation_matrix_2d(Q_ki)
     B[2, IDX_KI_Z] = sense
     B[3, IDX_KI_X] = 2. * sense * ki * helpers.ksq2E
 
@@ -194,12 +194,13 @@ def calc(param):
     thetas = twotheta * 0.5
     thetam = helpers.get_mono_angle(ki, param["mono_xtal_d"]) * param["mono_sense"]
     thetaa = helpers.get_mono_angle(kf, param["ana_xtal_d"]) * param["ana_sense"]
-    ki_Q = helpers.get_angle_ki_Q(ki, kf, Q) * param["sample_sense"]
-    kf_Q = helpers.get_angle_kf_Q(ki, kf, Q) * param["sample_sense"]
+    Q_ki = helpers.get_angle_Q_ki(ki, kf, Q) * param["sample_sense"]
+    Q_kf = helpers.get_angle_Q_kf(ki, kf, Q) * param["sample_sense"]
 
-#    print("2theta = %g, thetam = %g, thetaa = %g, ki_Q = %g, kf_Q = %g\n" %
-#        (twotheta*helpers.rad2deg, thetam*helpers.rad2deg, thetaa*helpers.rad2deg,
-#        ki_Q*helpers.rad2deg, kf_Q*helpers.rad2deg))
+    if param["verbose"]:
+        print("2theta = %g, thetam = %g, thetaa = %g, Q_ki = %g, Q_kf = %g\n" %
+            (twotheta*helpers.rad2deg, thetam*helpers.rad2deg, thetaa*helpers.rad2deg,
+            Q_ki*helpers.rad2deg, Q_kf*helpers.rad2deg))
 
 
     # --------------------------------------------------------------------
@@ -332,9 +333,9 @@ def calc(param):
     # -------------------------------------------------------------------------
     # ki and kf trafo matrices
     [Dm, Tm, Am, Bm] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
-        thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, ki_Q, 1.)
+        thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, Q_ki, 1.)
     [Da, Ta, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
-        thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, kf_Q, -1.)
+        thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, Q_kf, -1.)
 
     [D, T, A, B] = combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba)
     # -------------------------------------------------------------------------

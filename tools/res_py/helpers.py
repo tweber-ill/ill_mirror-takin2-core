@@ -69,12 +69,19 @@ def get_scattering_angle(ki, kf, Q):
     return np.arccos(c)
 
 
-def get_angle_ki_Q(ki, kf, Q):
+#
+# angle rotating Q into ki (i.e. angle inside scattering triangle)
+#
+def get_angle_Q_ki(ki, kf, Q):
     c = (ki**2. + Q**2. - kf**2.) / (2.*ki*Q)
     return np.arccos(c)
 
 
-def get_angle_kf_Q(ki, kf, Q):
+#
+# angle rotating Q into kf (i.e. angle outside scattering triangle),
+# Q_kf = Q_ki + twotheta_s
+#
+def get_angle_Q_kf(ki, kf, Q):
     c = (ki**2. - Q**2. - kf**2.) / (2.*kf*Q)
     return np.arccos(c)
 

@@ -159,9 +159,13 @@ def calc(param):
     twotheta = helpers.get_scattering_angle(ki, kf, Q) * param["sample_sense"]
     thetam = helpers.get_mono_angle(ki, param["mono_xtal_d"]) * param["mono_sense"]
     thetaa = helpers.get_mono_angle(kf, param["ana_xtal_d"]) * param["ana_sense"]
-    ki_Q = helpers.get_angle_ki_Q(ki, kf, Q) * param["sample_sense"]
-    kf_Q = helpers.get_angle_kf_Q(ki, kf, Q) * param["sample_sense"]
+    Q_ki = helpers.get_angle_Q_ki(ki, kf, Q) * param["sample_sense"]
+    Q_kf = helpers.get_angle_Q_kf(ki, kf, Q) * param["sample_sense"]
 
+    if param["verbose"]:
+        print("2theta = %g, thetam = %g, thetaa = %g, Q_ki = %g, Q_kf = %g\n" %
+            (twotheta*helpers.rad2deg, thetam*helpers.rad2deg, thetaa*helpers.rad2deg,
+            Q_ki*helpers.rad2deg, Q_kf*helpers.rad2deg))
 
     # --------------------------------------------------------------------
     # mono/ana focus
@@ -307,8 +311,8 @@ def calc(param):
 
 
     # equ. 54 in [eck14]
-    Dalph_i = helpers.rotation_matrix_3d_z(-ki_Q)
-    Dalph_f = helpers.rotation_matrix_3d_z(-kf_Q)
+    Dalph_i = helpers.rotation_matrix_3d_z(-Q_ki)
+    Dalph_f = helpers.rotation_matrix_3d_z(-Q_kf)
     Arot = np.dot(np.dot(np.transpose(Dalph_i), A), Dalph_i)
     Erot = np.dot(np.dot(np.transpose(Dalph_f), E), Dalph_f)
 
