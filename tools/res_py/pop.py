@@ -69,6 +69,8 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     thetam, thetas, inv_curvh, inv_curvv,
     ki, ki_Q, sense = 1.):
 
+    sign_z = -1.  # to compare with the calculations by F. Bourdarot
+
     s_th_m = np.sin(thetam)
     c_th_m = sense * np.cos(thetam)
     cot_th_m = c_th_m / s_th_m
@@ -84,16 +86,16 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     D[IDX_SRC_H, IDX_MONO_X] = -c_th_m / dist_src_mono
     D[IDX_SRC_H, IDX_MONO_Y] = s_th_m / dist_src_mono
 
-    D[IDX_SRC_V, IDX_SRC_Z] = -sense / dist_src_mono
-    D[IDX_SRC_V, IDX_MONO_Z] = sense / dist_src_mono
+    D[IDX_SRC_V, IDX_SRC_Z] = -sign_z*sense / dist_src_mono
+    D[IDX_SRC_V, IDX_MONO_Z] = sign_z*sense / dist_src_mono
 
     D[IDX_MONO_H, IDX_MONO_X] = c_th_m / dist_mono_sample
     D[IDX_MONO_H, IDX_MONO_Y] = s_th_m / dist_mono_sample
     D[IDX_MONO_H, IDX_SAMPLE_X] = s_th_s / dist_mono_sample
     D[IDX_MONO_H, IDX_SAMPLE_Y] = c_th_s / dist_mono_sample
 
-    D[IDX_MONO_V, IDX_MONO_Z] = -sense / dist_mono_sample
-    D[IDX_MONO_V, IDX_SAMPLE_Z] = sense / dist_mono_sample
+    D[IDX_MONO_V, IDX_MONO_Z] = -sign_z*sense / dist_mono_sample
+    D[IDX_MONO_V, IDX_SAMPLE_Z] = sign_z*sense / dist_mono_sample
 
 
     # T matrix, [pop75], Appendix 2
@@ -107,7 +109,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
 
     # signs for kf
     T[IDX_KI_V, IDX_SRC_Z] = 0.5 * sense * D[IDX_SRC_V, IDX_SRC_Z] / s_th_m
-    T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - inv_curvv
+    T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - sign_z*inv_curvv
     T[IDX_KI_V, IDX_SAMPLE_Z] = -0.5 * sense * D[IDX_MONO_V, IDX_SAMPLE_Z] / s_th_m
 
 
@@ -116,7 +118,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     A[IDX_KI_X, IDX_SRC_H] = 0.5 * ki * cot_th_m
     A[IDX_KI_X, IDX_MONO_H] = -0.5 * ki * cot_th_m
     A[IDX_KI_Y, IDX_MONO_H] = ki
-    A[IDX_KI_Z, IDX_MONO_V] = ki # sign
+    A[IDX_KI_Z, IDX_MONO_V] = sign_z * ki
 
 
     # B matrix, [mit84], equ. A.15 and [pop75] Appendix 1

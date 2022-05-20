@@ -42,7 +42,7 @@ ki = 1.4
 kf = 1.4
 Q = 1.777
 
-reso_method = "eck"    # "eck" or "pop"
+reso_method = "pop"    # "eck" or "pop"
 verbose = True
 
 
