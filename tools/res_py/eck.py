@@ -291,21 +291,21 @@ def calc(param):
 
     # equ. 4 & equ. 53 in [eck14]
     dE = (ki**2. - kf**2.) / (2.*Q**2.)
-    kipara = Q*(0.5 + dE)
-    kfpara = Q - kipara
-    kperp = np.sqrt(np.abs(kipara**2. - ki**2.))
+    dEi = 0.5 + dE
+    dEf = 0.5 - dE
+    kperp = np.sqrt(ki**2. - (Q*dEi)**2.)
     kperp *= param["sample_sense"]
 
 
     # trafo, equ. 52 in [eck14]
     T = np.identity(6)
     T[0,3] = T[1,4] = T[2,5] = -1.
-    T[3,0] = 2.*helpers.ksq2E * kipara
-    T[3,3] = 2.*helpers.ksq2E * kfpara
+    T[3,0] = 2.*helpers.ksq2E * Q*dEi
+    T[3,3] = 2.*helpers.ksq2E * Q*dEf
     T[3,1] = 2.*helpers.ksq2E * kperp
     T[3,4] = -2.*helpers.ksq2E * kperp
-    T[4,1] = T[5,2] = (0.5 - dE)
-    T[4,4] = T[5,5] = (0.5 + dE)
+    T[4,1] = T[5,2] = dEf
+    T[4,4] = T[5,5] = dEi
 
     Tinv = la.inv(T)
 
@@ -326,10 +326,8 @@ def calc(param):
 
     # V1 vector
     vecBF = np.zeros(6)
-    vecBrot = np.dot(np.transpose(Dalph_i), B)
-    vecFrot = np.dot(np.transpose(Dalph_f), F)
-    vecBF[0:3] = vecBrot
-    vecBF[3:6] = vecFrot
+    vecBF[0:3] = np.dot(np.transpose(Dalph_i), B)
+    vecBF[3:6] = np.dot(np.transpose(Dalph_f), F)
     V1 = np.dot(vecBF, Tinv)
 
 
@@ -342,14 +340,14 @@ def calc(param):
     V2 = reso.quadric_proj_vec(V1, U1, 5)
     V = reso.quadric_proj_vec(V2, U2, 4)
 
-    W = (C + D + G + H)
+    W = C + D + G + H
 
     # squares in Vs missing in paper? (thanks to F. Bourdarot for pointing this out)
-    W -= (0.5*V1[5]**2.)/U1[5,5] + (0.5*V2[4])**2./U2[4,4]
+    W -= (0.5*V1[5])**2./U1[5,5] + (0.5*V2[4])**2./U2[4,4]
 
     R0 = 0.
     if param["calc_R0"]:
-        R0 = dReflM*dReflA * np.sqrt(np.pi/np.abs(U1[5,5]) * np.pi/np.abs(U2[4,4]))
+        R0 = dReflM*dReflA * np.pi * np.sqrt(1. / np.abs(U1[5,5] * U2[4,4]))
     # --------------------------------------------------------------------------
 
 
