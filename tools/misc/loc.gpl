@@ -27,6 +27,7 @@ $loc << ENDDATA
 08/2021    62739    32112    13305     21016      3890      18689
 10/2021    62743    32112    13305     21251      9179      22515
 01/2022    62955    32113    14282     21951      3761      26628
+05/2022    63487    32186    16634     24224      5212      26787
 ENDDATA
 
 
@@ -38,7 +39,7 @@ col_plug = "#5500aa00"
 col_paths = "#55aaaa00"
 col_total = "#00000000"
 
-ymax = 170000
+ymax = 180000
 
 set timefmt "%m/%Y"
 set xdata time
@@ -46,7 +47,7 @@ set xdata time
 set xlabel "Date"
 set ylabel "Lines of code"
 
-set xrange [ "03/2014" : "03/2022" ]
+set xrange [ "03/2014" : "08/2022" ]
 set yrange [0 : ymax]
 
 # Version 1
