@@ -80,6 +80,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-std=c++14 -D_GLIBCXX_USE_CXX11_ABI)
 #add_compile_options(-fPIC)
+add_compile_options(-fvisibility=hidden)
 
 # for application plugins
 add_definitions(-DBUILD_APPLI)
@@ -202,6 +203,7 @@ if(USE_PLUGINS AND USE_Dl AND NOT (CMAKE_SYSTEM_NAME STREQUAL "Windows"))
 else()
 	set(Dl_LIBRARIES "")
 endif()
+#list(APPEND Dl_LIBRARIES -ldl_test)
 
 if(USE_GENTAB)
 	find_package(Clipper REQUIRED)

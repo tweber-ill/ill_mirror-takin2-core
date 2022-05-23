@@ -348,7 +348,6 @@ void unload_sqw_plugins()
 	g_vecMods.clear();
 	tl::log_debug("Unloaded all plugins.");
 
-
 	// also unload the external process plugins
 	unload_sqw_ext_plugins();
 }
