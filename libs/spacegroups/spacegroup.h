@@ -100,13 +100,6 @@ public:
 	}
 
 
-	/*bool HasReflection2(int h, int k, int l) const
-	{
-		return is_reflection_allowed_2<std::vector, t_mat, t_vec>
-		(h,k,l, m_vecTrafos);
-	}*/
-
-
 	/**
 	 * is reflection allowed based only on centring?
 	 */
