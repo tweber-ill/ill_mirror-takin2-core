@@ -58,6 +58,7 @@ declare -a filestochange=(
 	"${PRG}/Contents/MacOS/takin_cif2xml"
 	"${PRG}/Contents/MacOS/takin_findsg"
 	"${PRG}/Contents/MacOS/takin_pol"
+	"${PRG}/Contents/MacOS/takin_bz"
 	"${PRG}/Contents/MacOS/takin_structfact"
 	"${PRG}/Contents/MacOS/takin_magstructfact"
 	"${PRG}/Contents/MacOS/takin_scanbrowser"
