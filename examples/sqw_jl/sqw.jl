@@ -134,6 +134,15 @@ function TakinSqw(h::Float64, k::Float64, l::Float64, E::Float64)::Float64
 end
 
 
+#
+# background function, called for every nominal (Q, E) point (optional)
+#
+function TakinBackground(h::Float64, k::Float64, l::Float64, E::Float64)::Float64
+	#println("Calling TakinBackground(", h, ", ", k, ", ", l, ", ", E, ") -> ", S)
+	return Float64(0.)
+end
+
+
 
 # -----------------------------------------------------------------------------
 # test

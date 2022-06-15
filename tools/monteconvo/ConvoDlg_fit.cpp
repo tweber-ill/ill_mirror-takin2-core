@@ -157,9 +157,9 @@ void ConvoDlg::StartFit()
 	ostrFitParamMsg << "Using fitting parameters:\n";
 	ostrFitParamMsg
 		<< std::setw(15) << std::left << "Name"
-		<< std::setw(15) << std::left << "Initial" 
-		<< std::setw(15) << std::left << "Error" 
-		<< std::setw(30) << std::left << "Limits" 
+		<< std::setw(15) << std::left << "Initial"
+		<< std::setw(15) << std::left << "Error"
+		<< std::setw(30) << std::left << "Limits"
 		<< "\n";
 
 	minuit::MnUserParameters params;

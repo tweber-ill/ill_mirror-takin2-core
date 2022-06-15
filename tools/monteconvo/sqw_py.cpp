@@ -131,6 +131,11 @@ SqwPy::SqwPy(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 				m_disp = moddict["TakinDisp"];
 			else
 				tl::log_warn("Python script has no TakinDisp function.");
+
+			if(moddict.has_key("TakinBackground"))
+				m_background = moddict["TakinBackground"];
+			else
+				tl::log_warn("Python script has no TakinBackground function.");
 		}
 		catch(const py::error_already_set& ex) {}
 	}
@@ -151,7 +156,7 @@ SqwPy::~SqwPy()
 
 
 /**
- * E(Q)
+ * dispersion relation, E(Q)
  */
 std::tuple<std::vector<t_real>, std::vector<t_real>>
 	SqwPy::disp(t_real dh, t_real dk, t_real dl) const
@@ -207,7 +212,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 
 
 /**
- * S(Q,E)
+ * S(Q,E), queried for every mc point
  */
 t_real SqwPy::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 {
@@ -222,6 +227,34 @@ t_real SqwPy::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 	try
 	{
 		return py::extract<t_real>(m_Sqw(dh, dk, dl, dE));
+	}
+	catch(const py::error_already_set& ex)
+	{
+		PyErr_Print();
+		PyErr_Clear();
+	}
+
+	return 0.;
+}
+
+
+/**
+ * background function, only queried for every mc point
+ */
+t_real SqwPy::GetBackground(t_real dh, t_real dk, t_real dl, t_real dE) const
+{
+	if(!m_bOk)
+	{
+		tl::log_err("Interpreter has not initialised, cannot query background.");
+		return t_real(0);
+	}
+
+
+	std::lock_guard<std::mutex> lock(*m_pmtx);
+	try
+	{
+		if(!!m_background)
+			return py::extract<t_real>(m_background(dh, dk, dl, dE));
 	}
 	catch(const py::error_already_set& ex)
 	{
@@ -376,6 +409,7 @@ SqwBase* SqwPy::shallow_copy() const
 	pSqw->m_Sqw = this->m_Sqw;
 	pSqw->m_Init = this->m_Init;
 	pSqw->m_disp = this->m_disp;
+	pSqw->m_background = this->m_background;
 
 	return pSqw;
 }

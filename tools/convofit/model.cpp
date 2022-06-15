@@ -85,6 +85,7 @@ bool SqwFuncModel::SetTASPos(t_real dPrincipalX, TASReso& reso) const
 		tl::log_err(ostrErr.str());
 		return false;
 	}
+
 	return true;
 }
 
@@ -97,8 +98,8 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 
 	const t_real xrange = t_real(m_dPrincipalAxisMax - m_dPrincipalAxisMin);
 	const t_real xscale = (t_real(x_principal) - t_real(m_dPrincipalAxisMin)) / xrange;
-
 	const ublas::vector<t_real> vecScanPos = m_vecScanOrigin + t_real(xscale)*m_vecScanDir;
+
 	std::vector<ublas::vector<t_real_reso>> vecNeutrons;
 	Ellipsoid4d<t_real_reso> elli;
 	if(m_bUseThreads)
@@ -119,6 +120,8 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 	}
 
 	dS /= t_real(m_iNumNeutrons);
+	dS += m_pSqw->GetBackground(vecScanPos[0], vecScanPos[1], vecScanPos[2], vecScanPos[3]);
+
 	for(int i=0; i<4; ++i)
 		dhklE_mean[i] /= t_real(m_iNumNeutrons);
 
@@ -126,7 +129,6 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 		dS *= reso.GetResoResults().dR0;
 	if(reso.GetResoParams().flags & CALC_RESVOL)
 		dS /= reso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
-
 
 	t_real dYVal = m_dScale*(dS + m_dSlope*x_principal) + m_dOffs;
 	if(dYVal < 0.)

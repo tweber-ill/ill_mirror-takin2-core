@@ -248,9 +248,9 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 		{
 			// TODO: init random seeds for non-deferred, threaded simulation
 			if(bRecycleNeutrons && bForceDeferred)
-				tl::init_rand_seed(seed); 
+				tl::init_rand_seed(seed);
 			else
-				tl::init_rand(); 
+				tl::init_rand();
 		};
 
 		// call the start function directly in non-threaded mode
@@ -281,6 +281,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 					// TODO: add an option to let the user choose if S(Q,E) is
 					// really the dynamical structure factor, or its absolute square
 					dS += (*m_pSqw)(dCurH, dCurK, dCurL, dCurE);
+					dS += m_pSqw->GetBackground(dCurH, dCurK, dCurL, dCurE);
 				}
 				else
 				{	// convolution
@@ -322,6 +323,8 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 					}
 
 					dS /= t_real(iNumNeutrons*iNumSampleSteps);
+					dS += m_pSqw->GetBackground(dCurH, dCurK, dCurL, dCurE);
+
 					for(int i=0; i<4; ++i)
 						dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
 

@@ -100,6 +100,7 @@ SqwJl::SqwJl(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 	m_pInit = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinInit")));
 	m_pSqw = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinSqw")));
 	m_pDisp = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinDisp")));
+	m_pBackground = reinterpret_cast<jl_function_t*>(jl_get_global(jl_main_module, jl_symbol("TakinBackground")));
 
 	PrintExceptions();
 
@@ -119,6 +120,11 @@ SqwJl::SqwJl(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 	else
 		tl::log_warn("No TakinDisp function was found in \"", strFile, "\".");
 
+	if(m_pBackground)
+		tl::log_info("TakinBackground function was found in \"", strFile, "\".");
+	else
+		tl::log_warn("No TakinBackground function was found in \"", strFile, "\".");
+
 	// does the module have a TakinSqw function?
 	if(!m_pSqw)
 	{
@@ -130,13 +136,8 @@ SqwJl::SqwJl(const std::string& strFile) : m_pmtx(std::make_shared<std::mutex>()
 		m_bOk = 1;
 	}
 
-	if(!m_pDisp)
-		tl::log_warn("Julia script has no TakinDisp function.");
-
 	if(m_pInit)
 		jl_call0((jl_function_t*)m_pInit);
-	else
-		tl::log_warn("Julia script has no TakinInit function.");
 }
 
 
@@ -195,7 +196,7 @@ void SqwJl::PrintExceptions() const
 
 
 /**
- * E(Q)
+ * dispersion relation, E(Q)
  */
 std::tuple<std::vector<t_real>, std::vector<t_real>>
 	SqwJl::disp(t_real dh, t_real dk, t_real dl) const
@@ -245,7 +246,7 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 
 
 /**
- * S(Q,E)
+ * dynamical structure factor, S(Q,E)
  */
 t_real SqwJl::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 {
@@ -264,6 +265,35 @@ t_real SqwJl::operator()(t_real dh, t_real dk, t_real dl, t_real dE) const
 
 	PrintExceptions();
 	return t_real(tl::jl_traits<t_real>::unbox(pSqw));
+}
+
+
+/**
+ * background function
+ */
+t_real SqwJl::GetBackground(t_real dh, t_real dk, t_real dl, t_real dE) const
+{
+	if(!m_bOk)
+	{
+		tl::log_err("Julia interpreter has not initialised, cannot query background.");
+		return t_real(0);
+	}
+
+	std::lock_guard<std::mutex> lock(*m_pmtx);
+	t_real val = 0.;
+
+	if(m_pBackground)
+	{
+		jl_value_t *phklE[4] =
+			{ tl::jl_traits<t_real>::box(dh), tl::jl_traits<t_real>::box(dk),
+			tl::jl_traits<t_real>::box(dl), tl::jl_traits<t_real>::box(dE) };
+		jl_value_t *pVal = jl_call((jl_function_t*)m_pBackground, phklE, 4);
+
+		val = t_real(tl::jl_traits<t_real>::unbox(pVal));
+	}
+
+	PrintExceptions();
+	return val;
 }
 
 

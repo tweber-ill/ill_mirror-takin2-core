@@ -152,6 +152,17 @@ def TakinSqw(h, k, l, E):
 	except ZeroDivisionError:
 		return 0.
 
+
+#
+# background function, called for every nominal (Q, E), not convoluted (optional)
+#
+def TakinBackground(h, k, l, E):
+	try:
+#		print("h={0}, k={1}, l={2}, E={3}".format(h,k,l,E))
+		return 0.
+	except ZeroDivisionError:
+		return 0.
+
 # -----------------------------------------------------------------------------
 
 
