@@ -149,6 +149,17 @@ ResoResults calc_pop(const PopParams& pop)
 		coll_v_pre_mono = lam*(pop.guide_div_v/angs);
 	}
 
+	// if no vertical mosaic is given, use the horizontal one
+	angle mono_mosaic_v = pop.mono_mosaic_v;
+	angle sample_mosaic_v = pop.sample_mosaic_v;
+	angle ana_mosaic_v = pop.ana_mosaic_v;
+	if(tl::float_equal<t_real>(mono_mosaic_v/rads, 0.), 0.)
+		mono_mosaic_v = pop.mono_mosaic;
+	if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
+		sample_mosaic_v = pop.sample_mosaic;
+	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
+		ana_mosaic_v = pop.ana_mosaic;
+
 
 	// --------------------------------------------------------------------
 	// instrument property matrices
@@ -181,11 +192,11 @@ ResoResults calc_pop(const PopParams& pop)
 	F_mosaics(POP_MONO_H, POP_MONO_H) =
 		t_real(1)/(pop.mono_mosaic*pop.mono_mosaic /rads/rads);
 	F_mosaics(POP_MONO_V, POP_MONO_V) =
-		t_real(1)/(pop.mono_mosaic_v*pop.mono_mosaic_v /rads/rads);
+		t_real(1)/(mono_mosaic_v*mono_mosaic_v /rads/rads);
 	F_mosaics(POP_ANA_H, POP_ANA_H) =
 		t_real(1)/(pop.ana_mosaic*pop.ana_mosaic /rads/rads);
 	F_mosaics(POP_ANA_V, POP_ANA_V) =
-		t_real(1)/(pop.ana_mosaic_v*pop.ana_mosaic_v /rads/rads);
+		t_real(1)/(ana_mosaic_v*ana_mosaic_v /rads/rads);
 
 	const t_real s_th_m = units::sin(thetam);
 	const t_real c_th_m = units::cos(thetam);
@@ -452,7 +463,7 @@ ResoResults calc_pop(const PopParams& pop)
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_Gi_div, BA, true);
 	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
-	cov(2,2) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic_v*pop.sample_mosaic_v /rads/rads;
+	cov(2,2) += pop.Q*pop.Q*angs*angs * sample_mosaic_v*sample_mosaic_v /rads/rads;
 
 	if(!tl::inverse(cov, res.reso))
 	{

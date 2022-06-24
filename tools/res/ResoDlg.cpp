@@ -133,7 +133,7 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 		"reso/pop_det_w", "reso/pop_det_h",
 		"reso/pop_dist_mono_sample", "reso/pop_dist_sample_ana", "reso/pop_dist_ana_det", "reso/pop_dist_src_mono",
 
-		"reso/pop_monitor_w", "reso/pop_monitor_h", "reso/pop_dist_mono_monitor"
+		"reso/pop_monitor_w", "reso/pop_monitor_h", "reso/pop_dist_mono_monitor",
 
 		"reso/eck_mono_mosaic_v", "reso/eck_sample_mosaic_v", "reso/eck_ana_mosaic_v",
 		"reso/eck_sample_pos_x", "reso/eck_sample_pos_y", "reso/eck_sample_pos_z",

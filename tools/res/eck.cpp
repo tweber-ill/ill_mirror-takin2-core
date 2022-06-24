@@ -291,6 +291,18 @@ ResoResults calc_eck(const EckParams& eck)
 	t_real dxsec = std::get<2>(tupScFact);
 
 
+	// if no vertical mosaic is given, use the horizontal one
+	angle mono_mosaic_v = eck.mono_mosaic_v;
+	angle sample_mosaic_v = eck.sample_mosaic_v;
+	angle ana_mosaic_v = eck.ana_mosaic_v;
+	if(tl::float_equal<t_real>(mono_mosaic_v/rads, 0.), 0.)
+		mono_mosaic_v = eck.mono_mosaic;
+	if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
+		sample_mosaic_v = eck.sample_mosaic;
+	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
+		ana_mosaic_v = eck.ana_mosaic;
+
+
 	//--------------------------------------------------------------------------
 	// mono part
 
@@ -303,7 +315,7 @@ ResoResults calc_eck(const EckParams& eck)
 			eck.ki, thetam,
 			coll_h_pre_mono, eck.coll_h_pre_sample,
 			coll_v_pre_mono, eck.coll_v_pre_sample,
-			eck.mono_mosaic, eck.mono_mosaic_v,
+			eck.mono_mosaic, mono_mosaic_v,
 			inv_mono_curvh, inv_mono_curvv,
 			eck.pos_x , eck.pos_y, eck.pos_z,
 			dmono_refl);
@@ -335,7 +347,7 @@ ResoResults calc_eck(const EckParams& eck)
 			eck.kf, -thetaa,
 			eck.coll_h_post_ana, eck.coll_h_post_sample,
 			eck.coll_v_post_ana, eck.coll_v_post_sample,
-			eck.ana_mosaic, eck.ana_mosaic_v,
+			eck.ana_mosaic, ana_mosaic_v,
 			inv_ana_curvh, inv_ana_curvv,
 			eck.pos_x, pos_y2, pos_z2,
 			dana_effic);
