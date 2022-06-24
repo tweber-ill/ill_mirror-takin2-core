@@ -102,7 +102,9 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 		spinDetW, spinDetH,
 		spinDistMonoSample, spinDistSampleAna, spinDistAnaDet, spinDistSrcMono,
 
-		spinMonoMosaicV, spinAnaMosaicV,
+		spinMonitorW, spinMonitorH, spinDistMonoMonitor,
+
+		spinMonoMosaicV, spinSampleMosaicV, spinAnaMosaicV,
 		spinSamplePosX, spinSamplePosY, spinSamplePosZ,
 
 		spinDistTofPulseMono, spinDistTofMonoSample, spinDistTofSampleDet,
@@ -131,7 +133,9 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 		"reso/pop_det_w", "reso/pop_det_h",
 		"reso/pop_dist_mono_sample", "reso/pop_dist_sample_ana", "reso/pop_dist_ana_det", "reso/pop_dist_src_mono",
 
-		"reso/eck_mono_mosaic_v", "reso/eck_ana_mosaic_v",
+		"reso/pop_monitor_w", "reso/pop_monitor_h", "reso/pop_dist_mono_monitor"
+
+		"reso/eck_mono_mosaic_v", "reso/eck_sample_mosaic_v", "reso/eck_ana_mosaic_v",
 		"reso/eck_sample_pos_x", "reso/eck_sample_pos_y", "reso/eck_sample_pos_z",
 
 		"reso/viol_dist_pulse_mono", "reso/viol_dist_mono_sample", "reso/viol_dist_sample_det",
@@ -321,10 +325,13 @@ void ResoDlg::Calc()
 
 		// CN
 		cn.mono_d = t_real_reso(spinMonod->value()) * angs;
-		cn.mono_mosaic = t_real_reso(tl::m2r(spinMonoMosaic->value())) * rads;
 		cn.ana_d = t_real_reso(spinAnad->value()) * angs;
-		cn.ana_mosaic = t_real_reso(tl::m2r(spinAnaMosaic->value())) * rads;
+		cn.mono_mosaic = t_real_reso(tl::m2r(spinMonoMosaic->value())) * rads;
 		cn.sample_mosaic = t_real_reso(tl::m2r(spinSampleMosaic->value())) * rads;
+		cn.ana_mosaic = t_real_reso(tl::m2r(spinAnaMosaic->value())) * rads;
+		cn.mono_mosaic_v = t_real_reso(tl::m2r(spinMonoMosaicV->value())) * rads;
+		cn.sample_mosaic_v = t_real_reso(tl::m2r(spinSampleMosaicV->value())) * rads;
+		cn.ana_mosaic_v = t_real_reso(tl::m2r(spinAnaMosaicV->value())) * rads;
 
 		cn.dmono_sense = (radioMonoScatterPlus->isChecked() ? +1. : -1.);
 		cn.dana_sense = (radioAnaScatterPlus->isChecked() ? +1. : -1.);
@@ -467,10 +474,12 @@ void ResoDlg::Calc()
 		cn.dist_ana_det = t_real_reso(spinDistAnaDet->value()) * cm;
 		cn.dist_src_mono = t_real_reso(spinDistSrcMono->value()) * cm;
 
+		cn.monitor_w = t_real_reso(spinMonitorW->value()) * cm;
+		cn.monitor_h = t_real_reso(spinMonitorH->value()) * cm;
+		cn.dist_mono_monitor = t_real_reso(spinDistMonoMonitor->value()) * cm;
 
-		// Eck
-		cn.mono_mosaic_v = t_real_reso(tl::m2r(spinMonoMosaicV->value())) * rads;
-		cn.ana_mosaic_v = t_real_reso(tl::m2r(spinAnaMosaicV->value())) * rads;
+
+		// eck
 		cn.pos_x = t_real_reso(spinSamplePosX->value()) * cm;
 		cn.pos_y = t_real_reso(spinSamplePosY->value()) * cm;
 		cn.pos_z = t_real_reso(spinSamplePosZ->value()) * cm;
@@ -1134,7 +1143,7 @@ void ResoDlg::AlgoChanged()
 		{
 			tabWidget->setTabEnabled(0,1);
 			tabWidget->setTabEnabled(1,1);
-			tabWidget->setTabEnabled(2,0);
+			tabWidget->setTabEnabled(2,1);
 			tabWidget->setTabEnabled(3,0);
 			tabWidget->setTabEnabled(4,0);
 			strAlgo = "<b>M. Popovici</b><br>\n";

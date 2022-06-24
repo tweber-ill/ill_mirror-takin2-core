@@ -67,6 +67,9 @@ protected:
 	bool m_bKiFix = 0;
 	t_real_reso m_dKFix = 1.4;
 
+	// for better compatibility with older versions
+	t_real_reso m_R0_scale = 1.;
+
 public:
 	TASReso();
 	TASReso(const TASReso& res);
@@ -95,6 +98,7 @@ public:
 	const McNeutronOpts<ublas::matrix<t_real_reso>>& GetMCOpts() const { return m_opts; }
 	EckParams& GetResoParams() { return m_reso; }
 	ViolParams& GetTofResoParams() { return m_tofreso; }
+	t_real_reso GetR0Scale() const { return m_R0_scale; }
 
 	const ResoResults& GetResoResults() const { return m_res[0]; }
 

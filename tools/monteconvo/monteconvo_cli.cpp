@@ -415,7 +415,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 				for(int i=0; i<4; ++i)
 					dhklE_mean[i] /= t_real(cfg.neutron_count*cfg.sample_step_count);
 
-				dS *= localreso.GetResoResults().dR0;
+				dS *= localreso.GetResoResults().dR0 * localreso.GetR0Scale();
 				//if(localreso.GetResoParams().flags & CALC_RESVOL)
 				//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 			}
@@ -776,7 +776,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 				for(int i=0; i<4; ++i)
 					dhklE_mean[i] /= t_real(cfg.neutron_count*cfg.sample_step_count);
 
-				dS *= localreso.GetResoResults().dR0;
+				dS *= localreso.GetResoResults().dR0 * localreso.GetR0Scale();
 				//if(localreso.GetResoParams().flags & CALC_RESVOL)
 				//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 			}

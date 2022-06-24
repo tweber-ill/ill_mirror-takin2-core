@@ -118,10 +118,6 @@ ResoResults calc_cn(const CNParams& cn)
 	angle coll_h_pre_mono = cn.coll_h_pre_mono;
 	angle coll_v_pre_mono = cn.coll_v_pre_mono;
 
-	// use the same as the horizontal mosaics for now
-	angle mono_mosaic_v = cn.mono_mosaic;
-	angle ana_mosaic_v = cn.ana_mosaic;
-
 	angle thetaa = cn.thetaa * cn.dana_sense;
 	angle thetam = cn.thetam * cn.dmono_sense;
 	angle ki_Q = cn.angle_ki_Q;
@@ -198,13 +194,13 @@ ResoResults calc_cn(const CNParams& cn)
 	std::future<std::pair<t_mat, t_real>> futMono
 		= std::async(lpol, calc_mono_ana_res,
 			thetam, cn.ki,
-			cn.mono_mosaic, mono_mosaic_v,
+			cn.mono_mosaic, cn.mono_mosaic_v,
 			cn.coll_h_pre_mono, cn.coll_h_pre_sample,
 			cn.coll_v_pre_mono, cn.coll_v_pre_sample);
 	std::future<std::pair<t_mat, t_real>> futAna
 		= std::async(lpol, calc_mono_ana_res,
 			-thetaa, cn.kf,
-			cn.ana_mosaic, ana_mosaic_v,
+			cn.ana_mosaic, cn.ana_mosaic_v,
 			cn.coll_h_post_ana, cn.coll_h_post_sample,
 			cn.coll_v_post_ana, cn.coll_v_post_sample);
 

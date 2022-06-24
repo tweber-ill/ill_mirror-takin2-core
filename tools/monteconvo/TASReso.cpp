@@ -76,6 +76,7 @@ const TASReso& TASReso::operator=(const TASReso& res)
 	this->m_res = res.m_res;
 	this->m_bKiFix = res.m_bKiFix;
 	this->m_dKFix = res.m_dKFix;
+	this->m_R0_scale = res.m_R0_scale;
 
 	return *this;
 }
@@ -221,6 +222,8 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 	//	m_reso.flags &= ~CALC_RESVOL;
 	//m_reso.flags &= ~CALC_RESVOL;	// not used anymore
 
+	m_R0_scale = xml.Query<t_real>((strXmlRoot + "reso/r0_scale").c_str(), 1.);
+
 	m_reso.dmono_sense = (xml.Query<int>((strXmlRoot+"reso/mono_scatter_sense").c_str(), 0) ? +1. : -1.);
 	m_reso.dana_sense = (xml.Query<int>((strXmlRoot+"reso/ana_scatter_sense").c_str(), 0) ? +1. : -1.);
 	m_reso.dsample_sense = (xml.Query<int>((strXmlRoot+"reso/sample_scatter_sense").c_str(), 1) ? +1. : -1.);
@@ -269,9 +272,14 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 	m_reso.dist_ana_det = xml.Query<t_real>((strXmlRoot + "reso/pop_dist_ana_det").c_str(), 0.)*cm;
 	m_reso.dist_src_mono = xml.Query<t_real>((strXmlRoot + "reso/pop_dist_src_mono").c_str(), 0.)*cm;
 
+	m_reso.monitor_w = xml.Query<t_real>((strXmlRoot + "reso/pop_monitor_w").c_str(), 0.)*cm;
+	m_reso.monitor_h = xml.Query<t_real>((strXmlRoot + "reso/pop_monitor_h").c_str(), 0.)*cm;
+	m_reso.dist_mono_monitor = xml.Query<t_real>((strXmlRoot + "reso/pop_dist_mono_monitor").c_str(), 0.)*cm;
+
 
 	// Eck
 	m_reso.mono_mosaic_v = tl::m2r(xml.Query<t_real>((strXmlRoot + "reso/eck_mono_mosaic_v").c_str(), 0.)) * rads;
+	m_reso.sample_mosaic_v = tl::m2r(xml.Query<t_real>((strXmlRoot + "reso/eck_sample_mosaic_v").c_str(), 0.)) * rads;
 	m_reso.ana_mosaic_v = tl::m2r(xml.Query<t_real>((strXmlRoot + "reso/eck_ana_mosaic_v").c_str(), 0.)) * rads;
 	m_reso.pos_x = xml.Query<t_real>((strXmlRoot + "reso/eck_sample_pos_x").c_str(), 0.)*cm;
 	m_reso.pos_y = xml.Query<t_real>((strXmlRoot + "reso/eck_sample_pos_y").c_str(), 0.)*cm;

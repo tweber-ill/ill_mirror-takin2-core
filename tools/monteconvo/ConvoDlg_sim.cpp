@@ -328,7 +328,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 					for(int i=0; i<4; ++i)
 						dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
 
-					dS *= localreso.GetResoResults().dR0;
+					dS *= localreso.GetResoResults().dR0 * localreso.GetR0Scale();
 					//if(localreso.GetResoParams().flags & CALC_RESVOL)
 					//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 				}
@@ -833,7 +833,7 @@ void ConvoDlg::Start2D()
 					for(int i=0; i<4; ++i)
 						dhklE_mean[i] /= t_real(iNumNeutrons*iNumSampleSteps);
 
-					dS *= localreso.GetResoResults().dR0;
+					dS *= localreso.GetResoResults().dR0 * localreso.GetR0Scale();
 					//if(localreso.GetResoParams().flags & CALC_RESVOL)
 					//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 				}
