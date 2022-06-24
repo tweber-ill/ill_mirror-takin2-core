@@ -127,8 +127,8 @@ tl::t_real_min SqwFuncModel::operator()(tl::t_real_min x_principal) const
 
 	if(reso.GetResoParams().flags & CALC_R0)
 		dS *= reso.GetResoResults().dR0;
-	if(reso.GetResoParams().flags & CALC_RESVOL)
-		dS /= reso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
+	//if(reso.GetResoParams().flags & CALC_RESVOL)
+	//	dS /= reso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 
 	t_real dYVal = m_dScale*(dS + m_dSlope*x_principal) + m_dOffs;
 	if(dYVal < 0.)

@@ -417,8 +417,8 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 				if(localreso.GetResoParams().flags & CALC_R0)
 					dS *= localreso.GetResoResults().dR0;
-				if(localreso.GetResoParams().flags & CALC_RESVOL)
-					dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
+				//if(localreso.GetResoParams().flags & CALC_RESVOL)
+				//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 			}
 			return std::pair<bool, t_real>(true, dS);
 		});
@@ -779,8 +779,8 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 
 				if(localreso.GetResoParams().flags & CALC_R0)
 					dS *= localreso.GetResoResults().dR0;
-				if(localreso.GetResoParams().flags & CALC_RESVOL)
-					dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
+				//if(localreso.GetResoParams().flags & CALC_RESVOL)
+				//	dS /= localreso.GetResoResults().dResVol * tl::get_pi<t_real>() * t_real(3.);
 			}
 			return std::pair<bool, t_real>(true, dS);
 		});

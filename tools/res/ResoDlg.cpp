@@ -382,7 +382,7 @@ void ResoDlg::Calc()
 		//	cn.flags |= CALC_RESVOL;
 		//else
 		//	cn.flags &= ~CALC_RESVOL;
-		cn.flags &= ~CALC_RESVOL;	// not used anymore
+		//cn.flags &= ~CALC_RESVOL;	// not used anymore
 
 
 		// Position

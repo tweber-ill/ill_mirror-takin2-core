@@ -433,7 +433,7 @@ ResoResults calc_eck(const EckParams& eck)
 	// squares in Vs missing in paper? (thanks to F. Bourdarot for pointing this out)
 	W -= 0.25*V1[5]*V1[5]/U1(5,5) + 0.25*V2[4]*V2[4]/U2(4,4);
 
-	t_real Z = dReflM*dReflA
+	t_real Z = dReflM * dReflA
 		* std::sqrt(pi/std::abs(U1(5,5)))
 		* std::sqrt(pi/std::abs(U2(4,4)));
 	//--------------------------------------------------------------------------

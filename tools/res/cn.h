@@ -93,7 +93,7 @@ struct CNParams
 	std::shared_ptr<ReflCurve<t_real_reso>> mono_refl_curve;
 	std::shared_ptr<ReflCurve<t_real_reso>> ana_effic_curve;
 
-	std::size_t flags = CALC_R0 | CALC_RESVOL | CALC_KI3 | CALC_KF3 | CALC_KFKI;
+	std::size_t flags = CALC_R0 /*| CALC_RESVOL*/ | CALC_KI3 | CALC_KF3 | CALC_KFKI;
 };
 
 extern ResoResults calc_cn(const CNParams& cn);

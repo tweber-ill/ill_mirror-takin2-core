@@ -215,7 +215,7 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 	//	m_reso.flags |= CALC_RESVOL;
 	//else
 	//	m_reso.flags &= ~CALC_RESVOL;
-	m_reso.flags &= ~CALC_RESVOL;	// not used anymore
+	//m_reso.flags &= ~CALC_RESVOL;	// not used anymore
 
 	m_reso.dmono_sense = (xml.Query<int>((strXmlRoot+"reso/mono_scatter_sense").c_str(), 0) ? +1. : -1.);
 	m_reso.dana_sense = (xml.Query<int>((strXmlRoot+"reso/ana_scatter_sense").c_str(), 0) ? +1. : -1.);
