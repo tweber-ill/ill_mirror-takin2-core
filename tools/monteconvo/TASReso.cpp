@@ -495,6 +495,11 @@ bool TASReso::SetHKLE(t_real h, t_real k, t_real l, t_real E)
 			//tl::log_info("Algorithm: Cooper-Nathans (TAS)");
 			resores_cur = calc_cn(m_reso);
 		}
+		else if(m_algo == ResoAlgo::POP_CN)
+		{
+			//tl::log_info("Algorithm: Popovici/Pointlike (TAS)");
+			resores_cur = calc_pop_cn(m_reso);
+		}
 		else if(m_algo == ResoAlgo::POP)
 		{
 			//tl::log_info("Algorithm: Popovici (TAS)");

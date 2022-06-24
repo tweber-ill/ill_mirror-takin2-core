@@ -75,6 +75,15 @@ struct ResoResults
 
 
 // all algos
-enum class ResoAlgo { CN=1, POP=2, ECK=3, VIOL=4, SIMPLE=100, UNKNOWN=-1 };
+enum class ResoAlgo
+{
+	CN       = 1,
+	POP_CN   = 2,
+	POP      = 3,
+	ECK      = 4,
+	VIOL     = 5,
+	SIMPLE   = 100,
+	UNKNOWN  = -1
+};
 
 #endif

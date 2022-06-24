@@ -88,7 +88,7 @@ enum PopKiKfIdx : std::size_t
 };
 
 
-ResoResults calc_pop_cn(const PopParams& pop)
+ResoResults calc_pop_cn(const CNParams& pop)
 {
 	ResoResults res;
 
@@ -112,11 +112,11 @@ ResoResults calc_pop_cn(const PopParams& pop)
 	angle coll_h_pre_mono = pop.coll_h_pre_mono;
 	angle coll_v_pre_mono = pop.coll_v_pre_mono;
 
-	if(pop.bGuide)
+	/*if(pop.bGuide)
 	{
 		coll_h_pre_mono = lam*(pop.guide_div_h/angs);
 		coll_v_pre_mono = lam*(pop.guide_div_v/angs);
-	}
+	}*/
 
 	// if no vertical mosaic is given, use the horizontal one
 	angle mono_mosaic_v = pop.mono_mosaic_v;
@@ -128,6 +128,16 @@ ResoResults calc_pop_cn(const PopParams& pop)
 		sample_mosaic_v = pop.sample_mosaic;
 	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
 		ana_mosaic_v = pop.ana_mosaic;
+
+
+	const auto tupScFact = get_scatter_factors(pop.flags, pop.thetam, pop.ki, pop.thetaa, pop.kf);
+
+	t_real dmono_refl = pop.dmono_refl * std::get<0>(tupScFact);
+	t_real dana_effic = pop.dana_effic * std::get<1>(tupScFact);
+	if(pop.mono_refl_curve) dmono_refl *= (*pop.mono_refl_curve)(pop.ki);
+	if(pop.ana_effic_curve) dana_effic *= (*pop.ana_effic_curve)(pop.kf);
+	t_real dxsec = std::get<2>(tupScFact);
+	t_real dmonitor = std::get<3>(tupScFact);
 
 
 	// --------------------------------------------------------------------
@@ -201,52 +211,16 @@ ResoResults calc_pop_cn(const PopParams& pop)
 
 
 	// --------------------------------------------------------------------
-	// mono/ana focus
-	// --------------------------------------------------------------------
-	length mono_curvh = pop.mono_curvh, mono_curvv = pop.mono_curvv;
-	length ana_curvh = pop.ana_curvh, ana_curvv = pop.ana_curvv;
-
-	if(pop.bMonoIsOptimallyCurvedH)
-		mono_curvh = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), false);
-	if(pop.bAnaIsOptimallyCurvedH)
-		ana_curvh = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), false);
-	if(pop.bMonoIsOptimallyCurvedV)
-		mono_curvv = tl::foc_curv(pop.dist_src_mono, pop.dist_mono_sample, units::abs(t_real(2)*thetam), true);
-	if(pop.bAnaIsOptimallyCurvedV)
-		ana_curvv = tl::foc_curv(pop.dist_sample_ana, pop.dist_ana_det, units::abs(t_real(2)*thetaa), true);
-
-	mono_curvh *= pop.dmono_sense;
-	ana_curvh *= pop.dana_sense;
-	mono_curvv *= pop.dmono_sense;
-	ana_curvv *= pop.dana_sense;
-
-	inv_length inv_mono_curvh = pop.bMonoIsCurvedH ? t_real(1)/mono_curvh : t_real(0)/cm;
-	inv_length inv_ana_curvh = pop.bAnaIsCurvedH ? t_real(1)/ana_curvh : t_real(0)/cm;
-	inv_length inv_mono_curvv = pop.bMonoIsCurvedV ? t_real(1)/mono_curvv : t_real(0)/cm;
-	inv_length inv_ana_curvv = pop.bAnaIsCurvedV ? t_real(1)/ana_curvv : t_real(0)/cm;
-
-	const auto tupScFact = get_scatter_factors(pop.flags, pop.thetam, pop.ki, pop.thetaa, pop.kf);
-
-	t_real dmono_refl = pop.dmono_refl * std::get<0>(tupScFact);
-	t_real dana_effic = pop.dana_effic * std::get<1>(tupScFact);
-	if(pop.mono_refl_curve) dmono_refl *= (*pop.mono_refl_curve)(pop.ki);
-	if(pop.ana_effic_curve) dana_effic *= (*pop.ana_effic_curve)(pop.kf);
-	t_real dxsec = std::get<2>(tupScFact);
-	t_real dmonitor = std::get<3>(tupScFact);
-	// --------------------------------------------------------------------
-
-
-	// --------------------------------------------------------------------
 	// trafo matrix
 	// --------------------------------------------------------------------
 	// C matrix, [pop75], Appendix 1
 	t_mat C_trafo = ublas::zero_matrix<t_real>(POP_NUM_COORDS, POP_NUM_COMPS);
-	C_trafo(POP_ANA_H, POP_POSTANA_H) = 0.5;
-	C_trafo(POP_ANA_H, POP_POSTSAMPLE_H) = 0.5;
 	C_trafo(POP_MONO_H, POP_PRESAMPLE_H) = 0.5;
 	C_trafo(POP_MONO_H, POP_PREMONO_H) = 0.5;
 	C_trafo(POP_MONO_V, POP_PREMONO_V) = t_real(0.5)/s_th_m;
 	C_trafo(POP_MONO_V, POP_PRESAMPLE_V) = t_real(-0.5)/s_th_m;  // typo in paper
+	C_trafo(POP_ANA_H, POP_POSTANA_H) = 0.5;
+	C_trafo(POP_ANA_H, POP_POSTSAMPLE_H) = 0.5;
 	C_trafo(POP_ANA_V, POP_POSTSAMPLE_V) = t_real(0.5)/s_th_a;
 	C_trafo(POP_ANA_V, POP_POSTANA_V) = t_real(-0.5)/s_th_a;
 	// --------------------------------------------------------------------

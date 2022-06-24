@@ -81,7 +81,7 @@ ResoDlg::ResoDlg(QWidget *pParent, QSettings* pSettings)
 
 	setupAlgos();
 	connect(comboAlgo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ResoDlg::AlgoChanged);
-	comboAlgo->setCurrentIndex(1);
+	comboAlgo->setCurrentIndex(static_cast<int>(ResoAlgo::POP)-1);
 
 	groupGuide->setChecked(false);
 
@@ -224,12 +224,13 @@ ResoDlg::~ResoDlg() {}
 
 void ResoDlg::setupAlgos()
 {
-	comboAlgo->addItem("TAS: Cooper-Nathans", static_cast<int>(ResoAlgo::CN));
-	comboAlgo->addItem("TAS: Popovici", static_cast<int>(ResoAlgo::POP));
-	comboAlgo->addItem("TAS: Eckold-Sobolev", static_cast<int>(ResoAlgo::ECK));
-	comboAlgo->insertSeparator(3);
+	comboAlgo->addItem("TAS: Cooper-Nathans (Pointlike)", static_cast<int>(ResoAlgo::CN));
+	comboAlgo->addItem("TAS: Popovici (Pointlike)", static_cast<int>(ResoAlgo::POP_CN));
+	comboAlgo->addItem("TAS: Popovici (Extended)", static_cast<int>(ResoAlgo::POP));
+	comboAlgo->addItem("TAS: Eckold-Sobolev (Extended)", static_cast<int>(ResoAlgo::ECK));
+	comboAlgo->insertSeparator(4);
 	comboAlgo->addItem("TOF: Violini", static_cast<int>(ResoAlgo::VIOL));
-	comboAlgo->insertSeparator(5);
+	comboAlgo->insertSeparator(6);
 	comboAlgo->addItem("Simple", static_cast<int>(ResoAlgo::SIMPLE));
 }
 
@@ -411,20 +412,20 @@ void ResoDlg::Calc()
 		cn.bMonoIsOptimallyCurvedH = cn.bMonoIsOptimallyCurvedV = 0;
 		spinMonoCurvH->setEnabled(0); spinMonoCurvV->setEnabled(0);
 
-		if(comboMonoHori->currentIndex()==2)
+		if(comboMonoHori->currentIndex() == 2)
 		{
 			cn.bMonoIsCurvedH = 1;
 			spinMonoCurvH->setEnabled(1);
 		}
-		else if(comboMonoHori->currentIndex()==1)
+		else if(comboMonoHori->currentIndex() == 1)
 			cn.bMonoIsCurvedH = cn.bMonoIsOptimallyCurvedH = 1;
 
-		if(comboMonoVert->currentIndex()==2)
+		if(comboMonoVert->currentIndex() == 2)
 		{
 			cn.bMonoIsCurvedV = 1;
 			spinMonoCurvV->setEnabled(1);
 		}
-		else if(comboMonoVert->currentIndex()==1)
+		else if(comboMonoVert->currentIndex() == 1)
 			cn.bMonoIsCurvedV = cn.bMonoIsOptimallyCurvedV = 1;
 
 		cn.ana_w = t_real_reso(spinAnaW->value()) *cm;
@@ -436,7 +437,7 @@ void ResoDlg::Calc()
 		cn.bAnaIsOptimallyCurvedH = cn.bAnaIsOptimallyCurvedV = 0;
 		spinAnaCurvH->setEnabled(0); spinAnaCurvV->setEnabled(0);
 
-		if(comboAnaHori->currentIndex()==2)
+		if(comboAnaHori->currentIndex() == 2)
 		{
 			cn.bAnaIsCurvedH = 1;
 			spinAnaCurvH->setEnabled(1);
@@ -444,7 +445,7 @@ void ResoDlg::Calc()
 		else if(comboAnaHori->currentIndex()==1)
 			cn.bAnaIsCurvedH = cn.bAnaIsOptimallyCurvedH = 1;
 
-		if(comboAnaVert->currentIndex()==2)
+		if(comboAnaVert->currentIndex() == 2)
 		{
 			cn.bAnaIsCurvedV = 1;
 			spinAnaCurvV->setEnabled(1);
@@ -530,6 +531,7 @@ void ResoDlg::Calc()
 		switch(ResoDlg::GetSelectedAlgo())
 		{
 			case ResoAlgo::CN: res = calc_cn(cn); break;
+			case ResoAlgo::POP_CN: res = calc_pop_cn(cn); break;
 			case ResoAlgo::POP: res = calc_pop(cn); break;
 			case ResoAlgo::ECK: res = calc_eck(cn); break;
 			case ResoAlgo::VIOL: res = calc_viol(tof); break;
@@ -1122,12 +1124,14 @@ void ResoDlg::AlgoChanged()
 	switch(GetSelectedAlgo())
 	{
 		case ResoAlgo::CN:
+		case ResoAlgo::POP_CN:
 		{
 			tabWidget->setTabEnabled(0,1);
 			tabWidget->setTabEnabled(1,0);
 			tabWidget->setTabEnabled(2,0);
 			tabWidget->setTabEnabled(3,0);
 			tabWidget->setTabEnabled(4,0);
+
 			strAlgo = "<b>M. J. Cooper and <br>R. Nathans</b><br>\n";
 			strAlgo += "<a href=http://dx.doi.org/10.1107/S0365110X67002816>"
 				"Acta Cryst. 23, <br>pp. 357-367</a><br>\n";
@@ -1146,6 +1150,7 @@ void ResoDlg::AlgoChanged()
 			tabWidget->setTabEnabled(2,1);
 			tabWidget->setTabEnabled(3,0);
 			tabWidget->setTabEnabled(4,0);
+
 			strAlgo = "<b>M. Popovici</b><br>\n";
 			strAlgo += "<a href=http://dx.doi.org/10.1107/S0567739475001088>"
 				"Acta Cryst. A 31, <br>pp. 507-513</a><br>\n";
@@ -1159,6 +1164,7 @@ void ResoDlg::AlgoChanged()
 			tabWidget->setTabEnabled(2,1);
 			tabWidget->setTabEnabled(3,0);
 			tabWidget->setTabEnabled(4,0);
+
 			strAlgo = "<b>G. Eckold and <br>O. Sobolev</b><br>\n";
 			strAlgo += "<a href=http://dx.doi.org/10.1016/j.nima.2014.03.019>"
 				"NIM A 752, <br>pp. 54-64</a><br>\n";
@@ -1172,6 +1178,7 @@ void ResoDlg::AlgoChanged()
 			tabWidget->setTabEnabled(2,0);
 			tabWidget->setTabEnabled(3,1);
 			tabWidget->setTabEnabled(4,0);
+
 			strAlgo = "<b>N. Violini <i>et al.</i></b><br>\n";
 			strAlgo += "<a href=http://dx.doi.org/10.1016/j.nima.2013.10.042>"
 				"NIM A 736, <br>pp. 31-39</a><br>\n";
@@ -1185,6 +1192,7 @@ void ResoDlg::AlgoChanged()
 			tabWidget->setTabEnabled(2,0);
 			tabWidget->setTabEnabled(3,0);
 			tabWidget->setTabEnabled(4,1);
+
 			strAlgo = "<b>Simple</b><br>\n";
 			break;
 		}

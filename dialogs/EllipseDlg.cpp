@@ -334,9 +334,10 @@ void EllipseDlg::Calc()
 
 			switch(m_algo)
 			{
-				case ResoAlgo::CN: SetTitle("Cooper-Nathans Algorithm (TAS)"); break;
-				case ResoAlgo::POP: SetTitle("Popovici Algorithm (TAS)"); break;
-				case ResoAlgo::ECK: SetTitle("Eckold-Sobolev Algorithm (TAS)"); break;
+				case ResoAlgo::CN: SetTitle("Cooper-Nathans Algorithm (Pointlike TAS)"); break;
+				case ResoAlgo::POP_CN: SetTitle("Popovici Algorithm (Pointlike TAS)"); break;
+				case ResoAlgo::POP: SetTitle("Popovici Algorithm (Extended TAS)"); break;
+				case ResoAlgo::ECK: SetTitle("Eckold-Sobolev Algorithm (Extended TAS)"); break;
 				case ResoAlgo::VIOL: SetTitle("Violini Algorithm (TOF)"); break;
 				case ResoAlgo::SIMPLE: SetTitle("Simple Algorithm"); break;
 				default: SetTitle("Unknown Resolution Algorithm"); break;

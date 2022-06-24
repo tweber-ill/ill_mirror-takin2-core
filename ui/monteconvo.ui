@@ -160,17 +160,22 @@
             </property>
             <item>
              <property name="text">
-              <string>TAS: Cooper-Nathans</string>
+              <string>TAS: Cooper-Nathans (Pointlike)</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>TAS: Popovici</string>
+              <string>TAS: Popovici (Pointlike)</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>TAS: Eckold-Sobolev</string>
+              <string>TAS: Popovici (Extended)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>TAS: Eckold-Sobolev (Extended)</string>
              </property>
             </item>
             <item>
