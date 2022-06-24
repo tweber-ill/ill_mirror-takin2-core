@@ -86,7 +86,7 @@ std::tuple<t_real, t_real, t_real, t_real> get_scatter_factors(
 	if(flags & CALC_KFKI)
 		dSqwToXSec *= kf/ki;  // kf/ki factor, see Shirane, equ. (2.7)
 	if(flags & CALC_MONKI)
-		dmonitor /= ki*angs;  // monitor 1/ki factor, see [zhe07], p. 10
+		dmonitor *= ki*angs;  // monitor 1/ki factor, see [zhe07], p. 10
 
 	return std::make_tuple(dmono, dana, dSqwToXSec, dmonitor);
 }

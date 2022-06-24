@@ -483,8 +483,8 @@ ResoResults calc_pop(const PopParams& pop)
 	}*/
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
-	res.dR0 = 0.;
-	const t_real pi = tl::get_pi<t_real>();
+	res.dR0 = dmono_refl * dana_effic * dxsec * dmonitor;
+
 	t_real dDetF = tl::determinant(F_mosaics);
 
 	// --------------------------------------------------------------------
@@ -578,19 +578,23 @@ ResoResults calc_pop(const PopParams& pop)
 	// --------------------------------------------------------------------
 
 	// R0 calculation methods
-	if(1 /*pop.flags & CALC_GENERAL_R0*/)
+	const t_real pi = tl::get_pi<t_real>();
+	if(pop.flags & CALC_GENERAL_R0)
 	{
 		t_real dDetH = tl::determinant(H_G_div);
 
 		// alternate, more general calculation from [zhe07], p. 10, equ. 8
-		res.dR0 = pi*pi * std::sqrt(dDetF / dDetH);
+		res.dR0 *= pi*pi * std::sqrt(dDetF / dDetH);
 		res.dR0 /= t_real(16.) * s_th_m * s_th_a;
 
-		// mono part, [zhe07], p. 10, equ. 10
-		t_real dDetF_mono = tl::determinant(F_mono_mosaics);
-		t_real dDetH_mono = tl::determinant(H_G_mono_div);
-		res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
-		res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
+		if(pop.flags & CALC_MON)
+		{
+			// mono part, [zhe07], p. 10, equ. 10
+			t_real dDetF_mono = tl::determinant(F_mono_mosaics);
+			t_real dDetH_mono = tl::determinant(H_G_mono_div);
+			res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
+			res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
+		}
 	}
 	else
 	{
@@ -611,32 +615,33 @@ ResoResults calc_pop(const PopParams& pop)
 		t_real dDetDSiDti = tl::determinant(DSiDti);
 
 		// [pop75], equs. 13a & 16
-		res.dR0 = t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
+		res.dR0 *= t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
 		res.dR0 *= std::sqrt(dDetS*dDetF / (dDetK*dDetDSiDti));
 		res.dR0 /= t_real(8.*pi*8.*pi) * s_th_m * s_th_a;
-		//res.dR0 /= pop.ki * angs;
 
-		// mono part
-		t_mat DSiDt_mono = tl::transform_inv(SI_mono_geo, D_mono_geo_div_trafo, true);
-		t_mat DSiDti_mono;
-		if(!tl::inverse(DSiDt_mono, DSiDti_mono))
+		if(pop.flags & CALC_MON)
 		{
-			res.bOk = false;
-			res.strErr = "R0_mono factor cannot be calculated.";
-			return res;
+			// mono part
+			t_mat DSiDt_mono = tl::transform_inv(SI_mono_geo, D_mono_geo_div_trafo, true);
+			t_mat DSiDti_mono;
+			if(!tl::inverse(DSiDt_mono, DSiDti_mono))
+			{
+				res.bOk = false;
+				res.strErr = "R0_mono factor cannot be calculated.";
+				return res;
+			}
+			DSiDti_mono += G_mono_collis;
+
+			t_real dDetS_mono = tl::determinant(S_mono_geo);
+			t_real dDetF_mono = tl::determinant(F_mono_mosaics);
+			t_real dDetK_mono = tl::determinant(K_mono_geo);
+			t_real dDetDSiDti_mono = tl::determinant(DSiDti_mono);
+
+			res.dR0 /= std::sqrt(dDetS_mono*dDetF_mono / (dDetK_mono*dDetDSiDti_mono));
+			res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
 		}
-		DSiDti_mono += G_mono_collis;
-
-		t_real dDetS_mono = tl::determinant(S_mono_geo);
-		t_real dDetF_mono = tl::determinant(F_mono_mosaics);
-		t_real dDetK_mono = tl::determinant(K_mono_geo);
-		t_real dDetDSiDti_mono = tl::determinant(DSiDti_mono);
-
-		res.dR0 /= std::sqrt(dDetS_mono*dDetF_mono / (dDetK_mono*dDetDSiDti_mono));
-		res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
 	}
 
-	res.dR0 *= dmono_refl * dana_effic * dxsec * dmonitor;
 	res.dR0 = std::abs(res.dR0);
 
 	// rest of the prefactors, equ. 1 in [pop75], together with the mono and and ana reflectivities

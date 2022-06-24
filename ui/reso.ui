@@ -560,7 +560,7 @@
              <string>Use ki³ Factor</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -586,7 +586,7 @@
              <string>Use 1/ki Factor</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -612,7 +612,7 @@
              <string>Use kf/ki Factor</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
