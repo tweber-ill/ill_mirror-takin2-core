@@ -9,6 +9,7 @@
  *		http://www.ill.eu/en/instruments-support/computing-for-science/cs-software/all-software/matlab-ill/rescal-for-matlab/
  * @desc see: - [pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
  *            - [mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
+ *            - [zhe07] A. Zheludev, ResLib 3.4 manual (2007), https://ethz.ch/content/dam/ethz/special-interest/phys/solid-state-physics/neutron-scattering-and-magnetism-dam/images/research/manual.pdf
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -175,10 +176,6 @@ ResoResults calc_pop(const PopParams& pop)
 	G_collis(POP_POSTANA_V, POP_POSTANA_V) =
 		t_real(1) / (pop.coll_v_post_ana*pop.coll_v_post_ana /rads/rads);
 
-	// mono part
-	t_mat G_mono_collis = G_collis;
-	G_mono_collis.resize(POP_PRESAMPLE_V+1, POP_PRESAMPLE_V+1, true);
-
 	const angle mono_mosaic_z = pop.mono_mosaic;
 	const angle ana_mosaic_z = pop.ana_mosaic;
 	const angle sample_mosaic_z = pop.sample_mosaic;
@@ -193,10 +190,6 @@ ResoResults calc_pop(const PopParams& pop)
 		t_real(1)/(pop.ana_mosaic*pop.ana_mosaic /rads/rads);
 	F_mosaics(POP_ANA_V, POP_ANA_V) =
 		t_real(1)/(ana_mosaic_z*ana_mosaic_z /rads/rads);
-
-	// mono part
-	t_mat F_mono_mosaics = F_mosaics;
-	F_mono_mosaics.resize(POP_MONO_V+1, POP_MONO_V+1, true);
 
 	const t_real s_th_m = units::sin(thetam);
 	const t_real c_th_m = units::cos(thetam);
@@ -263,17 +256,6 @@ ResoResults calc_pop(const PopParams& pop)
 		res.strErr = "S matrix cannot be inverted.";
 		return res;
 	}
-
-	// mono part
-	t_mat SI_mono_geo = SI_geo;
-	SI_mono_geo.resize(POP_MONO_Z+1, POP_MONO_Z+1, true);
-	t_mat S_mono_geo;
-	if(!tl::inverse_diag(SI_mono_geo, S_mono_geo))
-	{
-		res.bOk = false;
-		res.strErr = "S_mono matrix cannot be inverted.";
-		return res;
-	}
 	// --------------------------------------------------------------------
 
 
@@ -309,6 +291,7 @@ ResoResults calc_pop(const PopParams& pop)
 	if(pop.mono_refl_curve) dmono_refl *= (*pop.mono_refl_curve)(pop.ki);
 	if(pop.ana_effic_curve) dana_effic *= (*pop.ana_effic_curve)(pop.kf);
 	t_real dxsec = std::get<2>(tupScFact);
+	t_real dmonitor = std::get<3>(tupScFact);
 	// --------------------------------------------------------------------
 
 
@@ -371,10 +354,6 @@ ResoResults calc_pop(const PopParams& pop)
 	T_mosaic_trafo(POP_ANA_V, POP_ANA_Z) = ana_mosaic_trafo[get_ki_pos(POP_ANA_Z)];
 	T_mosaic_trafo(POP_ANA_V, POP_SAMPLE_Z) = ana_mosaic_trafo[get_ki_pos(POP_SAMPLE_Z)];
 
-	// mono part
-	t_mat T_mono_mosaic_trafo = T_mosaic_trafo;
-	T_mono_mosaic_trafo.resize(POP_MONO_V+1, POP_MONO_Z+1, true);
-
 	// D matrix to transform spatial to divergence variables, [pop75], Appendix 2
 	auto get_geo_trafo = [](t_real dist_src_mono, t_real dist_mono_sample,
 		t_real s_th_m, t_real c_th_m, t_real s_th_s, t_real c_th_s)
@@ -435,10 +414,6 @@ ResoResults calc_pop(const PopParams& pop)
 	D_geo_div_trafo(POP_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
 	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
 	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_SAMPLE_Z) = -ana_geo_trafo[10];
-
-	// mono part
-	t_mat D_mono_geo_div_trafo = D_geo_div_trafo;
-	D_mono_geo_div_trafo.resize(POP_PRESAMPLE_V+1, POP_MONO_Z+1, true);
 	// --------------------------------------------------------------------
 
 
@@ -453,16 +428,6 @@ ResoResults calc_pop(const PopParams& pop)
 	{
 		res.bOk = false;
 		res.strErr = "Matrix K cannot be inverted.";
-		return res;
-	}
-
-	// mono part
-	t_mat K_mono_geo = S_mono_geo + tl::transform(F_mono_mosaics, T_mono_mosaic_trafo, true);
-	t_mat Ki_mono_geo;
-	if(!tl::inverse(K_mono_geo, Ki_mono_geo))
-	{
-		res.bOk = false;
-		res.strErr = "Matrix K_mono cannot be inverted.";
 		return res;
 	}
 
@@ -519,10 +484,116 @@ ResoResults calc_pop(const PopParams& pop)
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = 0.;
-	if(pop.flags & CALC_R0)
-	{
-		const t_real pi = tl::get_pi<t_real>();
+	const t_real pi = tl::get_pi<t_real>();
+	t_real dDetF = tl::determinant(F_mosaics);
 
+	// --------------------------------------------------------------------
+	// mono parts of the matrices, see: [zhe07], p. 10
+	// source - monitor distance and monitor dimensions
+	length dist_src_mon = pop.dist_src_mono;
+	length mon_w = pop.mono_w;
+	length mon_h = pop.mono_h;
+
+	t_mat G_mono_collis = G_collis;
+	G_mono_collis.resize(POP_PRESAMPLE_V+1, POP_PRESAMPLE_V+1, true);
+
+	t_mat F_mono_mosaics = F_mosaics;
+	F_mono_mosaics.resize(POP_MONO_V+1, POP_MONO_V+1, true);
+
+	//t_mat SI_mono_geo = SI_geo;
+	//SI_mono_geo.resize(POP_MONO_Z+1, POP_MONO_Z+1, true);
+
+	t_mat SI_mono_geo = tl::zero_matrix(POP_MONO_Z+1, POP_MONO_Z+1);
+	SI_mono_geo(POP_SRC_Y, POP_SRC_Y) = dMultSrc * pop.src_w*pop.src_w /cm/cm;
+	SI_mono_geo(POP_SRC_Z, POP_SRC_Z) = dMultSrc * pop.src_h*pop.src_h /cm/cm;
+
+	SI_mono_geo(POP_MONO_X, POP_MONO_X) = t_real(1./12.) * pop.mono_thick*pop.mono_thick /cm/cm;
+	SI_mono_geo(POP_MONO_Y, POP_MONO_Y) = t_real(1./12.) * mon_w*mon_w /cm/cm;
+	SI_mono_geo(POP_MONO_Z, POP_MONO_Z) = t_real(1./12.) * mon_h*mon_h /cm/cm;
+
+	SI_mono_geo *= sig2fwhm*sig2fwhm;
+
+	t_mat S_mono_geo;
+	if(!tl::inverse_diag(SI_mono_geo, S_mono_geo))
+	{
+		res.bOk = false;
+		res.strErr = "S_mono matrix cannot be inverted.";
+		return res;
+	}
+
+	//t_mat T_mono_mosaic_trafo = T_mosaic_trafo;
+	//T_mono_mosaic_trafo.resize(POP_MONO_V+1, POP_MONO_Z+1, true);
+	t_mat T_mono_mosaic_trafo = ublas::zero_matrix<t_real>(POP_MONO_V+1, POP_MONO_Z+1);
+	auto mon_mosaic_trafo = get_mosaic_trafo(
+		dist_src_mon/cm, pop.dist_mono_sample/cm,
+		s_th_m, c_th_m, s_th_s, c_th_s,
+		inv_mono_curvh*cm, inv_mono_curvv*cm);
+	T_mono_mosaic_trafo(POP_MONO_H, POP_SRC_Y) = mon_mosaic_trafo[POP_SRC_Y]; // sign forgotten in paper
+	T_mono_mosaic_trafo(POP_MONO_H, POP_MONO_X) = mon_mosaic_trafo[POP_MONO_X];
+	T_mono_mosaic_trafo(POP_MONO_H, POP_MONO_Y) = mon_mosaic_trafo[POP_MONO_Y];
+	T_mono_mosaic_trafo(POP_MONO_V, POP_SRC_Z) = mon_mosaic_trafo[POP_SRC_Z];
+	T_mono_mosaic_trafo(POP_MONO_V, POP_MONO_Z) = mon_mosaic_trafo[POP_MONO_Z];
+
+	//t_mat D_mono_geo_div_trafo = D_geo_div_trafo;
+	//D_mono_geo_div_trafo.resize(POP_PRESAMPLE_V+1, POP_MONO_Z+1, true);
+	t_mat D_mono_geo_div_trafo = ublas::zero_matrix<t_real>(POP_PRESAMPLE_V+1, POP_MONO_Z+1);
+	auto mon_geo_trafo = get_geo_trafo(
+		dist_src_mon/cm, pop.dist_mono_sample/cm,
+		s_th_m, c_th_m, s_th_s, c_th_s);
+	D_mono_geo_div_trafo(POP_PREMONO_H, POP_SRC_Y) = mon_geo_trafo[0];
+	D_mono_geo_div_trafo(POP_PREMONO_H, POP_MONO_X) = mon_geo_trafo[1];
+	D_mono_geo_div_trafo(POP_PREMONO_H, POP_MONO_Y) = mon_geo_trafo[2];
+	D_mono_geo_div_trafo(POP_PRESAMPLE_H, POP_MONO_X) = mon_geo_trafo[3];
+	D_mono_geo_div_trafo(POP_PRESAMPLE_H, POP_MONO_Y) = mon_geo_trafo[4];
+	D_mono_geo_div_trafo(POP_PREMONO_V, POP_SRC_Z) = mon_geo_trafo[7];
+	D_mono_geo_div_trafo(POP_PREMONO_V, POP_MONO_Z) = mon_geo_trafo[8];
+	D_mono_geo_div_trafo(POP_PRESAMPLE_V, POP_MONO_Z) = mon_geo_trafo[9];
+
+	t_mat K_mono_geo = S_mono_geo + tl::transform(F_mono_mosaics, T_mono_mosaic_trafo, true);
+	t_mat Ki_mono_geo;
+	if(!tl::inverse(K_mono_geo, Ki_mono_geo))
+	{
+		res.bOk = false;
+		res.strErr = "Matrix K_mono cannot be inverted.";
+		return res;
+	}
+
+	t_mat Hi_mono_div = tl::transform_inv(Ki_mono_geo, D_mono_geo_div_trafo, true);
+	t_mat H_mono_div;
+	if(!tl::inverse(Hi_mono_div, H_mono_div))
+	{
+		res.bOk = false;
+		res.strErr = "Matrix H_mono^(-1) cannot be inverted.";
+		return res;
+	}
+
+	t_mat H_G_mono_div = H_mono_div + G_mono_collis;
+	t_mat H_Gi_mono_div;
+	if(!tl::inverse(H_G_mono_div, H_Gi_mono_div))
+	{
+		res.bOk = false;
+		res.strErr = "Matrix H_mono+G_mono cannot be inverted.";
+		return res;
+	}
+	// --------------------------------------------------------------------
+
+	// R0 calculation methods
+	if(1 /*pop.flags & CALC_GENERAL_R0*/)
+	{
+		t_real dDetH = tl::determinant(H_G_div);
+
+		// alternate, more general calculation from [zhe07], p. 10, equ. 8
+		res.dR0 = pi*pi * std::sqrt(dDetF / dDetH);
+		res.dR0 /= t_real(16.) * s_th_m * s_th_a;
+
+		// mono part, [zhe07], p. 10, equ. 10
+		t_real dDetF_mono = tl::determinant(F_mono_mosaics);
+		t_real dDetH_mono = tl::determinant(H_G_mono_div);
+		res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
+		res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
+	}
+	else
+	{
 		// resolution volume, [pop75], equ. 13a & 16
 		// [D] = 1/cm, [SI] = cm^2
 		t_mat DSiDt = tl::transform_inv(SI_geo, D_geo_div_trafo, true);
@@ -536,15 +607,13 @@ ResoResults calc_pop(const PopParams& pop)
 		DSiDti += G_collis;
 
 		t_real dDetS = tl::determinant(S_geo);
-		t_real dDetF = tl::determinant(F_mosaics);
 		t_real dDetK = tl::determinant(K_geo);
 		t_real dDetDSiDti = tl::determinant(DSiDti);
 
 		// [pop75], equs. 13a & 16
-		res.dR0 = dmono_refl*dana_effic * t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
+		res.dR0 = t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
 		res.dR0 *= std::sqrt(dDetS*dDetF / (dDetK*dDetDSiDti));
 		res.dR0 /= t_real(8.*pi*8.*pi) * s_th_m * s_th_a;
-		res.dR0 *= dxsec;
 		//res.dR0 /= pop.ki * angs;
 
 		// mono part
@@ -564,18 +633,19 @@ ResoResults calc_pop(const PopParams& pop)
 		t_real dDetDSiDti_mono = tl::determinant(DSiDti_mono);
 
 		res.dR0 /= std::sqrt(dDetS_mono*dDetF_mono / (dDetK_mono*dDetDSiDti_mono));
-		res.dR0 *= s_th_m;
-		res.dR0 = std::abs(res.dR0);
-
-
-		// rest of the prefactors, equ. 1 in [pop75], together with the mono and and ana reflectivities
-		// (defining the resolution volume) these give the same correction as in [mit84] equ. A.57
-		// NOTE: these factors are not needed, because the normalisation of the 4d gaussian distribution
-		// is already taken care of in the MC step by the employed std::normal_distribution function
-		//res.dR0 *= std::sqrt(std::abs(tl::determinant(res.reso))) / (2.*pi*2.*pi);
-		// except for the (unimportant) prefactors this is the same as dividing by the resolution volume
-		//res.dR0 /= res.dResVol * pi * t_real(3.);
+		res.dR0 *= t_real(2.)*s_th_m / dmono_refl;
 	}
+
+	res.dR0 *= dmono_refl * dana_effic * dxsec * dmonitor;
+	res.dR0 = std::abs(res.dR0);
+
+	// rest of the prefactors, equ. 1 in [pop75], together with the mono and and ana reflectivities
+	// (defining the resolution volume) these give the same correction as in [mit84] equ. A.57
+	// NOTE: these factors are not needed, because the normalisation of the 4d gaussian distribution
+	// is already taken care of in the MC step by the employed std::normal_distribution function
+	//res.dR0 *= std::sqrt(std::abs(tl::determinant(res.reso))) / (2.*pi*2.*pi);
+	// except for the (unimportant) prefactors this is the same as dividing by the resolution volume
+	//res.dR0 /= res.dResVol * pi * t_real(3.);
 	// --------------------------------------------------------------------
 
 	// Bragg widths

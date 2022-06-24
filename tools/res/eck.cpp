@@ -474,6 +474,7 @@ ResoResults calc_eck(const EckParams& eck)
 
 	res.dR0 *= std::exp(-W);
 	res.dR0 *= dxsec;
+	res.dR0 = std::abs(res.dR0);
 
 	// Bragg widths
 	const std::vector<t_real> vecFwhms = calc_bragg_fwhms(res.reso);

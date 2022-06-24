@@ -7,6 +7,7 @@
  * @desc see:
  *	[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973)
  *	[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
+ *      [zhe07] A. Zheludev, ResLib 3.4 manual (2007), https://ethz.ch/content/dam/ethz/special-interest/phys/solid-state-physics/neutron-scattering-and-magnetism-dam/images/research/manual.pdf
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -68,22 +69,26 @@ static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
 /**
  * scattering factors
  */
-std::tuple<t_real, t_real, t_real> get_scatter_factors(std::size_t flags,
+std::tuple<t_real, t_real, t_real, t_real> get_scatter_factors(
+	std::size_t flags,
 	const angle& thetam, const wavenumber& ki,
 	const angle& thetaa, const wavenumber& kf)
 {
 	t_real dmono = t_real(1);
 	t_real dana = t_real(1);
 	t_real dSqwToXSec = t_real(1);
+	t_real dmonitor = t_real(1);
 
 	if(flags & CALC_KI3)
 		dmono *= tl::ana_effic_factor(ki, units::abs(thetam));
 	if(flags & CALC_KF3)
 		dana *= tl::ana_effic_factor(kf, units::abs(thetaa));
 	if(flags & CALC_KFKI)
-		dSqwToXSec *= kf/ki;	// see Shirane, equ. (2.7)
+		dSqwToXSec *= kf/ki;  // kf/ki factor, see Shirane, equ. (2.7)
+	if(flags & CALC_MONKI)
+		dmonitor /= ki*angs;  // monitor 1/ki factor, see [zhe07], p. 10
 
-	return std::make_tuple(dmono, dana, dSqwToXSec);
+	return std::make_tuple(dmono, dana, dSqwToXSec, dmonitor);
 }
 
 // -----------------------------------------------------------------------------

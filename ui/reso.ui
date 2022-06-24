@@ -539,22 +539,22 @@
            <number>1</number>
           </property>
           <item row="0" column="0">
-           <widget class="QCheckBox" name="checkUseR0">
+           <widget class="QCheckBox" name="checkUseGeneralR0">
             <property name="toolTip">
-             <string>Resolution pre-factor.</string>
+             <string>Use generalised R0 calculation method. Should normally be left unchecked.</string>
             </property>
             <property name="text">
-             <string>Use R0 Factor</string>
+             <string>Use Generalised R0 Factor</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QCheckBox" name="checkUseKi3">
             <property name="toolTip">
-             <string>Monochromator factor. Leave unchecked if a monitor counter is used in the ki axis.</string>
+             <string>Monochromator factor. Not needed if a monitor counter is used in the ki axis.</string>
             </property>
             <property name="text">
              <string>Use ki³ Factor</string>
@@ -564,10 +564,10 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QCheckBox" name="checkUseKf3">
             <property name="toolTip">
-             <string>Analyser factor. Leave unchecked for kf=const mode.</string>
+             <string>Analyser factor. Not needed for kf=const mode.</string>
             </property>
             <property name="text">
              <string>Use kf³ Factor</string>
@@ -577,26 +577,39 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="checkUseKfKi">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkUseKi">
             <property name="toolTip">
-             <string>Factor in conversion from dynamical structure factor S(Q,E) to double-differential scattering cross-section. Leave unchecked if a monitor counter is used in the ki axis.</string>
+             <string>Monitor factor. In kf=const mode, this and the kf/ki factor cancel out, and are not needed.</string>
             </property>
             <property name="text">
-             <string>Use kf/ki Factor</string>
+             <string>Use 1/ki Factor</string>
             </property>
             <property name="checked">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkUseGeneralR0">
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="checkUseMonitor">
             <property name="toolTip">
-             <string>Use generalised R0 calculation method via the ki and kf resolution volumes instead. Should normally be left unchecked.</string>
+             <string>Normalise R0 to the incoming resolution volume.</string>
             </property>
             <property name="text">
-             <string>Use Generalised R0 Factor</string>
+             <string>Monitor Counter in ki Axis</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="checkUseKfKi">
+            <property name="toolTip">
+             <string>Factor in conversion from dynamical structure factor S(Q,E) to double-differential scattering cross-section. Not needed if a monitor counter is used in the ki axis.</string>
+            </property>
+            <property name="text">
+             <string>Use kf/ki Factor</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -3570,6 +3583,9 @@
   <tabstop>checkUseGeneralR0</tabstop>
   <tabstop>checkUseKi3</tabstop>
   <tabstop>checkUseKf3</tabstop>
+  <tabstop>checkUseKi</tabstop>
+  <tabstop>checkUseMonitor</tabstop>
+  <tabstop>checkUseKfKi</tabstop>
   <tabstop>spinMonoW</tabstop>
   <tabstop>spinMonoH</tabstop>
   <tabstop>spinMonoThick</tabstop>

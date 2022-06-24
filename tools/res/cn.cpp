@@ -250,6 +250,7 @@ ResoResults calc_cn(const CNParams& cn)
 	res.dR0 = chess_R0(cn.ki,cn.kf, thetam, thetaa, cn.twotheta, cn.mono_mosaic,
 		cn.ana_mosaic, cn.coll_v_pre_mono, cn.coll_v_post_ana, dmono_refl, dana_effic);
 	res.dR0 *= dxsec;
+	res.dR0 = std::abs(res.dR0);
 
 	// Bragg widths
 	const std::vector<t_real> vecFwhms = calc_bragg_fwhms(res.reso);

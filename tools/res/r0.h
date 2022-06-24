@@ -37,6 +37,14 @@
 #include "tlibs/phys/neutrons.h"
 
 
+extern std::tuple<t_real_reso, t_real_reso, t_real_reso, t_real_reso>
+	get_scatter_factors(std::size_t flags,
+		const tl::t_angle_si<t_real_reso>& thetam,
+		const tl::t_wavenumber_si<t_real_reso>& ki,
+		const tl::t_angle_si<t_real_reso>& thetaa,
+		const tl::t_wavenumber_si<t_real_reso>& kf);
+
+
 /**
  * R0 factor from formula (2) in [ch73]
  */

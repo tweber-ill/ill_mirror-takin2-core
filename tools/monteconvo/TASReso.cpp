@@ -203,10 +203,14 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 		m_reso.flags |= CALC_KFKI;
 	else
 		m_reso.flags &= ~CALC_KFKI;
-	if(xml.Query<int>((strXmlRoot + "reso/use_R0").c_str(), 1))
-		m_reso.flags |= CALC_R0;
+	if(xml.Query<int>((strXmlRoot + "reso/use_monki").c_str(), 1))
+		m_reso.flags |= CALC_MONKI;
 	else
-		m_reso.flags &= ~CALC_R0;
+		m_reso.flags &= ~CALC_MONKI;
+	if(xml.Query<int>((strXmlRoot + "reso/use_mon").c_str(), 1))
+		m_reso.flags |= CALC_MON;
+	else
+		m_reso.flags &= ~CALC_MON;
 	if(xml.Query<int>((strXmlRoot + "reso/use_general_R0").c_str(), 0))
 		m_reso.flags |= CALC_GENERAL_R0;
 	else
@@ -496,7 +500,6 @@ bool TASReso::SetHKLE(t_real h, t_real k, t_real l, t_real E)
 		else if(m_algo == ResoAlgo::VIOL)
 		{
 			//tl::log_info("Algorithm: Violini (TOF)");
-			m_reso.flags &= ~CALC_R0;
 			resores_cur = calc_viol(m_tofreso);
 		}
 		else

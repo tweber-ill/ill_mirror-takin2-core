@@ -44,13 +44,14 @@ using t_real_reso = ::t_real_glob;
 
 enum ResoFlags : std::size_t
 {
-	CALC_R0     = 1<<0,
-//	CALC_RESVOL	= 1<<1,
+//	CALC_RESVOL	= 1<<0,
 
-	CALC_KI3    = 1<<2,
-	CALC_KF3    = 1<<3,
+	CALC_KI3        = 1<<0,
+	CALC_KF3        = 1<<1,
 
-	CALC_KFKI   = 1<<4,
+	CALC_KFKI       = 1<<2,
+	CALC_MONKI      = 1<<3,
+	CALC_MON        = 1<<4,
 
 	CALC_GENERAL_R0	= 1<<5,
 };
@@ -61,13 +62,13 @@ struct ResoResults
 	bool bOk;
 	std::string strErr;
 
-	ublas::matrix<t_real_reso> reso;	// quadratic part of quadric
-	ublas::vector<t_real_reso> reso_v;	// linear part of quadric
-	t_real_reso reso_s;					// constant part of quadric
+	ublas::matrix<t_real_reso> reso;    // quadratic part of quadric
+	ublas::vector<t_real_reso> reso_v;  // linear part of quadric
+	t_real_reso reso_s;                 // constant part of quadric
 
 	ublas::vector<t_real_reso> Q_avg;
-	t_real_reso dR0;		// resolution prefactor
-	t_real_reso dResVol;	// resolution volume in 1/A^3 * meV
+	t_real_reso dR0;                    // resolution prefactor
+	t_real_reso dResVol;                // resolution volume in 1/A^3 * meV
 
 	t_real_reso dBraggFWHMs[4];
 };
