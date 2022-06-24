@@ -148,6 +148,18 @@ ResoResults calc_cn(const CNParams& cn)
 	t_real dxsec = std::get<2>(tupScFact);
 
 
+	// if no vertical mosaic is given, use the horizontal one
+	angle mono_mosaic_v = cn.mono_mosaic_v;
+	angle ana_mosaic_v = cn.ana_mosaic_v;
+	//angle sample_mosaic_v = cn.sample_mosaic_v;
+	if(tl::float_equal<t_real>(mono_mosaic_v/rads, 0.), 0.)
+		mono_mosaic_v = cn.mono_mosaic;
+	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
+		ana_mosaic_v = cn.ana_mosaic;
+	//if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
+	//	sample_mosaic_v = cn.sample_mosaic;
+
+
 	// -------------------------------------------------------------------------
 	// resolution matrix, [mit84], equ. A.5
 	t_mat M = ublas::zero_matrix<t_real>(6,6);
@@ -194,13 +206,13 @@ ResoResults calc_cn(const CNParams& cn)
 	std::future<std::pair<t_mat, t_real>> futMono
 		= std::async(lpol, calc_mono_ana_res,
 			thetam, cn.ki,
-			cn.mono_mosaic, cn.mono_mosaic_v,
+			cn.mono_mosaic, mono_mosaic_v,
 			cn.coll_h_pre_mono, cn.coll_h_pre_sample,
 			cn.coll_v_pre_mono, cn.coll_v_pre_sample);
 	std::future<std::pair<t_mat, t_real>> futAna
 		= std::async(lpol, calc_mono_ana_res,
 			-thetaa, cn.kf,
-			cn.ana_mosaic, cn.ana_mosaic_v,
+			cn.ana_mosaic, ana_mosaic_v,
 			cn.coll_h_post_ana, cn.coll_h_post_sample,
 			cn.coll_v_post_ana, cn.coll_v_post_sample);
 
@@ -243,8 +255,10 @@ ResoResults calc_cn(const CNParams& cn)
 
 
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
-	res.dR0 = chess_R0(cn.ki,cn.kf, thetam, thetaa, cn.twotheta, cn.mono_mosaic,
-		cn.ana_mosaic, cn.coll_v_pre_mono, cn.coll_v_post_ana, dmono_refl, dana_effic);
+	res.dR0 = chess_R0(cn.ki,cn.kf, thetam, thetaa, cn.twotheta,
+		cn.mono_mosaic, cn.ana_mosaic,
+		cn.coll_v_pre_mono, cn.coll_v_post_ana,
+		dmono_refl, dana_effic);
 	res.dR0 *= dxsec;
 	res.dR0 = std::abs(res.dR0);
 

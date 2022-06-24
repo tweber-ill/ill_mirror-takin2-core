@@ -293,14 +293,14 @@ ResoResults calc_eck(const EckParams& eck)
 
 	// if no vertical mosaic is given, use the horizontal one
 	angle mono_mosaic_v = eck.mono_mosaic_v;
-	angle sample_mosaic_v = eck.sample_mosaic_v;
 	angle ana_mosaic_v = eck.ana_mosaic_v;
+	//angle sample_mosaic_v = eck.sample_mosaic_v;
 	if(tl::float_equal<t_real>(mono_mosaic_v/rads, 0.), 0.)
 		mono_mosaic_v = eck.mono_mosaic;
-	if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
-		sample_mosaic_v = eck.sample_mosaic;
 	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
 		ana_mosaic_v = eck.ana_mosaic;
+	//if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
+	//	sample_mosaic_v = eck.sample_mosaic;
 
 
 	//--------------------------------------------------------------------------
