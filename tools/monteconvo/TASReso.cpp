@@ -192,23 +192,23 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 	}
 
 
-	if(xml.Query<int>((strXmlRoot + "reso/use_ki3").c_str(), 1))
+	if(xml.Query<int>((strXmlRoot + "reso/use_ki3").c_str(), /*1*/ 0))
 		m_reso.flags |= CALC_KI3;
 	else
 		m_reso.flags &= ~CALC_KI3;
-	if(xml.Query<int>((strXmlRoot + "reso/use_kf3").c_str(), 1))
+	if(xml.Query<int>((strXmlRoot + "reso/use_kf3").c_str(), /*1*/ 0))
 		m_reso.flags |= CALC_KF3;
 	else
 		m_reso.flags &= ~CALC_KF3;
-	if(xml.Query<int>((strXmlRoot + "reso/use_kfki").c_str(), 1))
+	if(xml.Query<int>((strXmlRoot + "reso/use_kfki").c_str(), /*1*/ 0))
 		m_reso.flags |= CALC_KFKI;
 	else
 		m_reso.flags &= ~CALC_KFKI;
-	if(xml.Query<int>((strXmlRoot + "reso/use_monki").c_str(), 1))
+	if(xml.Query<int>((strXmlRoot + "reso/use_monki").c_str(), /*1*/ 0))
 		m_reso.flags |= CALC_MONKI;
 	else
 		m_reso.flags &= ~CALC_MONKI;
-	if(xml.Query<int>((strXmlRoot + "reso/use_mon").c_str(), 1))
+	if(xml.Query<int>((strXmlRoot + "reso/use_mon").c_str(), /*1*/ 0))
 		m_reso.flags |= CALC_MON;
 	else
 		m_reso.flags &= ~CALC_MON;
