@@ -195,7 +195,7 @@ void ResoDlg::WriteLastConfig()
 		m_pSettings->setValue(m_vecComboNames[iCombo].c_str(), m_vecComboBoxes[iCombo]->currentIndex());
 
 	const int iAlgo = static_cast<int>(ResoDlg::GetSelectedAlgo());
-		m_pSettings->setValue("reso/algo", iAlgo);
+		m_pSettings->setValue("reso/algo_idx", iAlgo);
 
 	m_pSettings->setValue("reso/use_guide", groupGuide->isChecked());
 }
@@ -272,8 +272,8 @@ void ResoDlg::ReadLastConfig()
 			m_pSettings->value(m_vecComboNames[iCombo].c_str()).value<int>());
 	}
 
-	if(m_pSettings->contains("reso/algo"))
-		SetSelectedAlgo(static_cast<ResoAlgo>(m_pSettings->value("reso/algo").value<int>()));
+	if(m_pSettings->contains("reso/algo_idx"))
+		SetSelectedAlgo(static_cast<ResoAlgo>(m_pSettings->value("reso/algo_idx").value<int>()));
 
 	groupGuide->setChecked(m_pSettings->value("reso/use_guide").value<bool>());
 
@@ -328,8 +328,33 @@ void ResoDlg::Save(std::map<std::string, std::string>& mapConf, const std::strin
 	for(std::size_t iCombo=0; iCombo<m_vecComboBoxes.size(); ++iCombo)
 		mapConf[strXmlRoot + m_vecComboNames[iCombo]] = tl::var_to_str<int>(m_vecComboBoxes[iCombo]->currentIndex());
 
-	const int iAlgo = static_cast<int>(ResoDlg::GetSelectedAlgo());
-		mapConf[strXmlRoot + "reso/algo"] = tl::var_to_str<int>(iAlgo);
+	ResoAlgo algo = ResoDlg::GetSelectedAlgo();
+	const int iAlgo = static_cast<int>(algo);
+	mapConf[strXmlRoot + "reso/algo_idx"] = tl::var_to_str<int>(static_cast<int>(algo));
+
+	switch(algo)
+	{
+		case ResoAlgo::CN:
+			mapConf[strXmlRoot + "reso/algo"] = "cn";
+			break;
+		case ResoAlgo::POP_CN:
+			mapConf[strXmlRoot + "reso/algo"] = "pop_cn";
+			break;
+		case ResoAlgo::POP:
+			mapConf[strXmlRoot + "reso/algo"] = "pop";
+			break;
+		case ResoAlgo::ECK:
+			mapConf[strXmlRoot + "reso/algo"] = "eck";
+			break;
+		case ResoAlgo::VIOL:
+			mapConf[strXmlRoot + "reso/algo"] = "viol";
+			break;
+		case ResoAlgo::SIMPLE:
+			mapConf[strXmlRoot + "reso/algo"] = "simple";
+			break;
+		default:
+			break;
+	}
 
 	mapConf[strXmlRoot + "reso/use_guide"] = groupGuide->isChecked() ? "1" : "0";
 
@@ -405,8 +430,29 @@ void ResoDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 		if(oiComboIdx) m_vecComboBoxes[iCombo]->setCurrentIndex(*oiComboIdx);
 	}
 
-	boost::optional<int> oiAlgo = xml.QueryOpt<int>(strXmlRoot + "reso/algo");
-	if(oiAlgo) SetSelectedAlgo(static_cast<ResoAlgo>(*oiAlgo));
+	// get reso algo by name
+	boost::optional<std::string> opAlgo = xml.QueryOpt<std::string>(strXmlRoot+"reso/algo");
+	if(opAlgo)
+	{
+		if(*opAlgo == "cn")
+			SetSelectedAlgo(ResoAlgo::CN);
+		else if(*opAlgo == "pop_cn")
+			SetSelectedAlgo(ResoAlgo::POP_CN);
+		else if(*opAlgo == "pop")
+			SetSelectedAlgo(ResoAlgo::POP);
+		else if(*opAlgo == "eck")
+			SetSelectedAlgo(ResoAlgo::ECK);
+		else if(*opAlgo == "viol")
+			SetSelectedAlgo(ResoAlgo::VIOL);
+		else if(*opAlgo == "simple")
+			SetSelectedAlgo(ResoAlgo::SIMPLE);
+	}
+	else
+	{
+		// get reso algo by index
+		boost::optional<int> oiAlgo = xml.QueryOpt<int>(strXmlRoot + "reso/algo_idx");
+		if(oiAlgo) SetSelectedAlgo(static_cast<ResoAlgo>(*oiAlgo));
+	}
 
 	boost::optional<int> obGroupVal = xml.QueryOpt<int>(strXmlRoot+"reso/use_guide");
 	if(obGroupVal) groupGuide->setChecked(*obGroupVal);

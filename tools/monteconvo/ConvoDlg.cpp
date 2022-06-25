@@ -106,11 +106,13 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	m_vecTextBoxes = { editSqwParams };
 	m_vecTextNames = { "convofit/sqw_params" };
 
-	m_vecComboBoxes = { comboAlgo, comboFixedK, comboFocMono, comboFocAna,
+	m_vecComboBoxes = { comboAlgo,
+		comboFixedK, comboFocMono, comboFocAna,
 		comboFitter, comboAxis, comboAxis2,
 	};
-	m_vecComboNames = { "monteconvo/algo", "monteconvo/fixedk", "monteconvo/mono_foc",
-		"monteconvo/ana_foc", "convofit/minimiser", "convofit/scanaxis", "convofit/scanaxis2",
+	m_vecComboNames = { "monteconvo/algo_idx",
+		"monteconvo/fixedk", "monteconvo/mono_foc", "monteconvo/ana_foc",
+		"convofit/minimiser", "convofit/scanaxis", "convofit/scanaxis2",
 	};
 
 	m_vecCheckBoxes = { checkScan, check2dMap,

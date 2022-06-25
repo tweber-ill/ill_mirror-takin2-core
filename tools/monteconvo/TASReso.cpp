@@ -324,7 +324,37 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 	m_tofreso.det_shape = tofdet;
 
 
-	m_algo = ResoAlgo(xml.Query<int>((strXmlRoot + "reso/algo").c_str(), 0));
+	// get selected reso algo
+	std::string algo = xml.Query<std::string>((strXmlRoot + "reso/algo").c_str(), "");
+	if(algo == "cn")
+		m_algo = ResoAlgo::CN;
+	else if(algo == "pop_cn")
+		m_algo = ResoAlgo::POP_CN;
+	else if(algo == "pop")
+		m_algo = ResoAlgo::POP;
+	else if(algo == "eck")
+		m_algo = ResoAlgo::ECK;
+	else if(algo == "viol")
+		m_algo = ResoAlgo::VIOL;
+	else
+	{
+		// in former versions, an index was used
+		int algo_idx = xml.Query<int>((strXmlRoot + "reso/algo").c_str(), 0);
+		if(algo_idx == 0)
+			m_algo = ResoAlgo::CN;
+		else if(algo_idx == 1)
+			m_algo = ResoAlgo::POP;
+		else if(algo_idx == 2)
+			m_algo = ResoAlgo::ECK;
+		else if(algo_idx == 3)
+			m_algo = ResoAlgo::VIOL;
+		else
+		{
+			// get the index instead
+			m_algo = ResoAlgo(xml.Query<int>(
+				(strXmlRoot + "reso/algo_idx").c_str(), 0));
+		}
+	}
 
 
 	// preliminary position

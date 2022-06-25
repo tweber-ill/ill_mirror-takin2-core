@@ -301,6 +301,21 @@ void ConvoDlg::Save(std::map<std::string, std::string>& mapConf, const std::stri
 			comboSqw->itemData(comboSqw->currentIndex()).toString().toStdString();
 	}
 
+	// save reso algo name
+	int algo_idx = comboAlgo->currentIndex();
+	std::string algo_name = "unknown";
+	if(algo_idx == 0)
+		algo_name = "cn";
+	else if(algo_idx == 1)
+		algo_name = "pop_cn";
+	else if(algo_idx == 2)
+		algo_name = "pop";
+	else if(algo_idx == 3)
+		algo_name = "eck";
+	else if(algo_idx == 4)
+		algo_name = "viol";
+	mapConf[strXmlRoot + "monteconvo/algo"] = algo_name;
+
 	const char* pcUser = std::getenv("USER");
 	if(!pcUser) pcUser = "";
 	mapConf[strXmlRoot + "meta/timestamp"] = tl::var_to_str<t_real>(tl::epoch<t_real>());
