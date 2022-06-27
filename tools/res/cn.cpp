@@ -147,6 +147,7 @@ ResoResults calc_cn(const CNParams& cn)
 	if(cn.mono_refl_curve) dmono_refl *= (*cn.mono_refl_curve)(cn.ki);
 	if(cn.ana_effic_curve) dana_effic *= (*cn.ana_effic_curve)(cn.kf);
 	t_real dxsec = std::get<2>(tupScFact);
+	t_real dmonitor = std::get<3>(tupScFact);
 
 
 	// if no vertical mosaic is given, use the horizontal one
@@ -268,12 +269,16 @@ ResoResults calc_cn(const CNParams& cn)
 	// -------------------------------------------------------------------------
 
 
+	bool use_monitor = (cn.flags & CALC_MON) != 0;
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
-	res.dR0 = chess_R0(cn.ki,cn.kf, thetam, thetaa, cn.twotheta,
+	res.dR0 = dana_effic * dxsec * dmonitor;
+	if(!use_monitor)
+		res.dR0 /= dmono_refl;
+	res.dR0 *= chess_R0(use_monitor, cn.ki, cn.kf,
+		thetam, thetaa, cn.twotheta,
 		cn.mono_mosaic, cn.ana_mosaic,
 		cn.coll_v_pre_mono, cn.coll_v_post_ana,
 		dmono_refl, dana_effic);
-	res.dR0 *= dxsec;
 	res.dR0 = std::abs(res.dR0);
 
 	// Bragg widths

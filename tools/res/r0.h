@@ -38,17 +38,17 @@
 
 
 extern std::tuple<t_real_reso, t_real_reso, t_real_reso, t_real_reso>
-	get_scatter_factors(std::size_t flags,
-		const tl::t_angle_si<t_real_reso>& thetam,
-		const tl::t_wavenumber_si<t_real_reso>& ki,
-		const tl::t_angle_si<t_real_reso>& thetaa,
-		const tl::t_wavenumber_si<t_real_reso>& kf);
+get_scatter_factors(std::size_t flags,
+	const tl::t_angle_si<t_real_reso>& thetam,
+	const tl::t_wavenumber_si<t_real_reso>& ki,
+	const tl::t_angle_si<t_real_reso>& thetaa,
+	const tl::t_wavenumber_si<t_real_reso>& kf);
 
 
 /**
  * R0 factor from formula (2) in [ch73]
  */
-extern t_real_reso chess_R0(
+extern t_real_reso chess_R0(bool norm_to_ki_vol,
 	tl::t_wavenumber_si<t_real_reso> ki, tl::t_wavenumber_si<t_real_reso> kf,
         tl::t_angle_si<t_real_reso> theta_m, tl::t_angle_si<t_real_reso> theta_a,
 	tl::t_angle_si<t_real_reso> twotheta_s,
@@ -61,11 +61,14 @@ extern t_real_reso chess_R0(
  * general R0 normalisation factor from [mit84], equ. A.57
  */
 template<class t_real = double>
-t_real mitch_R0(t_real dmono_refl, t_real dana_effic,
+t_real mitch_R0(bool norm_to_ki_vol,
+	t_real dmono_refl, t_real dana_effic,
 	t_real dKiVol, t_real dKfVol, t_real dResVol,
-	bool bNormToResVol=0)
+	bool bNormToResVol = false)
 {
-	t_real dR0 = dmono_refl * dKiVol * dana_effic * dKfVol;
+	t_real dR0 = dana_effic * dKfVol;
+	if(!norm_to_ki_vol)
+		dR0 *= dmono_refl * dKiVol;
 
 	// not needed for MC simulations, because the gaussian generated
 	// with std::normal_distribution is already normalised

@@ -289,6 +289,7 @@ ResoResults calc_eck(const EckParams& eck)
 	if(eck.mono_refl_curve) dmono_refl *= (*eck.mono_refl_curve)(eck.ki);
 	if(eck.ana_effic_curve) dana_effic *= (*eck.ana_effic_curve)(eck.kf);
 	t_real dxsec = std::get<2>(tupScFact);
+	t_real dmonitor = std::get<3>(tupScFact);
 
 
 	// if no vertical mosaic is given, use the horizontal one
@@ -441,7 +442,7 @@ ResoResults calc_eck(const EckParams& eck)
 	t_vec V2 = quadric_proj(V1, U1, 5);
 	t_vec V = quadric_proj(V2, U2, 4);
 
-	t_real W = (C + D + G + H);
+	t_real W = C + D + G + H;
 	// squares in Vs missing in paper? (thanks to F. Bourdarot for pointing this out)
 	W -= 0.25*V1[5]*V1[5]/U1(5,5) + 0.25*V2[4]*V2[4]/U2(4,4);
 
@@ -468,24 +469,29 @@ ResoResults calc_eck(const EckParams& eck)
 
 	// prefactor and volume
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
+	bool use_monitor = (eck.flags & CALC_MON) != 0;
 
 	if(eck.flags & CALC_GENERAL_R0)
 	{
 		// alternate R0 normalisation factor, see [mit84], equ. A.57
-		res.dR0 = mitch_R0<t_real>(dmono_refl, dana_effic,
-			tl::get_ellipsoid_volume(A), tl::get_ellipsoid_volume(E), res.dResVol, false);
+		res.dR0 = mitch_R0<t_real>(use_monitor, dmono_refl, dana_effic,
+			tl::get_ellipsoid_volume(A), tl::get_ellipsoid_volume(E),
+			res.dResVol, false);
 	}
 	else
 	{
 		res.dR0 = Z;
+		if(use_monitor)
+			res.dR0 /= dReflM * tl::get_ellipsoid_volume(A);
+
 		// missing volume prefactor to normalise gaussian,
 		// cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
 		//res.dR0 /= std::sqrt(std::abs(tl::determinant(res.reso))) / (2.*pi*2.*pi);
-		res.dR0 *= res.dResVol * pi * t_real(3.);
+		//res.dR0 *= res.dResVol * pi * t_real(3.);
 	}
 
 	res.dR0 *= std::exp(-W);
-	res.dR0 *= dxsec;
+	res.dR0 *= dxsec * dmonitor;
 	res.dR0 = std::abs(res.dR0);
 
 	// Bragg widths

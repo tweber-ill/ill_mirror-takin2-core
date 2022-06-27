@@ -131,11 +131,13 @@ t_real R0_J(wavenumber ki, wavenumber kf, angle twotheta)
 /**
  * R0 factor from formula (2) in [ch73]
  */
-t_real chess_R0(wavenumber ki, wavenumber kf,
+t_real chess_R0(bool norm_to_ki_vol,
+	wavenumber ki, wavenumber kf,
 	angle theta_m, angle theta_a, angle twotheta_s,
 	angle mos_m, angle mos_a, angle coll_pre_mono_v, angle coll_post_ana_v,
 	t_real refl_m, t_real refl_a)
 {
+	// TODO: norm_to_ki_vol
 	return R0_J(ki, kf, twotheta_s) *
 		R0_P(theta_m, coll_pre_mono_v, mos_m) * R0_P(theta_a, coll_post_ana_v, mos_a) *
 		R0_N(theta_m, mos_m, refl_m) * R0_N(theta_a, mos_a, refl_a);
