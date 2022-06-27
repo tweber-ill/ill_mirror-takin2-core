@@ -5,7 +5,7 @@
  * @license GPLv2
  *
  * @desc see:
- *	[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973)
+ *	[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973), doi: 10.1107/S0567739473000422
  *	[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
  *      [zhe07] A. Zheludev, ResLib 3.4 manual (2007), https://ethz.ch/content/dam/ethz/special-interest/phys/solid-state-physics/neutron-scattering-and-magnetism-dam/images/research/manual.pdf
  *
@@ -137,9 +137,16 @@ t_real chess_R0(bool norm_to_ki_vol,
 	angle mos_m, angle mos_a, angle coll_pre_mono_v, angle coll_post_ana_v,
 	t_real refl_m, t_real refl_a)
 {
-	// TODO: norm_to_ki_vol
-	return R0_J(ki, kf, twotheta_s) *
-		R0_P(theta_m, coll_pre_mono_v, mos_m) * R0_P(theta_a, coll_post_ana_v, mos_a) *
-		R0_N(theta_m, mos_m, refl_m) * R0_N(theta_a, mos_a, refl_a);
+	t_real R0 = R0_J(ki, kf, twotheta_s);
+
+	// kf volumne
+	R0 *= R0_P(theta_a, coll_post_ana_v, mos_a) * R0_N(theta_a, mos_a, refl_a);
+
+	// ki volume
+	if(!norm_to_ki_vol)
+		R0 *= R0_P(theta_m, coll_pre_mono_v, mos_m) * R0_N(theta_m, mos_m, refl_m);
+
+	// TODO: R0x,z factors
+	return R0;
 }
 // -----------------------------------------------------------------------------

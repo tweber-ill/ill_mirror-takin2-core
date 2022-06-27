@@ -168,7 +168,7 @@ ResoResults calc_cn(const CNParams& cn)
 		[](angle theta, wavenumber k,
 		angle mosaic, angle mosaic_v,
 		angle coll1, angle coll2,
-		angle coll1_v, angle coll2_v) -> std::pair<t_mat, t_real>
+		angle coll1_v, angle coll2_v) -> t_mat
 	{
 		// horizontal part
 		t_vec vecMos(2);
@@ -190,43 +190,45 @@ ResoResults calc_cn(const CNParams& cn)
 			ublas::outer_prod(vecColl1, vecColl1) +
 			ublas::outer_prod(vecColl2, vecColl2);
 
+		t_real s_th = units::sin(theta);
+
 		// vertical part, [mit84], equ. A.9 & A.13
 		t_real dVert = t_real(1)/(k*k * angs*angs) * rads*rads *
 		(
 			t_real(1) / (coll2_v * coll2_v) +
 			t_real(1) / (
-				(t_real(2)*units::sin(theta) * mosaic_v) *
-				(t_real(2)*units::sin(theta) * mosaic_v) +
+				(t_real(2)*s_th * mosaic_v) *
+				(t_real(2)*s_th * mosaic_v) +
 				coll1_v * coll1_v)
 		);
 
-		return std::pair<t_mat, t_real>(matHori, dVert);
+		t_mat matFull = ublas::zero_matrix<t_real>(3, 3);
+		tl::submatrix_copy(matFull, matHori, 0, 0);
+		matFull(2, 2) = dVert;
+
+		return matFull;
 	};
 
 	std::launch lpol = /*std::launch::deferred |*/ std::launch::async;
-	std::future<std::pair<t_mat, t_real>> futMono
+	std::future<t_mat> futMono
 		= std::async(lpol, calc_mono_ana_res,
 			thetam, cn.ki,
 			cn.mono_mosaic, mono_mosaic_v,
 			cn.coll_h_pre_mono, cn.coll_h_pre_sample,
 			cn.coll_v_pre_mono, cn.coll_v_pre_sample);
-	std::future<std::pair<t_mat, t_real>> futAna
+	std::future<t_mat> futAna
 		= std::async(lpol, calc_mono_ana_res,
 			-thetaa, cn.kf,
 			cn.ana_mosaic, ana_mosaic_v,
 			cn.coll_h_post_ana, cn.coll_h_post_sample,
 			cn.coll_v_post_ana, cn.coll_v_post_sample);
 
-	t_mat matMonoH, matAnaH;
-	t_real dMonoV, dAnaV;
-	std::tie(matMonoH, dMonoV) = futMono.get();
-	std::tie(matAnaH, dAnaV) = futAna.get();
+	t_mat matMono = futMono.get();
+	t_mat matAna = futAna.get();
 
 	t_mat M = ublas::zero_matrix<t_real>(6, 6);
-	tl::submatrix_copy(M, matMonoH, 0, 0);
-	tl::submatrix_copy(M, matAnaH, 3, 3);
-	M(2, 2) = dMonoV;
-	M(5, 5) = dAnaV;
+	tl::submatrix_copy(M, matMono, 0, 0);
+	tl::submatrix_copy(M, matAna, 3, 3);
 	// -------------------------------------------------------------------------
 
 
@@ -268,17 +270,20 @@ ResoResults calc_cn(const CNParams& cn)
 
 	// -------------------------------------------------------------------------
 
-
 	bool use_monitor = (cn.flags & CALC_MON) != 0;
+
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = dana_effic * dxsec * dmonitor;
 	if(!use_monitor)
-		res.dR0 /= dmono_refl;
-	res.dR0 *= chess_R0(use_monitor, cn.ki, cn.kf,
+		res.dR0 *= dmono_refl;
+
+	res.dR0 *= chess_R0(use_monitor,
+		cn.ki, cn.kf,
 		thetam, thetaa, cn.twotheta,
 		cn.mono_mosaic, cn.ana_mosaic,
 		cn.coll_v_pre_mono, cn.coll_v_post_ana,
 		dmono_refl, dana_effic);
+
 	res.dR0 = std::abs(res.dR0);
 
 	// Bragg widths

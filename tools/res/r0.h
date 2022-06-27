@@ -6,7 +6,7 @@
  *
  * @desc see:
  *	[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973)
- *	[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984)
+ *	[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)

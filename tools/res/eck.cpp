@@ -487,7 +487,7 @@ ResoResults calc_eck(const EckParams& eck)
 		// missing volume prefactor to normalise gaussian,
 		// cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
 		//res.dR0 /= std::sqrt(std::abs(tl::determinant(res.reso))) / (2.*pi*2.*pi);
-		//res.dR0 *= res.dResVol * pi * t_real(3.);
+		res.dR0 *= res.dResVol * pi * t_real(3.);
 	}
 
 	res.dR0 *= std::exp(-W);
