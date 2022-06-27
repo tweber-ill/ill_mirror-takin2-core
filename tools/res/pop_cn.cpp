@@ -185,6 +185,7 @@ ResoResults calc_pop_cn(const CNParams& pop)
 	const t_real cot_th_a = c_th_a / s_th_a;
 	const t_real s_th_s = units::sin(t_real(0.5)*twotheta);
 	const t_real c_th_s = units::cos(t_real(0.5)*twotheta);
+	const t_real sign_z = -1.;  // to compare with the calculations by F. Bourdarot
 
 	// A matrix, [pop75], Appendix 1
 	auto get_div_monosample = [](t_real ki, t_real cot_th_m) -> std::tuple<t_real, t_real>
@@ -200,13 +201,13 @@ ResoResults calc_pop_cn(const CNParams& pop)
 	A_div_kikf_trafo(POP_KI_X, POP_PREMONO_H) = std::get<0>(div_ki);
 	A_div_kikf_trafo(POP_KI_X, POP_PRESAMPLE_H) = std::get<1>(div_ki);
 	A_div_kikf_trafo(POP_KI_Y, POP_PRESAMPLE_H) = pop.ki * angs;
-	A_div_kikf_trafo(POP_KI_Z, POP_PRESAMPLE_V) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_Z, POP_PRESAMPLE_V) = sign_z * pop.ki * angs;
 
 	auto div_kf = get_div_monosample(pop.kf*angs, -cot_th_a);
 	A_div_kikf_trafo(POP_KF_X, POP_POSTANA_H) = std::get<0>(div_kf);
 	A_div_kikf_trafo(POP_KF_X, POP_POSTSAMPLE_H) = std::get<1>(div_kf);
 	A_div_kikf_trafo(POP_KF_Y, POP_POSTSAMPLE_H) = pop.kf * angs;
-	A_div_kikf_trafo(POP_KF_Z, POP_POSTSAMPLE_V) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_Z, POP_POSTSAMPLE_V) = sign_z * pop.kf * angs;
 	// --------------------------------------------------------------------
 
 
@@ -243,8 +244,8 @@ ResoResults calc_pop_cn(const CNParams& pop)
 	// [pop75], equ. 11
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_inv, BA, true);
-	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
-	cov(2,2) += pop.Q*pop.Q*angs*angs * sample_mosaic_v*sample_mosaic_v /rads/rads;
+	cov(1, 1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
+	cov(2, 2) += pop.Q*pop.Q*angs*angs * sample_mosaic_v*sample_mosaic_v /rads/rads;
 
 	if(!tl::inverse(cov, res.reso))
 	{

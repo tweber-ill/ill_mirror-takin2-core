@@ -126,6 +126,7 @@ ResoResults calc_cn(const CNParams& cn)
 	ki_Q *= cn.dsample_sense;
 	kf_Q *= cn.dsample_sense;
 
+	// transformation matrix U and its inverse V
 	t_mat U = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, cn.ki, cn.kf);
 
 	// V matrix -> [mit84], equ. A.16
@@ -151,19 +152,17 @@ ResoResults calc_cn(const CNParams& cn)
 	// if no vertical mosaic is given, use the horizontal one
 	angle mono_mosaic_v = cn.mono_mosaic_v;
 	angle ana_mosaic_v = cn.ana_mosaic_v;
-	//angle sample_mosaic_v = cn.sample_mosaic_v;
+	angle sample_mosaic_v = cn.sample_mosaic_v;
 	if(tl::float_equal<t_real>(mono_mosaic_v/rads, 0.), 0.)
 		mono_mosaic_v = cn.mono_mosaic;
 	if(tl::float_equal<t_real>(ana_mosaic_v/rads, 0.), 0.)
 		ana_mosaic_v = cn.ana_mosaic;
-	//if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
-	//	sample_mosaic_v = cn.sample_mosaic;
+	if(tl::float_equal<t_real>(sample_mosaic_v/rads, 0.), 0.)
+		sample_mosaic_v = cn.sample_mosaic;
 
 
 	// -------------------------------------------------------------------------
 	// resolution matrix, [mit84], equ. A.5
-	t_mat M = ublas::zero_matrix<t_real>(6,6);
-
 	auto calc_mono_ana_res =
 		[](angle theta, wavenumber k,
 		angle mosaic, angle mosaic_v,
@@ -194,7 +193,8 @@ ResoResults calc_cn(const CNParams& cn)
 		t_real dVert = t_real(1)/(k*k * angs*angs) * rads*rads *
 		(
 			t_real(1) / (coll2_v * coll2_v) +
-			t_real(1) / ((t_real(2)*units::sin(theta) * mosaic_v) *
+			t_real(1) / (
+				(t_real(2)*units::sin(theta) * mosaic_v) *
 				(t_real(2)*units::sin(theta) * mosaic_v) +
 				coll1_v * coll1_v)
 		);
@@ -221,25 +221,39 @@ ResoResults calc_cn(const CNParams& cn)
 	std::tie(matMonoH, dMonoV) = futMono.get();
 	std::tie(matAnaH, dAnaV) = futAna.get();
 
+	t_mat M = ublas::zero_matrix<t_real>(6, 6);
 	tl::submatrix_copy(M, matMonoH, 0, 0);
 	tl::submatrix_copy(M, matAnaH, 3, 3);
-	M(2,2) = dMonoV;
-	M(5,5) = dAnaV;
+	M(2, 2) = dMonoV;
+	M(5, 5) = dAnaV;
 	// -------------------------------------------------------------------------
 
 
-	t_mat N = tl::transform(M, V, 1);
+	// transform reso matrix, see [mit84], p. 158
+	t_mat M_trafo = tl::transform(M, V, 1);
 
-	N = quadric_proj(N, 5);
-	N = quadric_proj(N, 4);
+	// integrate components, see [mit84], p. 159
+	M_trafo = quadric_proj(M_trafo, 5);
+	M_trafo = quadric_proj(M_trafo, 4);
 
-	t_vec vec1 = tl::get_column<t_vec>(N, 1);
-	res.reso = N - ublas::outer_prod(vec1,vec1)
-		/ (1./((cn.sample_mosaic/rads * cn.Q*angs)
-		* (cn.sample_mosaic/rads * cn.Q*angs)) + N(1,1));
-	res.reso(2,2) = N(2,2);
+	// add horizontal sample mosaic
+	const t_real mos_Q_sq =
+		(cn.sample_mosaic/rads * cn.Q*angs) *
+		(cn.sample_mosaic/rads * cn.Q*angs);
+	t_vec vec1 = tl::get_column<t_vec>(M_trafo, 1);
+	//const t_real M_vert = M_trafo(2, 2);
+	M_trafo -= ublas::outer_prod(vec1, vec1) / (1./mos_Q_sq + M_trafo(1, 1));
+	//M_trafo(2, 2) = M_vert;
+
+	// add vertical sample mosaic
+	const t_real mos_v_Q_sq =
+		(sample_mosaic_v/rads * cn.Q*angs) *
+		(sample_mosaic_v/rads * cn.Q*angs);
+	t_vec vec2 = tl::get_column<t_vec>(M_trafo, 2);
+	M_trafo -= ublas::outer_prod(vec2, vec2) / (1./mos_v_Q_sq + M_trafo(2, 2));
+
+	res.reso = M_trafo;
 	res.reso *= sig2fwhm*sig2fwhm;
-
 	res.reso_v = ublas::zero_vector<t_real>(4);
 	res.reso_s = 0.;
 

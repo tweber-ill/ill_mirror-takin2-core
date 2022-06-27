@@ -206,6 +206,7 @@ ResoResults calc_pop(const PopParams& pop)
 	const t_real cot_th_a = c_th_a / s_th_a;
 	const t_real s_th_s = units::sin(t_real(0.5)*twotheta);
 	const t_real c_th_s = units::cos(t_real(0.5)*twotheta);
+	const t_real sign_z = -1.; // to compare with the calculations by F. Bourdarot -> should cancel out
 
 	// A matrix, [pop75], Appendix 1
 	auto get_div_monosample = [](t_real ki, t_real cot_th_m) -> std::tuple<t_real, t_real>
@@ -221,13 +222,13 @@ ResoResults calc_pop(const PopParams& pop)
 	A_div_kikf_trafo(POP_KI_X, POP_PREMONO_H) = std::get<0>(div_ki);
 	A_div_kikf_trafo(POP_KI_X, POP_PRESAMPLE_H) = std::get<1>(div_ki);
 	A_div_kikf_trafo(POP_KI_Y, POP_PRESAMPLE_H) = pop.ki * angs;
-	A_div_kikf_trafo(POP_KI_Z, POP_PRESAMPLE_V) = pop.ki * angs;
+	A_div_kikf_trafo(POP_KI_Z, POP_PRESAMPLE_V) = sign_z * pop.ki * angs;
 
 	auto div_kf = get_div_monosample(pop.kf*angs, -cot_th_a);
 	A_div_kikf_trafo(POP_KF_X, POP_POSTANA_H) = std::get<0>(div_kf);
 	A_div_kikf_trafo(POP_KF_X, POP_POSTSAMPLE_H) = std::get<1>(div_kf);
 	A_div_kikf_trafo(POP_KF_Y, POP_POSTSAMPLE_H) = pop.kf * angs;
-	A_div_kikf_trafo(POP_KF_Z, POP_POSTSAMPLE_V) = pop.kf * angs;
+	A_div_kikf_trafo(POP_KF_Z, POP_POSTSAMPLE_V) = sign_z * pop.kf * angs;
 
 
 	// covariance matrix of component geometries, S, [pop75], Appendices 2 and 3
@@ -326,7 +327,7 @@ ResoResults calc_pop(const PopParams& pop)
 		// vertical
 		arr[POP_SRC_Z] = t_real(-0.5) / (dist_src_mono * s_th_m);
 		arr[POP_MONO_Z] = ( + t_real(0.5) / dist_src_mono
-			+ t_real(0.5) / dist_mono_sample) / s_th_m
+			+ t_real(0.5) / dist_mono_sample ) / s_th_m
 			- inv_curvv;
 		arr[POP_SAMPLE_Z] = t_real(-0.5) / (dist_mono_sample * s_th_m);
 
@@ -344,9 +345,9 @@ ResoResults calc_pop(const PopParams& pop)
 	T_mosaic_trafo(POP_MONO_H, POP_MONO_Y) = mono_mosaic_trafo[POP_MONO_Y];
 	T_mosaic_trafo(POP_MONO_H, POP_SAMPLE_X) = mono_mosaic_trafo[POP_SAMPLE_X];
 	T_mosaic_trafo(POP_MONO_H, POP_SAMPLE_Y) = mono_mosaic_trafo[POP_SAMPLE_Y];
-	T_mosaic_trafo(POP_MONO_V, POP_SRC_Z) = mono_mosaic_trafo[POP_SRC_Z];
-	T_mosaic_trafo(POP_MONO_V, POP_MONO_Z) = mono_mosaic_trafo[POP_MONO_Z];
-	T_mosaic_trafo(POP_MONO_V, POP_SAMPLE_Z) = mono_mosaic_trafo[POP_SAMPLE_Z];
+	T_mosaic_trafo(POP_MONO_V, POP_SRC_Z) = sign_z*mono_mosaic_trafo[POP_SRC_Z];
+	T_mosaic_trafo(POP_MONO_V, POP_MONO_Z) = sign_z*mono_mosaic_trafo[POP_MONO_Z];
+	T_mosaic_trafo(POP_MONO_V, POP_SAMPLE_Z) = sign_z*mono_mosaic_trafo[POP_SAMPLE_Z];
 
 	auto ana_mosaic_trafo = get_mosaic_trafo(
 		pop.dist_ana_det/cm, pop.dist_sample_ana/cm,
@@ -357,9 +358,9 @@ ResoResults calc_pop(const PopParams& pop)
 	T_mosaic_trafo(POP_ANA_H, POP_ANA_Y) = ana_mosaic_trafo[get_ki_pos(POP_ANA_Y)];
 	T_mosaic_trafo(POP_ANA_H, POP_SAMPLE_X) = ana_mosaic_trafo[get_ki_pos(POP_SAMPLE_X)];
 	T_mosaic_trafo(POP_ANA_H, POP_SAMPLE_Y) = ana_mosaic_trafo[get_ki_pos(POP_SAMPLE_Y)];
-	T_mosaic_trafo(POP_ANA_V, POP_DET_Z) = ana_mosaic_trafo[get_ki_pos(POP_DET_Z)];
-	T_mosaic_trafo(POP_ANA_V, POP_ANA_Z) = ana_mosaic_trafo[get_ki_pos(POP_ANA_Z)];
-	T_mosaic_trafo(POP_ANA_V, POP_SAMPLE_Z) = ana_mosaic_trafo[get_ki_pos(POP_SAMPLE_Z)];
+	T_mosaic_trafo(POP_ANA_V, POP_DET_Z) = sign_z*ana_mosaic_trafo[get_ki_pos(POP_DET_Z)];
+	T_mosaic_trafo(POP_ANA_V, POP_ANA_Z) = sign_z*ana_mosaic_trafo[get_ki_pos(POP_ANA_Z)];
+	T_mosaic_trafo(POP_ANA_V, POP_SAMPLE_Z) = sign_z*ana_mosaic_trafo[get_ki_pos(POP_SAMPLE_Z)];
 
 	// D matrix to transform spatial to divergence variables, [pop75], Appendix 2
 	auto get_geo_trafo = [](t_real dist_src_mono, t_real dist_mono_sample,
@@ -402,10 +403,10 @@ ResoResults calc_pop(const PopParams& pop)
 	D_geo_div_trafo(POP_PRESAMPLE_H, POP_MONO_Y) = mono_geo_trafo[4];
 	D_geo_div_trafo(POP_PRESAMPLE_H, POP_SAMPLE_X) = mono_geo_trafo[5];
 	D_geo_div_trafo(POP_PRESAMPLE_H, POP_SAMPLE_Y) = mono_geo_trafo[6];
-	D_geo_div_trafo(POP_PREMONO_V, POP_SRC_Z) = mono_geo_trafo[7];
-	D_geo_div_trafo(POP_PREMONO_V, POP_MONO_Z) = mono_geo_trafo[8];
-	D_geo_div_trafo(POP_PRESAMPLE_V, POP_MONO_Z) = mono_geo_trafo[9];
-	D_geo_div_trafo(POP_PRESAMPLE_V, POP_SAMPLE_Z) = mono_geo_trafo[10];
+	D_geo_div_trafo(POP_PREMONO_V, POP_SRC_Z) = sign_z*mono_geo_trafo[7];
+	D_geo_div_trafo(POP_PREMONO_V, POP_MONO_Z) = sign_z*mono_geo_trafo[8];
+	D_geo_div_trafo(POP_PRESAMPLE_V, POP_MONO_Z) = sign_z*mono_geo_trafo[9];
+	D_geo_div_trafo(POP_PRESAMPLE_V, POP_SAMPLE_Z) = sign_z*mono_geo_trafo[10];
 
 	auto ana_geo_trafo = get_geo_trafo(
 		pop.dist_ana_det/cm, pop.dist_sample_ana/cm,
@@ -417,10 +418,10 @@ ResoResults calc_pop(const PopParams& pop)
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_ANA_Y) = ana_geo_trafo[4];
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_X) = ana_geo_trafo[5];
 	D_geo_div_trafo(POP_POSTSAMPLE_H, POP_SAMPLE_Y) = ana_geo_trafo[6]; // forgotten in paper
-	D_geo_div_trafo(POP_POSTANA_V, POP_DET_Z) = -ana_geo_trafo[7];
-	D_geo_div_trafo(POP_POSTANA_V, POP_ANA_Z) = -ana_geo_trafo[8];
-	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_ANA_Z) = -ana_geo_trafo[9];
-	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_SAMPLE_Z) = -ana_geo_trafo[10];
+	D_geo_div_trafo(POP_POSTANA_V, POP_DET_Z) = -sign_z*ana_geo_trafo[7];
+	D_geo_div_trafo(POP_POSTANA_V, POP_ANA_Z) = -sign_z*ana_geo_trafo[8];
+	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_ANA_Z) = -sign_z*ana_geo_trafo[9];
+	D_geo_div_trafo(POP_POSTSAMPLE_V, POP_SAMPLE_Z) = -sign_z*ana_geo_trafo[10];
 	// --------------------------------------------------------------------
 
 
