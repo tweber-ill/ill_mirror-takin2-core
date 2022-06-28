@@ -403,7 +403,6 @@ add_executable(takin
 	tools/taz/real_lattice.cpp tools/taz/proj_lattice.cpp
 	tools/taz/nicos.cpp tools/taz/sics.cpp tools/taz/taz_net.cpp
 
-	tools/res/r0.cpp
 	tools/res/cn.cpp tools/res/pop.cpp tools/res/pop_cn.cpp
 	tools/res/eck.cpp tools/res/viol.cpp tools/res/simple.cpp
 	tools/res/ResoDlg.cpp tools/res/ResoDlg_file.cpp
@@ -562,7 +561,6 @@ if(BUILD_EXT_TOOLS)
 	# convofit, convoseries
 	# -----------------------------------------------------------------------------
 	add_executable(convofit
-		tools/res/r0.cpp
 		tools/res/cn.cpp tools/res/pop.cpp tools/res/pop_cn.cpp
 		tools/res/eck.cpp tools/res/viol.cpp
 		#tools/res/simple.cpp

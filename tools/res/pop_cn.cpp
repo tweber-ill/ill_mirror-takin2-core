@@ -34,7 +34,6 @@
  */
 
 #include "pop.h"
-#include "r0.h"
 #include "helper.h"
 
 #include "tlibs/math/linalg.h"
@@ -293,43 +292,27 @@ ResoResults calc_pop_cn(const CNParams& pop)
 	const t_real pi = tl::get_pi<t_real>();
 
 	// R0 calculation methods
+	// cancels out in [pop75] equ. 5 and equ. 9
+	//t_real dDetG = tl::determinant(G_collis);
 	t_real dDetF = tl::determinant(F_mosaics);
 	t_real dDetH = tl::determinant(H);
 
-	if(pop.flags & CALC_GENERAL_R0)
+	// [pop75], equ. 9 and equ. 5 (and [zhe07], equ. 7)
+	res.dR0 *= t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
+	res.dR0 *= std::sqrt(dDetF / dDetH);
+	res.dR0 /= t_real(8.*pi*8.*pi) * s_th_m * s_th_a;
+
+	if(pop.flags & CALC_MON)
 	{
-		// [zhe07], equ. 7
-		res.dR0 *= pi*pi * std::sqrt(dDetF / dDetH);
-		res.dR0 /= t_real(16.) * s_th_m * s_th_a;
+		// cancels out in [pop75] equ. 5 and equ. 9
+		//t_real dDetG_mono = tl::determinant(G_mono_collis);
 
-		if(pop.flags & CALC_MON)
-		{
-			// [zhe07], equ. 9
-			t_real dDetF_mono = tl::determinant(F_mono_mosaics);
-			t_real dDetH_mono = tl::determinant(H_mono);
+		// [zhe07], equ. 9
+		t_real dDetF_mono = tl::determinant(F_mono_mosaics);
+		t_real dDetH_mono = tl::determinant(H_mono);
 
-			res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
-			res.dR0 *= t_real(2.)/pi * s_th_m / dmono_refl;
-		}
-	}
-	else
-	{
-		// [pop75], equ. 9
-		t_real dDetG = tl::determinant(G_collis);
-
-		res.dR0 *= t_real((2.*pi)*(2.*pi)*(2.*pi)*(2.*pi));
-		res.dR0 *= std::sqrt(dDetG*dDetF / dDetH);
-		res.dR0 /= t_real(8.*pi*8.*pi) * s_th_m * s_th_a;
-
-		if(pop.flags & CALC_MON)
-		{
-			t_real dDetG_mono = tl::determinant(G_mono_collis);
-			t_real dDetF_mono = tl::determinant(F_mono_mosaics);
-			t_real dDetH_mono = tl::determinant(H_mono);
-
-			res.dR0 /= std::sqrt(dDetG_mono*dDetF_mono / dDetH_mono);
-			res.dR0 *= t_real(2.)/pi * s_th_m / dmono_refl;
-		}
+		res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
+		res.dR0 *= t_real(2.)/pi * s_th_m / dmono_refl;
 	}
 
 	res.dR0 = std::abs(res.dR0);

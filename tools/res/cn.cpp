@@ -7,10 +7,12 @@
  * @desc This is a reimplementation in C++ of the file rc_cnmat.m of the
  *		rescal5 package by Zinkin, McMorrow, Tennant, Farhi, and Wildes (ca. 1995-2007):
  *		http://www.ill.eu/en/instruments-support/computing-for-science/cs-software/all-software/matlab-ill/rescal-for-matlab/
- * @desc see: 	[cn67] M. J. Cooper and R. Nathans, Acta Cryst. 23, 357 (1967), doi: 10.1107/S0365110X67002816
+ * @desc see:
+ *		[cn67] M. J. Cooper and R. Nathans, Acta Cryst. 23, 357 (1967), doi: 10.1107/S0365110X67002816
  *		[ch73] N. J. Chesser and J. D. Axe, Acta Cryst. A 29, 160 (1973), doi: 10.1107/S0567739473000422
  *		[mit84] P. W. Mitchell, R. A. Cowley and S. A. Higgins, Acta Cryst. Sec A, 40(2), 152-160 (1984), doi: 10.1107/S0108767384000325
  *		[pop75] M. Popovici, Acta Cryst. A 31, 507 (1975), doi: 10.1107/S0567739475001088
+ *		[zhe07] A. Zheludev, ResLib 3.4 manual (2007), https://ethz.ch/content/dam/ethz/special-interest/phys/solid-state-physics/neutron-scattering-and-magnetism-dam/images/research/manual.pdf
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -35,7 +37,6 @@
  */
 
 #include "cn.h"
-#include "r0.h"
 #include "ellipse.h"
 #include "helper.h"
 
@@ -65,6 +66,33 @@ static const auto mn = tl::get_m_n<t_real>();
 static const auto hbar = tl::get_hbar<t_real>();
 static const t_real pi = tl::get_pi<t_real>();
 static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
+
+
+// -----------------------------------------------------------------------------
+/**
+ * scattering factors
+ */
+std::tuple<t_real, t_real, t_real, t_real> get_scatter_factors(
+	std::size_t flags,
+	const angle& thetam, const wavenumber& ki,
+	const angle& thetaa, const wavenumber& kf)
+{
+	t_real dmono = t_real(1);
+	t_real dana = t_real(1);
+	t_real dSqwToXSec = t_real(1);
+	t_real dmonitor = t_real(1);
+
+	if(flags & CALC_KI3)
+		dmono *= tl::ana_effic_factor(ki, units::abs(thetam));
+	if(flags & CALC_KF3)
+		dana *= tl::ana_effic_factor(kf, units::abs(thetaa));
+	if(flags & CALC_KFKI)
+		dSqwToXSec *= kf/ki;  // kf/ki factor, see Shirane, equ. (2.7)
+	if(flags & CALC_MONKI)
+		dmonitor *= ki*angs;  // monitor 1/ki factor, see [zhe07], p. 10
+
+	return std::make_tuple(dmono, dana, dSqwToXSec, dmonitor);
+}
 
 
 /**
@@ -103,6 +131,57 @@ t_mat get_trafo_dkidkf_dQdE(const angle& ki_Q, const angle& kf_Q,
 
 	return U;
 }
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+/**
+ * R0 factor from formula (2) in [ch73]
+ */
+t_real chess_R0(bool norm_to_ki_vol,
+	wavenumber ki, wavenumber kf,
+	const t_mat& M, const t_mat& V,
+	angle theta_m, angle theta_a, angle twotheta_s,
+	angle mos_m, angle mos_a, angle coll_pre_mono_v, angle coll_post_ana_v,
+	t_real refl_m, t_real refl_a)
+{
+	auto R0_P = [](angle theta, angle coll, angle mosaic) -> t_real
+	{
+		t_real tS = units::sin(theta);
+		return std::sqrt(t_real(2)*pi) / rads *
+			tl::my_units_sqrt<angle>(t_real(1) / (
+				t_real(1)/(coll*coll) + t_real(1)/(t_real(4)*mosaic*mosaic*tS*tS)));
+	};
+
+	auto R0_N = [](angle theta, angle mosaic, t_real refl) -> t_real
+	{
+		t_real tS = units::sin(theta);
+		return (refl / (t_real(2)*mosaic * tS)) / std::sqrt(t_real(2)*pi) * rads;
+	};
+
+	t_real s_tt = units::sin(twotheta_s);
+	t_real R0 = mn/hbar / (ki*ki * kf*kf*kf * s_tt) / angs/angs/angs/sec;
+
+	// kf volumne
+	R0 *= R0_P(theta_a, coll_post_ana_v, mos_a) * R0_N(theta_a, mos_a, refl_a);
+
+	// ki volume
+	if(!norm_to_ki_vol)
+		R0 *= R0_P(theta_m, coll_pre_mono_v, mos_m) * R0_N(theta_m, mos_m, refl_m);
+
+	// R0x see: [mit84], equ. A.43
+	R0 /= std::sqrt(
+		  M(1,1)*V(1,4)*V(1,4)    + M(3,3)*V(3,4)*V(3,4)
+		+ M(4,4)*V(4,4)*V(4,4)    + M(0,0)*V(0,4)*V(0,4)
+		+ M(0,1)*V(0,4)*V(1,4)*2. + M(3,4)*V(4,4)*V(3,4)*2.);
+	// TODO: R0z
+	R0 *= t_real(2)*pi;
+
+	return R0;
+}
+// -----------------------------------------------------------------------------
+
 
 
 ResoResults calc_cn(const CNParams& cn)
@@ -127,11 +206,11 @@ ResoResults calc_cn(const CNParams& cn)
 	kf_Q *= cn.dsample_sense;
 
 	// transformation matrix U and its inverse V
-	t_mat U = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, cn.ki, cn.kf);
+	t_mat U_trafo_QE = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, cn.ki, cn.kf);
 
 	// V matrix -> [mit84], equ. A.16
-	t_mat V(6,6);
-	if(!tl::inverse(U, V))
+	t_mat V_inv_trafo_QE(6, 6);
+	if(!tl::inverse(U_trafo_QE, V_inv_trafo_QE))
 	{
 		res.bOk = false;
 		res.strErr = "Transformation matrix cannot be inverted.";
@@ -170,14 +249,16 @@ ResoResults calc_cn(const CNParams& cn)
 		angle coll1, angle coll2,
 		angle coll1_v, angle coll2_v) -> t_mat
 	{
+		t_real t_th = units::tan(theta);
+
 		// horizontal part
 		t_vec vecMos(2);
-		vecMos[0] = units::tan(theta);
+		vecMos[0] = t_th;
 		vecMos[1] = 1.;
 		vecMos /= k*angs * mosaic/rads;
 
 		t_vec vecColl1(2);
-		vecColl1[0] = 2.*units::tan(theta);
+		vecColl1[0] = 2.*t_th;
 		vecColl1[1] = 1.;
 		vecColl1 /= (k*angs * coll1/rads);
 
@@ -233,7 +314,7 @@ ResoResults calc_cn(const CNParams& cn)
 
 
 	// transform reso matrix, see [mit84], p. 158
-	t_mat M_trafo = tl::transform(M, V, 1);
+	t_mat M_trafo = tl::transform(M, V_inv_trafo_QE, 1);
 
 	// integrate components, see [mit84], p. 159
 	M_trafo = quadric_proj(M_trafo, 5);
@@ -277,12 +358,45 @@ ResoResults calc_cn(const CNParams& cn)
 	if(!use_monitor)
 		res.dR0 *= dmono_refl;
 
-	res.dR0 *= chess_R0(use_monitor,
-		cn.ki, cn.kf,
+	t_real s_th_m = units::sin(thetam);
+	t_real s_th_a = units::sin(thetaa);
+	t_real t_th_m = units::tan(thetam);
+
+	if(use_monitor)
+	{
+		// [mit84], equ. B.10/B.11 (similar to equ. B.13 with coll. idx 5 -> idx 1) and equ. B.3
+		res.dR0 *=
+			  1./std::sqrt((M(1, 1) + M(4, 4)) * (M(0, 0) + M(3, 3)) - std::pow(M(0, 1) + M(3, 4), 2.))
+			* 1./std::sqrt(M(2, 2) + M(5, 5))
+			* 1./std::sqrt(1. + std::pow(2.*s_th_a*ana_mosaic_v/cn.coll_v_post_ana, 2.))
+			* rads * units::sqrt(
+				  1./(cn.coll_v_pre_sample*cn.coll_v_pre_sample)
+				+ 1./(cn.coll_v_pre_mono*cn.coll_v_pre_mono + 4.*s_th_m*s_th_m*mono_mosaic_v*mono_mosaic_v))
+			* rads*rads * units::sqrt(
+				  1./(cn.coll_h_pre_mono*cn.coll_h_pre_mono*cn.coll_h_pre_sample*cn.coll_h_pre_sample)
+				+ 1./(4.*cn.coll_h_pre_mono*cn.coll_h_pre_mono*cn.mono_mosaic*cn.mono_mosaic)
+				+ 1./(4.*cn.coll_h_pre_sample*cn.coll_h_pre_sample*cn.mono_mosaic*cn.mono_mosaic));
+		res.dR0 /= cn.ki*cn.ki*cn.ki*cn.ki * angs*angs*angs*angs * t_th_m;
+		//res.dR0 *= hbar/mn /angs/angs*sec / std::sqrt(2.*pi);
+	}
+	else
+	{
+		// [mit84], equ. B.10
+		res.dR0 *=
+			  1./std::sqrt((M(1, 1) + M(4, 4)) * (M(0, 0) + M(3, 3)) - std::pow(M(0, 1) + M(3, 4), 2.))
+			* 1./std::sqrt(M(2, 2) + M(5, 5))
+			* 1./std::sqrt(1. + std::pow(2.*s_th_a*ana_mosaic_v/cn.coll_v_post_ana, 2.))
+			* 1./std::sqrt(1. + std::pow(2.*s_th_m*mono_mosaic_v/cn.coll_v_pre_mono, 2.));
+		res.dR0 /= cn.ki*cn.ki*cn.ki * angs*angs*angs;
+		//res.dR0 *= 2.*pi*hbar/mn /angs/angs*sec;
+	}
+
+	/*res.dR0 *= chess_R0(use_monitor,
+		cn.ki, cn.kf, M, V_inv_trafo_QE,
 		thetam, thetaa, cn.twotheta,
 		cn.mono_mosaic, cn.ana_mosaic,
 		cn.coll_v_pre_mono, cn.coll_v_post_ana,
-		dmono_refl, dana_effic);
+		dmono_refl, dana_effic);*/
 
 	res.dR0 = std::abs(res.dR0);
 

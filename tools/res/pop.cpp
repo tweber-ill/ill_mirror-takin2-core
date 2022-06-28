@@ -34,7 +34,6 @@
  */
 
 #include "pop.h"
-#include "r0.h"
 #include "helper.h"
 
 #include "tlibs/math/linalg.h"
@@ -573,24 +572,6 @@ ResoResults calc_pop(const PopParams& pop)
 		res.strErr = "Matrix K_mono cannot be inverted.";
 		return res;
 	}
-
-	t_mat Hi_mono_div = tl::transform_inv(Ki_mono_geo, D_mono_geo_div_trafo, true);
-	t_mat H_mono_div;
-	if(!tl::inverse(Hi_mono_div, H_mono_div))
-	{
-		res.bOk = false;
-		res.strErr = "Matrix H_mono^(-1) cannot be inverted.";
-		return res;
-	}
-
-	t_mat H_G_mono_div = H_mono_div + G_mono_collis;
-	t_mat H_Gi_mono_div;
-	if(!tl::inverse(H_G_mono_div, H_Gi_mono_div))
-	{
-		res.bOk = false;
-		res.strErr = "Matrix H_mono+G_mono cannot be inverted.";
-		return res;
-	}
 	// --------------------------------------------------------------------
 
 	// R0 calculation methods
@@ -600,15 +581,23 @@ ResoResults calc_pop(const PopParams& pop)
 		t_real dDetH = tl::determinant(H_G_div);
 
 		// alternate, more general calculation from [zhe07], p. 10, equ. 8
-		res.dR0 *= pi*pi * std::sqrt(dDetF / dDetH);
+		res.dR0 *= 4.*pi*pi * std::sqrt(dDetF / dDetH);
 		res.dR0 /= t_real(16.) * s_th_m * s_th_a;
 
 		if(pop.flags & CALC_MON)
 		{
+			t_mat Hi_mono_div = tl::transform_inv(Ki_mono_geo, D_mono_geo_div_trafo, true);
+			t_mat H_mono_div;
+			if(!tl::inverse(Hi_mono_div, H_mono_div))
+			{
+				res.bOk = false;
+				res.strErr = "Matrix H_mono^(-1) cannot be inverted.";
+				return res;
+			}
+			H_mono_div += G_mono_collis;
+
 			// mono part, [zhe07], p. 10, equ. 10
-			t_real dDetF_mono = tl::determinant(F_mono_mosaics);
-			t_real dDetH_mono = tl::determinant(H_G_mono_div);
-			res.dR0 /= std::sqrt(dDetF_mono / dDetH_mono);
+			res.dR0 /= std::sqrt(tl::determinant(F_mono_mosaics) / tl::determinant(H_mono_div));
 			res.dR0 *= t_real(2.)/pi * s_th_m / dmono_refl;
 		}
 	}

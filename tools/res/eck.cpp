@@ -32,7 +32,6 @@
  */
 
 #include "eck.h"
-#include "r0.h"
 #include "helper.h"
 
 #include "tlibs/math/linalg.h"
@@ -62,6 +61,30 @@ static const auto cm = tl::get_one_centimeter<t_real>();
 static const auto secs = tl::get_one_second<t_real>();
 static const t_real pi = tl::get_pi<t_real>();
 static const t_real sig2fwhm = tl::get_SIGMA2FWHM<t_real>();
+
+
+
+/**
+ * general R0 normalisation factor from [mit84], equ. A.57
+ */
+template<class t_real = double>
+t_real mitch_R0(bool norm_to_ki_vol,
+	t_real dmono_refl, t_real dana_effic,
+	t_real dKiVol, t_real dKfVol, t_real dResVol,
+	bool bNormToResVol = false)
+{
+	t_real dR0 = dana_effic * dKfVol;
+	if(!norm_to_ki_vol)
+		dR0 *= dmono_refl * dKiVol;
+
+	// not needed for MC simulations, because the gaussian generated
+	// with std::normal_distribution is already normalised
+	// see: tools/test/tst_norm.cpp
+	if(bNormToResVol)
+		dR0 /= (dResVol * tl::get_pi<t_real>() * t_real{3});
+
+	return dR0;
+}
 
 
 static std::tuple<t_mat, t_vec, t_real, t_real, t_real>
@@ -481,13 +504,15 @@ ResoResults calc_eck(const EckParams& eck)
 	else
 	{
 		res.dR0 = Z;
+		res.dR0 *= tl::get_ellipsoid_volume(matAE);
+
 		if(use_monitor)
 			res.dR0 /= dReflM * tl::get_ellipsoid_volume(A);
 
 		// missing volume prefactor to normalise gaussian,
 		// cf. equ. 56 in [eck14] to  equ. 1 in [pop75] and equ. A.57 in [mit84]
 		//res.dR0 /= std::sqrt(std::abs(tl::determinant(res.reso))) / (2.*pi*2.*pi);
-		res.dR0 *= res.dResVol * pi * t_real(3.);
+		//res.dR0 *= res.dResVol * pi * t_real(3.);
 	}
 
 	res.dR0 *= std::exp(-W);
