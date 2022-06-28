@@ -240,7 +240,14 @@ ResoResults calc_pop_cn(const CNParams& pop)
 		return res;
 	}
 
-	// [pop75], equ. 11
+	//
+	// [pop75], equ. 11, resolution matrix:
+	// R = ((BA) (              H           )^(-1) (BA)^T)^(-1)
+	// R = ((BA) (C^T F_mosaics C + G_collis)^(-1) (BA)^T)^(-1)
+	//
+	// cn R0 factor, [pop75], equ. 9 and equ. 5:
+	// R0 ~ sqrt(|F_mosaics| / |H|)
+	//
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_inv, BA, true);
 	cov(1, 1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;

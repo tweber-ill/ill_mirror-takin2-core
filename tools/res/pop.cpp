@@ -459,7 +459,23 @@ ResoResults calc_pop(const PopParams& pop)
 		return res;
 	}
 
-	// [pop75], equ. 20
+	//
+	// [pop75], equ. 20, resolution matrix:
+	// R = ((BA) ((                  H                 )      + G_collis)^(-1) (BA)^T)^(-1)
+	// R = ((BA) ((D (        K              )^(-1) D^T)^(-1) + G_collis)^(-1) (BA)^T)^(-1)
+	// R = ((BA) ((D (T^T F_mosaics T + S_geo)^(-1) D^T)^(-1) + G_collis)^(-1) (BA)^T)^(-1)
+	//
+	// compare to cn resolution matrix, [pop75], equ. 11:
+	// R = ((BA) (                      H_cn                            )^(-1) (BA)^T)^(-1)
+	// R = ((BA) (    C^T F_mosaics C                         + G_collis)^(-1) (BA)^T)^(-1)
+	//  => C = T D^(-1) for zero instrument lengths
+	//
+	// [pop75], equ. 13a & 16, R0 intensity factor:
+	// R0 ~ sqrt(|F_mosaics| |S_geo| / (|K| |(D S_geo^(-1) D^T)^(-1) + G_collis|))
+	//
+	// compare to cn R0 factor, [pop75], equ. 9 and equ. 5:
+	// R0 ~ sqrt(|F_mosaics| / |H_cn|)
+	//
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_Gi_div, BA, true);
 	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
