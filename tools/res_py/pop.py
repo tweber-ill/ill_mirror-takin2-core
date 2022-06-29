@@ -67,7 +67,7 @@ NUM_KI_COMPS   = 3
 #
 def get_mono_trafos(dist_src_mono, dist_mono_sample,
     thetam, thetas, inv_curvh, inv_curvv,
-    ki, Q_ki, sense = 1.):
+    ki, Q_ki, sense = 1., pointlike = False):
 
     sign_z = -1.  # to compare with the calculations by F. Bourdarot
 
@@ -79,38 +79,47 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     cot_th_s = c_th_s / s_th_s
 
 
-    # D matrix, [pop75], Appendix 2
-    D = np.zeros([NUM_MONO_COMPS, NUM_MONO_POS])
+    if pointlike:
+        # C matrix, [pop75], Appendix 1
+        C = np.zeros([NUM_KI, NUM_MONO_COMPS])
+        C[IDX_KI_H, IDX_SRC_H] = 0.5
+        C[IDX_KI_H, IDX_MONO_H] = 0.5
+        C[IDX_KI_V, IDX_SRC_V] = sense * 0.5 / s_th_m
+        C[IDX_KI_V, IDX_MONO_V] = -sense * 0.5 / s_th_m
 
-    D[IDX_SRC_H, IDX_SRC_Y] = -sense / dist_src_mono
-    D[IDX_SRC_H, IDX_MONO_X] = -c_th_m / dist_src_mono
-    D[IDX_SRC_H, IDX_MONO_Y] = s_th_m / dist_src_mono
+    else:
+        # D matrix, [pop75], Appendix 2
+        D = np.zeros([NUM_MONO_COMPS, NUM_MONO_POS])
 
-    D[IDX_SRC_V, IDX_SRC_Z] = -sign_z*sense / dist_src_mono
-    D[IDX_SRC_V, IDX_MONO_Z] = sign_z*sense / dist_src_mono
+        D[IDX_SRC_H, IDX_SRC_Y] = -sense / dist_src_mono
+        D[IDX_SRC_H, IDX_MONO_X] = -c_th_m / dist_src_mono
+        D[IDX_SRC_H, IDX_MONO_Y] = s_th_m / dist_src_mono
 
-    D[IDX_MONO_H, IDX_MONO_X] = c_th_m / dist_mono_sample
-    D[IDX_MONO_H, IDX_MONO_Y] = s_th_m / dist_mono_sample
-    D[IDX_MONO_H, IDX_SAMPLE_X] = s_th_s / dist_mono_sample
-    D[IDX_MONO_H, IDX_SAMPLE_Y] = c_th_s / dist_mono_sample
+        D[IDX_SRC_V, IDX_SRC_Z] = -sign_z*sense / dist_src_mono
+        D[IDX_SRC_V, IDX_MONO_Z] = sign_z*sense / dist_src_mono
 
-    D[IDX_MONO_V, IDX_MONO_Z] = -sign_z*sense / dist_mono_sample
-    D[IDX_MONO_V, IDX_SAMPLE_Z] = sign_z*sense / dist_mono_sample
+        D[IDX_MONO_H, IDX_MONO_X] = c_th_m / dist_mono_sample
+        D[IDX_MONO_H, IDX_MONO_Y] = s_th_m / dist_mono_sample
+        D[IDX_MONO_H, IDX_SAMPLE_X] = s_th_s / dist_mono_sample
+        D[IDX_MONO_H, IDX_SAMPLE_Y] = c_th_s / dist_mono_sample
+
+        D[IDX_MONO_V, IDX_MONO_Z] = -sign_z*sense / dist_mono_sample
+        D[IDX_MONO_V, IDX_SAMPLE_Z] = sign_z*sense / dist_mono_sample
 
 
-    # T matrix, [pop75], Appendix 2
-    T = np.zeros([NUM_KI, NUM_MONO_POS])
+        # T matrix, [pop75], Appendix 2
+        T = np.zeros([NUM_KI, NUM_MONO_POS])
 
-    T[IDX_KI_H, IDX_SRC_Y] = 0.5 * D[IDX_SRC_H, IDX_SRC_Y]
-    T[IDX_KI_H, IDX_MONO_X] = 0.5 * (D[IDX_SRC_H, IDX_MONO_X] + D[IDX_MONO_H, IDX_MONO_X])
-    T[IDX_KI_H, IDX_MONO_Y] = 0.5 * (D[IDX_SRC_H, IDX_MONO_Y] + D[IDX_MONO_H, IDX_MONO_Y]) - inv_curvh
-    T[IDX_KI_H, IDX_SAMPLE_X] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_X]
-    T[IDX_KI_H, IDX_SAMPLE_Y] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_Y]
+        T[IDX_KI_H, IDX_SRC_Y] = 0.5 * D[IDX_SRC_H, IDX_SRC_Y]
+        T[IDX_KI_H, IDX_MONO_X] = 0.5 * (D[IDX_SRC_H, IDX_MONO_X] + D[IDX_MONO_H, IDX_MONO_X])
+        T[IDX_KI_H, IDX_MONO_Y] = 0.5 * (D[IDX_SRC_H, IDX_MONO_Y] + D[IDX_MONO_H, IDX_MONO_Y]) - inv_curvh
+        T[IDX_KI_H, IDX_SAMPLE_X] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_X]
+        T[IDX_KI_H, IDX_SAMPLE_Y] = 0.5 * D[IDX_MONO_H, IDX_SAMPLE_Y]
 
-    # signs for kf
-    T[IDX_KI_V, IDX_SRC_Z] = 0.5 * sense * D[IDX_SRC_V, IDX_SRC_Z] / s_th_m
-    T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - sign_z*inv_curvv
-    T[IDX_KI_V, IDX_SAMPLE_Z] = -0.5 * sense * D[IDX_MONO_V, IDX_SAMPLE_Z] / s_th_m
+        # signs for kf
+        T[IDX_KI_V, IDX_SRC_Z] = 0.5 * sense * D[IDX_SRC_V, IDX_SRC_Z] / s_th_m
+        T[IDX_KI_V, IDX_MONO_Z] = 0.5 * sense * (D[IDX_SRC_V, IDX_MONO_Z] - D[IDX_MONO_V, IDX_MONO_Z]) / s_th_m - sign_z*inv_curvv
+        T[IDX_KI_V, IDX_SAMPLE_Z] = -0.5 * sense * D[IDX_MONO_V, IDX_SAMPLE_Z] / s_th_m
 
 
     # A matrix, [pop75], Appendix 1
@@ -127,34 +136,50 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
     B[2, IDX_KI_Z] = sense
     B[3, IDX_KI_X] = 2. * sense * ki * helpers.ksq2E
 
-    return [D, T, A, B]
+
+    if pointlike:
+        return [C, A, B]
+    else:
+        return [D, T, A, B]
 
 
 
 #
 # unite trafo matrices
 #
-def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba):
-    N = Dm.shape[0]
-    M = Dm.shape[1]
-    D = np.zeros([2*N, 2*M - 3])
+def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba, pointlike):
+    if pointlike:
+        Cm = Dm
+        Ca = Da
 
-    D[0:N, 0:M] = Dm
-    # add ana matrix (without sample columns) in lower right block
-    D[N:2*N, M:2*M-3] = Da[:, 0:IDX_SAMPLE_X]
-    # unite mono and ana sample columns
-    D[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Da[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
+        N = Cm.shape[0]
+        M = Cm.shape[1]
+        C = np.zeros([2*N, 2*M])
+
+        C[0:N, 0:M] = Cm
+        C[N:2*N, M:2*M] = Ca
+
+    else:
+        N = Dm.shape[0]
+        M = Dm.shape[1]
+        D = np.zeros([2*N, 2*M - 3])
+
+        D[0:N, 0:M] = Dm
+        # add ana matrix (without sample columns) in lower right block
+        D[N:2*N, M:2*M-3] = Da[:, 0:IDX_SAMPLE_X]
+        # unite mono and ana sample columns
+        D[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Da[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
 
 
-    N = Tm.shape[0]
-    M = Tm.shape[1]
-    T = np.zeros([2*N, 2*M - 3])
+        N = Tm.shape[0]
+        M = Tm.shape[1]
+        T = np.zeros([2*N, 2*M - 3])
 
-    T[0:N, 0:M] = Tm
-    # add ana matrix (without sample columns) in lower right block
-    T[N:2*N, M:2*M-3] = Ta[:, 0:IDX_SAMPLE_X]
-    # unite mono and ana sample columns
-    T[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Ta[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
+        T[0:N, 0:M] = Tm
+        # add ana matrix (without sample columns) in lower right block
+        T[N:2*N, M:2*M-3] = Ta[:, 0:IDX_SAMPLE_X]
+        # unite mono and ana sample columns
+        T[N:2*N, IDX_SAMPLE_X:IDX_SAMPLE_Z+1] = Ta[:, IDX_SAMPLE_X:IDX_SAMPLE_Z+1]
 
 
     N = Am.shape[0]
@@ -173,14 +198,20 @@ def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba):
     B[0:N, M:2*M] = Ba
 
 
-    return [D, T, A, B]
+    BA = np.dot(B, A)
+
+
+    if pointlike:
+        return [C, BA]
+    else:
+        return [D, T, BA]
 
 
 
 #
 # resolution algorithm
 #
-def calc(param):
+def calc(param, pointlike = False):
     # instrument position
     ki = param["ki"]
     kf = param["kf"]
@@ -312,50 +343,64 @@ def calc(param):
     else:
         raise "ResPy: No valid detector shape given."
 
-    S[IDX_SRC_Y, IDX_SRC_Y] = src_factor / param["src_w"]**2.
-    S[IDX_SRC_Z, IDX_SRC_Z] = src_factor / param["src_h"]**2.
-    S[IDX_MONO_X, IDX_MONO_X] = 12. / param["mono_d"]**2.
-    S[IDX_MONO_Y, IDX_MONO_Y] = 12. / param["mono_w"]**2.
-    S[IDX_MONO_Z, IDX_MONO_Z] = 12. / param["mono_h"]**2.
-    S[IDX_SAMPLE_X, IDX_SAMPLE_X] = sample_factor / param["sample_d"]**2.
-    S[IDX_SAMPLE_Y, IDX_SAMPLE_Y] = sample_factor / param["sample_w"]**2.
-    S[IDX_SAMPLE_Z, IDX_SAMPLE_Z] = 12. / param["sample_h"]**2.
-    S[IDX_ANA_X, IDX_ANA_X] = 12. / param["ana_d"]**2.
-    S[IDX_ANA_Y, IDX_ANA_Y] = 12. / param["ana_w"]**2.
-    S[IDX_ANA_Z, IDX_ANA_Z] = 12. / param["ana_h"]**2.
-    S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
-    S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
-    S /= helpers.sig2fwhm**2.
-    Sinv = la.inv(S)
+    if not pointlike:
+        S[IDX_SRC_Y, IDX_SRC_Y] = src_factor / param["src_w"]**2.
+        S[IDX_SRC_Z, IDX_SRC_Z] = src_factor / param["src_h"]**2.
+        S[IDX_MONO_X, IDX_MONO_X] = 12. / param["mono_d"]**2.
+        S[IDX_MONO_Y, IDX_MONO_Y] = 12. / param["mono_w"]**2.
+        S[IDX_MONO_Z, IDX_MONO_Z] = 12. / param["mono_h"]**2.
+        S[IDX_SAMPLE_X, IDX_SAMPLE_X] = sample_factor / param["sample_d"]**2.
+        S[IDX_SAMPLE_Y, IDX_SAMPLE_Y] = sample_factor / param["sample_w"]**2.
+        S[IDX_SAMPLE_Z, IDX_SAMPLE_Z] = 12. / param["sample_h"]**2.
+        S[IDX_ANA_X, IDX_ANA_X] = 12. / param["ana_d"]**2.
+        S[IDX_ANA_Y, IDX_ANA_Y] = 12. / param["ana_w"]**2.
+        S[IDX_ANA_Z, IDX_ANA_Z] = 12. / param["ana_h"]**2.
+        S[IDX_DET_Y, IDX_DET_Y] = det_factor / param["det_w"]**2.
+        S[IDX_DET_Z, IDX_DET_Z] = det_factor / param["det_h"]**2.
+        S /= helpers.sig2fwhm**2.
+        Sinv = la.inv(S)
     # -------------------------------------------------------------------------
 
 
     # -------------------------------------------------------------------------
-    # ki and kf trafo matrices
-    [Dm, Tm, Am, Bm] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
-        thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, Q_ki, 1.)
-    [Da, Ta, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
-        thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, Q_kf, -1.)
+    if pointlike:
+        # ki and kf trafo matrices
+        [Cm, Am, Bm] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
+            thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, Q_ki, 1., pointlike)
+        [Ca, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
+            thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, Q_kf, -1., pointlike)
 
-    [D, T, A, B] = combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba)
+        [C, BA] = combine_mono_ana_trafos(Cm, None, Am, Bm, Ca, None, Aa, Ba, pointlike)
+
+        # [pop75], equ. 8
+        H = np.dot(np.dot(np.transpose(C), F), C)
+
+    else:
+        # ki and kf trafo matrices
+        [Dm, Tm, Am, Bm] = get_mono_trafos(param["dist_src_mono"], param["dist_mono_sample"], \
+            thetam, thetas, inv_mono_curvh, inv_mono_curvv, ki, Q_ki, 1., pointlike)
+        [Da, Ta, Aa, Ba] = get_mono_trafos(param["dist_ana_det"], param["dist_sample_ana"], \
+            thetaa, thetas, inv_ana_curvh, inv_ana_curvv, kf, Q_kf, -1., pointlike)
+
+        [D, T, BA] = combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba, pointlike)
+
+        # [pop75], equ. 20
+        K = S + np.dot(np.dot(np.transpose(T), F), T)
+        Kinv = la.inv(K)
+
+        # [pop75], equ. 17
+        Hinv = np.dot(np.dot(D, Kinv), np.transpose(D))
+        H = la.inv(Hinv)
     # -------------------------------------------------------------------------
-
-
-    # [pop75], equ. 20
-    K = S + np.dot(np.dot(np.transpose(T), F), T)
-    Kinv = la.inv(K)
-
-    # [pop75], equ. 17
-    Hinv = np.dot(np.dot(D, Kinv), np.transpose(D))
-    H = la.inv(Hinv)
 
     # [pop75], equ. 18
     HG = H + G
     HGinv = la.inv(HG)
 
     # [pop75], equ. 20
-    BA = np.dot(B, A)
     cov = np.dot(np.dot(BA, HGinv), np.transpose(BA))
+
+
     cov[1, 1] += Q**2. * param["sample_mosaic"]**2.
     cov[2, 2] += Q**2. * param["sample_mosaic_v"]**2.
     R = la.inv(cov) * helpers.sig2fwhm**2.
@@ -365,14 +410,20 @@ def calc(param):
         matMirror = helpers.mirror_matrix(len(R), 1)
         R = np.dot(np.dot(np.transpose(matMirror), R), matMirror)
 
-    # [pop75], equ. 13a & 16
     R0 = 0.
     if param["calc_R0"]:
-        DS = np.dot(np.dot(D, Sinv), np.transpose(D))
-        DSinv = la.inv(DS) + G
         R0 = dmono_refl*dana_effic * dxsec * (0.5*np.pi)**2. \
-            * np.sqrt(la.det(S)*la.det(F) / (la.det(K)*la.det(DSinv))) \
             / (np.sin(thetam) * np.sin(thetaa))
+
+        # [pop75], equ. 5 & 9
+        if pointlike:
+            R0 *= np.sqrt(la.det(F) / la.det(H))
+
+        # [pop75], equ. 13a & 16
+        else:
+            DS = np.dot(np.dot(D, Sinv), np.transpose(D))
+            DSinv = la.inv(DS) + G
+            R0 *= np.sqrt(la.det(S)*la.det(F) / (la.det(K)*la.det(DSinv)))
 
     res["reso"] = R
     res["reso_v"] = np.array([0., 0., 0., 0.])

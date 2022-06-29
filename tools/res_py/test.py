@@ -42,7 +42,7 @@ ki = 1.4
 kf = 1.4
 Q = 1.777
 
-reso_method = "eck"    # "eck" or "pop"
+reso_method = "pop"    # "eck", "pop", or "cn"
 verbose = True
 
 
@@ -100,13 +100,13 @@ params = {
     "coll_h_pre_mono" : 30. * helpers.min2rad,
     "coll_h_pre_sample" : 30. * helpers.min2rad,
     "coll_h_post_sample" : 30. * helpers.min2rad,
-    "coll_h_post_ana" : 9999. * helpers.min2rad,
+    "coll_h_post_ana" : 30. * helpers.min2rad,
 
     # vertical collimation
-    "coll_v_pre_mono" : 9999. * helpers.min2rad,
-    "coll_v_pre_sample" : 9999. * helpers.min2rad,
-    "coll_v_post_sample" : 9999. * helpers.min2rad,
-    "coll_v_post_ana" : 9999. * helpers.min2rad,
+    "coll_v_pre_mono" : 30. * helpers.min2rad,
+    "coll_v_pre_sample" : 30. * helpers.min2rad,
+    "coll_v_post_sample" : 30. * helpers.min2rad,
+    "coll_v_post_ana" : 30. * helpers.min2rad,
 
     # horizontal focusing
     "mono_curvh" : 0.,
@@ -162,7 +162,9 @@ params = {
 if reso_method == "eck":
     res = eck.calc(params)
 elif reso_method == "pop":
-    res = pop.calc(params)
+    res = pop.calc(params, False)
+elif reso_method == "cn":
+    res = pop.calc(params, True)
 else:
     raise "ResPy: Invalid resolution calculation method selected."
 
