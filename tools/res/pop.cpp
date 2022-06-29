@@ -461,7 +461,7 @@ ResoResults calc_pop(const PopParams& pop)
 
 	//
 	// [pop75], equ. 20, resolution matrix:
-	// R = ((BA) ((                  H                 )      + G_collis)^(-1) (BA)^T)^(-1)
+	// R = ((BA) ((                  H                      ) + G_collis)^(-1) (BA)^T)^(-1)
 	// R = ((BA) ((D (        K              )^(-1) D^T)^(-1) + G_collis)^(-1) (BA)^T)^(-1)
 	// R = ((BA) ((D (T^T F_mosaics T + S_geo)^(-1) D^T)^(-1) + G_collis)^(-1) (BA)^T)^(-1)
 	//
@@ -478,8 +478,12 @@ ResoResults calc_pop(const PopParams& pop)
 	//
 	t_mat BA = ublas::prod(B_trafo_QE, A_div_kikf_trafo);
 	t_mat cov = tl::transform_inv(H_Gi_div, BA, true);
-	cov(1,1) += pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
-	cov(2,2) += pop.Q*pop.Q*angs*angs * sample_mosaic_v*sample_mosaic_v /rads/rads;
+
+	// include sample mosaic, see [zhe07], equs. 12-14
+	t_real mos_h = pop.Q*pop.Q*angs*angs * pop.sample_mosaic*pop.sample_mosaic /rads/rads;
+	t_real mos_v = pop.Q*pop.Q*angs*angs * sample_mosaic_v*sample_mosaic_v /rads/rads;
+	cov(1, 1) += mos_h;
+	cov(2, 2) += mos_v;
 
 	if(!tl::inverse(cov, res.reso))
 	{
@@ -508,7 +512,11 @@ ResoResults calc_pop(const PopParams& pop)
 	res.dResVol = tl::get_ellipsoid_volume(res.reso);
 	res.dR0 = dmono_refl * dana_effic * dxsec * dmonitor;
 
-	t_real dDetF = tl::determinant(F_mosaics);
+	// include sample mosaic, see [zhe07], equs. 12-14
+	// typically this correction is too small to give any difference
+	res.dR0 /= std::sqrt(1. + cov(1, 1)*mos_h - mos_h*mos_h)
+		* std::sqrt(1. + cov(2, 2)*mos_v - mos_v*mos_v);
+
 
 	// --------------------------------------------------------------------
 	// mono parts of the matrices, see: [zhe07], p. 10
@@ -590,30 +598,33 @@ ResoResults calc_pop(const PopParams& pop)
 	}
 	// --------------------------------------------------------------------
 
+
 	// R0 calculation methods
+	t_real dDetF = tl::determinant(F_mosaics);
 	const t_real pi = tl::get_pi<t_real>();
+
 	if(pop.flags & CALC_GENERAL_R0)
 	{
-		t_real dDetH = tl::determinant(H_G_div);
+		t_real dDetHG = tl::determinant(H_G_div);
 
 		// alternate, more general calculation from [zhe07], p. 10, equ. 8
-		res.dR0 *= 4.*pi*pi * std::sqrt(dDetF / dDetH);
+		res.dR0 *= 4.*pi*pi * std::sqrt(dDetF / dDetHG);
 		res.dR0 /= t_real(16.) * s_th_m * s_th_a;
 
 		if(pop.flags & CALC_MON)
 		{
 			t_mat Hi_mono_div = tl::transform_inv(Ki_mono_geo, D_mono_geo_div_trafo, true);
-			t_mat H_mono_div;
-			if(!tl::inverse(Hi_mono_div, H_mono_div))
+			t_mat HG_mono_div;
+			if(!tl::inverse(Hi_mono_div, HG_mono_div))
 			{
 				res.bOk = false;
 				res.strErr = "Matrix H_mono^(-1) cannot be inverted.";
 				return res;
 			}
-			H_mono_div += G_mono_collis;
+			HG_mono_div += G_mono_collis;
 
 			// mono part, [zhe07], p. 10, equ. 10
-			res.dR0 /= std::sqrt(tl::determinant(F_mono_mosaics) / tl::determinant(H_mono_div));
+			res.dR0 /= std::sqrt(tl::determinant(F_mono_mosaics) / tl::determinant(HG_mono_div));
 			res.dR0 *= t_real(2.)/pi * s_th_m / dmono_refl;
 		}
 	}
