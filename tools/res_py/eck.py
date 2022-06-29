@@ -335,7 +335,8 @@ def calc(param):
     # integrate last 2 vars -> equs 57 & 58 in [eck14]
 
     U2 = reso.quadric_proj(U1, 5)
-    U = reso.quadric_proj(U2, 4)
+    # careful: factor -0.5*... missing in U matrix compared to normal gaussian!
+    U = 2. * reso.quadric_proj(U2, 4)
 
     V2 = reso.quadric_proj_vec(V1, U1, 5)
     V = reso.quadric_proj_vec(V2, U2, 4)
@@ -351,9 +352,24 @@ def calc(param):
     # --------------------------------------------------------------------------
 
 
+    # --------------------------------------------------------------------------
+    # include sample mosaic, see cn.cpp
+    # add horizontal sample mosaic
+    mos_Q_sq = (param["sample_mosaic"] * Q)**2.
+    vec1 = U[:, 1] / helpers.sig2fwhm**2.
+    U -= helpers.sig2fwhm**2. * np.outer(vec1, vec1) / \
+        (1./mos_Q_sq + U[1,1]/helpers.sig2fwhm**2.)
+
+    # add vertical sample mosaic
+    mos_v_Q_sq = (param["sample_mosaic_v"] * Q)**2.
+    vec2 = U[:, 2] / helpers.sig2fwhm**2.
+    U -= helpers.sig2fwhm**2. * np.outer(vec2, vec2) / \
+        (1./mos_v_Q_sq + U[2,2]/helpers.sig2fwhm**2.)
+    # --------------------------------------------------------------------------
+
+
     # quadratic part of quadric (matrix U)
-    # careful: factor -0.5*... missing in U matrix compared to normal gaussian!
-    R = 2. * U
+    R = U
     # linear (vector V) and constant (scalar W) part of quadric
     res["reso_v"] = V
     res["reso_s"] = W

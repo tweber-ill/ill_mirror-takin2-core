@@ -131,12 +131,12 @@ params = {
 
     # horizontal mosaics
     "mono_mosaic" : 45. *helpers.min2rad,
-    "sample_mosaic" : 5. *helpers.min2rad,
+    "sample_mosaic" : 30. *helpers.min2rad,
     "ana_mosaic" : 45. *helpers.min2rad,
 
     # vertical mosaics
     "mono_mosaic_v" : 45. *helpers.min2rad,
-    "sample_mosaic_v" : 5. *helpers.min2rad,
+    "sample_mosaic_v" : 30. *helpers.min2rad,
     "ana_mosaic_v" : 45. *helpers.min2rad,
 
     # calculate R0 factor (not needed if only the ellipses are to be plotted)
