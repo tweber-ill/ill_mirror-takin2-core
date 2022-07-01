@@ -126,15 +126,13 @@ get_mono_vals(const length& src_w, const length& src_h,
 		const auto A_tx = inv_mono_curvh*dist_mono_sample / s_th_m;
 		const auto A_t1 = A_t0*A_tx;
 
-		A(0, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
-			t_th_m*t_th_m *
+		A(0, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) * t_th_m*t_th_m *
 		(
 /*a*/			+ units::pow<2>(t_real(2)/coll_h_pre_mono) *rads*rads
 /*b*/			+ units::pow<2>(t_real(2)*dist_src_mono/src_w)
 /*c*/			+ A_t0*A_t0 * rads*rads
 		);
-		A(0, 1) = A(1, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs)
-			* t_th_m *
+		A(0, 1) = A(1, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) * t_th_m *
 		(
 /*w*/			+ t_real(2)*tl::my_units_pow2(t_real(1)/coll_h_pre_mono) *rads*rads
 /*x*/			+ t_real(2)*dist_src_mono*(dist_src_mono-dist_mono_sample)/(src_w*src_w)
@@ -500,7 +498,7 @@ ResoResults calc_eck(const EckParams& eck)
 	const t_real mos_Q_sq =
 		(eck.sample_mosaic/rads * eck.Q*angs) *
 		(eck.sample_mosaic/rads * eck.Q*angs);
-		t_vec vec1 = tl::get_column<t_vec>(U/(sig2fwhm*sig2fwhm), 1);
+	t_vec vec1 = tl::get_column<t_vec>(U/(sig2fwhm*sig2fwhm), 1);
 	U -= sig2fwhm*sig2fwhm * ublas::outer_prod(vec1, vec1)
 		/ (1./mos_Q_sq + U(1, 1)/(sig2fwhm*sig2fwhm));
 

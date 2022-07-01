@@ -147,7 +147,7 @@ def get_mono_trafos(dist_src_mono, dist_mono_sample,
 #
 # unite trafo matrices
 #
-def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba, pointlike):
+def combine_mono_ana_trafos(Dm, Tm, Am, Bm, Da, Ta, Aa, Ba, pointlike = False):
     if pointlike:
         Cm = Dm
         Ca = Da

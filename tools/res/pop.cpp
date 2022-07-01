@@ -497,7 +497,7 @@ ResoResults calc_pop(const PopParams& pop)
 	// --------------------------------------------------------------------
 	// r0 intensity scaling factor and resolution volume calculation
 	// --------------------------------------------------------------------
-	res.reso *= sig2fwhm*sig2fwhm;
+	res.reso *= sig2fwhm*sig2fwhm;  // convert to sigmas
 	res.reso_v = ublas::zero_vector<t_real>(4);
 	res.reso_s = 0.;
 
@@ -550,7 +550,7 @@ ResoResults calc_pop(const PopParams& pop)
 	SI_mono_geo(POP_MONO_Y, POP_MONO_Y) = t_real(1./12.) * monitor_w*monitor_w /cm/cm;
 	SI_mono_geo(POP_MONO_Z, POP_MONO_Z) = t_real(1./12.) * monitor_h*monitor_h /cm/cm;
 
-	SI_mono_geo *= sig2fwhm*sig2fwhm;
+	SI_mono_geo *= sig2fwhm*sig2fwhm;  // convert to sigmas
 
 	t_mat S_mono_geo;
 	if(!tl::inverse_diag(SI_mono_geo, S_mono_geo))
