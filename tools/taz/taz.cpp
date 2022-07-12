@@ -673,7 +673,7 @@ TazDlg::TazDlg(QWidget* pParent, const std::string& strLogFile)
 					std::string toolbin = find_program_binary(toolprog);
 					if(toolbin == "")
 					{
-						tl::log_err("Tool binary \"", toolprog, "\" was not found.");
+						tl::log_warn("Tool binary \"", toolprog, "\" was not found.");
 						continue;
 					}
 
