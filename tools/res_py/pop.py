@@ -254,6 +254,12 @@ def calc(param, pointlike = False):
         ana_curvv = helpers.foc_curv(param["dist_sample_ana"], \
             param["dist_ana_det"], np.abs(2.*thetaa), True)
 
+    if param["verbose"]:
+        print("Mono curvature radius: vertical: %g cm, horizontal: %g cm." %
+               (mono_curvv/helpers.cm2A, mono_curvh/helpers.cm2A))
+        print("Ana curvature radius: vertical: %g cm, horizontal: %g cm.\n" %
+               (ana_curvv/helpers.cm2A, ana_curvh/helpers.cm2A))
+
     inv_mono_curvh = 0.
     inv_mono_curvv = 0.
     inv_ana_curvh = 0.

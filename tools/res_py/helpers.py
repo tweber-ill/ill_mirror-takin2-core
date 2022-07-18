@@ -141,11 +141,11 @@ def focal_len(lenBefore, lenAfter):
 #    - or nicos/nicos-core.git/tree/nicos/devices/tas/mono.py in nicos
 #    - or Monochromator_curved.comp in McStas
 #
-def foc_curv(lenBefore, lenAfter, tt, bVert):
+def foc_curv(lenBefore, lenAfter, tt, vert):
     f = focal_len(lenBefore, lenAfter)
     s = np.abs(np.sin(0.5*tt))
 
-    if bVert:
+    if vert:
         curv = 2. * f*s
     else:
         curv = 2. * f/s
