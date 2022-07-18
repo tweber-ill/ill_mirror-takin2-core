@@ -410,21 +410,17 @@ void ResoDlg::Calc()
 		cn.mono_curvv = t_real_reso(spinMonoCurvV->value()) * cm;
 		cn.bMonoIsCurvedH = cn.bMonoIsCurvedV = 0;
 		cn.bMonoIsOptimallyCurvedH = cn.bMonoIsOptimallyCurvedV = 0;
-		spinMonoCurvH->setEnabled(0); spinMonoCurvV->setEnabled(0);
+
+		spinMonoCurvH->setEnabled(comboMonoHori->currentIndex() == 2);
+		spinMonoCurvV->setEnabled(comboMonoVert->currentIndex() == 2);
 
 		if(comboMonoHori->currentIndex() == 2)
-		{
 			cn.bMonoIsCurvedH = 1;
-			spinMonoCurvH->setEnabled(1);
-		}
 		else if(comboMonoHori->currentIndex() == 1)
 			cn.bMonoIsCurvedH = cn.bMonoIsOptimallyCurvedH = 1;
 
 		if(comboMonoVert->currentIndex() == 2)
-		{
 			cn.bMonoIsCurvedV = 1;
-			spinMonoCurvV->setEnabled(1);
-		}
 		else if(comboMonoVert->currentIndex() == 1)
 			cn.bMonoIsCurvedV = cn.bMonoIsOptimallyCurvedV = 1;
 
@@ -435,21 +431,17 @@ void ResoDlg::Calc()
 		cn.ana_curvv = t_real_reso(spinAnaCurvV->value()) * cm;
 		cn.bAnaIsCurvedH = cn.bAnaIsCurvedV = 0;
 		cn.bAnaIsOptimallyCurvedH = cn.bAnaIsOptimallyCurvedV = 0;
-		spinAnaCurvH->setEnabled(0); spinAnaCurvV->setEnabled(0);
+
+		spinAnaCurvH->setEnabled(comboAnaHori->currentIndex() == 2);
+		spinAnaCurvV->setEnabled(comboAnaVert->currentIndex() == 2);
 
 		if(comboAnaHori->currentIndex() == 2)
-		{
 			cn.bAnaIsCurvedH = 1;
-			spinAnaCurvH->setEnabled(1);
-		}
 		else if(comboAnaHori->currentIndex()==1)
 			cn.bAnaIsCurvedH = cn.bAnaIsOptimallyCurvedH = 1;
 
 		if(comboAnaVert->currentIndex() == 2)
-		{
 			cn.bAnaIsCurvedV = 1;
-			spinAnaCurvV->setEnabled(1);
-		}
 		else if(comboAnaVert->currentIndex()==1)
 			cn.bAnaIsCurvedV = cn.bAnaIsOptimallyCurvedV = 1;
 
