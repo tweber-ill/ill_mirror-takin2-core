@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# install all packages needed for building on jammy
+# creates a distro archive
 # @author Tobias Weber <tobias.weber@tum.de>
-# @date 28-jul-20
+# @date 2016-2022
 # @license GPLv2
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -27,22 +27,43 @@
 # ----------------------------------------------------------------------------
 #
 
-#if [[ $(id -u) -gt 0 ]]; then
-#	echo -e "Please run this script as root."
-#	exit -1
-#fi
 
+# installation directory
+INSTDIR="$1"
 
-# -----------------------------------------------------------------------------
-# install packages
-# -----------------------------------------------------------------------------
-if ! sudo apt-get install cmake clang build-essential \
-	libboost-all-dev libclipper-dev \
-	qtchooser qtbase5-dev qttools5-dev-tools libqt5svg5-dev qt5-assistant \
-	libqwt-qt5-dev libpython3-dev \
-	libfreetype6-dev libbz2-dev wget coreutils
-then
-	echo -e "Error: Could not install packages necessary for building."
-	exit -1
+if [ "${INSTDIR}" = "" ]; then
+	INSTDIR=takin
 fi
-# -----------------------------------------------------------------------------
+
+mkdir -p ${INSTDIR}
+
+
+# main programs
+cp -rv bin			${INSTDIR}/
+cp -v takin.sh			${INSTDIR}/
+
+
+# info files
+cp -v *.txt			${INSTDIR}/
+cp -rv 3rdparty_licenses/	${INSTDIR}/
+
+
+# examples
+cp -rv examples 		${INSTDIR}/
+cp -rv data/samples 		${INSTDIR}/
+cp -rv data/instruments 	${INSTDIR}/
+cp -rv data/demos 		${INSTDIR}/
+
+
+# resources
+mkdir ${INSTDIR}/res
+cp -rv res/* ${INSTDIR}/res/
+cp -rv doc/*.html ${INSTDIR}/res/doc/
+gunzip -v ${INSTDIR}/res/data/*
+
+
+# remove uneeded files
+find ${INSTDIR}/ -type f -name ".dir" -exec rm -v {} \; -print
+
+# stripping
+strip -v ${INSTDIR}/bin/*

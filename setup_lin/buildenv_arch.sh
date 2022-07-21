@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# install all packages needed for building on jammy
+# install all packages needed for building
 # @author Tobias Weber <tobias.weber@tum.de>
-# @date 28-jul-20
+# @date 21-jul-22
 # @license GPLv2
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -36,11 +36,9 @@
 # -----------------------------------------------------------------------------
 # install packages
 # -----------------------------------------------------------------------------
-if ! sudo apt-get install cmake clang build-essential \
-	libboost-all-dev libclipper-dev \
-	qtchooser qtbase5-dev qttools5-dev-tools libqt5svg5-dev qt5-assistant \
-	libqwt-qt5-dev libpython3-dev \
-	libfreetype6-dev libbz2-dev wget coreutils
+if ! sudo pacman -S cmake gcc boost \
+	qt5 qt5-webkit qwt qcustomplot \
+	qhull lapacke gnuplot python3
 then
 	echo -e "Error: Could not install packages necessary for building."
 	exit -1
