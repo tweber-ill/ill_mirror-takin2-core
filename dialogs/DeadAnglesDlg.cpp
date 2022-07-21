@@ -184,13 +184,13 @@ void DeadAnglesDlg::SendApplyDeadAngles()
 	for(int iRow=0; iRow<tableAngles->rowCount(); ++iRow)
 	{
 		DeadAngle<t_real> angle;
-		angle.dAngleStart = 
+		angle.dAngleStart =
 			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::START_ANGLE))->text().toStdString());
-		angle.dAngleEnd = 
+		angle.dAngleEnd =
 			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::STOP_ANGLE))->text().toStdString());
-		angle.dAngleOffs = 
+		angle.dAngleOffs =
 			tl::str_to_var_parse<t_real>(tableAngles->item(
 				iRow, static_cast<int>(AngleInfo::OFFSET_ANGLE))->text().toStdString());
 

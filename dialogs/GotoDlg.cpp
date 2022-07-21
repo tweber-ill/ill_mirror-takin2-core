@@ -85,9 +85,9 @@ GotoDlg::GotoDlg(QWidget* pParent, QSettings* pSett) : QDialog(pParent), m_pSett
 		{
 			bool bKi = m_pSettings->value("goto_pos/ki_fix").toBool();
 			if(bKi)
-				radioFixedKi->setChecked(1);
+				radioFixedKi->setChecked(true);
 			else
-				radioFixedKf->setChecked(1);
+				radioFixedKf->setChecked(true);
 		}
 	}
 }
@@ -114,7 +114,7 @@ void GotoDlg::CalcSample()
 	t_real dKf = tl::str_to_var_parse<t_real>(editKf->text().toStdString());
 
 	ublas::vector<t_real> vecQ;
-	bool bFailed = 0;
+	bool bFailed = false;
 	try
 	{
 		tl::get_tas_angles(m_lattice,
@@ -137,7 +137,7 @@ void GotoDlg::CalcSample()
 
 		//log_err(ex.what());
 		labelStatus->setText((std::string("Error (sample): ") + ex.what()).c_str());
-		bFailed = 1;
+		bFailed = true;
 	}
 
 	tl::set_eps_0(vecQ, g_dEps);
@@ -188,8 +188,8 @@ void GotoDlg::CalcMonoAna()
 	tl::t_wavenumber_si<t_real> ki = dKi / angs;
 	tl::t_wavenumber_si<t_real> kf = dKf / angs;
 
-	bool bMonoOk = 0;
-	bool bAnaOk = 0;
+	bool bMonoOk = false;
+	bool bAnaOk = false;
 
 	try
 	{
@@ -198,7 +198,7 @@ void GotoDlg::CalcMonoAna()
 			throw tl::Err("Invalid monochromator angle.");
 
 		tl::set_eps_0(m_dMono2Theta, g_dEps);
-		bMonoOk = 1;
+		bMonoOk = true;
 	}
 	catch(const std::exception& ex)
 	{
@@ -216,7 +216,7 @@ void GotoDlg::CalcMonoAna()
 			throw tl::Err("Invalid analysator angle.");
 
 		tl::set_eps_0(m_dAna2Theta, g_dEps);
-		bAnaOk = 1;
+		bAnaOk = true;
 	}
 	catch(const std::exception& ex)
 	{
@@ -275,7 +275,7 @@ void GotoDlg::EditedE()
 	t_real dE = tl::str_to_var_parse<t_real>(editE->text().toStdString());
 	tl::t_energy_si<t_real> E = dE * meV;
 
-	bool bImag=0;
+	bool bImag = false;
 	tl::t_wavenumber_si<t_real> k_E = tl::E2k(E, bImag);
 	t_real dSign = 1.;
 	if(bImag) dSign = -1.;
@@ -333,7 +333,7 @@ void GotoDlg::EditedAngles()
 	t_real h,k,l;
 	t_real dKi, dKf, dE;
 	ublas::vector<t_real> vecQ;
-	bool bFailed = 0;
+	bool bFailed = false;
 	try
 	{
 		tl::get_hkl_from_tas_angles<t_real>(m_lattice,
@@ -712,14 +712,20 @@ void GotoDlg::Save(std::map<std::string, std::string>& mapConf, const std::strin
 
 void GotoDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot)
 {
-	bool bOk=0;
+	bool bOk = false;
 
 	editH->setText(tl::var_to_str(xml.Query<t_real>(strXmlRoot + "goto_pos/h", 1., &bOk), g_iPrec).c_str());
 	editK->setText(tl::var_to_str(xml.Query<t_real>(strXmlRoot + "goto_pos/k", 0., &bOk), g_iPrec).c_str());
 	editL->setText(tl::var_to_str(xml.Query<t_real>(strXmlRoot + "goto_pos/l", 0., &bOk), g_iPrec).c_str());
 	editKi->setText(tl::var_to_str(xml.Query<t_real>(strXmlRoot + "goto_pos/ki", 1.4, &bOk), g_iPrec).c_str());
 	editKf->setText(tl::var_to_str(xml.Query<t_real>(strXmlRoot + "goto_pos/kf", 1.4, &bOk), g_iPrec).c_str());
-	radioFixedKi->setChecked(xml.Query<bool>(strXmlRoot + "goto_pos/cki", 0, &bOk));
+
+	bool cki = xml.Query<bool>(strXmlRoot + "goto_pos/cki", false, &bOk);
+
+	if(cki)
+		radioFixedKi->setChecked(true);
+	else
+		radioFixedKf->setChecked(true);
 
 	// favlist
 	ClearList();
