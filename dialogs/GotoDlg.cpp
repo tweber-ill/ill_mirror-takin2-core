@@ -6,7 +6,7 @@
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
- * Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+ * Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
  *                          Grenoble, France).
  * Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
  *                          (TUM), Garching, Germany).
@@ -43,11 +43,17 @@ static const tl::t_angle_si<t_real> rads = tl::get_one_radian<t_real>();
 GotoDlg::GotoDlg(QWidget* pParent, QSettings* pSett) : QDialog(pParent), m_pSettings(pSett)
 {
 	this->setupUi(this);
+	splitter->setStretchFactor(0, 1);
+	splitter->setStretchFactor(1, 2);
+
 	if(m_pSettings)
 	{
 		QFont font;
-		if(m_pSettings->contains("main/font_gen") && font.fromString(m_pSettings->value("main/font_gen", "").toString()))
+		if(m_pSettings->contains("main/font_gen") &&
+			font.fromString(m_pSettings->value("main/font_gen", "").toString()))
+		{
 			setFont(font);
+		}
 	}
 
 	btnAdd->setIcon(load_icon("res/icons/list-add.svg"));
@@ -56,16 +62,21 @@ GotoDlg::GotoDlg(QWidget* pParent, QSettings* pSett) : QDialog(pParent), m_pSett
 	btnLoad->setIcon(load_icon("res/icons/document-open.svg"));
 
 	std::vector<QLineEdit*> vecObjs {editH, editK, editL};
-	std::vector<QLineEdit*> vecAngles {edit2ThetaM, editThetaM, edit2ThetaA, editThetaA, edit2ThetaS, editThetaS};
+	std::vector<QLineEdit*> vecAngles {edit2ThetaM, editThetaM,
+		edit2ThetaA, editThetaA, edit2ThetaS, editThetaS};
 
 	QObject::connect(buttonBox, &QDialogButtonBox::clicked, this, &GotoDlg::ButtonBoxClicked);
 
-	QObject::connect(btnAdd, &QAbstractButton::clicked, this, static_cast<void(GotoDlg::*)()>(&GotoDlg::AddPosToList));
-	QObject::connect(btnDel, &QAbstractButton::clicked, this, &GotoDlg::RemPosFromList);
+	QObject::connect(btnAdd, &QAbstractButton::clicked,
+		this, static_cast<void(GotoDlg::*)()>(&GotoDlg::AddPosToList));
+	QObject::connect(btnDel, &QAbstractButton::clicked,
+		this, &GotoDlg::RemPosFromList);
 	QObject::connect(btnLoad, &QAbstractButton::clicked, this, &GotoDlg::LoadList);
 	QObject::connect(btnSave, &QAbstractButton::clicked, this, &GotoDlg::SaveList);
-	QObject::connect(listSeq, &QListWidget::itemSelectionChanged, this, &GotoDlg::ListItemSelected);
-	QObject::connect(listSeq, &QListWidget::itemDoubleClicked, this, &GotoDlg::ListItemDoubleClicked);
+	QObject::connect(listSeq, &QListWidget::itemSelectionChanged,
+		this, &GotoDlg::ListItemSelected);
+	QObject::connect(listSeq, &QListWidget::itemDoubleClicked,
+		this, &GotoDlg::ListItemDoubleClicked);
 
 	QObject::connect(editKi, &QLineEdit::textEdited, this, &GotoDlg::EditedKiKf);
 	QObject::connect(editKf, &QLineEdit::textEdited, this, &GotoDlg::EditedKiKf);
@@ -144,10 +155,12 @@ void GotoDlg::CalcSample()
 	tl::set_eps_0(m_dSample2Theta, g_dEps);
 	tl::set_eps_0(m_dSampleTheta, g_dEps);
 
-	const std::wstring strAA = tl::get_spec_char_utf16("AA") + tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
+	const std::wstring strAA = tl::get_spec_char_utf16("AA") +
+		tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
 
 	std::wostringstream ostrStatus;
-	ostrStatus << "Q = " << vecQ << " " << strAA << ", |Q| = " << ublas::norm_2(vecQ) << " " << strAA;
+	ostrStatus << "Q = " << vecQ << " " << strAA << ", |Q| = "
+		<< ublas::norm_2(vecQ) << " " << strAA;
 	labelQ->setText(QString::fromWCharArray(ostrStatus.str().c_str()));
 
 #ifndef NDEBUG
@@ -355,9 +368,11 @@ void GotoDlg::EditedAngles()
 		bFailed = 1;
 	}
 
-	const std::wstring strAA = tl::get_spec_char_utf16("AA") + tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
+	const std::wstring strAA = tl::get_spec_char_utf16("AA") +
+		tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
 	std::wostringstream ostrStatus;
-	ostrStatus << "Q = " << vecQ << " " << strAA << ", |Q| = " << ublas::norm_2(vecQ) << " " << strAA;
+	ostrStatus << "Q = " << vecQ << " " << strAA
+		<< ", |Q| = " << ublas::norm_2(vecQ) << " " << strAA;
 	labelQ->setText(QString::fromWCharArray(ostrStatus.str().c_str()));
 
 	if(bFailed) return;
@@ -450,6 +465,9 @@ void GotoDlg::showEvent(QShowEvent *pEvt)
 //------------------------------------------------------------------------------
 
 
+/**
+ * instrument position stored in the list
+ */
 struct HklPos
 {
 	t_real dh, dk, dl;
@@ -555,7 +573,8 @@ void GotoDlg::AddPosToList(t_real dh, t_real dk, t_real dl, t_real dki, t_real d
 	tl::set_eps_0(pPos->dkf, g_dEps);
 	tl::set_eps_0(pPos->dE, g_dEps);
 
-	const std::wstring strAA = tl::get_spec_char_utf16("AA") + tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
+	const std::wstring strAA = tl::get_spec_char_utf16("AA") +
+		tl::get_spec_char_utf16("sup-") + tl::get_spec_char_utf16("sup1");
 
 	std::wostringstream ostrHKL;
 	ostrHKL.precision(g_iPrecGfx);

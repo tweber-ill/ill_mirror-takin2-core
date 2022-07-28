@@ -1,7 +1,7 @@
 /**
  * Dead Angles Dialog
  * @author Tobias Weber <tobias.weber@tum.de>
- * @date jun-2017
+ * @date jun-2017, 28-jul-2022
  * @license GPLv2
  *
  * ----------------------------------------------------------------------------
@@ -34,6 +34,7 @@
 
 #include "libs/globals.h"
 #include "libs/globals_qt.h"
+#include "tlibs/file/prop.h"
 
 #include "ui/ui_deadangles.h"
 
@@ -59,16 +60,33 @@ protected:
 	virtual void closeEvent(QCloseEvent*) override;
 	void SendApplyDeadAngles();
 
+	// list
+	void ClearList();
+	void AddAnglesToList(const std::vector<DeadAngle<t_real_glob>>& angles);
+	void SetAnglesFromList(QListWidgetItem* item);
+
 protected slots:
 	void ButtonBoxClicked(QAbstractButton* pBtn);
 	void RemoveAngle();
 	void AddAngle();
 
+	// list
+	void AddAnglesToList();
+	void RemAnglesFromList();
+	void LoadList();
+	void SaveList();
+	void ListItemSelected();
+	void ListItemDoubleClicked(QListWidgetItem*);
+
 public:
 	DeadAnglesDlg(QWidget* pParent = nullptr, QSettings *pSettings = nullptr);
-	virtual ~DeadAnglesDlg() = default;
+	virtual ~DeadAnglesDlg();
 
 	void SetDeadAngles(const std::vector<DeadAngle<t_real_glob>>& vecAngle);
+	std::vector<DeadAngle<t_real_glob>> GetDeadAngles() const;
+
+	void Save(std::map<std::string, std::string>& mapConf, const std::string& strXmlRoot);
+	void Load(tl::Prop<std::string>& xml, const std::string& strXmlRoot);
 
 signals:
 	void ApplyDeadAngles(const std::vector<DeadAngle<t_real_glob>>& vecAngle);

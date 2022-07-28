@@ -210,6 +210,7 @@ class TazDlg : public QMainWindow, Ui::TazDlg
 
 	protected:
 		void InitReso();
+		void InitDeadAngles();
 		void InitGoto();
 		void InitResoConv();
 

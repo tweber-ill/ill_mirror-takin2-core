@@ -1606,14 +1606,20 @@ void TazDlg::RealContextMenu(const QPoint& _pt)
 //--------------------------------------------------------------------------------
 // obstacles
 
-void TazDlg::ShowDeadAnglesDlg()
+void TazDlg::InitDeadAngles()
 {
 	if(!m_pDeadAnglesDlg)
 	{
 		m_pDeadAnglesDlg = new DeadAnglesDlg(this, &m_settings);
-		QObject::connect(m_pDeadAnglesDlg, &DeadAnglesDlg::ApplyDeadAngles, this, &TazDlg::ApplyDeadAngles);
+		QObject::connect(m_pDeadAnglesDlg, &DeadAnglesDlg::ApplyDeadAngles,
+			this, &TazDlg::ApplyDeadAngles);
 	}
+}
 
+
+void TazDlg::ShowDeadAnglesDlg()
+{
+	InitDeadAngles();
 	m_pDeadAnglesDlg->SetDeadAngles(m_vecDeadAngles);
 	focus_dlg(m_pDeadAnglesDlg);
 }

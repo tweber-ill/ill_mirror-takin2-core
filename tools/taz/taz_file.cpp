@@ -353,27 +353,11 @@ bool TazDlg::Load(const char* pcFile)
 
 	// dead angles
 	m_vecDeadAngles.clear();
-	unsigned int iNumAngles = xml.Query<unsigned int>(strXmlRoot + "deadangles/num", 0, &bOk);
-	if(bOk)
+	if(xml.Exists(strXmlRoot + "deadangles"))
 	{
-		m_vecDeadAngles.reserve(iNumAngles);
-
-		for(unsigned int iAngle=0; iAngle<iNumAngles; ++iAngle)
-		{
-			DeadAngle<t_real> angle;
-
-			std::string strNr = tl::var_to_str(iAngle);
-			angle.dAngleStart = xml.Query<t_real>(strXmlRoot + "deadangles/" + strNr + "/start", 0.);
-			angle.dAngleEnd = xml.Query<t_real>(strXmlRoot + "deadangles/" + strNr + "/end", 0.);
-			angle.dAngleOffs = xml.Query<t_real>(strXmlRoot + "deadangles/" + strNr + "/offs", 0.);
-			angle.iCentreOn = xml.Query<int>(strXmlRoot + "deadangles/" + strNr + "/centreon", 1);
-			angle.iRelativeTo = xml.Query<int>(strXmlRoot + "deadangles/" + strNr + "/relativeto", 0);
-
-			m_vecDeadAngles.emplace_back(std::move(angle));
-		}
-
-		if(m_pDeadAnglesDlg)
-			m_pDeadAnglesDlg->SetDeadAngles(m_vecDeadAngles);
+		InitDeadAngles();
+		m_pDeadAnglesDlg->Load(xml, strXmlRoot);
+		m_vecDeadAngles = m_pDeadAnglesDlg->GetDeadAngles();
 		if(m_sceneReal.GetTasLayout())
 			m_sceneReal.GetTasLayout()->SetDeadAngles(&m_vecDeadAngles);
 	}
@@ -560,26 +544,6 @@ bool TazDlg::Save()
 	}
 
 
-	// dead angles
-	mapConf[strXmlRoot + "deadangles/num"] = tl::var_to_str(m_vecDeadAngles.size());
-	for(std::size_t iAngle=0; iAngle<m_vecDeadAngles.size(); ++iAngle)
-	{
-		const DeadAngle<t_real>& angle = m_vecDeadAngles[iAngle];
-
-		std::string strAtomNr = tl::var_to_str(iAngle);
-		mapConf[strXmlRoot + "deadangles/" + strAtomNr + "/start"] =
-			tl::var_to_str(angle.dAngleStart);
-		mapConf[strXmlRoot + "deadangles/" + strAtomNr + "/end"] =
-			tl::var_to_str(angle.dAngleEnd);
-		mapConf[strXmlRoot + "deadangles/" + strAtomNr + "/offs"] =
-			tl::var_to_str(angle.dAngleOffs);
-		mapConf[strXmlRoot + "deadangles/" + strAtomNr + "/centreon"] =
-			tl::var_to_str(angle.iCentreOn);
-		mapConf[strXmlRoot + "deadangles/" + strAtomNr + "/relativeto"] =
-			tl::var_to_str(angle.iRelativeTo);
-	}
-
-
 	// meta data
 	const char* pcUser = std::getenv("USER");
 	if(!pcUser) pcUser = "";
@@ -596,6 +560,7 @@ bool TazDlg::Save()
 	if(m_pReso) m_pReso->Save(mapConf, strXmlRoot);
 	if(m_pConvoDlg) m_pConvoDlg->Save(mapConf, strXmlRoot);
 	if(m_pGotoDlg) m_pGotoDlg->Save(mapConf, strXmlRoot);
+	if(m_pDeadAnglesDlg) m_pDeadAnglesDlg->Save(mapConf, strXmlRoot);
 	//if(m_pPowderDlg) m_pPowderDlg->Save(mapConf, strXmlRoot);
 
 

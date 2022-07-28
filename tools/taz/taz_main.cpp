@@ -95,7 +95,8 @@ static bool add_logfile(std::ofstream* postrLog, bool bAdd=1)
 		return 0;
 	}
 
-	for(tl::Log* plog : { &tl::log_info, &tl::log_warn, &tl::log_err, &tl::log_crit, &tl::log_debug })
+	for(tl::Log* plog : { &tl::log_info, &tl::log_warn,
+		&tl::log_err, &tl::log_crit, &tl::log_debug })
 	{
 		if(bAdd)
 			plog->AddOstr(postrLog, 0, 0);
@@ -117,12 +118,13 @@ static inline void sys_err(const SysErr& err)
 }
 
 
-static void show_splash_msg(QApplication *pApp, QSplashScreen *pSplash, const std::string &strMsg)
+static void show_splash_msg(QApplication *pApp, QSplashScreen *pSplash,
+	const std::string &strMsg)
 {
 	if(!pApp || !pSplash)
 		return;
 
-	QColor colSplash(0xff, 0xcc, 0x00);
+	QColor colSplash(0xff, 0x55, 0x00);
 	pSplash->showMessage(strMsg.c_str(), Qt::AlignCenter, colSplash);
 	pApp->processEvents();
 }
@@ -518,16 +520,23 @@ int main(int argc, char** argv)
 
 
 		// ------------------------------------------------------------
+		// NOTE: If the program crashes after the splash screen, this
+		// is most likely due to linking different libraries depending
+		// on mismatching qt versions (e.g. a qt6 qwt with a qt5 main
+		// program).
+
 		std::shared_ptr<TazDlg> pTakDlg;
 		std::shared_ptr<ConvoDlg> pConvoDlg;
 		std::shared_ptr<ScanViewerDlg> pScanViewerDlg;
 
 		if(bStartTakinMain)
 		{
-			show_splash_msg(app_gui, pSplash.get(), strStarting + "\nLoading 1/2 ...");
+			show_splash_msg(app_gui, pSplash.get(),
+				strStarting + "\nLoading 1/2 ...");
 			pTakDlg.reset(new TazDlg{nullptr, strLog});
 			app_gui->SetTakDlg(pTakDlg);
-			show_splash_msg(app_gui, pSplash.get(), strStarting + "\nLoading 2/2 ...");
+			show_splash_msg(app_gui, pSplash.get(),
+				strStarting + "\nLoading 2/2 ...");
 			app_gui->DoPendingRequests();
 
 			if(pSplash) pSplash->finish(pTakDlg.get());
@@ -536,6 +545,7 @@ int main(int argc, char** argv)
 				tl::log_info("Loading \"", vecTazFiles[0], "\"...");
 				pTakDlg->Load(vecTazFiles[0].c_str());
 			}
+
 			pTakDlg->show();
 		}
 		if(bStartMonteconvo)
