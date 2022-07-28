@@ -428,7 +428,7 @@ void DeadAnglesDlg::Save(std::map<std::string, std::string>& mapConf, const std:
 			(std::vector<DeadAngle<t_real>>*)listSeq->item(stored)->data(
 				Qt::UserRole).value<void*>();
 
-		std::string strStoredNr = "stored_ " + tl::var_to_str(stored) + "/";
+		std::string strStoredNr = "stored_" + tl::var_to_str(stored) + "/";
 
 		for(std::size_t angle_idx=0; angle_idx<stored_angles->size(); ++angle_idx)
 		{
@@ -485,7 +485,7 @@ void DeadAnglesDlg::Load(tl::Prop<std::string>& xml, const std::string& strXmlRo
 	{
 		for(unsigned int stored_idx=0; stored_idx<num_stored; ++stored_idx)
 		{
-			std::string strStoredNr = "stored_ " + tl::var_to_str(stored_idx) + "/";
+			std::string strStoredNr = "stored_" + tl::var_to_str(stored_idx) + "/";
 
 			std::vector<DeadAngle<t_real>> angles;
 			angles.reserve(num_angles);
