@@ -30,7 +30,7 @@
 #define __DO_RESO_H__
 
 #include "../res/eck.h"
-#include "../res/viol.h"
+#include "../res/vio.h"
 #include "../res/ellipse.h"
 #include "../res/mc.h"
 
@@ -59,7 +59,7 @@ protected:
 
 	McNeutronOpts<ublas::matrix<t_real_reso>> m_opts;
 	EckParams m_reso;
-	ViolParams m_tofreso;
+	VioParams m_tofreso;
 
 	// randomly smear out sample position if vector size >= 1
 	std::vector<ResoResults> m_res;
@@ -94,10 +94,10 @@ public:
 	void SetOptimalFocus(ResoFocus foc) { m_foc = foc; }
 
 	const EckParams& GetResoParams() const { return m_reso; }
-	const ViolParams& GetTofResoParams() const { return m_tofreso; }
+	const VioParams& GetTofResoParams() const { return m_tofreso; }
 	const McNeutronOpts<ublas::matrix<t_real_reso>>& GetMCOpts() const { return m_opts; }
 	EckParams& GetResoParams() { return m_reso; }
-	ViolParams& GetTofResoParams() { return m_tofreso; }
+	VioParams& GetTofResoParams() { return m_tofreso; }
 	t_real_reso GetR0Scale() const { return m_R0_scale; }
 
 	const ResoResults& GetResoResults() const { return m_res[0]; }

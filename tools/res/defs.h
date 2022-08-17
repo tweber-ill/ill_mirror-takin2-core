@@ -81,7 +81,7 @@ enum class ResoAlgo
 	POP_CN   = 2,
 	POP      = 3,
 	ECK      = 4,
-	VIOL     = 5,
+	VIO      = 5,
 	SIMPLE   = 100,
 	UNKNOWN  = -1
 };

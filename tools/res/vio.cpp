@@ -4,7 +4,7 @@
  * @date apr-2016
  * @license GPLv2
  *
- * @desc for used algo, see: [viol14] N. Violini et al., NIM A 736 (2014) pp. 31-39, doi: 10.1016/j.nima.2013.10.042
+ * @desc for used algo, see: [vio14] N. Violini et al., NIM A 736 (2014) pp. 31-39, doi: 10.1016/j.nima.2013.10.042
  * @desc results checked with: [ehl11] G. Ehlers et al., http://arxiv.org/abs/1109.1482 (2011)
  *
  * ----------------------------------------------------------------------------
@@ -29,7 +29,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#include "viol.h"
+#include "vio.h"
 #include "ellipse.h"
 #include "helper.h"
 
@@ -61,7 +61,7 @@ static const t_time sec = tl::get_one_second<t_real>();
 static const length meter = tl::get_one_meter<t_real>();
 
 
-ResoResults calc_viol(const ViolParams& params)
+ResoResults calc_vio(const VioParams& params)
 {
 	ResoResults res;
 	res.Q_avg.resize(4);
@@ -109,7 +109,7 @@ ResoResults calc_viol(const ViolParams& params)
 	const mass mn = tl::get_m_n<t_real>();
 	const auto mn_hbar = mn / tl::get_hbar<t_real>();
 
-	// formulas 20 & 21 in [viol14]
+	// formulas 20 & 21 in [vio14]
 	const t_time st = tl::my_units_sqrt<t_time>(sp*sp + sm*sm);
 	const t_time stm = tl::my_units_sqrt<t_time>(sd*sd + sm*sm);
 
@@ -119,7 +119,7 @@ ResoResults calc_viol(const ViolParams& params)
 
 
 	// --------------------------------------------------------------------
-	// E formulas 14-18 in [viol14]
+	// E formulas 14-18 in [vio14]
 
 	std::vector<std::function<t_real()>> vecEderivs =
 	{
@@ -132,7 +132,7 @@ ResoResults calc_viol(const ViolParams& params)
 
 
 #ifndef NDEBUG
-	// formula 19 in [viol14]
+	// formula 19 in [vio14]
 	t_real sigE = std::sqrt(
 		std::inner_product(vecEderivs.begin(), vecEderivs.end(), vecsigs.begin(), t_real(0),
 		[](t_real r1, t_real r2)->t_real { return r1 + r2; },
@@ -159,8 +159,8 @@ ResoResults calc_viol(const ViolParams& params)
 
 
 	// --------------------------------------------------------------------
-	// spherical: Q formulas in appendices A.1 and p. 34 of [viol14]
-	// cylindrical: Q formulas in appendices A.3 and p. 35 of [viol14]
+	// spherical: Q formulas in appendices A.1 and p. 34 of [vio14]
+	// cylindrical: Q formulas in appendices A.3 and p. 35 of [vio14]
 
 	t_real ctt_i = std::cos(tt_i/rads), stt_i = std::sin(tt_i/rads);
 	t_real ctt_f = std::cos(tt/rads), stt_f = std::sin(tt/rads);
@@ -270,8 +270,8 @@ ResoResults calc_viol(const ViolParams& params)
 		mn_hbar * s2tf/rads * (vf * ctt_f)
 	}) };
 
-	t_vec sigQ2 = tl::make_vec<t_vec>({ 
-		tl::my_units_norm2<wavenumber>(vecQ2[0]) * angs, 
+	t_vec sigQ2 = tl::make_vec<t_vec>({
+		tl::my_units_norm2<wavenumber>(vecQ2[0]) * angs,
 		tl::my_units_norm2<wavenumber>(vecQ2[1]) * angs });
 	tl::log_debug("dQ (Vanadium fwhm, check) = ", tl::get_SIGMA2FWHM<t_real>()*sigQ2);
 	// --------------------------------------------------------------------
@@ -282,7 +282,7 @@ ResoResults calc_viol(const ViolParams& params)
 
 
 	// --------------------------------------------------------------------
-	// formulas 10 & 11 in [viol14]
+	// formulas 10 & 11 in [vio14]
 	t_mat matSigSq = tl::diag_matrix({
 		st*st /sec/sec, stm*stm /sec/sec,
 		slp*slp /meter/meter, slm*slm /meter/meter, sls*sls /meter/meter,

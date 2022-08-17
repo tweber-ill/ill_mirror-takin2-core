@@ -44,7 +44,7 @@
 #include "cn.h"
 #include "pop.h"
 #include "eck.h"
-#include "viol.h"
+#include "vio.h"
 #include "simple.h"
 #include "tlibs/math/linalg.h"
 #include "tlibs/file/prop.h"
@@ -122,7 +122,7 @@ protected:
 
 
 	EckParams m_tasparams;
-	ViolParams m_tofparams;
+	VioParams m_tofparams;
 	SimpleResoParams m_simpleparams;
 
 	ResoResults m_res;

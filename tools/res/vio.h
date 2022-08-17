@@ -4,7 +4,7 @@
  * @date apr-2016
  * @license GPLv2
  *
- * @desc for algo, see: [viol14] N. Violini et al., NIM A 736 (2014) pp. 31-39, doi: 10.1016/j.nima.2013.10.042
+ * @desc for algo, see: [vio14] N. Violini et al., NIM A 736 (2014) pp. 31-39, doi: 10.1016/j.nima.2013.10.042
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
@@ -44,7 +44,7 @@ enum class TofDetShape { SPH, CYL, UNKNOWN };
 /**
  * TOF parameters in sigma
  */
-struct ViolParams
+struct VioParams
 {
 	// scattering triangle
 	tl::t_wavenumber_si<t_real_reso> ki, kf, Q;
@@ -76,6 +76,6 @@ struct ViolParams
 };
 
 
-extern ResoResults calc_viol(const ViolParams& params);
+extern ResoResults calc_vio(const VioParams& params);
 
 #endif

@@ -229,7 +229,7 @@ void ResoDlg::setupAlgos()
 	comboAlgo->addItem("TAS: Popovici (Extended)", static_cast<int>(ResoAlgo::POP));
 	comboAlgo->addItem("TAS: Eckold-Sobolev (Extended)", static_cast<int>(ResoAlgo::ECK));
 	comboAlgo->insertSeparator(4);
-	comboAlgo->addItem("TOF: Violini", static_cast<int>(ResoAlgo::VIOL));
+	comboAlgo->addItem("TOF: Violini", static_cast<int>(ResoAlgo::VIO));
 	comboAlgo->insertSeparator(6);
 	comboAlgo->addItem("Simple", static_cast<int>(ResoAlgo::SIMPLE));
 }
@@ -319,7 +319,7 @@ void ResoDlg::Calc()
 		if(m_bDontCalc) return;
 
 		EckParams &cn = m_tasparams;
-		ViolParams &tof = m_tofparams;
+		VioParams &tof = m_tofparams;
 		SimpleResoParams &simple = m_simpleparams;
 
 		ResoResults &res = m_res;
@@ -526,7 +526,7 @@ void ResoDlg::Calc()
 			case ResoAlgo::POP_CN: res = calc_pop_cn(cn); break;
 			case ResoAlgo::POP: res = calc_pop(cn); break;
 			case ResoAlgo::ECK: res = calc_eck(cn); break;
-			case ResoAlgo::VIOL: res = calc_viol(tof); break;
+			case ResoAlgo::VIO: res = calc_vio(tof); break;
 			case ResoAlgo::SIMPLE: res = calc_simplereso(simple); break;
 			default: tl::log_err("Unknown resolution algorithm selected."); return;
 		}
@@ -1163,7 +1163,7 @@ void ResoDlg::AlgoChanged()
 			strAlgo += "2014";
 			break;
 		}
-		case ResoAlgo::VIOL:
+		case ResoAlgo::VIO:
 		{
 			tabWidget->setTabEnabled(0,0);
 			tabWidget->setTabEnabled(1,0);

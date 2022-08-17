@@ -24,14 +24,14 @@
  * ----------------------------------------------------------------------------
  */
 
-// gcc -DNO_QT -I. -I../.. -o tst_tof ../../tools/test/tst_tof.cpp ../../tools/res/viol.cpp ../../tlibs/log/log.cpp -lstdc++ -std=c++11 -lstdc++ -lm
+// gcc -DNO_QT -I. -I../.. -o tst_tof ../../tools/test/tst_tof.cpp ../../tools/res/vio.cpp ../../tlibs/log/log.cpp -lstdc++ -std=c++11 -lstdc++ -lm
 
-#include "tools/res/viol.h"
+#include "tools/res/vio.h"
 #include <iostream>
 
 int main()
 {
-	ViolParams parms;
+	VioParams parms;
 
 	parms.ki = 1.4 / tl::get_one_angstrom<double>();
 	parms.kf = 1.4 / tl::get_one_angstrom<double>();
@@ -59,7 +59,7 @@ int main()
 	parms.sig_outplane_i = tl::m2r(30.) * tl::get_one_radian<double>();
 	parms.sig_outplane_f = tl::m2r(30.) * tl::get_one_radian<double>();
 
-	ResoResults res = calc_viol(parms);
+	ResoResults res = calc_vio(parms);
 
 	return 0;
 }

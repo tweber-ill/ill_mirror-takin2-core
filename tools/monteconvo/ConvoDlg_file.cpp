@@ -313,7 +313,7 @@ void ConvoDlg::Save(std::map<std::string, std::string>& mapConf, const std::stri
 	else if(algo_idx == 3)
 		algo_name = "eck";
 	else if(algo_idx == 4)
-		algo_name = "viol";
+		algo_name = "vio";
 	mapConf[strXmlRoot + "monteconvo/algo"] = algo_name;
 
 	const char* pcUser = std::getenv("USER");

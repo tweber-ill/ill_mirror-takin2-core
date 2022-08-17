@@ -146,7 +146,7 @@ std::string convert_monteconvo(
 		case 0: strAlgo = "cn"; break;
 		case 1: strAlgo = "pop"; break;
 		case 2: strAlgo = "eck"; break;
-		case 3: strAlgo = "viol"; break;
+		case 3: strAlgo = "vio"; break;
 	}
 	mapJob["resolution/algorithm"] = strAlgo;
 

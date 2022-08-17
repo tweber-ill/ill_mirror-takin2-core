@@ -334,8 +334,8 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 		m_algo = ResoAlgo::POP;
 	else if(algo == "eck")
 		m_algo = ResoAlgo::ECK;
-	else if(algo == "viol")
-		m_algo = ResoAlgo::VIOL;
+	else if(algo == "vio" || algo == "viol")
+		m_algo = ResoAlgo::VIO;
 	else
 	{
 		// in former versions, an index was used
@@ -347,7 +347,7 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 		else if(algo_idx == 2)
 			m_algo = ResoAlgo::ECK;
 		else if(algo_idx == 3)
-			m_algo = ResoAlgo::VIOL;
+			m_algo = ResoAlgo::VIO;
 		else
 		{
 			// get the index instead
@@ -540,10 +540,10 @@ bool TASReso::SetHKLE(t_real h, t_real k, t_real l, t_real E)
 			//tl::log_info("Algorithm: Eckold-Sobolev (TAS)");
 			resores_cur = calc_eck(m_reso);
 		}
-		else if(m_algo == ResoAlgo::VIOL)
+		else if(m_algo == ResoAlgo::VIO)
 		{
 			//tl::log_info("Algorithm: Violini (TOF)");
-			resores_cur = calc_viol(m_tofreso);
+			resores_cur = calc_vio(m_tofreso);
 		}
 		else
 		{

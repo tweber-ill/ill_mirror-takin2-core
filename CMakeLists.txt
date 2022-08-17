@@ -404,7 +404,7 @@ add_executable(takin
 	tools/taz/nicos.cpp tools/taz/sics.cpp tools/taz/taz_net.cpp
 
 	tools/res/cn.cpp tools/res/pop.cpp tools/res/pop_cn.cpp
-	tools/res/eck.cpp tools/res/viol.cpp tools/res/simple.cpp
+	tools/res/eck.cpp tools/res/vio.cpp tools/res/simple.cpp
 	tools/res/ResoDlg.cpp tools/res/ResoDlg_file.cpp
 
 	tools/monteconvo/ConvoDlg.cpp tools/monteconvo/ConvoDlg_file.cpp
@@ -562,7 +562,7 @@ if(BUILD_EXT_TOOLS)
 	# -----------------------------------------------------------------------------
 	add_executable(convofit
 		tools/res/cn.cpp tools/res/pop.cpp tools/res/pop_cn.cpp
-		tools/res/eck.cpp tools/res/viol.cpp
+		tools/res/eck.cpp tools/res/vio.cpp
 		#tools/res/simple.cpp
 
 		tools/monteconvo/TASReso.cpp
