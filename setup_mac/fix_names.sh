@@ -30,15 +30,12 @@
 
 PRG="takin.app"
 
-TOOL=install_name_tool
+fix_libs=1
+
+NAME_TOOL=install_name_tool
 STRIP=strip
 
-QT_VER=$(ls /usr/local/Cellar/qt)
-QT_VER=5.15.2_2
 PY_VER=3.10
-QT_NAME=qt@5
-
-echo -e "Qt version: ${QT_VER}"
 echo -e "Py version: ${PY_VER}"
 
 # files whose linkage is to be changed
@@ -73,173 +70,76 @@ declare -a filestochange=(
 )
 
 
-
-# original symbols
+# original symbols, pattern-matched
 declare -a changefrom=(
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtCore.framework/Versions/5/QtCore"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtCore.framework/Versions/5/QtCore"
-	"/usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore"
-	"/usr/local/opt/qt/lib/QtCore.framework/Versions/A/QtCore"
-	"/usr/local/opt/${QT_NAME}/lib/QtCore.framework/Versions/5/QtCore"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtGui.framework/Versions/5/QtGui"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtGui.framework/Versions/5/QtGui"
-	"/usr/local/opt/qt/lib/QtGui.framework/Versions/5/QtGui"
-	"/usr/local/opt/qt/lib/QtGui.framework/Versions/A/QtGui"
-	"/usr/local/opt/${QT_NAME}/lib/QtGui.framework/Versions/5/QtGui"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtWidgets.framework/Versions/5/QtWidgets"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtWidgets.framework/Versions/5/QtWidgets"
-	"/usr/local/opt/qt/lib/QtWidgets.framework/Versions/5/QtWidgets"
-	"/usr/local/opt/qt/lib/QtWidgets.framework/Versions/A/QtWidgets"
-	"/usr/local/opt/${QT_NAME}/lib/QtWidgets.framework/Versions/5/QtWidgets"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"/usr/local/opt/qt/lib/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"/usr/local/opt/qt/lib/QtOpenGL.framework/Versions/A/QtOpenGL"
-	"/usr/local/opt/${QT_NAME}/lib/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"/usr/local/opt/qt/lib/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"/usr/local/opt/qt/lib/QtConcurrent.framework/Versions/A/QtConcurrent"
-	"/usr/local/opt/${QT_NAME}/lib/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtXml.framework/Versions/5/QtXml"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtXml.framework/Versions/5/QtXml"
-	"/usr/local/opt/qt/lib/QtXml.framework/Versions/5/QtXml"
-	"/usr/local/opt/qt/lib/QtXml.framework/Versions/A/QtXml"
-	"/usr/local/opt/${QT_NAME}/lib/QtXml.framework/Versions/5/QtXml"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"/usr/local/opt/qt/lib/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"/usr/local/opt/qt/lib/QtXmlPatterns.framework/Versions/A/QtXmlPatterns"
-	"/usr/local/opt/${QT_NAME}/lib/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtSvg.framework/Versions/5/QtSvg"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtSvg.framework/Versions/5/QtSvg"
-	"/usr/local/opt/qt/lib/QtSvg.framework/Versions/5/QtSvg"
-	"/usr/local/opt/qt/lib/QtSvg.framework/Versions/A/QtSvg"
-	"/usr/local/opt/${QT_NAME}/lib/QtSvg.framework/Versions/5/QtSvg"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"/usr/local/opt/qt/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"/usr/local/opt/qt/lib/QtPrintSupport.framework/Versions/A/QtPrintSupport"
-	"/usr/local/opt/${QT_NAME}/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"/usr/local/Cellar/qt/${QT_VER}/lib/QtDBus.framework/Versions/5/QtDBus"
-	"/usr/local/Cellar/${QT_NAME}/${QT_VER}/lib/QtDBus.framework/Versions/5/QtDBus"
-	"/usr/local/opt/qt/lib/QtDBus.framework/Versions/5/QtDBus"
-	"/usr/local/opt/qt/lib/QtDBus.framework/Versions/A/QtDBus"
-	"/usr/local/opt/${QT_NAME}/lib/QtDBus.framework/Versions/5/QtDBus"
-	"/usr/local/opt/qwt-qt5/lib/qwt.framework/Versions/6/qwt"
-	"/usr/local/opt/python@${PY_VER}/Frameworks/Python.framework/Versions/${PY_VER}/Python"
-	"/Library/Frameworks/Python.framework/Versions/${PY_VER}/Python"
-	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
-	"/usr/local/opt/boost/lib/libboost_system-mt.dylib"
-	"/usr/local/opt/boost/lib/libboost_filesystem-mt.dylib"
-	"/usr/local/opt/boost/lib/libboost_atomic-mt.dylib"
-	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
-	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
-	"/usr/local/opt/boost-python3/lib/libboost_python39-mt.dylib"
-	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
-	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
-	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
-	"/usr/local/opt/jpeg/lib/libjpeg.9.dylib"
-	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
-	"/usr/local/opt/gcc/lib/gcc/11/libgfortran.5.dylib"
-	"/usr/local/opt/gcc/lib/gcc/11/libgomp.1.dylib"
-	"/usr/local/opt/gcc/lib/gcc/11/libquadmath.0.dylib"
-	"/usr/local/Cellar/gcc/11.2.0_3/lib/gcc/11/libquadmath.0.dylib"
-	"/usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib"
-	"/usr/local/lib/gcc/11/libgcc_s.1.dylib"
-	"/usr/local/opt/lapack/lib/liblapacke.3.dylib"
-	"/usr/local/opt/lapack/lib/liblapack.3.dylib"
-	"@rpath/liblapack.3.dylib"
-	"/usr/local/opt/lapack/lib/libblas.3.dylib"
-	"@rpath/libblas.3.dylib"
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtCore\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtGui\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtWidgets\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtOpenGL\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtConcurrent\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtXml\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtXmlPatterns\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtSvg\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtPrintSupport\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/QtDBus\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/qwt\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/Python\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_system-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_filesystem-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_atomic-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_iostreams-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_program_options-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libboost_python39-mt.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libMinuit2.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libjpeg.9.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libpng16.16.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libtiff.5.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libfreetype.6.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgcc_s.1.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgomp.1.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libquadmath.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgfortran.5.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblapacke.3.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblapack.3.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libblas.3.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libopenblas.0.dylib\""
 )
-
-#	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
-
 
 
 # symbols to change into
 declare -a changeto=(
 	"@executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore"
-	"@executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore"
-	"@executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore"
-	"@executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore"
-	"@executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore"
-	"@executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui"
-	"@executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui"
-	"@executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui"
-	"@executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui"
 	"@executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui"
 	"@executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets"
-	"@executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets"
-	"@executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets"
-	"@executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets"
-	"@executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets"
-	"@executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"@executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"@executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL"
-	"@executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL"
 	"@executable_path/../Frameworks/QtOpenGL.framework/Versions/5/QtOpenGL"
 	"@executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"@executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"@executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"@executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"@executable_path/../Frameworks/QtConcurrent.framework/Versions/5/QtConcurrent"
-	"@executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml"
-	"@executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml"
-	"@executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml"
-	"@executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml"
 	"@executable_path/../Frameworks/QtXml.framework/Versions/5/QtXml"
 	"@executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"@executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"@executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"@executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"@executable_path/../Frameworks/QtXmlPatterns.framework/Versions/5/QtXmlPatterns"
-	"@executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg"
-	"@executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg"
-	"@executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg"
-	"@executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg"
 	"@executable_path/../Frameworks/QtSvg.framework/Versions/5/QtSvg"
 	"@executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"@executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"@executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"@executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"@executable_path/../Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport"
-	"@executable_path/../Frameworks/QtDBus.framework/Versions/5/QtDBus"
-	"@executable_path/../Frameworks/QtDBus.framework/Versions/5/QtDBus"
-	"@executable_path/../Frameworks/QtDBus.framework/Versions/5/QtDBus"
-	"@executable_path/../Frameworks/QtDBus.framework/Versions/5/QtDBus"
 	"@executable_path/../Frameworks/QtDBus.framework/Versions/5/QtDBus"
 	"@executable_path/../Frameworks/qwt.framework/Versions/6/qwt"
 	"@executable_path/../Frameworks/Python.framework/Versions/${PY_VER}/Python"
-	"@executable_path/../Frameworks/Python.framework/Versions/${PY_VER}/Python"
-	"@executable_path/../Libraries/libMinuit2.0.dylib"
 	"@executable_path/../Libraries/libboost_system-mt.dylib"
 	"@executable_path/../Libraries/libboost_filesystem-mt.dylib"
 	"@executable_path/../Libraries/libboost_atomic-mt.dylib"
 	"@executable_path/../Libraries/libboost_iostreams-mt.dylib"
 	"@executable_path/../Libraries/libboost_program_options-mt.dylib"
 	"@executable_path/../Libraries/libboost_python39-mt.dylib"
-	"@executable_path/../Libraries/libfreetype.6.dylib"
+	"@executable_path/../Libraries/libMinuit2.0.dylib"
+	"@executable_path/../Libraries/libjpeg.9.dylib"
 	"@executable_path/../Libraries/libpng16.16.dylib"
-	"@executable_path/../Libraries/libjpeg.9.dylib"
-	"@executable_path/../Libraries/libjpeg.9.dylib"
 	"@executable_path/../Libraries/libtiff.5.dylib"
-	"@executable_path/../Libraries/libgfortran.5.dylib"
+	"@executable_path/../Libraries/libfreetype.6.dylib"
+	"@executable_path/../Libraries/libgcc_s.1.dylib"
 	"@executable_path/../Libraries/libgomp.1.dylib"
 	"@executable_path/../Libraries/libquadmath.0.dylib"
-	"@executable_path/../Libraries/libquadmath.0.dylib"
-	"@executable_path/../Libraries/libgcc_s.1.dylib"
-	"@executable_path/../Libraries/libgcc_s.1.dylib"
+	"@executable_path/../Libraries/libgfortran.5.dylib"
 	"@executable_path/../Libraries/liblapacke.3.dylib"
 	"@executable_path/../Libraries/liblapack.3.dylib"
-	"@executable_path/../Libraries/liblapack.3.dylib"
 	"@executable_path/../Libraries/libblas.3.dylib"
-	"@executable_path/../Libraries/libblas.3.dylib"
+	"@executable_path/../Libraries/libopenblas.0.dylib"
 )
-
-#	"@executable_path/../Libraries/libopenblas.0.dylib"
-
 
 
 CNT=$(expr ${#changefrom[*]} - 1)
@@ -258,12 +158,18 @@ function fix_name()
 	chmod a+rx ${cfile}
 
 	for idx in $(seq 0 ${CNT}); do
-		cfrom=${changefrom[$idx]}
+		cfrom_interp=${changefrom[$idx]}
 		cto=${changeto[$idx]}
+		cfrom_cmd="${cfrom_interp/__BIN_FILE__/${cfile}}"
+		cfrom=$(eval "${cfrom_cmd}")
+		if [ -z "${cfrom}" ]; then
+			continue
+		fi
 
+		#echo -e "Command: $cfrom_cmd"
 		echo -e "\tChanging \"${cfrom}\"\n\t -> \"${cto}\"."
 		chmod u+w ${cfile}
-		${TOOL} -change ${cfrom} ${cto} ${cfile}
+		${NAME_TOOL} -change ${cfrom} ${cto} ${cfile}
 	done
 
 	${STRIP} ${cfile}
@@ -277,8 +183,10 @@ for cfile in ${filestochange[@]}; do
 done
 
 
-# fix names for libraries
-find ${PRG}/Contents/ \( -name "*.dylib" -o -name "*.so" \) -print0 \
-	| while read -d $'\0' dylib; do
-	fix_name $dylib
-done
+if [ $fix_libs -ne 0 ]; then
+	# fix names for libraries
+	find ${PRG}/Contents/ \( -name "*.dylib" -o -name "*.so" \) -print0 \
+		| while read -d $'\0' dylib; do
+		fix_name $dylib
+	done
+fi
