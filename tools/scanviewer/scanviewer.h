@@ -89,6 +89,8 @@ protected:
 		std::vector<t_real_glob>& vecErrs,
 		const std::vector<bool>& vecFixed);
 
+	void ShowRawFiles(const std::vector<std::string>& files);
+
 protected slots:
 	void GenerateExternal(int iLang=0);
 

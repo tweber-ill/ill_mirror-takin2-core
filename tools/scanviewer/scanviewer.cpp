@@ -243,6 +243,7 @@ void ScanViewerDlg::closeEvent(QCloseEvent* pEvt)
 	m_settings.setValue("geo", saveGeometry());
 	m_settings.setValue("last_dir", QString(m_strCurDir.c_str()));
 
+	// save recent directory list
 	QStringList lstDirs;
 	for(int iDir=0; iDir<comboPath->count(); ++iDir)
 	{
@@ -308,7 +309,8 @@ void ScanViewerDlg::ClearPlot()
 	comboX->clear();
 	comboY->clear();
 	comboMon->clear();
-	textRoot->clear();
+	textExportedFile->clear();
+	textRawFile->clear();
 	spinStart->setValue(0);
 	spinStop->setValue(0);
 	spinSkip->setValue(0);
@@ -389,17 +391,29 @@ void ScanViewerDlg::FileSelected()
 	if(lstSelected.size() == 0)
 		return;
 
+	// clear previous files
 	ClearPlot();
+
+	// get first selected file
 	m_strCurFile = lstSelected.first()->text().toStdString();
 
-	std::vector<std::string> vecStrSelected;
+	// get the rest of the selected files
+	std::vector<std::string> vecSelectedFiles, vecSelectedFilesRest;
 	for(const QListWidgetItem *pLstItem : lstSelected)
 	{
 		if(!pLstItem) continue;
-		if(pLstItem == lstSelected.first()) continue;
 
-		vecStrSelected.push_back(m_strCurDir + pLstItem->text().toStdString());
+		std::string selectedFile = m_strCurDir + pLstItem->text().toStdString();
+		vecSelectedFiles.push_back(selectedFile);
+
+		// ignore first file
+		if(pLstItem == lstSelected.first())
+			continue;
+
+		vecSelectedFilesRest.push_back(selectedFile);
 	}
+
+	ShowRawFiles(vecSelectedFiles);
 
 	// first file
 	std::string strFile = m_strCurDir + m_strCurFile;
@@ -407,7 +421,7 @@ void ScanViewerDlg::FileSelected()
 	if(!m_pInstr) return;
 
 	// merge with other selected files
-	for(const std::string& strOtherFile : vecStrSelected)
+	for(const std::string& strOtherFile : vecSelectedFilesRest)
 	{
 		std::unique_ptr<tl::FileInstrBase<t_real>> pToMerge(
 			tl::FileInstrBase<t_real>::LoadInstr(strOtherFile.c_str()));
@@ -421,7 +435,7 @@ void ScanViewerDlg::FileSelected()
 	std::string strMonVar = m_pInstr->GetMonVar();
 	//tl::log_info("Count var: ", strCntVar, ", mon var: ", strMonVar);
 
-	const std::wstring strPM = tl::get_spec_char_utf16("pm");
+	const std::wstring strPM = tl::get_spec_char_utf16("pm");  // +-
 
 	m_bDoUpdate = 0;
 	int iIdxX=-1, iIdxY=-1, iIdxMon=-1, iCurIdx=0;
@@ -1026,7 +1040,7 @@ void ScanViewerDlg::PlotScan()
  */
 void ScanViewerDlg::GenerateExternal(int iLang)
 {
-	textRoot->clear();
+	textExportedFile->clear();
 	if(!m_vecX.size() || !m_vecY.size())
 		return;
 
@@ -1045,8 +1059,51 @@ void ScanViewerDlg::GenerateExternal(int iLang)
 	else
 		tl::log_err("Unknown external language.");
 
-	textRoot->setText(strSrc.c_str());
+	textExportedFile->setText(strSrc.c_str());
 
+}
+
+
+/**
+ * show raw scan files
+ */
+void ScanViewerDlg::ShowRawFiles(const std::vector<std::string>& files)
+{
+	QString rawFiles;
+
+	for(const std::string& file : files)
+	{
+		std::size_t size = tl::get_file_size(file);
+		std::ifstream ifstr(file);
+		if(!ifstr)
+			continue;
+
+		auto ch_ptr = std::unique_ptr<char[]>(new char[size+1]);
+		ch_ptr[size] = 0;
+		ifstr.read(ch_ptr.get(), size);
+
+		// check if the file is of non-binary type
+		bool is_printable = std::all_of(ch_ptr.get(), ch_ptr.get()+size, [](char ch) -> bool
+		{
+			bool is_bin = std::iscntrl(ch) != 0 && std::isspace(ch) == 0;
+			//if(is_bin)
+			//	std::cerr << "Non-printable character: 0x" << std::hex << int((unsigned char)ch) << std::endl;
+			return !is_bin;
+		});
+
+		if(is_printable)
+		{
+			//rawFiles += ("# File: " + file + "\n").c_str();
+			rawFiles += ch_ptr.get();
+			rawFiles += "\n";
+		}
+		else
+		{
+			tl::log_err("Cannot print binary file \"", file, "\".");
+		}
+	}
+
+	textRawFile->setText(rawFiles);
 }
 
 
@@ -1560,7 +1617,7 @@ void ScanViewerDlg::FitGauss()
 	// prefit
 	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
-	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder,
 		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
@@ -1663,7 +1720,7 @@ void ScanViewerDlg::FitLorentz()
 	// prefit
 	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
-	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder,
 		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
@@ -1773,7 +1830,7 @@ void ScanViewerDlg::FitVoigt()
 	// prefit
 	unsigned int iOrder = m_settings.value("spline_order", 6).toInt();
 	std::vector<t_real> vecMaximaX, vecMaximaSize, vecMaximaWidth;
-	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder, 
+	tl::find_peaks<t_real>(m_vecX.size(), m_vecX.data(), m_vecY.data(), iOrder,
 		vecMaximaX, vecMaximaSize, vecMaximaWidth, g_dEpsGfx);
 
 
