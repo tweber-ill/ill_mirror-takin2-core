@@ -134,6 +134,9 @@ strip -v ${INSTDIR}/usr/local/lib/*
 cp -v takin.sh			${INSTDIR}/usr/local/bin
 
 
+# remove unnecessary files
+find ${INSTDIR} -type f -name ".dir" -exec rm -fv {} \; -print
+
 
 # build package
 cd ${INSTDIR}/..
