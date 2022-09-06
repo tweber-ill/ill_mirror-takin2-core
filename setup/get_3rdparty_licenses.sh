@@ -122,3 +122,33 @@ fi
 if ! wget https://gitlab.com/DerManu/QCustomPlot/-/raw/master/GPL.txt -O ${LICDIR}/qcustomplot_license.txt; then
 	echo -e "Error: Cannot download QCustomPlot license.";
 fi
+
+# xz
+if ! wget https://git.tukaani.org/?p=xz.git;a=blob_plain;f=COPYING -O ${LICDIR}/xz_license.txt; then
+	echo -e "Error: Cannot download XZ license.";
+fi
+
+# zstd
+if ! wget https://raw.githubusercontent.com/facebook/zstd/dev/LICENSE -O ${LICDIR}/zstd_license.txt; then
+	echo -e "Error: Cannot download Zstdanard license.";
+fi
+
+# libintl
+if ! wget https://git.savannah.gnu.org/cgit/gettext.git/plain/gettext-runtime/intl/COPYING.LIB -O ${LICDIR}/libintl_license.txt; then
+	echo -e "Error: Cannot download libintl license.";
+fi
+
+# pcre
+if ! wget https://raw.githubusercontent.com/PCRE2Project/pcre2/master/LICENCE -O ${LICDIR}/pcre_license.txt; then
+	echo -e "Error: Cannot download pcre license.";
+fi
+
+# glib
+if ! wget https://gitlab.gnome.org/GNOME/glib/-/raw/main/COPYING -O ${LICDIR}/glib_license.txt; then
+	echo -e "Error: Cannot download glib license.";
+fi
+
+# gcc runtime libraries
+if ! wget https://raw.githubusercontent.com/gcc-mirror/gcc/master/COPYING.RUNTIME -O ${LICDIR}/gcc_runtime_license.txt; then
+	echo -e "Error: Cannot download gcc_runtime license.";
+fi

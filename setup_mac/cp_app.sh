@@ -59,7 +59,6 @@ declare -a SRC_FRAMEWORKS=(
 )
 #	"/usr/local/opt/python/Frameworks/Python.framework"
 
-
 # libs which need to have their symbolic link resolved
 declare -a SRC_LIBS=(
 	"/usr/local/opt/minuit2/lib/libMinuit2.0.dylib"
@@ -68,7 +67,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/boost/lib/libboost_atomic-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_iostreams-mt.dylib"
 	"/usr/local/opt/boost/lib/libboost_program_options-mt.dylib"
-	"/usr/local/opt/boost-python3/lib/libboost_python39-mt.dylib"
+	"/usr/local/opt/boost-python3/lib/libboost_python310-mt.dylib"
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
@@ -241,10 +240,15 @@ if [ $clean_frameworks -ne 0 ]; then
 
 	for qlib in ${QT_FW_LIBS[@]}; do
 		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/Resources
+		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/Headers
 		rm -rfv ${DST_FRAMEWORK_DIR}/${qlib}.framework/${qlib}*
 	done
 
 	# remove old signatures
 	codesign --remove-signature ${DST_FRAMEWORK_DIR}/Python.framework/Versions/Current/Python
 fi
+
+
+find ${PRG} -type f -name ".dir" -exec rm -fv {} \; -print
+find ${PRG} -type f -name ".DS_Store" -exec rm -fv {} \; -print
 # -----------------------------------------------------------------------------

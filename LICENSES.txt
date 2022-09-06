@@ -556,6 +556,66 @@ subject to the following restrictions:
 
 
 
+--------------------------------------------------------------------------------
+liblzma / XZ Utils
+URL: https://git.tukaani.org/?p=xz.git
+License URL: https://git.tukaani.org/?p=xz.git;a=blob_plain;f=COPYING
+
+Copyright (c) 2022 by Lasse Collin.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+zstdandard
+URL: https://github.com/facebook/zstd
+License URL: https://raw.githubusercontent.com/facebook/zstd/dev/LICENSE
+
+Copyright (c) 2016-2022 by Facebook, Inc.
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+libintl
+URL: https://git.savannah.gnu.org/cgit/gettext.git/tree/gettext-runtime/intl
+License URL: https://git.savannah.gnu.org/cgit/gettext.git/plain/gettext-runtime/intl/COPYING.LIB
+
+Copyright (c) 2005-2022 by Free Software Foundation, Inc.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+pcre
+URL: http://www.pcre.org
+License URL: https://raw.githubusercontent.com/PCRE2Project/pcre2/master/LICENCE
+
+Copyright (c) 1997-2022 by University of Cambridge.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+glib
+URL: https://gitlab.gnome.org/GNOME/glib
+License URL: https://gitlab.gnome.org/GNOME/glib/-/raw/main/COPYING
+
+Copyright (c) 2022 by the GLib Team.
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+gcc runtime libraries
+URL: https://github.com/gcc-mirror/gcc/tree/master/libgcc
+License URL: https://raw.githubusercontent.com/gcc-mirror/gcc/master/COPYING.RUNTIME
+
+Copyright (c) 1987-2022 by the GCC Team.
+--------------------------------------------------------------------------------
+
+
 
 ================================================================================
 

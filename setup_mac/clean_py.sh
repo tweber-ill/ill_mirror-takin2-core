@@ -73,11 +73,11 @@ find ${PRG}/Contents/Frameworks/Python.framework -name "*.dylib" -exec strip -v 
 rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/Current/Resources/Python.app
 
 # remove tests
-rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/3.9/lib/python3.9/test
+rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/Current/lib/python3.9/test
 
 # remove headers
-#rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/3.9/include
-#rm -fv ${PRG}/Contents/Frameworks/Python.framework/Headers
+rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/Current/include
+rm -fv ${PRG}/Contents/Frameworks/Python.framework/Headers
 
 # remove binaries
-#rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/3.9/bin
+#rm -rfv ${PRG}/Contents/Frameworks/Python.framework/Versions/Current/bin
