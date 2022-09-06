@@ -567,7 +567,7 @@ Copyright (c) 2022 by Lasse Collin.
 
 
 --------------------------------------------------------------------------------
-zstdandard
+zstandard
 URL: https://github.com/facebook/zstd
 License URL: https://raw.githubusercontent.com/facebook/zstd/dev/LICENSE
 

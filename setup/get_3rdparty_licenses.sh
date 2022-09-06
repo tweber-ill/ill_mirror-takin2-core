@@ -130,7 +130,7 @@ fi
 
 # zstd
 if ! wget https://raw.githubusercontent.com/facebook/zstd/dev/LICENSE -O ${LICDIR}/zstd_license.txt; then
-	echo -e "Error: Cannot download Zstdanard license.";
+	echo -e "Error: Cannot download Zstandard license.";
 fi
 
 # libintl
