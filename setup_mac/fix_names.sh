@@ -110,6 +110,7 @@ declare -a changefrom=(
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libintl.8.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libzstd.1.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblzma.5.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libqhull_r.8.0.dylib\""
 )
 
 # symbols to change into
@@ -152,6 +153,7 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libintl.8.dylib"
 	"@executable_path/../Libraries/libzstd.1.dylib"
 	"@executable_path/../Libraries/liblzma.5.dylib"
+	"@executable_path/../Libraries/libqhull_r.8.0.dylib"
 )
 
 CNT=$(expr ${#changefrom[*]} - 1)

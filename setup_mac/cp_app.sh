@@ -86,6 +86,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/gettext/lib/libintl.8.dylib"
 	"/usr/local/opt/zstd/lib/libzstd.1.dylib"
 	"/usr/local/opt/xz/lib/liblzma.5.dylib"
+	"/usr/local/opt/qhull/lib/libqhull_r.8.0.dylib"
 )
 
 #	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
