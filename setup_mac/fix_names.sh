@@ -95,7 +95,7 @@ declare -a changefrom=(
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libpng16.16.dylib\""
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libtiff.5.dylib\""
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libfreetype.6.dylib\""
-	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgcc_s.1.dylib\""
+	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgcc_s.1.1.dylib\""
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgomp.1.dylib\""
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libquadmath.0.dylib\""
 	"otool -L __BIN_FILE__ | grep -o -m1 \"/[-_/@.a-zA-Z0-9]*/libgfortran.5.dylib\""
@@ -103,8 +103,14 @@ declare -a changefrom=(
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblapack.3.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libblas.3.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libopenblas.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libgthread-2.0.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libglib-2.0.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libpcre.1.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libpcre2-16.0.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libintl.8.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libzstd.1.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblzma.5.dylib\""
 )
-
 
 # symbols to change into
 declare -a changeto=(
@@ -131,7 +137,7 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libpng16.16.dylib"
 	"@executable_path/../Libraries/libtiff.5.dylib"
 	"@executable_path/../Libraries/libfreetype.6.dylib"
-	"@executable_path/../Libraries/libgcc_s.1.dylib"
+	"@executable_path/../Libraries/libgcc_s.1.1.dylib"
 	"@executable_path/../Libraries/libgomp.1.dylib"
 	"@executable_path/../Libraries/libquadmath.0.dylib"
 	"@executable_path/../Libraries/libgfortran.5.dylib"
@@ -139,8 +145,14 @@ declare -a changeto=(
 	"@executable_path/../Libraries/liblapack.3.dylib"
 	"@executable_path/../Libraries/libblas.3.dylib"
 	"@executable_path/../Libraries/libopenblas.0.dylib"
+	"@executable_path/../Libraries/libgthread-2.0.0.dylib"
+	"@executable_path/../Libraries/libglib-2.0.0.dylib"
+	"@executable_path/../Libraries//libpcre.1.dylib"
+	"@executable_path/../Libraries/libpcre2-16.0.dylib"
+	"@executable_path/../Libraries/libintl.8.dylib"
+	"@executable_path/../Libraries/libzstd.1.dylib"
+	"@executable_path/../Libraries/liblzma.5.dylib"
 )
-
 
 CNT=$(expr ${#changefrom[*]} - 1)
 
