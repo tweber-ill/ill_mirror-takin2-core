@@ -57,7 +57,7 @@ if ! wget https://raw.githubusercontent.com/root-project/root/master/LICENSE -O 
 fi
 
 # qwt
-if ! wget https://sourceforge.net/p/qwt/git/ci/develop/tree/COPYING?format=raw -O ${LICDIR}/qwt_license.txt; then
+if ! wget https://sourceforge.net/p/qwt/git/ci/develop/tree/COPYING\?format=raw -O ${LICDIR}/qwt_license.txt; then
 	echo -e "Error: Cannot download Qwt license.";
 fi
 
@@ -124,7 +124,7 @@ if ! wget https://gitlab.com/DerManu/QCustomPlot/-/raw/master/GPL.txt -O ${LICDI
 fi
 
 # xz
-if ! wget https://git.tukaani.org/?p=xz.git;a=blob_plain;f=COPYING -O ${LICDIR}/xz_license.txt; then
+if ! wget https://git.tukaani.org/\?p=xz.git\;a=blob_plain\;f=COPYING -O ${LICDIR}/xz_license.txt; then
 	echo -e "Error: Cannot download XZ license.";
 fi
 
