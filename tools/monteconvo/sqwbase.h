@@ -62,14 +62,14 @@ public:
 	 * return [energies, weights]
 	 */
 	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>
-		disp(t_real_reso dh, t_real_reso dk, t_real_reso dl) const
+		disp(t_real_reso /*dh*/, t_real_reso /*dk*/, t_real_reso /*dl*/) const
 	{ return std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>({}, {}); }
 
 	// S(Q,E) dynamical structure factor function which is queried for every mc point
 	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const = 0;
 
 	// background which is queried for every nominal (Q, E) point
-	virtual t_real_reso GetBackground(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const
+	virtual t_real_reso GetBackground(t_real_reso /*dh*/, t_real_reso /*dk*/, t_real_reso /*dl*/, t_real_reso /*dE*/) const
 	{ return 0.; }
 
 	virtual bool IsOk() const { return m_bOk; }
