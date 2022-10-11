@@ -168,41 +168,38 @@ AboutDlg::AboutDlg(QWidget* pParent, QSettings *pSett)
 	ostrFeat << "Feature flags: ";
 
 #if !defined NO_NET
-	ostrFeat << "Network, ";
+	ostrFeat << "Network ";
 #endif
 
 #if defined USE_PLUGINS
-	ostrFeat << "Plugins, ";
+	ostrFeat << "Plugins ";
 #endif
 
 #if !defined NO_3D
-	ostrFeat << "GL, ";
+	ostrFeat << "GL ";
 #endif
 
 #if !defined NO_LAPACK
-	ostrFeat << "Lapack, ";
+	ostrFeat << "Lapack ";
 #endif
 
 #if defined HAS_COMPLEX_ERF
-	ostrFeat << "Faddeeva, ";
+	ostrFeat << "Faddeeva ";
 #endif
 
 #if !defined NO_QHULL
-	ostrFeat << "QHull, ";
+	ostrFeat << "QHull ";
 #endif
 
 #if !defined NO_IOSTR
-	ostrFeat << "Boost.Iostr, ";
+	ostrFeat << "Boost.Iostr ";
 #endif
 
 #if defined USE_BOOST_REX
-	ostrFeat << "Boost.Regex, ";
+	ostrFeat << "Boost.Regex ";
 #endif
 
-#if defined _GLIBCXX_USE_CXX11_ABI
-	ostrFeat << "C++11-abi.";
-#endif
-
+	ostrFeat << ".";
 	labelFeatures->setText(ostrFeat.str().c_str());
 
 

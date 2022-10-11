@@ -192,7 +192,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 	{
 		scan.dTemp = tl::mean_value(vecTemp);
 		scan.dTempErr = tl::std_dev(vecTemp);
-		tl::log_info("Sample temperature: ", scan.dTemp, " +- ", scan.dTempErr);
+		tl::log_info("Sample temperature: ", scan.dTemp, " +- ", scan.dTempErr, ".");
 	}
 
 	const tl::FileInstrBase<t_real_sc>::t_vecVals& vecField = pInstr->GetCol(scan.strFieldCol);
