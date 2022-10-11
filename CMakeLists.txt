@@ -78,7 +78,7 @@ endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_CXX_STANDARD 14)
-add_compile_options(-std=c++14 -D_GLIBCXX_USE_CXX11_ABI)
+add_compile_options(-std=c++14)
 #add_compile_options(-fPIC)
 add_compile_options(-fvisibility=hidden)
 
