@@ -172,6 +172,7 @@ find_package(PNG REQUIRED)
 find_package(Julia)
 find_package(ZLIB)
 find_package(BZip2)
+find_package(HDF5 COMPONENTS CXX)
 
 if(Py_FOUND)
 	if(TARGET Boost::python3)
@@ -190,6 +191,11 @@ if(Py_FOUND)
 	endif()
 endif()
 
+if(HDF5_FOUND)
+	message("Using HDF5 version ${HDF5_VERSION}.")
+else()
+	message("Disabling HDF5 file support.")
+endif()
 
 if(USE_RtMp)
 	find_package(RtMp REQUIRED)
@@ -290,6 +296,7 @@ include_directories("${QWT_INCLUDE_DIRS}")
 include_directories("${ZLIB_INCLUDE_DIRS}")
 include_directories("${BZIP2_INCLUDE_DIR}")
 include_directories("${Minuit2_INCLUDE_DIRS}")
+include_directories("${HDF5_CXX_INCLUDE_DIRS}")
 
 set(LIBS_FIT ${Minuit2_LIBRARIES})
 
@@ -459,6 +466,7 @@ target_link_libraries(takin
 	${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES}
 	Boost::iostreams${BOOST_SUFFIX} Boost::system${BOOST_SUFFIX} Boost::filesystem${BOOST_SUFFIX} Boost::program_options${BOOST_SUFFIX}
 	Threads::Threads ${Mp_LIBRARIES} ${Rt_LIBRARIES} ${Dl_LIBRARIES}
+	${HDF5_CXX_LIBRARIES}
 )
 
 

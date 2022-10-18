@@ -72,7 +72,7 @@ namespace fs = boost::filesystem;
 ScanViewerDlg::ScanViewerDlg(QWidget* pParent)
 	: QDialog(pParent, Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowMinMaxButtonsHint),
 		m_settings("takin", "scanviewer"),
-		m_vecExts({ ".dat", ".DAT", ".scn", ".SCN", ".ng0", ".NG0", ".log", ".LOG", "" }),
+		m_vecExts({ ".dat", ".DAT", ".scn", ".SCN", ".ng0", ".NG0", ".log", ".LOG", ".nxs", ".NXS", ".hdf", ".HDF", "" }),
 		m_pFitParamDlg(new FitParamDlg(this, &m_settings))
 {
 	this->setupUi(this);
@@ -1099,7 +1099,8 @@ void ScanViewerDlg::ShowRawFiles(const std::vector<std::string>& files)
 		}
 		else
 		{
-			tl::log_err("Cannot print binary file \"", file, "\".");
+			//tl::log_err("Cannot print binary file \"", file, "\".");
+			rawFiles = "<binary data>";
 		}
 	}
 
