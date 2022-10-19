@@ -92,10 +92,10 @@ class H5Loader:
 		# print header variable
 		def print_var(var, name):
 			ctr = 0
-			for key in self.zeros:
+			for key in var:
 				if ctr % 4 == 0:
 					print("\n%s: " % name, end="")
-				val = float(self.zeros[key])
+				val = float(var[key])
 				print("%-8s = %6.2f, " % (key, val), end="")
 				ctr += 1
 
