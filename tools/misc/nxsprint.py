@@ -22,12 +22,14 @@ class H5Loader:
 		# get scan data
 		self.data = entry["data_scan/scanned_variables/data"][:]
 		self.data = np.transpose(self.data)
-		axes = entry["data_scan/scanned_variables/variables_names/axis"][:]
-		names = entry["data_scan/scanned_variables/variables_names/name"][:]
-		properties = entry["data_scan/scanned_variables/variables_names/property"][:]
-		self.columns = [names[i] if axes[i]!=0 else properties[i] for i in range(axes.size)]
+		try:
+			self.columns = entry["data_scan/scanned_variables/variables_names/label"][:]
+		except KeyError:
+			axes = entry["data_scan/scanned_variables/variables_names/axis"][:]
+			names = entry["data_scan/scanned_variables/variables_names/name"][:]
+			properties = entry["data_scan/scanned_variables/variables_names/property"][:]
+			self.columns = [names[i] if axes[i]!=0 else properties[i] for i in range(axes.size)]
 		self.columns = np.array([str.decode("utf-8") for str in self.columns])
-
 		self.selected_columns = self.columns
 
 		# get instrument variables
