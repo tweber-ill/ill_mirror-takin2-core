@@ -39,6 +39,17 @@ class H5Loader:
 
 		instr = entry["instrument"]
 		self.instrname = instr["name"][0].decode("utf-8")
+		self.commandline = instr["command_line/actual_command"][0].decode("utf-8")
+		self.palcmd = instr["pal/pal_contents"][0].decode("utf-8")
+		self.instrmode = instr["instrument_mode/description"][0].decode("utf-8")
+		if instr["Monochromator/automatic_curvature"]:
+			self.mono_autocurve = "auto"
+		else:
+			self.mono_autocurve = "manu"
+		if instr["Analyser/automatic_curvature"]:
+			self.ana_autocurve = "auto"
+		else:
+			self.ana_autocurve = "manu"
 		for key in instr.keys():
 			varia_path = key + "/value"
 			offs_path = key + "/offset_value"
@@ -107,13 +118,16 @@ class H5Loader:
 
 		# print header
 		print("INSTR: %s" % self.instrname)
+		print("EXPNO: %s" % self.expnumber)
 		print("USER_: %s" % self.username)
 		print("LOCAL: %s" % self.localname)
-		print("EXPNO: %s" % self.expnumber)
-		print("TITLE: %s" % self.exptitle)
-		print("DATE_: %s" % self.starttime)
 		print("FILE_: %d" % self.numor)
+		print("DATE_: %s" % self.starttime)
+		print("TITLE: %s" % self.exptitle)
+		print("TYPE_: %s" % self.instrmode)
+		print("COMND: %s" % self.commandline)
 		print("POSQE: QH = %.4f, QK = %.4f, QL = %.4f, EN = %.4f, UN=meV" % self.posqe)
+		print("CURVE: MONO = %s, ANA = %s" % (self.mono_autocurve, self.ana_autocurve))
 		print("PARAM: AS = %.4f, BS = %.4f, CS = %.4f" % self.lattice)
 		print("PARAM: AA = %.4f, BB = %.4f, CC = %.4f" % self.angles)
 		print("PARAM: AX = %.4f, AY = %.4f, AZ = %.4f" % self.plane0)
@@ -122,6 +136,10 @@ class H5Loader:
 		print_var(self.zeros, "ZEROS")
 		print_var(self.targets, "TARGET")
 		print()
+		for polcmd in self.palcmd.split("|"):
+			polcmd = polcmd.strip()
+			if polcmd != "":
+				print("POLAN: %s" % polcmd)
 
 		# print data
 		print("FORMT:")  # TODO
