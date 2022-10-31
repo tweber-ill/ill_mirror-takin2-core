@@ -42,10 +42,18 @@ class H5Loader:
 		self.commandline = instr["command_line/actual_command"][0].decode("utf-8")
 		self.palcmd = instr["pal/pal_contents"][0].decode("utf-8")
 		self.instrmode = instr["instrument_mode/description"][0].decode("utf-8")
+		self.mono_d = instr["Monochromator/d_spacing"][0]
+		self.mono_k = instr["Monochromator/ki"][0]
+		self.mono_sense = instr["Monochromator/sens"][0]
+		self.mono_mosaic = instr["Monochromator/mosaic"][0]
 		if instr["Monochromator/automatic_curvature"]:
 			self.mono_autocurve = "auto"
 		else:
 			self.mono_autocurve = "manu"
+		self.ana_d = instr["Analyser/d_spacing"][0]
+		self.ana_k = instr["Analyser/kf"][0]
+		self.ana_sense = instr["Analyser/sens"][0]
+		self.ana_mosaic = instr["Analyser/mosaic"][0]
 		if instr["Analyser/automatic_curvature"]:
 			self.ana_autocurve = "auto"
 		else:
@@ -61,6 +69,26 @@ class H5Loader:
 				self.zeros[key] = instr[offs_path][0]
 			if target_path in instr:
 				self.targets[key] = instr[target_path][0]
+
+		self.kfix_which = 2   # TODO: get from file
+		if self.kfix_which == 2:
+			self.kfix = self.ana_k
+		else:
+			self.kfix = self.mono_k
+
+		self.colli_h = [
+			instr["SourceToMonochromator/divergence_x"][0],
+			instr["MonochromatorToSample/divergence_x"][0],
+			instr["SampleToAnalyser/divergence_x"][0],
+			instr["AnalyserToDetector/divergence_x"][0],
+		]
+
+		self.colli_v = [
+			instr["SourceToMonochromator/divergence_y"][0],
+			instr["MonochromatorToSample/divergence_y"][0],
+			instr["SampleToAnalyser/divergence_y"][0],
+			instr["AnalyserToDetector/divergence_y"][0],
+		]
 
 		# get user infos
 		user = entry["user"]
@@ -90,6 +118,8 @@ class H5Loader:
 			sample["unit_cell_gamma"][0] )
 		self.plane0 = ( sample["ax"][0], sample["ay"][0], sample["az"][0] )
 		self.plane1 = ( sample["bx"][0], sample["by"][0], sample["bz"][0] )
+		self.sample_sense = sample["sens"][0]
+		self.sample_mosaic = sample["mosaic"][0]
 
 
 	#
@@ -128,10 +158,15 @@ class H5Loader:
 		print("COMND: %s" % self.commandline)
 		print("POSQE: QH = %.4f, QK = %.4f, QL = %.4f, EN = %.4f, UN=meV" % self.posqe)
 		print("CURVE: MONO = %s, ANA = %s" % (self.mono_autocurve, self.ana_autocurve))
-		print("PARAM: AS = %.4f, BS = %.4f, CS = %.4f" % self.lattice)
-		print("PARAM: AA = %.4f, BB = %.4f, CC = %.4f" % self.angles)
-		print("PARAM: AX = %.4f, AY = %.4f, AZ = %.4f" % self.plane0)
-		print("PARAM: BX = %.4f, BY = %.4f, BZ = %.4f" % self.plane1)
+		print("PARAM: DM = %.5f, DA = %.5f, KFIX = %.5f" % (self.mono_d, self.ana_d, self.kfix))
+		print("PARAM: SM = %d, SS = %d, SA = %d, FX = %d" % (self.mono_sense, self.sample_sense, self.ana_sense, self.kfix_which))
+		print("PARAM: ALF1 = %.2f, ALF2 = %.2f, ALF3 = %.2f, ALF4 = %.2f" % (self.colli_h[0], self.colli_h[1], self.colli_h[2], self.colli_h[3]))
+		print("PARAM: BET1 = %.2f, BET2 = %.2f, BET3 = %.2f, BET4 = %.2f" % (self.colli_v[0], self.colli_v[1], self.colli_v[2], self.colli_v[3]))
+		print("PARAM: ETAM = %.2f, ETAS = %.5f, ETAA = %.2f" % (self.mono_mosaic, self.sample_mosaic, self.ana_mosaic))
+		print("PARAM: AS = %.5f, BS = %.5f, CS = %.5f" % self.lattice)
+		print("PARAM: AA = %.5f, BB = %.5f, CC = %.5f" % self.angles)
+		print("PARAM: AX = %.3f, AY = %.3f, AZ = %.3f" % self.plane0)
+		print("PARAM: BX = %.3f, BY = %.3f, BZ = %.3f" % self.plane1)
 		print_var(self.varias, "VARIA")
 		print_var(self.zeros, "ZEROS")
 		print_var(self.targets, "TARGET")
