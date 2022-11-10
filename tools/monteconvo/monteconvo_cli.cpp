@@ -309,7 +309,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
 
 		tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
-		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str(), cfg.flip_coords))
 		{
 			tl::log_err("Could not load crystal file \"", strLatticeFile, "\".");
 			return false;
@@ -664,7 +664,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
 
 	tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
-	if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+	if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str(), cfg.flip_coords))
 	{
 		tl::log_err("Could not load crystal file \"", strLatticeFile, "\".");
 		return false;

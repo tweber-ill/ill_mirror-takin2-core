@@ -78,7 +78,7 @@ public:
 	virtual ~TASReso() = default;
 
 	bool LoadRes(const char* pcXmlFile);
-	bool LoadLattice(const char* pcXmlFile);
+	bool LoadLattice(const char* pcXmlFile, bool flip_coords = false);
 
 	bool SetLattice(t_real_reso a, t_real_reso b, t_real_reso c,
 		t_real_reso alpha, t_real_reso beta, t_real_reso gamma,

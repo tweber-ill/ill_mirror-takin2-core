@@ -1236,9 +1236,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabFitting">
+     <widget class="QWidget" name="tabOptions">
       <attribute name="title">
-       <string>Fitting</string>
+       <string>Options</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_13">
        <property name="horizontalSpacing">

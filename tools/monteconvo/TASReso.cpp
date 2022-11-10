@@ -85,7 +85,7 @@ const TASReso& TASReso::operator=(const TASReso& res)
 /**
  * loads a crystal definition file
  */
-bool TASReso::LoadLattice(const char* pcXmlFile)
+bool TASReso::LoadLattice(const char* pcXmlFile, bool flip_coords)
 {
 	const std::string strXmlRoot("taz/");
 
@@ -115,6 +115,13 @@ bool TASReso::LoadLattice(const char* pcXmlFile)
 	t_real dPlaneY0 = xml.Query<t_real>((strXmlRoot + "plane/y0").c_str(), 0.);
 	t_real dPlaneY1 = xml.Query<t_real>((strXmlRoot + "plane/y1").c_str(), 1.);
 	t_real dPlaneY2 = xml.Query<t_real>((strXmlRoot + "plane/y2").c_str(), 0.);
+
+	if(flip_coords)
+	{
+		dPlaneY0 *= t_real(-1);
+		dPlaneY1 *= t_real(-1);
+		dPlaneY2 *= t_real(-1);
+	}
 
 	t_vec vec1 = tl::make_vec({dPlaneX0, dPlaneX1, dPlaneX2});
 	t_vec vec2 = tl::make_vec({dPlaneY0, dPlaneY1, dPlaneY2});

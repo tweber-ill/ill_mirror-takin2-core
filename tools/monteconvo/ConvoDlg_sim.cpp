@@ -63,6 +63,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 	t_real dOffs = tl::str_to_var<t_real>(editOffs->text().toStdString());
 
 	bool bRecycleNeutrons = checkRnd->isChecked();
+	bool bFlipCoords = checkFlip->isChecked();
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
 	std::string strAutosave = editAutosave->text().toStdString();
@@ -70,7 +71,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
-	tabFitting->setEnabled(false);
+	tabOptions->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
 	if(m_pSqwParamDlg)
 		m_pSqwParamDlg->setEnabled(false);
@@ -84,14 +85,14 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
-	std::function<void()> fkt = [this, connty, bForceDeferred, bUseScan, seed, bRecycleNeutrons,
-		dScale, dSlope, dOffs, bLiveResults, bLivePlots, strAutosave]
+	std::function<void()> fkt = [this, connty, bForceDeferred, bUseScan, bFlipCoords,
+		seed, bRecycleNeutrons, dScale, dSlope, dOffs, bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
-			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabOptions, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
 			if(m_pSqwParamDlg)
 				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
@@ -178,7 +179,7 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 			const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
 
 			tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
-			if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+			if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str(), bFlipCoords))
 			{
 				//QMessageBox::critical(this, "Error", "Could not load crystal file.");
 				fktEnableButtons();
@@ -530,6 +531,7 @@ void ConvoDlg::Start2D()
 {
 	m_atStop.store(false);
 
+	bool bFlipCoords = checkFlip->isChecked();
 	bool bLiveResults = m_pLiveResults->isChecked();
 	bool bLivePlots = m_pLivePlots->isChecked();
 	std::string strAutosave = editAutosave->text().toStdString();
@@ -537,7 +539,7 @@ void ConvoDlg::Start2D()
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
-	tabFitting->setEnabled(false);
+	tabOptions->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
 	if(m_pSqwParamDlg)
 		m_pSqwParamDlg->setEnabled(false);
@@ -552,13 +554,14 @@ void ConvoDlg::Start2D()
 		? Qt::ConnectionType::DirectConnection
 		: Qt::ConnectionType::BlockingQueuedConnection;
 
-	std::function<void()> fkt = [this, connty, bForceDeferred, bLiveResults, bLivePlots, strAutosave]
+	std::function<void()> fkt = [this, connty, bFlipCoords, bForceDeferred,
+		bLiveResults, bLivePlots, strAutosave]
 	{
 		std::function<void()> fktEnableButtons = [this]
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
-			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabOptions, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
 			if(m_pSqwParamDlg)
 				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
@@ -691,7 +694,7 @@ void ConvoDlg::Start2D()
 		const std::string strLatticeFile = find_file_in_global_paths(_strLatticeFile);
 
 		tl::log_debug("Loading crystal from \"", strLatticeFile, "\".");
-		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str()))
+		if(strLatticeFile == "" || !reso.LoadLattice(strLatticeFile.c_str(), bFlipCoords))
 		{
 			//QMessageBox::critical(this, "Error", "Could not load crystal file.");
 			fktEnableButtons();
@@ -947,7 +950,7 @@ void ConvoDlg::StartDisp()
 	btnStart->setEnabled(false);
 	btnStartFit->setEnabled(false);
 	tabSettings->setEnabled(false);
-	tabFitting->setEnabled(false);
+	tabOptions->setEnabled(false);
 	m_pMenuBar->setEnabled(false);
 	if(m_pSqwParamDlg)
 		m_pSqwParamDlg->setEnabled(false);
@@ -968,7 +971,7 @@ void ConvoDlg::StartDisp()
 		{
 			QMetaObject::invokeMethod(btnStop, "setEnabled", Q_ARG(bool, false));
 			QMetaObject::invokeMethod(tabSettings, "setEnabled", Q_ARG(bool, true));
-			QMetaObject::invokeMethod(tabFitting, "setEnabled", Q_ARG(bool, true));
+			QMetaObject::invokeMethod(tabOptions, "setEnabled", Q_ARG(bool, true));
 			QMetaObject::invokeMethod(m_pMenuBar, "setEnabled", Q_ARG(bool, true));
 			if(m_pSqwParamDlg)
 				QMetaObject::invokeMethod(m_pSqwParamDlg, "setEnabled", Q_ARG(bool, true));
