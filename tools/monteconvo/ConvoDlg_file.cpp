@@ -81,7 +81,7 @@ void ConvoDlg::Load()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir", "~").toString();
 	QString _strFile = QFileDialog::getOpenFileName(this,
-		"Open Convolution Configuration...", strDirLast, "Takin files (*.taz *.TAZ)",
+		"Open Convolution Configuration", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
 
 	Load(_strFile);
@@ -512,7 +512,7 @@ void ConvoDlg::browseCrysFiles()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_crys", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
-		"Open Crystal File...", strDirLast, "Takin files (*.taz *.TAZ)",
+		"Open Crystal File", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
 	if(strFile == "")
 		return;
@@ -535,7 +535,7 @@ void ConvoDlg::browseResoFiles()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_reso", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
-		"Open Resolution File...", strDirLast, "Takin files (*.taz *.TAZ)",
+		"Open Resolution File", strDirLast, "Takin files (*.taz *.TAZ)",
 		nullptr, fileopt);
 	if(strFile == "")
 		return;
@@ -558,7 +558,7 @@ void ConvoDlg::browseSqwFiles()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_sqw", "~").toString();
 	QString strFile = QFileDialog::getOpenFileName(this,
-		"Open S(q,w) File...", strDirLast, "All S(q,w) files (*.dat *.DAT *.py *.PY *.jl *.JL *.XML *.xml)",
+		"Open S(q,w) File", strDirLast, "All S(q,w) files (*.dat *.DAT *.py *.PY *.jl *.JL *.XML *.xml)",
 		nullptr, fileopt);
 	if(strFile == "")
 		return;
@@ -580,15 +580,15 @@ void ConvoDlg::browseScanFiles()
 	QString strDirLast = "~";
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_scan", "~").toString();
-	QString strFile = QFileDialog::getOpenFileName(this,
-		"Open S(q,w) File...", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN);;All files (*.* *)",
+	QStringList files = QFileDialog::getOpenFileNames(this,
+		"Open Scan File", strDirLast, "All scan files (*.dat *.DAT *.scn *.SCN);;All files (*.* *)",
 		nullptr, fileopt);
-	if(strFile == "")
+	if(!files.size())
 		return;
 
-	editScan->setText(strFile);
+	editScan->setText(files.join(";"));
 
-	std::string strDir = tl::get_dir(strFile.toStdString());
+	std::string strDir = tl::get_dir(files[0].toStdString());
 	if(m_pSett)
 		m_pSett->setValue("monteconvo/last_dir_scan", QString(strDir.c_str()));
 }
@@ -604,7 +604,7 @@ void ConvoDlg::browseAutosaveFile()
 	if(m_pSett)
 		strDirLast = m_pSett->value("monteconvo/last_dir_autosave", "~").toString();
 	QString strFile = QFileDialog::getSaveFileName(this,
-		"Open S(q,w) File...", strDirLast, "Data files (*.dat *.txt);;All files (*.*)",
+		"Save Results", strDirLast, "Data files (*.dat *.txt);;All files (*.*)",
 		nullptr, fileopt);
 
 	editScan->setText(strFile);
