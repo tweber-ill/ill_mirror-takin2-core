@@ -494,7 +494,7 @@ bool Convofit::run_job(const std::string& _strJob)
 
 		if(strResAlgo == "pop")
 			reso.SetAlgo(ResoAlgo::POP);
-		if(strResAlgo == "pop_cn")
+		else if(strResAlgo == "pop_cn")
 			reso.SetAlgo(ResoAlgo::POP_CN);
 		else if(strResAlgo == "cn")
 			reso.SetAlgo(ResoAlgo::CN);

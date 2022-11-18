@@ -140,13 +140,19 @@ std::string convert_monteconvo(
 
 
 	// resolution
-	std::string strAlgo = "eck";
-	switch(propMC.Query<int>("taz/monteconvo/algo"))
+	std::string strAlgo = propMC.Query<std::string>("taz/monteconvo/algo");
+
+	// if the algo id string is unrecognised, try the algo index
+	if(strAlgo!="cn" && strAlgo!="pop_cn" && strAlgo!="pop" && strAlgo!="eck" && strAlgo!="vio")
 	{
-		case 0: strAlgo = "cn"; break;
-		case 1: strAlgo = "pop"; break;
-		case 2: strAlgo = "eck"; break;
-		case 3: strAlgo = "vio"; break;
+		switch(propMC.Query<int>("taz/monteconvo/algo_idx"))
+		{
+			case 0: strAlgo = "cn"; break;
+			case 1: strAlgo = "pop_cn"; break;
+			case 2: strAlgo = "pop"; break;
+			case 3: strAlgo = "eck"; break;
+			case 4: strAlgo = "vio"; break;
+		}
 	}
 	mapJob["resolution/algorithm"] = strAlgo;
 
@@ -154,19 +160,19 @@ std::string convert_monteconvo(
 	std::string strFocAnaH, strFocAnaV;
 	switch(propMC.Query<int>("taz/monteconvo/mono_foc"))
 	{
-		case 0: strFocMonoH = "-1"; strFocMonoV = "-1"; break;	// unchanged
-		case 1: strFocMonoH = "0"; strFocMonoV = "0"; break;	// flat
-		case 2: strFocMonoH = "1"; strFocMonoV = "0"; break;	// horizontal
-		case 3: strFocMonoH = "0"; strFocMonoV = "1"; break;	// vertical
-		case 4: strFocMonoH = "1"; strFocMonoV = "1"; break;	// both
+		case 0: strFocMonoH = "-1"; strFocMonoV = "-1"; break;  // unchanged
+		case 1: strFocMonoH = "0"; strFocMonoV = "0"; break;    // flat
+		case 2: strFocMonoH = "1"; strFocMonoV = "0"; break;    // horizontal
+		case 3: strFocMonoH = "0"; strFocMonoV = "1"; break;    // vertical
+		case 4: strFocMonoH = "1"; strFocMonoV = "1"; break;    // both
 	}
 	switch(propMC.Query<int>("taz/monteconvo/ana_foc"))
 	{
-		case 0: strFocAnaH = "-1"; strFocAnaV = "-1"; break;	// unchanged
-		case 1: strFocAnaH = "0"; strFocAnaV = "0"; break;		// flat
-		case 2: strFocAnaH = "1"; strFocAnaV = "0"; break;		// horizontal
-		case 3: strFocAnaH = "0"; strFocAnaV = "1"; break;		// vertical
-		case 4: strFocAnaH = "1"; strFocAnaV = "1"; break;		// both
+		case 0: strFocAnaH = "-1"; strFocAnaV = "-1"; break;    // unchanged
+		case 1: strFocAnaH = "0"; strFocAnaV = "0"; break;      // flat
+		case 2: strFocAnaH = "1"; strFocAnaV = "0"; break;      // horizontal
+		case 3: strFocAnaH = "0"; strFocAnaV = "1"; break;      // vertical
+		case 4: strFocAnaH = "1"; strFocAnaV = "1"; break;      // both
 	}
 
 	mapJob["resolution/focus_mono_v"] = strFocMonoV;
