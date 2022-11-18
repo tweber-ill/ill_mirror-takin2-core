@@ -191,12 +191,6 @@ if(Py_FOUND)
 	endif()
 endif()
 
-if(HDF5_FOUND)
-	message("Using HDF5 version ${HDF5_VERSION}.")
-else()
-	message("Disabling HDF5 file support.")
-endif()
-
 if(USE_RtMp)
 	find_package(RtMp REQUIRED)
 else()
@@ -296,9 +290,18 @@ include_directories("${QWT_INCLUDE_DIRS}")
 include_directories("${ZLIB_INCLUDE_DIRS}")
 include_directories("${BZIP2_INCLUDE_DIR}")
 include_directories("${Minuit2_INCLUDE_DIRS}")
-include_directories("${HDF5_CXX_INCLUDE_DIRS}")
 
 set(LIBS_FIT ${Minuit2_LIBRARIES})
+
+
+if(HDF5_FOUND)
+	message("Using HDF5 version ${HDF5_VERSION}.")
+	include_directories("${HDF5_CXX_INCLUDE_DIRS}")
+	add_definitions(-DUSE_HDF5)
+else()
+	message("Disabling HDF5 file support.")
+	set(HDF5_CXX_LIBRARIES "")
+endif()
 
 
 
@@ -360,7 +363,6 @@ if(OPENGL_FOUND AND FREETYPE_FOUND)
 	)
 else()
 	message("Disabling 3D support: OGL: ${OPENGL_FOUND}, FT: ${FREETYPE_FOUND}")
-
 	add_definitions(-DNO_3D)
 endif()
 
