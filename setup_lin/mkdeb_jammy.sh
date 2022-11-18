@@ -45,7 +45,7 @@ mkdir -p ${INSTDIR}/DEBIAN
 
 
 # control file
-echo -e "Package: takin\nVersion: 2.2.0" > ${INSTDIR}/DEBIAN/control
+echo -e "Package: takin\nVersion: 2.3.0" > ${INSTDIR}/DEBIAN/control
 echo -e "Description: inelastic neutron scattering software" >> ${INSTDIR}/DEBIAN/control
 echo -e "Maintainer: n/a" >> ${INSTDIR}/DEBIAN/control
 echo -e "Architecture: $(dpkg --print-architecture)" >> ${INSTDIR}/DEBIAN/control
@@ -136,6 +136,7 @@ cp -v takin.sh			${INSTDIR}/usr/local/bin
 
 # remove unnecessary files
 find ${INSTDIR} -type f -name ".dir" -exec rm -fv {} \; -print
+rm -v ${INSTDIR}/usr/local/share/takin/CMakeLists.txt
 
 
 # build package
