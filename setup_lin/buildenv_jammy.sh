@@ -37,7 +37,7 @@
 # install packages
 # -----------------------------------------------------------------------------
 if ! sudo apt-get install cmake clang build-essential \
-	libboost-all-dev libclipper-dev \
+	libboost-all-dev libclipper-dev libhdf5-dev \
 	qtchooser qtbase5-dev qttools5-dev-tools libqt5svg5-dev qt5-assistant \
 	libqwt-qt5-dev libpython3-dev \
 	libfreetype6-dev libbz2-dev wget coreutils
