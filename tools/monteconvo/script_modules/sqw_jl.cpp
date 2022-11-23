@@ -35,7 +35,7 @@
 using t_real = t_real_reso;
 
 static const char* pcModIdent = "jl";
-static const char* pcModName = "Julia Model";
+static const char* pcModName = "Julia Scripting";
 
 #define MAX_PARAM_VAL_SIZE 128
 

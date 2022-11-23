@@ -40,7 +40,7 @@
 using t_real = t_real_reso;
 
 static const char* pcModIdent = "py";
-static const char* pcModName = "Python Model";
+static const char* pcModName = "Python Scripting";
 
 #define MAX_PARAM_VAL_SIZE 128
 
