@@ -26,10 +26,10 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef __SQW_PY_H__
-#define __SQW_PY_H__
+#ifndef __SQWMOD_PY_H__
+#define __SQWMOD_PY_H__
 
-#include "sqw.h"
+#include "../sqwbase.h"
 #include <mutex>
 #include <memory>
 #include <string>

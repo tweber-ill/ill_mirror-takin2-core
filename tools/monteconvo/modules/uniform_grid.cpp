@@ -26,7 +26,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#include "sqw_uniform_grid.h"
+#include "uniform_grid.h"
 
 #include "libs/version.h"
 #include "tlibs/string/string.h"
@@ -81,14 +81,17 @@ SqwUniformGrid::SqwUniformGrid(const std::string& strDatFile) : m_strDataFile(st
 	m_hmin = _dims.second.get()[0];
 	m_hmax = _dims.second.get()[1];
 	m_hstep = _dims.second.get()[2];
+	m_hsize = std::size_t(std::round((m_hmax - m_hmin) / m_hstep));
 
 	m_kmin = _dims.second.get()[3];
 	m_kmax = _dims.second.get()[4];
 	m_kstep = _dims.second.get()[5];
+	m_ksize = std::size_t(std::round((m_kmax - m_kmin) / m_kstep));
 
 	m_lmin = _dims.second.get()[6];
 	m_lmax = _dims.second.get()[7];
 	m_lstep = _dims.second.get()[8];
+	m_lsize = std::size_t(std::round((m_lmax - m_lmin) / m_lstep));
 
 	std::size_t numEntries =
 		std::size_t(((m_hmax-m_hmin) / m_hstep)) *
@@ -129,22 +132,17 @@ std::tuple<std::vector<t_real>, std::vector<t_real>>
 		if(k >= m_kmax) k = m_kmax - m_kstep;
 		if(l >= m_lmax) l = m_lmax - m_lstep;
 
-		// max dimensions
-		std::size_t iHSize = std::size_t(((m_hmax-m_hmin) / m_hstep));
-		std::size_t iKSize = std::size_t(((m_kmax-m_kmin) / m_kstep));
-		std::size_t iLSize = std::size_t(((m_lmax-m_lmin) / m_lstep));
-
 		// position indices
 		std::size_t iH = std::size_t(std::round(((h - m_hmin) / m_hstep)));
 		std::size_t iK = std::size_t(std::round(((k - m_kmin) / m_kstep)));
 		std::size_t iL = std::size_t(std::round(((l - m_lmin) / m_lstep)));
 
-		// clamp again
-		if(iH >= iHSize) iH = iHSize-1;
-		if(iK >= iKSize) iK = iKSize-1;
-		if(iL >= iLSize) iL = iLSize-1;
+                // clamp again
+		if(iH >= m_hsize) iH = m_hsize-1;
+		if(iK >= m_ksize) iK = m_ksize-1;
+		if(iL >= m_lsize) iL = m_lsize-1;
 
-		return iH*iKSize*iLSize + iK*iLSize + iL;
+		return iH*m_ksize*m_lsize + iK*m_lsize + iL;
 	};
 
 
@@ -307,12 +305,17 @@ SqwBase* SqwUniformGrid::shallow_copy() const
 	pMod->m_hmin = this->m_hmin;
 	pMod->m_hmax = this->m_hmax;
 	pMod->m_hstep = this->m_hstep;
+	pMod->m_hsize = this->m_hsize;
+
 	pMod->m_kmin = this->m_kmin;
 	pMod->m_kmax = this->m_kmax;
 	pMod->m_kstep = this->m_kstep;
+	pMod->m_ksize = this->m_ksize;
+
 	pMod->m_lmin = this->m_lmin;
 	pMod->m_lmax = this->m_lmax;
 	pMod->m_lstep = this->m_lstep;
+	pMod->m_lsize = this->m_lsize;
 
 	return pMod;
 }

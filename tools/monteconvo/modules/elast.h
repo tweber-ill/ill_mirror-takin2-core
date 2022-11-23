@@ -1,7 +1,7 @@
 /**
- * S(q,w) parameters dialog
+ * pre-defined sqw modules
  * @author Tobias Weber <tobias.weber@tum.de>
- * @date aug-2015
+ * @date 2015 -- 2018
  * @license GPLv2
  *
  * ----------------------------------------------------------------------------
@@ -26,49 +26,54 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef __SQW_DLG_H__
-#define __SQW_DLG_H__
+#ifndef __MCONV_SQWMOD_ELAST_H__
+#define __MCONV_SQWMOD_ELAST_H__
 
-#include <QDialog>
-#include <QSettings>
+#include <list>
+#include <unordered_map>
 
-#include "ui/ui_sqwparams.h"
-#include "sqwbase.h"
+#include "tlibs/helper/boost_hacks.h"
+#include <boost/numeric/ublas/vector.hpp>
+
+#include "tlibs/math/math.h"
+#include "tlibs/math/kd.h"
+#include "tlibs/file/loaddat.h"
+#include "../../res/defs.h"
+#include "../sqwbase.h"
 
 
-enum
+namespace ublas = boost::numeric::ublas;
+
+
+struct ElastPeak
 {
-	SQW_NAME = 0,
-	SQW_TYPE = 1,
-	SQW_VAL = 2,
-
-	SQW_ERR = 3,
-	SQW_RANGE = 4,
-	SQW_FIT = 5,
+	t_real_reso h, k, l;
+	t_real_reso dSigQ, dSigE;
+	t_real_reso dS;
 };
 
 
-class SqwParamDlg : public QDialog, Ui::SqwParamDlg
-{ Q_OBJECT
+/**
+ * Bragg peaks
+ */
+class SqwElast : public SqwBase
+{
 protected:
-	QSettings *m_pSett = nullptr;
-
-protected:
-	void SaveSqwParams();
-	virtual void showEvent(QShowEvent *pEvt) override;
+	bool m_bLoadedFromFile = false;
+	std::list<ElastPeak> m_lstPeaks;
 
 public:
-	SqwParamDlg(QWidget* pParent=nullptr, QSettings* pSett=nullptr);
-	virtual ~SqwParamDlg();
+	SqwElast() { SqwBase::m_bOk = true; }
+	SqwElast(const char* pcFile);
+	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
 
-public slots:
-	void SqwLoaded(const std::vector<SqwBase::t_var>&, const std::vector<SqwBase::t_var_fit>*);
+	void AddPeak(t_real_reso h, t_real_reso k, t_real_reso l, t_real_reso dSigQ, t_real_reso dSigE, t_real_reso dS);
 
-protected slots:
-	void ButtonBoxClicked(QAbstractButton *pBtn);
+	virtual std::vector<SqwBase::t_var> GetVars() const override;
+	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
 
-signals:
-	void SqwParamsChanged(const std::vector<SqwBase::t_var>&, const std::vector<SqwBase::t_var_fit>*);
+	virtual SqwBase* shallow_copy() const override;
 };
+
 
 #endif

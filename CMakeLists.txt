@@ -419,7 +419,12 @@ add_executable(takin
 	tools/monteconvo/ConvoDlg.cpp tools/monteconvo/ConvoDlg_file.cpp
 	tools/monteconvo/ConvoDlg_sim.cpp tools/monteconvo/ConvoDlg_fit.cpp
 	tools/monteconvo/SqwParamDlg.cpp tools/monteconvo/TASReso.cpp
-	tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
+	tools/monteconvo/modules/elast.cpp
+	tools/monteconvo/modules/kdtree.cpp
+	tools/monteconvo/modules/simple_magnon.cpp
+	tools/monteconvo/modules/simple_phonon.cpp
+	tools/monteconvo/modules/table1d.cpp
+	tools/monteconvo/modules/uniform_grid.cpp
 	tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
 	tools/monteconvo/monteconvo_cli.cpp tools/monteconvo/monteconvo_common.cpp
 
@@ -508,7 +513,8 @@ endif()
 if(Py_FOUND)
 #add_library(takinmod_py SHARED
 add_executable(takinmod_py
-	tools/monteconvo/sqw_py.cpp tools/monteconvo/sqwbase.cpp
+	tools/monteconvo/script_modules/sqw_py.cpp
+	tools/monteconvo/sqwbase.cpp
 	tlibs/log/log.cpp
 	tlibs/math/rand.cpp
 )
@@ -541,7 +547,8 @@ endif()
 if(Julia_FOUND)
 #add_library(takinmod_jl SHARED
 add_executable(takinmod_jl
-	tools/monteconvo/sqw_jl.cpp tools/monteconvo/sqwbase.cpp
+	tools/monteconvo/script_modules/sqw_jl.cpp
+	tools/monteconvo/sqwbase.cpp
 	tlibs/log/log.cpp
 	tlibs/math/rand.cpp
 )
@@ -576,7 +583,11 @@ if(BUILD_EXT_TOOLS)
 		#tools/res/simple.cpp
 
 		tools/monteconvo/TASReso.cpp
-		tools/monteconvo/sqw.cpp tools/monteconvo/sqw_uniform_grid.cpp
+		tools/monteconvo/modules/kdtree.cpp
+		tools/monteconvo/modules/simple_magnon.cpp
+		tools/monteconvo/modules/simple_phonon.cpp
+		tools/monteconvo/modules/table1d.cpp
+		tools/monteconvo/modules/uniform_grid.cpp
 		tools/monteconvo/sqwbase.cpp tools/monteconvo/sqwfactory.cpp
 
 		tools/convofit/convofit.cpp tools/convofit/convofit_import.cpp

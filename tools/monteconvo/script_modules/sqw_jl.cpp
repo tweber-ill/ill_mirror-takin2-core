@@ -419,8 +419,8 @@ SqwBase* SqwJl::shallow_copy() const
 #ifdef BUILD_PLUGIN
 
 #include <boost/dll/alias.hpp>
-#include "sqw_proc.h"
-#include "sqw_proc_impl.h"
+#include "../sqw_proc.h"
+#include "../sqw_proc_impl.h"
 #include "libs/version.h"
 
 
@@ -468,8 +468,8 @@ BOOST_DLL_ALIAS(sqw_construct, takin_sqw);
 // external program
 #ifdef BUILD_APPLI
 
-#include "sqw_proc.h"
-#include "sqw_proc_impl.h"
+#include "../sqw_proc.h"
+#include "../sqw_proc_impl.h"
 #include "libs/version.h"
 
 

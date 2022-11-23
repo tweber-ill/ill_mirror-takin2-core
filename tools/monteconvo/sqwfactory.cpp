@@ -27,10 +27,16 @@
  */
 
 #include "sqwfactory.h"
-#include "sqw.h"
+
+#include "modules/simple_phonon.h"
+#include "modules/simple_magnon.h"
+#include "modules/kdtree.h"
+#include "modules/table1d.h"
+#include "modules/elast.h"
+#include "modules/uniform_grid.h"
+
 #include "sqw_proc.h"
 #include "sqw_proc_impl.h"
-#include "sqw_uniform_grid.h"
 #include "sqwrawdelegate.h"
 #include "sqwnull.h"
 

@@ -1,7 +1,7 @@
 /**
- * S(Q,w) julia interface
+ * pre-defined sqw modules
  * @author Tobias Weber <tobias.weber@tum.de>
- * @date dec-2016
+ * @date 2015 -- 2018
  * @license GPLv2
  *
  * ----------------------------------------------------------------------------
@@ -26,50 +26,56 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef __SQW_JL_H__
-#define __SQW_JL_H__
+#ifndef __MCONV_SQWMOD_TAB1D_H__
+#define __MCONV_SQWMOD_TAB1D_H__
 
-#include "sqw.h"
-#include <mutex>
-#include <string>
-#include <memory>
+//#define USE_RTREE
+
+#include <list>
+#include <unordered_map>
+
+#include "tlibs/helper/boost_hacks.h"
+#include <boost/numeric/ublas/vector.hpp>
+
+#include "tlibs/math/math.h"
+#include "tlibs/math/kd.h"
+#include "tlibs/file/loaddat.h"
+#include "../../res/defs.h"
+#include "../sqwbase.h"
+
+namespace ublas = boost::numeric::ublas;
 
 
-class SqwJl : public SqwBase
+/**
+ * tabulated 1d model
+ */
+class SqwTable1d : public SqwBase
 {
 protected:
-	mutable std::shared_ptr<std::mutex> m_pmtx;
+	std::shared_ptr<tl::DatFile<t_real_reso>> m_dat;
+	std::shared_ptr<tl::Kd<t_real_reso>> m_kd;
 
-	/*jl_function_t*/ void *m_pInit = nullptr;
-	/*jl_function_t*/ void *m_pSqw = nullptr;
-	/*jl_function_t*/ void *m_pDisp = nullptr;
-	/*jl_function_t*/ void *m_pBackground = nullptr;
+	t_real_reso m_G[3] = { 0., 0., 0. };
 
-	// filter variables that don't start with the given prefix
-	std::string m_strVarPrefix = "g_";
+	unsigned int m_qcol = 0;
+	unsigned int m_Ecol = 1;
+	unsigned int m_Scol = 2;
 
 protected:
-	std::string GetJlString(void* pVal) const;
-	void PrintExceptions() const;
+	void CreateKd();
 
 public:
-	SqwJl() = default;
-	SqwJl(const std::string& pcFile);
-	virtual ~SqwJl();
+	SqwTable1d(const char* pcFile = nullptr);
+	virtual ~SqwTable1d() = default;
 
-	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>> disp(
-		t_real_reso dh, t_real_reso dk, t_real_reso dl) const override;
-	virtual t_real_reso operator()(
-		t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
-	virtual t_real_reso GetBackground(
-		t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
+	bool open(const char* pcFile);
+	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
 
 	virtual std::vector<SqwBase::t_var> GetVars() const override;
 	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
 
 	virtual SqwBase* shallow_copy() const override;
-
-	void SetVarPrefix(const char* pcFilter) { m_strVarPrefix = pcFilter; }
 };
+
 
 #endif

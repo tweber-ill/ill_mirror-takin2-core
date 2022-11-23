@@ -26,10 +26,8 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef __MCONV_SQW_H__
-#define __MCONV_SQW_H__
-
-//#define USE_RTREE
+#ifndef __MCONV_SQWMOD_PHONON_H__
+#define __MCONV_SQWMOD_PHONON_H__
 
 #include <list>
 #include <unordered_map>
@@ -40,115 +38,16 @@
 #include "tlibs/math/math.h"
 #include "tlibs/math/kd.h"
 #include "tlibs/file/loaddat.h"
-#include "../res/defs.h"
-#include "sqwbase.h"
+#include "../../res/defs.h"
+#include "../sqwbase.h"
 
 #ifdef USE_RTREE
 	#include "tlibs/math/rt.h"
 	#define RT_ELEMS 64
 #endif
 
+
 namespace ublas = boost::numeric::ublas;
-
-
-// -----------------------------------------------------------------------------
-
-struct ElastPeak
-{
-	t_real_reso h, k, l;
-	t_real_reso dSigQ, dSigE;
-	t_real_reso dS;
-};
-
-
-/**
- * Bragg peaks
- */
-class SqwElast : public SqwBase
-{
-protected:
-	bool m_bLoadedFromFile = false;
-	std::list<ElastPeak> m_lstPeaks;
-
-public:
-	SqwElast() { SqwBase::m_bOk = true; }
-	SqwElast(const char* pcFile);
-	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
-
-	void AddPeak(t_real_reso h, t_real_reso k, t_real_reso l, t_real_reso dSigQ, t_real_reso dSigE, t_real_reso dS);
-
-	virtual std::vector<SqwBase::t_var> GetVars() const override;
-	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
-
-	virtual SqwBase* shallow_copy() const override;
-};
-
-
-// -----------------------------------------------------------------------------
-
-
-/**
- * tabulated model
- */
-class SqwKdTree : public SqwBase
-{
-protected:
-	std::unordered_map<std::string, std::string> m_mapParams;
-	std::shared_ptr<tl::Kd<t_real_reso>> m_kd;
-
-public:
-	SqwKdTree(const char* pcFile = nullptr);
-	virtual ~SqwKdTree() = default;
-
-	bool open(const char* pcFile);
-	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
-
-	virtual std::vector<SqwBase::t_var> GetVars() const override;
-	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
-
-	virtual SqwBase* shallow_copy() const override;
-};
-
-
-// -----------------------------------------------------------------------------
-
-
-
-/**
- * tabulated 1d model
- */
-class SqwTable1d : public SqwBase
-{
-protected:
-	std::shared_ptr<tl::DatFile<t_real_reso>> m_dat;
-	std::shared_ptr<tl::Kd<t_real_reso>> m_kd;
-
-	t_real_reso m_G[3] = { 0., 0., 0. };
-
-	unsigned int m_qcol = 0;
-	unsigned int m_Ecol = 1;
-	unsigned int m_Scol = 2;
-
-protected:
-	void CreateKd();
-
-public:
-	SqwTable1d(const char* pcFile = nullptr);
-	virtual ~SqwTable1d() = default;
-
-	bool open(const char* pcFile);
-	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
-
-	virtual std::vector<SqwBase::t_var> GetVars() const override;
-	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
-
-	virtual SqwBase* shallow_copy() const override;
-};
-
-
-
-
-// -----------------------------------------------------------------------------
 
 
 /**
@@ -242,49 +141,6 @@ public:
 		disp(t_real_reso dh, t_real_reso dk, t_real_reso dl) const override;
 	virtual t_real_reso
 		operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
-
-	const ublas::vector<t_real_reso>& GetBragg() const { return m_vecBragg; }
-
-	virtual std::vector<SqwBase::t_var> GetVars() const override;
-	virtual void SetVars(const std::vector<SqwBase::t_var>&) override;
-
-	virtual SqwBase* shallow_copy() const override;
-};
-
-
-// -----------------------------------------------------------------------------
-
-
-/**
- * simple magnon model
- */
-class SqwMagnon : public SqwBase
-{
-private:
-	SqwMagnon() {};
-
-protected:
-	static t_real_reso ferro_disp(t_real_reso dq, t_real_reso dD, t_real_reso doffs);
-	static t_real_reso antiferro_disp(t_real_reso dq, t_real_reso dD, t_real_reso doffs);
-
-protected:
-	unsigned short m_iWhichDisp = 0;		// 0: ferro, 1: antiferro
-	ublas::vector<t_real_reso> m_vecBragg;
-
-	t_real_reso m_dD = 1., m_dOffs = 0.;
-	t_real_reso m_dE_HWHM = 0.1;
-	t_real_reso m_dS0 = 1.;
-
-	t_real_reso m_dIncAmp = 0., m_dIncSig = 0.1;
-	t_real_reso m_dT = 300.;
-
-public:
-	SqwMagnon(const char* pcFile);
-	virtual ~SqwMagnon() = default;
-
-	virtual std::tuple<std::vector<t_real_reso>, std::vector<t_real_reso>>
-		disp(t_real_reso dh, t_real_reso dk, t_real_reso dl) const override;
-	virtual t_real_reso operator()(t_real_reso dh, t_real_reso dk, t_real_reso dl, t_real_reso dE) const override;
 
 	const ublas::vector<t_real_reso>& GetBragg() const { return m_vecBragg; }
 

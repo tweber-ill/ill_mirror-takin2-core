@@ -53,7 +53,7 @@
 	#undef BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
 #endif
 
-#include "sqw.h"
+#include "sqwbase.h"
 #include <mutex>
 #include <memory>
 #include <string>
