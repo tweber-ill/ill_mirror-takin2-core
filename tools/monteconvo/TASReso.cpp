@@ -27,6 +27,7 @@
  */
 
 #include "TASReso.h"
+#include "libs/version.h"
 #include "tlibs/phys/lattice.h"
 #include "tlibs/math/rand.h"
 #include "tlibs/file/prop.h"
@@ -155,6 +156,29 @@ bool TASReso::LoadRes(const char* pcXmlFile)
 		return false;
 	}
 
+	// check version with which the file has been written
+	std::string very_old_ver = "< 1.6.0"; // first version that wrote version information
+	std::string version = xml.Query<std::string>((strXmlRoot + "meta/version").c_str(), very_old_ver);
+	bool version_error = (version == very_old_ver);
+	bool version_warning = (version != TAKIN_VER);
+	if(!version_error)
+	{
+		std::vector<int> vecVer;
+		tl::get_tokens<int, std::string>(version, ".", vecVer);
+		if(vecVer.size() < 1 || vecVer[0] < 2)
+			version_error = true;
+	}
+	if(version_error)
+	{
+		tl::log_err("File \"", pcXmlFile, "\" was created using a very old version of Takin (",
+			version, "). Please load, adapt, and save it again using the resolution dialog.");
+		//return false;
+	}
+	else if(version_warning)
+	{
+		tl::log_warn("File \"", pcXmlFile, "\" was created using a different version of Takin (",
+			version, "), whose settings may differ from the current version.");
+	}
 
 	// CN
 	m_reso.mono_d = xml.Query<t_real>((strXmlRoot + "reso/mono_d").c_str(), 0.) * angs;
