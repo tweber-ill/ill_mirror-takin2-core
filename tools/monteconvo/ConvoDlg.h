@@ -153,7 +153,7 @@ protected slots:
 	void coordFlipToggled(bool);
 	void scaleChanged();
 
-	void SaveResult();
+	void SaveResult(const QString* outfile = nullptr);
 
 	void Start();		// convolution
 	void StartFit();	// convolution fit

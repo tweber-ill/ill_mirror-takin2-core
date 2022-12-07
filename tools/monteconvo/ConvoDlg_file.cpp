@@ -375,32 +375,43 @@ void ConvoDlg::SaveConvofit()
 // -----------------------------------------------------------------------------
 
 
-void ConvoDlg::SaveResult()
+void ConvoDlg::SaveResult(const QString* outfile)
 {
-	QFileDialog::Option fileopt = QFileDialog::Option(0);
-	if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
-		fileopt = QFileDialog::DontUseNativeDialog;
+	std::string strOutFile;
 
-	QString strDirLast = "~";
-	if(m_pSett)
-		strDirLast = m_pSett->value("monteconvo/last_dir_result", "~").toString();
+	if(outfile)
+	{
+		// a file is explicitely given
+		strOutFile = outfile->toStdString();
+	}
+	else
+	{
+		// ask for the output file
+		QFileDialog::Option fileopt = QFileDialog::Option(0);
+		if(m_pSett && !m_pSett->value("main/native_dialogs", 1).toBool())
+			fileopt = QFileDialog::DontUseNativeDialog;
 
-	QString strFile = QFileDialog::getSaveFileName(this,
-		"Save Scan", strDirLast, "Data Files (*.dat *.DAT)", nullptr, fileopt);
+		QString strDirLast = "~";
+		if(m_pSett)
+			strDirLast = m_pSett->value("monteconvo/last_dir_result", "~").toString();
 
-	if(strFile == "")
-		return;
+		QString strFile = QFileDialog::getSaveFileName(this,
+			"Save Scan", strDirLast, "Data Files (*.dat *.DAT)", nullptr, fileopt);
 
-	std::string strFile1 = strFile.toStdString();
-	std::string strDir = tl::get_dir(strFile1);
-	if(tl::get_fileext(strFile1,1) != "dat")
-		strFile1 += ".dat";
+		if(strFile == "")
+			return;
 
+		strOutFile = strFile.toStdString();
+	}
 
-	std::ofstream ofstr(strFile1);
+	std::string strDir = tl::get_dir(strOutFile);
+	if(tl::get_fileext(strOutFile, 1) != "dat")
+		strOutFile += ".dat";
+
+	std::ofstream ofstr(strOutFile);
 	if(!ofstr)
 	{
-		QMessageBox::critical(this, "Error", "Could not open file.");
+		QMessageBox::critical(this, "Error", "Could not open file for writing.");
 		return;
 	}
 
@@ -607,7 +618,7 @@ void ConvoDlg::browseAutosaveFile()
 		"Save Results", strDirLast, "Data files (*.dat *.txt);;All files (*.*)",
 		nullptr, fileopt);
 
-	editScan->setText(strFile);
+	editAutosave->setText(strFile);
 
 	std::string strDir = tl::get_dir(strFile.toStdString());
 	if(m_pSett)

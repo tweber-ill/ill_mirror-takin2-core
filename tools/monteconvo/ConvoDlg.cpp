@@ -348,8 +348,8 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	connect(pExportPlot2d, &QAction::triggered, m_plotwrap2d.get(), &QwtPlotWrapper::SavePlot);
 	connect(pExportPlotGpl, &QAction::triggered, m_plotwrap.get(), &QwtPlotWrapper::ExportGpl);
 	connect(pExportPlot2dGpl, &QAction::triggered, m_plotwrap2d.get(), &QwtPlotWrapper::ExportGpl);
-	connect(pSaveResults, &QAction::triggered, this, &ConvoDlg::SaveResult);
 	connect(pAbout, &QAction::triggered, this, &ConvoDlg::ShowAboutDlg);
+	connect(pSaveResults, &QAction::triggered, [this]() { SaveResult(); });
 
 	this->layout()->setMenuBar(m_pMenuBar);
 	// --------------------------------------------------------------------
@@ -362,13 +362,19 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	m_pFavDlg = new FavDlg(this, m_pSett);
 	connect(m_pFavDlg, &FavDlg::ChangePos, this, &ConvoDlg::ChangePos);
 
-	connect(btnBrowseCrys, &QToolButton::clicked, this, &ConvoDlg::browseCrysFiles);
-	connect(btnBrowseRes, &QToolButton::clicked, this, &ConvoDlg::browseResoFiles);
-	connect(btnBrowseSqw, &QPushButton::clicked, this, &ConvoDlg::browseSqwFiles);
-	connect(btnBrowseScan, &QToolButton::clicked, this, &ConvoDlg::browseScanFiles);
-	connect(btnBrowseAutosave, &QToolButton::clicked, this, &ConvoDlg::browseAutosaveFile);
-	connect(btnFav, &QPushButton::clicked, this, &ConvoDlg::ShowFavourites);
-	connect(btnSqwParams, &QToolButton::clicked, this, &ConvoDlg::showSqwParamDlg);
+	connect(btnBrowseCrys, &QAbstractButton::clicked, this, &ConvoDlg::browseCrysFiles);
+	connect(btnBrowseRes, &QAbstractButton::clicked, this, &ConvoDlg::browseResoFiles);
+	connect(btnBrowseSqw, &QAbstractButton::clicked, this, &ConvoDlg::browseSqwFiles);
+	connect(btnBrowseScan, &QAbstractButton::clicked, this, &ConvoDlg::browseScanFiles);
+	connect(btnBrowseAutosave, &QAbstractButton::clicked, this, &ConvoDlg::browseAutosaveFile);
+	connect(btnFav, &QAbstractButton::clicked, this, &ConvoDlg::ShowFavourites);
+	connect(btnSqwParams, &QAbstractButton::clicked, this, &ConvoDlg::showSqwParamDlg);
+	connect(btnSaveResults, &QAbstractButton::clicked,
+	[this]()
+	{
+		QString outfile = editAutosave->text();
+		SaveResult(&outfile);
+	});
 
 	connect(comboSqw, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ConvoDlg::SqwModelChanged);
 	connect(editSqw, &QLineEdit::textChanged, this, &ConvoDlg::createSqwModel);
@@ -382,9 +388,9 @@ ConvoDlg::ConvoDlg(QWidget* pParent, QSettings* pSett)
 	connect(editSlope, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
 	connect(editOffs, &QLineEdit::textChanged, this, &ConvoDlg::scaleChanged);
 
-	connect(btnStart, &QPushButton::clicked, this, &ConvoDlg::Start);
-	connect(btnStartFit, &QPushButton::clicked, this, &ConvoDlg::StartFit);
-	connect(btnStop, &QPushButton::clicked, this, &ConvoDlg::Stop);
+	connect(btnStart, &QAbstractButton::clicked, this, &ConvoDlg::Start);
+	connect(btnStartFit, &QAbstractButton::clicked, this, &ConvoDlg::StartFit);
+	connect(btnStop, &QAbstractButton::clicked, this, &ConvoDlg::Stop);
 
 	connect(checkScan, &QCheckBox::toggled, this, &ConvoDlg::scanCheckToggled);
 	connect(checkFlip, &QCheckBox::toggled, this, &ConvoDlg::coordFlipToggled);

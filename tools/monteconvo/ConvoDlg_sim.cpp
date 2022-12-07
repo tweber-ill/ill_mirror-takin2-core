@@ -29,6 +29,7 @@
 #include "ConvoDlg.h"
 #include "libs/version.h"
 
+#include "tlibs/time/chrono.h"
 #include "tlibs/time/stopwatch.h"
 #include "tlibs/helper/thread.h"
 #include "tlibs/math/stat.h"
@@ -207,6 +208,9 @@ void ConvoDlg::StartSim1D(bool bForceDeferred, unsigned int seed)
 		ostrOut.precision(g_iPrec);
 		ostrOut << "#\n";
 		ostrOut << "# Takin/Monteconvo version " << TAKIN_VER << "\n";
+		ostrOut << "# DOI: https://dx.doi.org/10.5281/zenodo.4117437\n";
+		ostrOut << "# URL: https://code.ill.fr/scientific-software/takin\n";
+		ostrOut << "# Timestamp: " << tl::epoch_to_str(tl::epoch()) << "\n";
 		ostrOut << "# MC neutrons: " << iNumNeutrons << "\n";
 		ostrOut << "# MC sample steps: " << iNumSampleSteps << "\n";
 		ostrOut << "# Scale: " << dScale << "\n";
