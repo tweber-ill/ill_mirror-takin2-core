@@ -75,8 +75,8 @@ echo -e "Depends:" \
 	"libopengl0," \
 	"liblapacke," \
 	"libqhull-r7," \
-	"libhdf5-103" \
-	"libhdf5-cpp-103" \
+	"libhdf5-103," \
+	"libhdf5-cpp-103," \
 	"libqcustomplot2.0\n" \
 		>> ${INSTDIR}/DEBIAN/control
 
