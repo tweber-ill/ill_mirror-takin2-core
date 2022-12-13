@@ -177,6 +177,12 @@ bool Convofit::run_job(const std::string& _strJob)
 	if(strScFile == "")	// "scan_file_0" is synonymous to "scan_file"
 		strScFile = prop.Query<std::string>("input/scan_file_0");
 
+	boost::optional<unsigned> iMainScanAxis = prop.QueryOpt<unsigned>("input/scan_axis");  // 1-based scan axis
+	if(!iMainScanAxis)	// "scan_axis_0" is synonymous to "scan_axis"
+		iMainScanAxis = prop.Query<unsigned>("input/scan_axis_0", 0);
+	if(!iMainScanAxis)
+		iMainScanAxis = 0;	// automatic selection
+
 	std::string strTempCol = prop.Query<std::string>("input/temp_col");
 	std::string strFieldCol = prop.Query<std::string>("input/field_col");
 	bool bTempOverride = prop.Exists("input/temp_override");
@@ -197,8 +203,6 @@ bool Convofit::run_job(const std::string& _strJob)
 	bool bNormToMon = prop.Query<bool>("input/norm_to_monitor", 1);
 	bool bFlipCoords = prop.Query<bool>("input/flip_lhs_rhs", 0);
 	bool bUseFirstAndLastScanPt = prop.Query<bool>("input/use_first_last_pt", 0);
-	unsigned iScanAxis = prop.Query<unsigned>("input/scan_axis", 0);
-
 
 	if(g_strSetParams != "")
 	{
@@ -218,18 +222,22 @@ bool Convofit::run_job(const std::string& _strJob)
 	// files in inner vector will be merged
 	// files in outer vector will be used for multi-function fitting
 	std::vector<std::vector<std::string>> vecvecScFiles;
+	std::vector<unsigned> vecScanAxes;
 
-	// primary scan files
+	// primary scan file(s)
 	{
 		std::vector<std::string> vecScFiles;
 		tl::get_tokens<std::string, std::string>(strScFile, ";", vecScFiles);
 		std::for_each(vecScFiles.begin(), vecScFiles.end(), [](std::string& str){ tl::trim(str); });
 		vecvecScFiles.emplace_back(std::move(vecScFiles));
+
+		vecScanAxes.push_back(*iMainScanAxis);
 	}
 
 	// get secondary scan files for multi-function fitting
 	for(std::size_t iSecFile=1; 1; ++iSecFile)
 	{
+		// scan file names
 		std::string strSecFile = "input/scan_file_" + tl::var_to_str(iSecFile);
 		std::string strSecScFile = prop.Query<std::string>(strSecFile, "");
 		if(strSecScFile == "")
@@ -239,7 +247,15 @@ bool Convofit::run_job(const std::string& _strJob)
 		tl::get_tokens<std::string, std::string>(strSecScFile, ";", vecSecScFiles);
 		std::for_each(vecSecScFiles.begin(), vecSecScFiles.end(), [](std::string& str){ tl::trim(str); });
 		vecvecScFiles.emplace_back(std::move(vecSecScFiles));
+
+		// scan axes
+		unsigned iScanAxis = prop.Query<unsigned>("input/scan_axis_" + tl::var_to_str(iSecFile), *iMainScanAxis);
+		vecScanAxes.push_back(iScanAxis);
 	}
+
+	// fall-back default
+	if(!vecScanAxes.size())
+		vecScanAxes.push_back(*iMainScanAxis);
 	// --------------------------------------------------------------------
 
 
@@ -443,11 +459,14 @@ bool Convofit::run_job(const std::string& _strJob)
 		if(vecvecScFiles.size() > 1)
 			tl::log_info("Loading scan group ", iSc, ".");
 		if(!load_file(vecvecScFiles[iSc], sc, bNormToMon, filter,
-			bFlipCoords, bUseFirstAndLastScanPt, iScanAxis, g_bVerbose))
+			bFlipCoords, bUseFirstAndLastScanPt, vecScanAxes[iSc], g_bVerbose))
 		{
 			tl::log_err("Cannot load scan files of group ", iSc, ".");
 			continue;
 		}
+
+		// read back the determined scan axis
+		vecScanAxes[iSc] = sc.m_iScIdx + 1;
 
 		vecSc.emplace_back(std::move(sc));
 	}
@@ -555,7 +574,7 @@ bool Convofit::run_job(const std::string& _strJob)
 	std::vector<t_real> vecModTmpX, vecModTmpY;
 	// slots
 	mod.AddFuncResultSlot(
-	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate, iScanAxis]
+	[this, &pltMeas, &vecModTmpX, &vecModTmpY, bPlotIntermediate, &vecScanAxes]
 		(t_real h, t_real k, t_real l, t_real E, t_real S, std::size_t scan_group)
 	{
 		if(g_bVerbose)
@@ -564,6 +583,8 @@ bool Convofit::run_job(const std::string& _strJob)
 		if(bPlotIntermediate)
 		{
 			t_real x = 0.;
+			unsigned iScanAxis = vecScanAxes[scan_group];
+
 			switch(iScanAxis)
 			{
 				case 1: x = h; break;

@@ -283,7 +283,7 @@ bool load_file(const std::vector<std::string>& vecFiles, Scan& scan, bool bNormT
 
 	scan.m_iScIdx = 0;
 
-	if(iScanAxis >= 1 && iScanAxis <=4)
+	if(iScanAxis >= 1 && iScanAxis <= 4)
 	{
 		scan.m_iScIdx = iScanAxis-1;
 		scan.vecMainScanDir[scan.m_iScIdx] = 1.;
