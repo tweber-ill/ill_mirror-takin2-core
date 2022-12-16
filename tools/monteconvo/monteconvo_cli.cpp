@@ -88,7 +88,7 @@ struct ConvoConfig
 	bool flip_coords{false};
 	bool has_scanfile{false};
 
-	int algo{1};
+	ResoAlgo algo{ResoAlgo::POP};
 	int fixedk{1};
 	int mono_foc{1}, ana_foc{1};
 	int scanaxis{4}, scanaxis2{0};
@@ -146,9 +146,8 @@ static ConvoConfig load_config(const tl::Prop<std::string>& xml)
 	obVal = xml.QueryOpt<int>(g_strXmlRoot+"convofit/flip_coords"); if(obVal) cfg.flip_coords = *obVal != 0;
 	obVal = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/has_scanfile"); if(obVal) cfg.has_scanfile = *obVal != 0;
 
-	// indices for gui comboboxes
+	// index values
 	boost::optional<int> oCmb;
-	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/algo"); if(oCmb) cfg.algo = *oCmb;
 	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/fixedk"); if(oCmb) cfg.fixedk = *oCmb;
 	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/mono_foc"); if(oCmb) cfg.mono_foc = *oCmb;
 	oCmb = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/ana_foc"); if(oCmb) cfg.ana_foc = *oCmb;
@@ -171,6 +170,32 @@ static ConvoConfig load_config(const tl::Prop<std::string>& xml)
 	//osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"convofit/sqw_params"); if(osVal) cfg.sqw_params = *osVal;
 	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/filter_col"); if(osVal) cfg.filter_col = *osVal;
 	osVal = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/filter_val"); if(osVal) cfg.filter_val = *osVal;
+
+	// algo selection
+	boost::optional<std::string> algo = xml.QueryOpt<std::string>(g_strXmlRoot+"monteconvo/algo");
+	if(algo)
+	{
+		if(*algo == "cn" || *algo == "0")  // numbers refer to indices used in old versions
+			cfg.algo = ResoAlgo::CN;
+		else if(*algo == "pop_cn")
+			cfg.algo = ResoAlgo::POP_CN;
+		else if(*algo == "pop"  || *algo == "1")
+			cfg.algo = ResoAlgo::POP;
+		else if(*algo == "eck"  || *algo == "2")
+			cfg.algo = ResoAlgo::ECK;
+		else if(*algo == "vio"  || *algo == "3")
+			cfg.algo = ResoAlgo::VIO;
+		else
+			tl::log_err("Unknown algorithm selected: \"", *algo, "\".");
+	}
+	else
+	{
+		boost::optional<int> algo_idx = xml.QueryOpt<int>(g_strXmlRoot+"monteconvo/algo_idx");
+		if(algo_idx)
+			cfg.algo = ResoAlgo(*algo_idx + 1);
+		else
+			tl::log_err("Unknown algorithm index selected: ", *algo_idx, ".");
+	}
 
 	return cfg;
 }
@@ -317,7 +342,7 @@ static bool start_convo_1d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 		// -------------------------------------------------------------------------
 	}
 
-	reso.SetAlgo(ResoAlgo(cfg.algo+1));
+	reso.SetAlgo(cfg.algo);
 	reso.SetKiFix(cfg.fixedk==0);
 	reso.SetKFix(cfg.kfix);
 	reso.SetOptimalFocus(get_reso_focus(cfg.mono_foc, cfg.ana_foc));
@@ -672,7 +697,7 @@ static bool start_convo_2d(const ConvoConfig& cfg, const tl::Prop<std::string>& 
 	// -------------------------------------------------------------------------
 
 
-	reso.SetAlgo(ResoAlgo(cfg.algo+1));
+	reso.SetAlgo(cfg.algo);
 	reso.SetKiFix(cfg.fixedk==0);
 	reso.SetKFix(cfg.kfix);
 	reso.SetOptimalFocus(get_reso_focus(cfg.mono_foc, cfg.ana_foc));

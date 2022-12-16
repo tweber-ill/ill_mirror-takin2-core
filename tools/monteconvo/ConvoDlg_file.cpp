@@ -297,7 +297,7 @@ void ConvoDlg::Save(std::map<std::string, std::string>& mapConf, const std::stri
 	if(m_pSqw)
 	{
 		save_sqw_params(m_pSqw.get(), mapConf, strXmlRoot + "monteconvo/");
-		mapConf[strXmlRoot + "monteconvo/sqw"] = 
+		mapConf[strXmlRoot + "monteconvo/sqw"] =
 			comboSqw->itemData(comboSqw->currentIndex()).toString().toStdString();
 	}
 
