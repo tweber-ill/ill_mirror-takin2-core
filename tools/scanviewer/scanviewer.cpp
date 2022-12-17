@@ -466,10 +466,18 @@ void ScanViewerDlg::FileSelected()
 		std::string strFirstScanVar = tl::str_to_lower(vecScanVars[0]);
 		std::string strColLower = tl::str_to_lower(strCol);
 
-		if(vecScanVars.size() && strFirstScanVar == strColLower)
-			iIdxX = iCurIdx;
-		if(vecScanVars.size() && strFirstScanVar.substr(0, strCol.length()) == strColLower)
-			iIdxX = iCurIdx;
+		if(vecScanVars.size())
+		{
+			if(strFirstScanVar == strColLower)
+				iIdxX = iCurIdx;
+			else if(strFirstScanVar.substr(0, strCol.length()) == strColLower)
+				iIdxX = iCurIdx;
+			// sometimes the scanned variable is named "QH", but the data column "H"
+			else if(strFirstScanVar.substr(1) == strColLower)
+				iIdxX = iCurIdx;
+		}
+
+		// count and monitor variables
 		if(tl::str_to_lower(strCntVar) == strColLower)
 			iIdxY = iCurIdx;
 		if(tl::str_to_lower(strMonVar) == strColLower)
