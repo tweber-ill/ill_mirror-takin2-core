@@ -471,10 +471,10 @@ void ScanViewerDlg::FileSelected()
 			if(strFirstScanVar == strColLower)
 				iIdxX = iCurIdx;
 			else if(strFirstScanVar.substr(0, strCol.length()) == strColLower)
-				iIdxX = iCurIdx;
+				iAlternateX = iCurIdx;
 			// sometimes the scanned variable is named "QH", but the data column "H"
 			else if(strFirstScanVar.substr(1) == strColLower)
-				iIdxX = iCurIdx;
+				iAlternateX = iCurIdx;
 		}
 
 		// count and monitor variables
