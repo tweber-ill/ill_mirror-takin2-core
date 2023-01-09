@@ -152,3 +152,8 @@ fi
 if ! wget https://raw.githubusercontent.com/gcc-mirror/gcc/master/COPYING.RUNTIME -O ${LICDIR}/gcc_runtime_license.txt; then
 	echo -e "Error: Cannot download gcc_runtime license.";
 fi
+
+# hdf5
+if ! wget https://raw.githubusercontent.com/HDFGroup/hdf5/develop/COPYING -O ${LICDIR}/hdf5_license.txt; then
+	echo -e "Error: Cannot download hdf5 license.";
+fi
