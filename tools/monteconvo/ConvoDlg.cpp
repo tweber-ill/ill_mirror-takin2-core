@@ -1,12 +1,12 @@
 /**
  * monte carlo convolution tool
  * @author Tobias Weber <tobias.weber@tum.de>
- * @date 2015-2022
+ * @date 2015 - 2023
  * @license GPLv2
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
- * Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
+ * Copyright (C) 2017-2023  Tobias WEBER (Institut Laue-Langevin (ILL),
  *                          Grenoble, France).
  * Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
  *                          (TUM), Garching, Germany).
@@ -802,7 +802,7 @@ void ConvoDlg::ShowAboutDlg()
 	std::ostringstream ostrAbout;
 	ostrAbout << "Takin/Convo version " << TAKIN_VER << ".\n";
 	ostrAbout << "Written by Tobias Weber <tweber@ill.fr>,\n";
-	ostrAbout << "2015 - 2022.\n";
+	ostrAbout << "2015 - 2023.\n";
 	ostrAbout << "\n" << TAKIN_LICENSE("Takin/Convo");
 
 	QMessageBox::about(this, "About Convo", ostrAbout.str().c_str());

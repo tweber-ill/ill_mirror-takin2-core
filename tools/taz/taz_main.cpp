@@ -6,7 +6,7 @@
  *
  * ----------------------------------------------------------------------------
  * Takin (inelastic neutron scattering software package)
- * Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
+ * Copyright (C) 2017-2023  Tobias WEBER (Institut Laue-Langevin (ILL),
  *                          Grenoble, France).
  * Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
  *                          (TUM), Garching, Germany).
@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 
 		tl::log_info("--------------------------------------------------------------------------------");
 		tl::log_info("This is Takin version " TAKIN_VER ".");
-		tl::log_info("Author: Tobias Weber <tweber@ill.fr>, 2014 - 2022.");
+		tl::log_info("Author: Tobias Weber <tweber@ill.fr>, 2014 - 2023.");
 		tl::log_info("Licensed under GPLv2, see the about dialog.");
 		tl::log_info("--------------------------------------------------------------------------------");
 
@@ -388,7 +388,8 @@ int main(int argc, char** argv)
 		add_resource_path(g_strApp + "/resources");
 		add_resource_path(g_strApp + "/Resources");
 		add_resource_path(g_strApp + "/../resources");
-		add_resource_path(g_strApp + "/../Resources");
+		add_resource_path(g_strApp + "/../lib");
+		add_resource_path(g_strApp + "/lib");
 
 		QCoreApplication::addLibraryPath((g_strApp + "/../lib/plugins").c_str());
 		QCoreApplication::addLibraryPath((g_strApp + "/lib/plugins").c_str());

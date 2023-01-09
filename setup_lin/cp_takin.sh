@@ -2,12 +2,12 @@
 #
 # creates a distro archive
 # @author Tobias Weber <tobias.weber@tum.de>
-# @date 2016-2022
+# @date 2016 - 2023
 # @license GPLv2
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2022  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2023  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).

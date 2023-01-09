@@ -6,7 +6,7 @@
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
-# Copyright (C) 2017-2021  Tobias WEBER (Institut Laue-Langevin (ILL),
+# Copyright (C) 2017-2023  Tobias WEBER (Institut Laue-Langevin (ILL),
 #                          Grenoble, France).
 # Copyright (C) 2013-2017  Tobias WEBER (Technische Universitaet Muenchen
 #                          (TUM), Garching, Germany).
@@ -38,6 +38,7 @@ fi
 # directories
 mkdir -p ${INSTDIR}/usr/local/bin
 mkdir -p ${INSTDIR}/usr/local/lib
+mkdir -p ${INSTDIR}/usr/local/lib/takin_plugins
 mkdir -p ${INSTDIR}/usr/local/share/takin/res
 mkdir -p ${INSTDIR}/usr/local/share/takin/3rdparty_licenses
 mkdir -p ${INSTDIR}/usr/share/applications
@@ -45,7 +46,7 @@ mkdir -p ${INSTDIR}/DEBIAN
 
 
 # control file
-echo -e "Package: takin\nVersion: 2.3.0" > ${INSTDIR}/DEBIAN/control
+echo -e "Package: takin\nVersion: 2.4.0" > ${INSTDIR}/DEBIAN/control
 echo -e "Description: inelastic neutron scattering software" >> ${INSTDIR}/DEBIAN/control
 echo -e "Maintainer: n/a" >> ${INSTDIR}/DEBIAN/control
 echo -e "Architecture: $(dpkg --print-architecture)" >> ${INSTDIR}/DEBIAN/control
@@ -75,7 +76,7 @@ ln -sf libMinuit2.so libMinuit2.so.0.0.0
 popd
 
 
-# copy optional external programs
+# copy external programs
 cp -v bin/takin_cif2xml		${INSTDIR}/usr/local/bin
 cp -v bin/takin_findsg		${INSTDIR}/usr/local/bin
 cp -v bin/takin_pol		${INSTDIR}/usr/local/bin
@@ -88,12 +89,17 @@ cp -v bin/takin_magdyn          ${INSTDIR}/usr/local/bin
 cp -v bin/takin_moldyn          ${INSTDIR}/usr/local/bin
 
 
+# copy plugins
+cp -v plugins/*.so		${INSTDIR}/usr/local/lib/takin_plugins
+
+
 # permissions
 chmod a+x ${INSTDIR}/usr/local/bin/*
 
 # stripping
 strip -v ${INSTDIR}/usr/local/bin/*
 strip -v ${INSTDIR}/usr/local/lib/*
+strip -v ${INSTDIR}/usr/local/lib/plugins/*
 
 
 # startup script

@@ -364,7 +364,11 @@ void load_sqw_plugins()
 	static bool bPluginsLoaded = 0;
 	if(!bPluginsLoaded)
 	{
-		std::vector<std::string> vecPlugins = find_resource_dirs("plugins");
+		// look in the directories "plugins" and "takin_plugins"
+		std::vector<std::string> vecPlugins = find_resource_dirs("plugins", false);
+		for(const std::string& plugin : find_resource_dirs("takin_plugins", false))
+			vecPlugins.push_back(plugin);
+
 		for(const std::string& strPlugins : vecPlugins)
 		{
 			tl::log_info("Loading plugins from directory: ", strPlugins, ".");
