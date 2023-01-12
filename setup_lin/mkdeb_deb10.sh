@@ -99,7 +99,7 @@ chmod a+x ${INSTDIR}/usr/local/bin/*
 # stripping
 strip -v ${INSTDIR}/usr/local/bin/*
 strip -v ${INSTDIR}/usr/local/lib/*
-strip -v ${INSTDIR}/usr/local/lib/plugins/*
+strip -v ${INSTDIR}/usr/local/lib/takin_plugins/*
 
 
 # startup script
