@@ -91,8 +91,8 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/hdf5/lib/libhdf5_cpp.200.dylib"
 	"/usr/local/opt/hdf5/lib/libhdf5.200.dylib"
 	"/usr/local/opt/libaec/lib/libsz.2.dylib"
+	"/usr/local/lib/libqcustomplot.dylib"
 )
-
 #	"/usr/local/opt/openblas/lib/libopenblas.0.dylib"
 
 

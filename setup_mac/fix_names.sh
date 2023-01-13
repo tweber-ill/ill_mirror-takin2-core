@@ -67,8 +67,8 @@ declare -a filestochange=(
 	"${PRG}/Contents/MacOS/takin_convofit"
 	"${PRG}/Contents/MacOS/takin_convoseries"
 	"${PRG}/Contents/MacOS/takin_polextract"
-	"${PRG}/Contents/PlugIns/libmagnonmod.dylib" 
 )
+#	"${PRG}/Contents/PlugIns/libmagnonmod.dylib"
 
 
 # original symbols, pattern-matched
@@ -116,6 +116,7 @@ declare -a changefrom=(
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5_cpp.200.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5.200.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libsz.2.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libqcustomplot.dylib\""
 )
 
 # symbols to change into
@@ -163,6 +164,7 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libhdf5_cpp.200.dylib"
 	"@executable_path/../Libraries/libhdf5.200.dylib"
 	"@executable_path/../Libraries/libsz.2.dylib"
+	"@executable_path/../Libraries/libqcustomplot.dylib"
 )
 
 CNT=$(expr ${#changefrom[*]} - 1)
