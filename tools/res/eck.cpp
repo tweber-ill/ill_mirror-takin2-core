@@ -163,14 +163,14 @@ get_mono_vals(const length& src_w, const length& src_h,
 
 		Av(0, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
 		(
-/*1*/	//		+ units::pow<2>(t_real(1)/coll_v_pre_mono) *rads*rads	// missing in paper?
-/*2*/			+ units::pow<2>(t_real(1)/coll_v_pre_sample) *rads*rads
-/*~3*/			+ units::pow<2>(dist_mono_sample/src_h)
-/*4*/			+ units::pow<2>(dist_mono_sample/mono_h)
+/*1*/	//		+ units::pow<2>(t_real(1) / coll_v_pre_mono) *rads*rads	// missing in paper?
+/*2*/			+ units::pow<2>(t_real(1) / coll_v_pre_sample) *rads*rads
+/*~3*/			+ units::pow<2>(dist_mono_sample / src_h)
+/*4*/			+ units::pow<2>(dist_mono_sample / mono_h)
 
-/*5*/			+ Av_t0*Av_t0 * rads*rads 				// typo in paper?
+/*5*/			+ Av_t0*Av_t0 * rads*rads				// typo in paper?
 /*6*/			- t_real(2)*Av_t0*Av_t1 * rads*rads
-/*7*/			+ Av_t1*Av_t1 * rads*rads 				// missing in paper?
+/*7*/			+ Av_t1*Av_t1 * rads*rads				// missing in paper?
 		);
 		Av(0, 1) = Av(1, 0) = t_real(0.5)*sig2fwhm*sig2fwhm / (ki*angs*ki*angs) *
 		(
@@ -209,7 +209,7 @@ get_mono_vals(const length& src_w, const length& src_h,
 	// Bv vector: formula 39 in [eck14]
 	t_vec Bv(2);
 	{
-		const auto Bv_t0 = inv_mono_curvv/(mono_mosaic_v*mono_mosaic_v);
+		const auto Bv_t0 = inv_mono_curvv / (mono_mosaic_v*mono_mosaic_v);
 
 		Bv(0) = sig2fwhm*sig2fwhm * pos_z / (ki*angs) * t_real(-1.) *
 		(
@@ -423,8 +423,8 @@ ResoResults calc_eck(const EckParams& eck)
 
 	// equ 4 & equ 53 in [eck14]
 	const t_real dE = (eck.ki*eck.ki - eck.kf*eck.kf) / (t_real(2)*eck.Q*eck.Q);
-	const wavenumber kipara = eck.Q*(t_real(0.5)+dE);
-	const wavenumber kfpara = eck.Q-kipara;
+	const wavenumber kipara = eck.Q * (t_real(0.5)+dE);
+	const wavenumber kfpara = eck.Q - kipara;
 	wavenumber kperp = tl::my_units_sqrt<wavenumber>(units::abs(kipara*kipara - eck.ki*eck.ki));
 	kperp *= eck.dsample_sense;
 
