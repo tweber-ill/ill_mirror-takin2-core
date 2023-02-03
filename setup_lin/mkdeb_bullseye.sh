@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # creates a DEB distro
-# @author Tobias Weber <tobias.weber@tum.de>
+# @author Tobias Weber <tobias.weber@tum.de>, Jens Krüger
+# @date 3 february 2023
 # @license GPLv2
 #
 # ----------------------------------------------------------------------------
