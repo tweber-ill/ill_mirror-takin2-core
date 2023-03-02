@@ -333,10 +333,6 @@ class TazDlg : public QMainWindow, Ui::TazDlg
 
 		void ShowConnectDlg();
 
-		void ConnectTo(ControlSystem control_sys,
-			const QString& strHost, const QString& strPort,
-			const QString& strUser, const QString& strPass);
-		void Disconnect();
 		void NetRefresh();
 		void ShowNetCache();
 		void ShowNetScanMonitor();
@@ -355,6 +351,12 @@ class TazDlg : public QMainWindow, Ui::TazDlg
 		void RecipNodeEvent(bool bStarted);
 		void RealNodeEvent(bool bStarted);
 		void TofNodeEvent(bool bStarted);
+
+	public slots:
+		void ConnectTo(ControlSystem control_sys,
+			const QString& strHost, const QString& strPort,
+			 const QString& strUser, const QString& strPass);
+		void Disconnect();
 
 	signals:
 		void ResoParamsChanged(const ResoParams& resoparams);

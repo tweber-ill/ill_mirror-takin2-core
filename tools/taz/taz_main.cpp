@@ -251,10 +251,10 @@ int main(int argc, char** argv)
 		});
 
 
-
 		// --------------------------------------------------------------------
 		// get program options
 		std::vector<std::string> vecTazFiles;
+		std::string connectTo;
 		bool bShowHelp = 0;
 		bool bStartScanviewer = 0;
 		bool bStartMonteconvo = 0;
@@ -267,6 +267,10 @@ int main(int argc, char** argv)
 			new opts::option_description("taz-file",
 			opts::value<decltype(vecTazFiles)>(&vecTazFiles),
 			"loads a Takin session file")));
+		args.add(boost::shared_ptr<opts::option_description>(
+			new opts::option_description("connect",
+			opts::value<decltype(connectTo)>(&connectTo),
+			"connect to an instrument, arg format: system:host:port[:user:pass], where system=nicos or sics")));
 		args.add(boost::shared_ptr<opts::option_description>(
 			new opts::option_description("help",
 			opts::bool_switch(&bShowHelp),
@@ -314,7 +318,6 @@ int main(int argc, char** argv)
 			return 0;
 		}
 		// --------------------------------------------------------------------
-
 
 
 		std::string strLog = QDir::tempPath().toStdString();
@@ -545,6 +548,36 @@ int main(int argc, char** argv)
 			{
 				tl::log_info("Loading \"", vecTazFiles[0], "\"...");
 				pTakDlg->Load(vecTazFiles[0].c_str());
+			}
+
+			// connect to an instrument control system
+			if(connectTo != "")
+			{
+				std::vector<std::string> vecConnectTo;
+				tl::get_tokens<std::string, std::string>(connectTo, ":", vecConnectTo);
+
+				if(vecConnectTo.size() >= 3)
+				{
+					ControlSystem control_sys = ControlSystem::UNKNOWN;
+					if(tl::str_to_lower(vecConnectTo[0]) == "nicos")
+						control_sys = ControlSystem::NICOS;
+					else if(tl::str_to_lower(vecConnectTo[0]) == "sics")
+						control_sys = ControlSystem::SICS;
+
+					std::string username, userpwd;
+					if(vecConnectTo.size() > 3)
+						username = vecConnectTo[3];
+					if(vecConnectTo.size() > 4)
+						userpwd = vecConnectTo[4];
+
+					pTakDlg->ConnectTo(control_sys,
+						vecConnectTo[1].c_str(), vecConnectTo[2].c_str(),
+						username.c_str(), userpwd.c_str());
+				}
+				else
+				{
+					tl::log_err("Unknown connection string, format is: system:host:port[:user:pass].");
+				}
 			}
 
 			pTakDlg->show();
