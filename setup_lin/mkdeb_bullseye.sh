@@ -47,9 +47,9 @@ mkdir -p ${INSTDIR}/DEBIAN
 
 
 # control file
-echo -e "Package: takin\nVersion: 2.5.0" > ${INSTDIR}/DEBIAN/control
+echo -e "Package: takin\nVersion: 2.5.1" > ${INSTDIR}/DEBIAN/control
 echo -e "Description: inelastic neutron scattering software" >> ${INSTDIR}/DEBIAN/control
-echo -e "Maintainer: Tobias Weber <tobias.weber@ill.fr>" >> ${INSTDIR}/DEBIAN/control
+echo -e "Maintainer: Tobias Weber <tweber@ill.fr>" >> ${INSTDIR}/DEBIAN/control
 echo -e "Architecture: $(dpkg --print-architecture)" >> ${INSTDIR}/DEBIAN/control
 echo -e "Section: science\nPriority: optional" >> ${INSTDIR}/DEBIAN/control
 echo -e "Depends:" \
