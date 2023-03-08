@@ -51,6 +51,14 @@
 #include <boost/scope_exit.hpp>
 #include <boost/program_options.hpp>
 
+#ifndef USE_BOOST_REX
+	#include <regex>
+	namespace rex = ::std;
+#else
+	#include <boost/tr1/regex.hpp>
+	namespace rex = ::boost;
+#endif
+
 #include <locale>
 #include <clocale>
 #include <memory>
@@ -553,25 +561,61 @@ int main(int argc, char** argv)
 			// connect to an instrument control system
 			if(connectTo != "")
 			{
-				std::vector<std::string> vecConnectTo;
-				tl::get_tokens<std::string, std::string>(connectTo, ":", vecConnectTo);
+				bool has_valid_connection_infos = false;
+				ControlSystem control_sys = ControlSystem::UNKNOWN;
+				std::string hostname, portnumber;
+				std::string username, userpwd;
 
-				if(vecConnectTo.size() >= 3)
+				const rex::regex regex_url(
+					"(([A-Za-z0-9]+)(:([A-Za-z0-9]+))?@)?([A-Za-z0-9]+)://([A-Za-z0-9\\.]+)(:([0-9]+))?",
+					rex::regex::ECMAScript);
+				rex::smatch match_url;
+
+				if(rex::regex_match(connectTo, match_url, regex_url))
 				{
-					ControlSystem control_sys = ControlSystem::UNKNOWN;
-					if(tl::str_to_lower(vecConnectTo[0]) == "nicos")
+					// connection string is in url format
+
+					if(tl::str_to_lower(std::string(match_url[5])) == "nicos")
 						control_sys = ControlSystem::NICOS;
-					else if(tl::str_to_lower(vecConnectTo[0]) == "sics")
+					else if(tl::str_to_lower(std::string(match_url[5])) == "sics")
 						control_sys = ControlSystem::SICS;
 
-					std::string username, userpwd;
-					if(vecConnectTo.size() > 3)
-						username = vecConnectTo[3];
-					if(vecConnectTo.size() > 4)
-						userpwd = vecConnectTo[4];
+					hostname = match_url[6];
+					portnumber = match_url[8];
+					username = match_url[2];
+					userpwd = match_url[4];
 
+					has_valid_connection_infos = true;
+				}
+				else
+				{
+					// try simple token format instead
+					std::vector<std::string> vecConnectTo;
+					tl::get_tokens<std::string, std::string>(connectTo, ":", vecConnectTo);
+
+					if(vecConnectTo.size() >= 3)
+					{
+						if(tl::str_to_lower(vecConnectTo[0]) == "nicos")
+							control_sys = ControlSystem::NICOS;
+						else if(tl::str_to_lower(vecConnectTo[0]) == "sics")
+							control_sys = ControlSystem::SICS;
+
+						hostname = vecConnectTo[1];
+						portnumber = vecConnectTo[2];
+
+						if(vecConnectTo.size() > 3)
+							username = vecConnectTo[3];
+						if(vecConnectTo.size() > 4)
+							userpwd = vecConnectTo[4];
+
+						has_valid_connection_infos = true;
+					}
+				}
+
+				if(has_valid_connection_infos)
+				{
 					pTakDlg->ConnectTo(control_sys,
-						vecConnectTo[1].c_str(), vecConnectTo[2].c_str(),
+						hostname.c_str(), portnumber.c_str(),
 						username.c_str(), userpwd.c_str());
 				}
 				else
