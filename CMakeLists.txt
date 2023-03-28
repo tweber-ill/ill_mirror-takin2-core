@@ -496,13 +496,6 @@ add_custom_target(prebuild-script
 	COMMAND cd ${PROJECT_SOURCE_DIR} && ./setup/prebuild.sh ${PROJECT_SOURCE_DIR} ${QT_MOC_EXECUTABLE})
 
 
-# post-build
-#add_custom_command(TARGET takin POST_BUILD
-#	COMMAND qcollectiongenerator ${PROJECT_SOURCE_DIR}/doc/takin.qhcp -o ${PROJECT_SOURCE_DIR}/doc/takin.qhc
-#		&& cp -v ${PROJECT_SOURCE_DIR}/doc/takin.qhc ${PROJECT_SOURCE_DIR}/res/
-#		&& cp -v ${PROJECT_SOURCE_DIR}/doc/takin.qch ${PROJECT_SOURCE_DIR}/res/
-#	MAIN_DEPENDENCY takin)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Release" AND USE_STRIP)
 	add_custom_command(TARGET takin POST_BUILD
 		COMMAND strip -v $<TARGET_FILE:takin>

@@ -65,7 +65,6 @@ echo -e "Depends:" \
 	"libqt5opengl5 (>=5.9.5)," \
 	"libqt5svg5 (>=5.9.5)," \
 	"libqt5xml5 (>=5.9.5)," \
-	"qt5-assistant," \
 	"libqwt-qt5-6 (>=6.1.3)," \
 	"libpython3.9 (>=3.9.0)," \
 	"python3.9 (>=3.9.0)," \
