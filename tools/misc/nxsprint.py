@@ -9,6 +9,7 @@
 import h5py
 import numpy as np
 import tabulate as tab
+import re
 
 
 class H5Loader:
@@ -68,6 +69,15 @@ class H5Loader:
 			self.data = np.append(self.data, row_indices.reshape(num_rows, 1), axis=1)
 			self.columns = np.append(self.columns, "PNT")
 			self.selected_columns.insert(0, "PNT")
+
+		# add detector and monitor columns
+		re_det = re.compile("([A-Za-z0-9]*)(Detector|Monitor)([A-Za-z0-9]*)")
+		for col_name in self.columns:
+			if col_name in self.selected_columns:
+				continue
+			if re_det.match(col_name) == None:
+				continue
+			self.selected_columns.append(col_name)
 
 		# get instrument variables
 		self.varias = {}
