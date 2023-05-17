@@ -44,6 +44,7 @@ class H5Loader:
 		# get scan data
 		self.data = entry["data_scan/scanned_variables/data"][:]
 		self.data = np.transpose(self.data)
+
 		try:
 			self.columns = entry["data_scan/scanned_variables/variables_names/label"][:]
 		except KeyError:
@@ -59,6 +60,14 @@ class H5Loader:
 		except KeyError:
 			# select all columns
 			self.selected_columns = self.columns
+
+		# add data row index
+		if not "PNT" in self.columns:
+			num_rows = len(self.data)
+			row_indices = np.linspace(1, num_rows, num_rows)
+			self.data = np.append(self.data, row_indices.reshape(num_rows, 1), axis=1)
+			self.columns = np.append(self.columns, "PNT")
+			self.selected_columns.insert(0, "PNT")
 
 		# get instrument variables
 		self.varias = {}
