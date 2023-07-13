@@ -71,7 +71,7 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/freetype/lib/libfreetype.6.dylib"
 	"/usr/local/opt/libpng/lib/libpng16.16.dylib"
 	"/usr/local/opt/libjpeg/lib/libjpeg.9.dylib"
-	"/usr/local/opt/libtiff/lib/libtiff.5.dylib"
+	"/usr/local/opt/libtiff/lib/libtiff.6.dylib"
 	"/usr/local/opt/lapack/lib/liblapacke.3.dylib"
 	"/usr/local/opt/lapack/lib/liblapack.3.dylib"
 	"/usr/local/opt/lapack/lib/libblas.3.dylib"
