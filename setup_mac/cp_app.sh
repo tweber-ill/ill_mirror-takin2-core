@@ -88,8 +88,8 @@ declare -a SRC_LIBS=(
 	"/usr/local/opt/zstd/lib/libzstd.1.dylib"
 	"/usr/local/opt/xz/lib/liblzma.5.dylib"
 	"/usr/local/opt/qhull/lib/libqhull_r.8.0.dylib"
-	"/usr/local/opt/hdf5/lib/libhdf5_cpp.200.dylib"
-	"/usr/local/opt/hdf5/lib/libhdf5.200.dylib"
+	"/usr/local/opt/hdf5/lib/libhdf5_cpp.310.dylib"
+	"/usr/local/opt/hdf5/lib/libhdf5.310.dylib"
 	"/usr/local/opt/libaec/lib/libsz.2.dylib"
 	"/usr/local/lib/libqcustomplot.dylib"
 )

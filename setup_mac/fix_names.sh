@@ -113,8 +113,8 @@ declare -a changefrom=(
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libzstd.1.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/liblzma.5.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libqhull_r.8.0.dylib\""
-	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5_cpp.200.dylib\""
-	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5.200.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5_cpp.310.dylib\""
+	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libhdf5.310.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libsz.2.dylib\""
 	"otool -L __BIN_FILE__ | grep -E -o -m1 \"(/|@rpath)[-_/@.a-zA-Z0-9]*/libqcustomplot.dylib\""
 )
@@ -161,8 +161,8 @@ declare -a changeto=(
 	"@executable_path/../Libraries/libzstd.1.dylib"
 	"@executable_path/../Libraries/liblzma.5.dylib"
 	"@executable_path/../Libraries/libqhull_r.8.0.dylib"
-	"@executable_path/../Libraries/libhdf5_cpp.200.dylib"
-	"@executable_path/../Libraries/libhdf5.200.dylib"
+	"@executable_path/../Libraries/libhdf5_cpp.310.dylib"
+	"@executable_path/../Libraries/libhdf5.310.dylib"
 	"@executable_path/../Libraries/libsz.2.dylib"
 	"@executable_path/../Libraries/libqcustomplot.dylib"
 )
