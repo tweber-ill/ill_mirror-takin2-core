@@ -245,8 +245,8 @@ void ResoDlg::RefreshQEPos()
 		//t_real_reso dE = editE->text().toDouble();
 		tl::t_energy_si<t_real_reso> E = tl::get_energy_transfer(ki, kf);
 
-		tl::t_angle_si<t_real_reso> kiQ = tl::get_angle_ki_Q(ki, kf, Q, true);
-		tl::t_angle_si<t_real_reso> kfQ = tl::get_angle_kf_Q(ki, kf, Q, true);
+		tl::t_angle_si<t_real_reso> kiQ = tl::get_angle_ki_Q(ki, kf, Q, true, false);
+		tl::t_angle_si<t_real_reso> kfQ = tl::get_angle_kf_Q(ki, kf, Q, true, true);
 		tl::t_angle_si<t_real_reso> twotheta = tl::get_sample_twotheta(ki, kf, Q, true);
 
 		const t_real_reso dMono = spinMonod->value();
@@ -887,9 +887,9 @@ void ResoDlg::RecipParamsChanged(const RecipParams& parms)
 		m_simpleparams.Q = m_tofparams.Q = m_tasparams.Q = dQ / angs;
 
 		m_simpleparams.angle_ki_Q = m_tofparams.angle_ki_Q = m_tasparams.angle_ki_Q =
-			tl::get_angle_ki_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true);
+			tl::get_angle_ki_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true, false);
 		m_simpleparams.angle_kf_Q = m_tofparams.angle_kf_Q = m_tasparams.angle_kf_Q =
-			tl::get_angle_kf_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true);
+			tl::get_angle_kf_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true, true);
 
 		editQ->setText(tl::var_to_str(dQ, g_iPrec).c_str());
 		editE->setText(tl::var_to_str(parms.dE, g_iPrec).c_str());
