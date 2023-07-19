@@ -199,11 +199,8 @@ ResoResults calc_cn(const CNParams& cn)
 
 	angle thetaa = cn.thetaa * cn.dana_sense;
 	angle thetam = cn.thetam * cn.dmono_sense;
-	angle ki_Q = cn.angle_ki_Q;
-	angle kf_Q = cn.angle_kf_Q;
-
-	ki_Q *= cn.dsample_sense;
-	kf_Q *= cn.dsample_sense;
+	angle ki_Q = cn.angle_ki_Q * cn.dsample_sense;
+	angle kf_Q = cn.angle_kf_Q * cn.dsample_sense;
 
 	// transformation matrix U and its inverse V
 	t_mat U_trafo_QE = get_trafo_dkidkf_dQdE(ki_Q, kf_Q, cn.ki, cn.kf);

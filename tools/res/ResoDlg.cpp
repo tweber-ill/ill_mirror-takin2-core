@@ -245,9 +245,9 @@ void ResoDlg::RefreshQEPos()
 		//t_real_reso dE = editE->text().toDouble();
 		tl::t_energy_si<t_real_reso> E = tl::get_energy_transfer(ki, kf);
 
-		tl::t_angle_si<t_real_reso> kiQ = tl::get_angle_ki_Q(ki, kf, Q, 1);
-		tl::t_angle_si<t_real_reso> kfQ = tl::get_angle_kf_Q(ki, kf, Q, 1);
-		tl::t_angle_si<t_real_reso> twotheta = tl::get_sample_twotheta(ki, kf, Q, 1);
+		tl::t_angle_si<t_real_reso> kiQ = tl::get_angle_ki_Q(ki, kf, Q, true);
+		tl::t_angle_si<t_real_reso> kfQ = tl::get_angle_kf_Q(ki, kf, Q, true);
+		tl::t_angle_si<t_real_reso> twotheta = tl::get_sample_twotheta(ki, kf, Q, true);
 
 		const t_real_reso dMono = spinMonod->value();
 		const t_real_reso dAna = spinAnad->value();
@@ -261,8 +261,8 @@ void ResoDlg::RefreshQEPos()
 		m_simpleparams.angle_ki_Q = m_tofparams.angle_ki_Q = m_tasparams.angle_ki_Q = kiQ;
 		m_simpleparams.angle_kf_Q = m_tofparams.angle_kf_Q = m_tasparams.angle_kf_Q = kfQ;
 
-		m_tasparams.thetam = t_real_reso(0.5) * tl::get_mono_twotheta(ki, dMono*angs, 1);
-		m_tasparams.thetaa = t_real_reso(0.5) * tl::get_mono_twotheta(kf, dAna*angs, 1);
+		m_tasparams.thetam = t_real_reso(0.5) * tl::get_mono_twotheta(ki, dMono*angs, true);
+		m_tasparams.thetaa = t_real_reso(0.5) * tl::get_mono_twotheta(kf, dAna*angs, true);
 
 #ifndef NDEBUG
 		tl::log_debug("Manually changed parameters: ",
@@ -887,11 +887,9 @@ void ResoDlg::RecipParamsChanged(const RecipParams& parms)
 		m_simpleparams.Q = m_tofparams.Q = m_tasparams.Q = dQ / angs;
 
 		m_simpleparams.angle_ki_Q = m_tofparams.angle_ki_Q = m_tasparams.angle_ki_Q =
-			/*M_PI*rads -*/ tl::get_angle_ki_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, 1);
+			tl::get_angle_ki_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true);
 		m_simpleparams.angle_kf_Q = m_tofparams.angle_kf_Q = m_tasparams.angle_kf_Q =
-			/*M_PI*rads -*/ tl::get_angle_kf_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, 1);
-		//m_tasparams.angle_ki_Q = units::abs(m_tasparams.angle_ki_Q);
-		//m_tasparams.angle_kf_Q = units::abs(m_tasparams.angle_kf_Q);
+			tl::get_angle_kf_Q(m_tasparams.ki, m_tasparams.kf, m_tasparams.Q, true);
 
 		editQ->setText(tl::var_to_str(dQ, g_iPrec).c_str());
 		editE->setText(tl::var_to_str(parms.dE, g_iPrec).c_str());

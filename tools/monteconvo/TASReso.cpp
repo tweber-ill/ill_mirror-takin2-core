@@ -492,12 +492,17 @@ bool TASReso::SetHKLE(t_real h, t_real k, t_real l, t_real E)
 
 	//tl::log_debug("ki = ", m_reso.ki, " (fixed = ", m_bKiFix, "), kf = ", m_reso.kf, ".");
 
-	m_reso.thetam = units::abs(tl::get_mono_twotheta(m_reso.ki, m_reso.mono_d, /*m_reso.dmono_sense>=0.*/1)*t_real(0.5));
-	m_reso.thetaa = units::abs(tl::get_mono_twotheta(m_reso.kf, m_reso.ana_d, /*m_reso.dana_sense>=0.*/1)*t_real(0.5));
-	m_tofreso.twotheta = m_reso.twotheta = units::abs(tl::get_sample_twotheta(m_reso.ki, m_reso.kf, m_reso.Q, 1));
+	m_reso.thetam = units::abs(
+		tl::get_mono_twotheta(m_reso.ki, m_reso.mono_d, /*m_reso.dmono_sense>=0.*/true)*t_real(0.5));
+	m_reso.thetaa = units::abs(
+		tl::get_mono_twotheta(m_reso.kf, m_reso.ana_d, /*m_reso.dana_sense>=0.*/true)*t_real(0.5));
+	m_tofreso.twotheta = m_reso.twotheta = units::abs(
+		tl::get_sample_twotheta(m_reso.ki, m_reso.kf, m_reso.Q, /*m_reso.dsample_sense>=0.*/true));
 
-	m_tofreso.angle_ki_Q = m_reso.angle_ki_Q = tl::get_angle_ki_Q(m_reso.ki, m_reso.kf, m_reso.Q, /*m_reso.dsample_sense>=0.*/1);
-	m_tofreso.angle_kf_Q = m_reso.angle_kf_Q = tl::get_angle_kf_Q(m_reso.ki, m_reso.kf, m_reso.Q, /*m_reso.dsample_sense>=0.*/1);
+	m_tofreso.angle_ki_Q = m_reso.angle_ki_Q =
+		tl::get_angle_ki_Q(m_reso.ki, m_reso.kf, m_reso.Q, /*m_reso.dsample_sense>=0.*/true);
+	m_tofreso.angle_kf_Q = m_reso.angle_kf_Q =
+		tl::get_angle_kf_Q(m_reso.ki, m_reso.kf, m_reso.Q, /*m_reso.dsample_sense>=0.*/true);
 
 
 	if(m_foc != ResoFocus::FOC_UNCHANGED)
