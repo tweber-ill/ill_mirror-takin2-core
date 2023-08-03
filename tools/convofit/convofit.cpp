@@ -607,15 +607,16 @@ bool Convofit::run_job(const std::string& _strJob)
 		if(bPlotIntermediate)
 		{
 			t_real x = 0.;
+			std::string scan_axis = "";
 			unsigned iScanAxis = vecScanAxes[scan_group];
 
 			switch(iScanAxis)
 			{
-				case 1: x = h; break;
-				case 2: x = k; break;
-				case 3: x = l; break;
-				case 4: x = E; break;
-				default: x = E; break;
+				case 1: x = h; scan_axis = "h (rlu)"; break;
+				case 2: x = k; scan_axis = "k (rlu)"; break;
+				case 3: x = l; scan_axis = "l (rlu)"; break;
+				case 4: x = E; scan_axis = "E (meV)"; break;
+				default: x = E; scan_axis = "E (meV)"; break;
 			}
 
 			vecModTmpX.push_back(x);
@@ -628,7 +629,7 @@ bool Convofit::run_job(const std::string& _strJob)
 			pltMod.odSize = 1.5;
 
 			if(scan_group < pltMeas.size())
-				m_sigPlot(this->m_pPlt, "", "Intensity", pltMeas[scan_group], pltMod, 0);
+				m_sigPlot(this->m_pPlt, scan_axis.c_str(), "Intensity", pltMeas[scan_group], pltMod, 0);
 		}
 	});
 	mod.AddParamsChangedSlot(
@@ -776,7 +777,7 @@ bool Convofit::run_job(const std::string& _strJob)
 		mod.SetMinuitParams(state);
 
 		std::ostringstream ostrMini;
-		ostrMini << mini << "\n";
+		ostrMini << "Final fit results: " << mini << "\n";
 		tl::log_info(ostrMini.str(), "Fit valid: ", bValidFit);
 	}
 	else
@@ -800,6 +801,7 @@ bool Convofit::run_job(const std::string& _strJob)
 			strCurModOutFile += tl::var_to_str(iSc);
 			strCurScOutFile += tl::var_to_str(iSc);
 		}
+
 		mod.SetParamSet(iSc);
 		mod.Save(strCurModOutFile.c_str(), iPlotPoints, iPlotPointsSkipBegin, iPlotPointsSkipEnd);
 		save_file(strCurScOutFile.c_str(), sc);

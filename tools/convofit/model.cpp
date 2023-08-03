@@ -209,9 +209,10 @@ bool SqwFuncModel::SetParams(const std::vector<tl::t_real_min>& vecParams)
 {
 	// --------------------------------------------------------------------
 	// prints changed model parameters
-	std::vector<t_real> vecOldParams = {m_dScale, m_dSlope, m_dOffs};
+	std::vector<t_real> vecOldParams = { m_dScale, m_dSlope, m_dOffs };
 	vecOldParams.insert(vecOldParams.end(), m_vecModelParams.begin(), m_vecModelParams.end());
 	std::vector<std::string> vecParamNames = GetParamNames();
+
 	if(vecOldParams.size()==vecParams.size() && vecParamNames.size()==vecParams.size())
 	{
 		std::ostringstream ostrDebug;
@@ -237,6 +238,10 @@ bool SqwFuncModel::SetParams(const std::vector<tl::t_real_min>& vecParams)
 
 		if(m_psigParamsChanged)
 			(*m_psigParamsChanged)(ostrDebug.str());
+	}
+	else
+	{
+		tl::log_err("Parameter size mismatch.");
 	}
 	// --------------------------------------------------------------------
 
@@ -381,9 +386,11 @@ bool SqwFuncModel::Save(const char *pcFile, std::size_t iNum, std::size_t iSkipB
 		const std::vector<t_real> vecErrs = cst(GetParamErrors());
 
 		for(std::size_t iParam=0; iParam<vecNames.size(); ++iParam)
+		{
 			ofstr << "# " << vecNames[iParam] << " = "
 				<< vecVals[iParam] << " +- "
 				<< vecErrs[iParam] << "\n";
+		}
 
 		ofstr << "## Data columns: (1) scan axis, (2) intensity";
 		ofstr << ", (3) Bragg Qx (rlu), (4) Bragg Qy (rlu), (5) Bragg Qz (rlu), (6) Bragg E (meV)\n";
