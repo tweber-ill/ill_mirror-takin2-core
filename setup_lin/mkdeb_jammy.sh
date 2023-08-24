@@ -2,6 +2,7 @@
 #
 # creates a DEB distro
 # @author Tobias Weber <tobias.weber@tum.de>
+# @date july 2022
 # @license GPLv2
 #
 # ----------------------------------------------------------------------------

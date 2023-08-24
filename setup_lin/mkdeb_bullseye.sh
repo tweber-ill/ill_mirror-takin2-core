@@ -4,6 +4,7 @@
 # @author Tobias Weber <tobias.weber@tum.de>, Jens Krüger
 # @date 3 february 2023
 # @license GPLv2
+# @note based on the mkdeb_jammy.sh script
 #
 # ----------------------------------------------------------------------------
 # Takin (inelastic neutron scattering software package)
