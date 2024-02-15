@@ -5,6 +5,11 @@ An inelastic neutron scattering software package.
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4117437.svg)](https://doi.org/10.5281/zenodo.4117437)
 
 
+***
+**Note: *Takin's* code repository has moved to [here](https://github.com/ILLGrenoble/takin).** 
+***
+
+
 ## Overview of former and current Takin core repositories
 
 |Date        |URL                                                             |Description                                     |
